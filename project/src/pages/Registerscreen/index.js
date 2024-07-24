@@ -78,7 +78,7 @@ const RegisterScreen = ({ navigation }) => {
       }
 
       axios
-        .post("http://10.224.21.21:5001/register", UserData)
+        .post("http://192.168.137.44:5001/register", UserData)
         .then(res => {
           console.log(res.data)
           if (res.data.status == "ok") {
@@ -88,9 +88,9 @@ const RegisterScreen = ({ navigation }) => {
               textBody: 'Registered Successfully!!',
               button: 'close',
               onHide: () => {
-                navigation.navigate('Signin');
               },
             });
+            navigation.navigate('Signin');
           } else {
             Toast.show({
               type: ALERT_TYPE.DANGER,
