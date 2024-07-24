@@ -50,19 +50,21 @@ app.post("/register", async (req, res) => {
 })
 
 app.post("/login-user", async (req, res) => {
-    const { email, username, password } = req.body
+    const { email, password } = req.body
 
-    const oldUserEmail = await User.findOne({ email: email })
-    const oldUserUsername = await User.findOne({ username: username })
+    const oldUser = await User.findOne({ email: email })
+    // const oldUserUsername = await User.findOne({ email: username })
 
-    if (!oldUserEmail) {
+    if (!oldUser) {
         return res.send({ data: "Email Doesn't Exists!!" })
-    } else if (!oldUserUsername) {
-        return res.send({ data: "User Doesn't Exists!!" })
     }
+    // else if (!oldUserUsername) {
+    //     return res.send({ data: "User Doesn't Exists!!" })
+    // }
+    // SEMENTARA KITA PAKAI EMAIL DULU
 
-    if (await bcrypt.compare(password, oldUserEmail.password)) {
-        const token = jwt.sign({ email: oldUserEmail.email }, JWT_SECRET)
+    if (await bcrypt.compare(password, oldUser.password)) {
+        const token = jwt.sign({ email: oldUser.email }, JWT_SECRET)
 
         if (res.status(201)) {
             return res.send({ status: "ok", data: token })
@@ -71,6 +73,41 @@ app.post("/login-user", async (req, res) => {
         }
     }
 
+})
+
+// app.post("/login-user", async (req, res) => {
+//     const { email, password } = req.body
+
+//     const oldUser = await User.findOne({ email: email })
+
+//     if (!oldUser) {
+//         return res.send({ data: "Email Doesn't Exist!!" })
+//     }
+
+//     if (await bcrypt.compare(password, oldUser.password)) {
+//         const token = jwt.sign({ email: oldUser.email }, JWT_SECRET)
+
+//         return res.send({ status: "ok", data: token })
+//     } else {
+//         return res.end({ status: "error", data: "Invalid password" })
+//     }
+// });
+
+
+app.post("/userdata", async (req, res) => {
+    const { token } = req.body
+    try {
+        const user = jwt.verify(token, JWT_SECRET)
+        const useremail = user.email
+
+        User
+            .findOne({ email: useremail })
+            .then(data => {
+                return res.send({ status: "ok", data: data })
+            })
+    } catch (error) {
+        return res.send({ error: error })
+    }
 })
 
 app.listen(5001, () => {

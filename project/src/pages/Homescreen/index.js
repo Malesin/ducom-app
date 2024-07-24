@@ -1,4 +1,3 @@
-// index.js
 import React from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import Header from './../../components/header';
@@ -13,10 +12,10 @@ const HomeScreen = () => {
       </View>
       <Footer />
     </View>
-  );
-};
+  )
+}
 
-export default HomeScreen;
+export default HomeScreen
 
 const styles = StyleSheet.create({
   container: {
