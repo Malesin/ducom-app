@@ -1,8 +1,8 @@
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import React, { useState } from 'react';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { ALERT_TYPE, AlertNotificationRoot, Toast } from 'react-native-alert-notification';
 import axios from 'axios';
-import { Alert } from 'react-native';
 
 const RegisterScreen = ({ navigation }) => {
   const [name, setName] = useState('');
@@ -59,6 +59,16 @@ const RegisterScreen = ({ navigation }) => {
       valid = false;
     }
 
+    if (!isCheckedTerms) {
+      Toast.show({
+        type: ALERT_TYPE.WARNING,
+        title: 'Terms and Conditions',
+        textBody: 'You must agree to the terms and conditions to register.',
+        button: 'close',
+      });
+      valid = false;
+    }
+
     if (valid) {
       const UserData = {
         name: name,
@@ -68,110 +78,134 @@ const RegisterScreen = ({ navigation }) => {
       }
 
       axios
-        .post("http://10.224.21.22:5001/register", UserData)
+        .post("http://192.168.137.44:5001/register", UserData)
         .then(res => {
           console.log(res.data)
           if (res.data.status == "ok") {
-            Alert.alert("Registered Successfully!!")
-            navigation.navigate('Signin')
+            Toast.show({
+              type: ALERT_TYPE.SUCCESS,
+              title: 'Success',
+              textBody: 'Registered Successfully!!',
+              button: 'close',
+              onHide: () => {
+                navigation.navigate('Signin');
+              },
+            });
           } else {
-            Alert.alert(JSON.stringify(res.data))
+            Toast.show({
+              type: ALERT_TYPE.DANGER,
+              title: 'Error',
+              textBody: JSON.stringify(res.data),
+              button: 'close',
+            });
           }
         })
-        .catch(e => console.log(e))
+        .catch(e => {
+          console.log(e);
+          Toast.show({
+            type: ALERT_TYPE.DANGER,
+            title: 'Error',
+            textBody: 'An error occurred. Please try again later.',
+            button: 'close',
+          });
+        });
     }
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Sign Up</Text>
-      <TextInput
-        style={[styles.input, nameError ? styles.errorInput : null]}
-        onChangeText={setName}
-        value={name}
-        placeholder="Name"
-        autoCapitalize="none"
-      />
-      {nameError ? <Text style={styles.errorText}>{nameError}</Text> : null}
-      <TextInput
-        style={[styles.input, usernameError ? styles.errorInput : null]}
-        onChangeText={setUsername}
-        value={username}
-        placeholder="Username"
-        autoCapitalize="none"
-      />
-      {usernameError ? <Text style={styles.errorText}>{usernameError}</Text> : null}
-      <TextInput
-        style={[styles.input, emailError ? styles.errorInput : null]}
-        onChangeText={setEmail}
-        value={email}
-        placeholder="Email"
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
-      {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
-      <View style={[styles.passwordContainer, passwordError ? styles.errorInput : null]}>
+    <AlertNotificationRoot>
+      <ScrollView contentContainerStyle={styles.container}>
+        <Text style={styles.title}>Sign Up</Text>
         <TextInput
-          style={styles.passwordInput}
-          onChangeText={setPassword}
-          value={password}
-          placeholder="Password"
-          secureTextEntry={!showPassword}
+          style={[styles.input, nameError ? styles.errorInput : null]}
+          onChangeText={setName}
+          value={name}
+          placeholder="Name"
           autoCapitalize="none"
         />
-        <TouchableOpacity
-          style={styles.eyeIcon}
-          onPress={() => {
-            setShowPassword(!showPassword);
-          }}
-        >
-          {showPassword ? (
-            <Icon name="visibility" size={18} color="#000000" />
-          ) : (
-            <Icon name="visibility-off" size={18} color="#000000" />
-          )}
-        </TouchableOpacity>
-      </View>
-      {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
-      <View style={styles.passwordContainer}>
+        {nameError ? <Text style={styles.errorText}>{nameError}</Text> : null}
         <TextInput
-          style={styles.passwordInput}
-          onChangeText={setConfirmPassword}
-          value={confirmpassword}
-          placeholder="Confirm Password"
-          secureTextEntry={!showConfirmPassword}
+          style={[styles.input, usernameError ? styles.errorInput : null]}
+          onChangeText={setUsername}
+          value={username}
+          placeholder="Username"
           autoCapitalize="none"
         />
-        <TouchableOpacity
-          style={styles.eyeIcon}
-          onPress={() => {
-            setShowConfirmPassword(!showConfirmPassword);
-          }}
-        >
-          {showConfirmPassword ? (
-            <Icon name="visibility" size={18} color="#000000" />
-          ) : (
-            <Icon name="visibility-off" size={18} color="#000000" />
-          )}
+        {usernameError ? <Text style={styles.errorText}>{usernameError}</Text> : null}
+        <TextInput
+          style={[styles.input, emailError ? styles.errorInput : null]}
+          onChangeText={setEmail}
+          value={email}
+          placeholder="Email"
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
+        {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
+        <View style={[styles.passwordContainer, passwordError ? styles.errorInput : null]}>
+          <TextInput
+            style={styles.passwordInput}
+            onChangeText={setPassword}
+            value={password}
+            placeholder="Password"
+            secureTextEntry={!showPassword}
+            autoCapitalize="none"
+          />
+          <TouchableOpacity
+            style={styles.eyeIcon}
+            onPress={() => {
+              setShowPassword(!showPassword);
+            }}
+          >
+            {showPassword ? (
+              <Icon name="visibility" size={18} color="#000000" />
+            ) : (
+              <Icon name="visibility-off" size={18} color="#000000" />
+            )}
+          </TouchableOpacity>
+        </View>
+        {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
+        <View style={styles.passwordContainer}>
+          <TextInput
+            style={styles.passwordInput}
+            onChangeText={setConfirmPassword}
+            value={confirmpassword}
+            placeholder="Confirm Password"
+            secureTextEntry={!showConfirmPassword}
+            autoCapitalize="none"
+          />
+          <TouchableOpacity
+            style={styles.eyeIcon}
+            onPress={() => {
+              setShowConfirmPassword(!showConfirmPassword);
+            }}
+          >
+            {showConfirmPassword ? (
+              <Icon name="visibility" size={18} color="#000000" />
+            ) : (
+              <Icon name="visibility-off" size={18} color="#000000" />
+            )}
+          </TouchableOpacity>
+        </View>
+        <View style={styles.checkboxContainer}>
+          <TouchableOpacity
+            style={styles.checkbox}
+            onPress={() => {
+              setIsCheckedTerms(!isCheckedTerms);
+            }}
+          >
+            <Icon name={isCheckedTerms ? "check-box" : "check-box-outline-blank"} size={24} color="#000000" />
+          </TouchableOpacity>
+          <Text style={styles.checkboxLabel}>I agree to the <Text style={styles.termslink} >terms and conditions</Text></Text>
+        </View>
+        <TouchableOpacity style={styles.buttonSignup} onPress={handleSignup}>
+          <Text style={styles.textSignUp}>Sign Up</Text>
         </TouchableOpacity>
-      </View>
-      <View style={styles.checkboxContainer}>
-        <TouchableOpacity
-          style={styles.checkbox}
-          onPress={() => {
-            setIsCheckedTerms(!isCheckedTerms);
-          }}
-        >
-          <Icon name={isCheckedTerms ? "check-box" : "check-box-outline-blank"} size={24} color="#000000" />
-        </TouchableOpacity>
-        <Text style={styles.checkboxLabel}>I agree to the <Text style={styles.termslink} >terms and conditions</Text></Text>
-      </View>
-      <TouchableOpacity style={styles.buttonSignup} onPress={handleSignup}>
-        <Text style={styles.textSignUp}>Sign Up</Text>
-      </TouchableOpacity>
 
-      <Text style={styles.loginText}>Already signed up? <Text style={styles.loginLink} onPress={() => navigation.navigate('Signin')} >Log In</Text></Text>
-    </ScrollView>
+        <Text style={styles.loginText}>Already signed up? <Text style={styles.loginLink}
+          onPress={() =>
+            navigation.navigate('Signin')} >Log In</Text></Text>
+      </ScrollView>
+    </AlertNotificationRoot>
   );
 };
 
