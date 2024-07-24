@@ -1,7 +1,6 @@
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import React, { useState } from 'react';
-import axios from 'axios';
-import { Alert } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const RegisterScreen = ({ navigation }) => {
   const [name, setName] = useState('');
@@ -11,13 +10,13 @@ const RegisterScreen = ({ navigation }) => {
   const [confirmpassword, setConfirmPassword] = useState('');
   const [isCheckedTerms, setIsCheckedTerms] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [nameError, setNameError] = useState('');
   const [usernameError, setUsernameError] = useState('');
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
 
   const handleSignup = () => {
-
     let valid = true;
     if (!name) {
       setNameError('Name cannot be empty');
@@ -43,20 +42,13 @@ const RegisterScreen = ({ navigation }) => {
       setEmailError('');
     }
 
-    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]+$/;
-
     if (!password) {
       setPasswordError('Password cannot be empty');
       valid = false;
     } else if (password.length < 8) {
       setPasswordError('Password must be at least 8 characters');
       valid = false;
-    }
-    // else if (password != passwordRegex) {
-    //   setPasswordError('passwords must be a combination of letters and numbers');
-    //   valid = false;
-    // } 
-    else {
+    } else {
       setPasswordError('');
     }
 
@@ -66,25 +58,7 @@ const RegisterScreen = ({ navigation }) => {
     }
 
     if (valid) {
-      const UserData = {
-        name: name,
-        username: username,
-        email,
-        password
-      }
-
-      axios
-        .post("http://192.168.137.44:5001/register", UserData)
-        .then(res => {
-          console.log(res.data)
-          if(res.data.status == "ok"){
-            Alert.alert("Registered Successfully!!")
-            navigation.navigate('Signin')
-          } else {
-            Alert.alert(JSON.stringify(res.data))
-          }
-        })
-        .catch(e => console.log(e))
+      // Handle signup action
     }
   };
 
@@ -125,28 +99,41 @@ const RegisterScreen = ({ navigation }) => {
           secureTextEntry={!showPassword}
           autoCapitalize="none"
         />
-      </View>
-      {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
-      <View style={styles.checkboxContainer}>
         <TouchableOpacity
-          style={styles.checkbox}
+          style={styles.eyeIcon}
           onPress={() => {
             setShowPassword(!showPassword);
           }}
         >
-          {showPassword && <Text style={styles.checkboxInner}>✓</Text>}
+          {showPassword ? (
+            <Icon name="visibility" size={18} color="#000000" />
+          ) : (
+            <Icon name="visibility-off" size={18} color="#000000" />
+          )}
         </TouchableOpacity>
-        <Text style={styles.checkboxLabel}>Show Password</Text>
       </View>
+      {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
       <View style={styles.passwordContainer}>
         <TextInput
           style={styles.passwordInput}
           onChangeText={setConfirmPassword}
           value={confirmpassword}
           placeholder="Confirm Password"
-          secureTextEntry={!showPassword}
+          secureTextEntry={!showConfirmPassword}
           autoCapitalize="none"
         />
+        <TouchableOpacity
+          style={styles.eyeIcon}
+          onPress={() => {
+            setShowConfirmPassword(!showConfirmPassword);
+          }}
+        >
+          {showConfirmPassword ? (
+            <Icon name="visibility" size={18} color="#000000" />
+          ) : (
+            <Icon name="visibility-off" size={18} color="#000000" />
+          )}
+        </TouchableOpacity>
       </View>
       <View style={styles.checkboxContainer}>
         <TouchableOpacity
@@ -155,14 +142,14 @@ const RegisterScreen = ({ navigation }) => {
             setIsCheckedTerms(!isCheckedTerms);
           }}
         >
-          {isCheckedTerms && <Text style={styles.checkboxInner}>✓</Text>}
+          <Icon name={isCheckedTerms ? "check-box" : "check-box-outline-blank"} size={24} color="#000000" />
         </TouchableOpacity>
         <Text style={styles.checkboxLabel}>I agree to the <Text style={styles.termslink} >terms and conditions</Text></Text>
       </View>
       <TouchableOpacity style={styles.buttonSignup} onPress={handleSignup}>
         <Text style={styles.textSignUp}>Sign Up</Text>
       </TouchableOpacity>
-
+      
       <Text style={styles.loginText}>Already signed up? <Text style={styles.loginLink} onPress={() => navigation.navigate('Signin')} >Log In</Text></Text>
     </ScrollView>
   );
@@ -210,6 +197,9 @@ const styles = StyleSheet.create({
     height: 50,
     padding: 10,
   },
+  eyeIcon: {
+    marginRight: 10,
+  },
   checkboxContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -217,17 +207,7 @@ const styles = StyleSheet.create({
     margin: 12,
   },
   checkbox: {
-    width: 20,
-    height: 20,
-    borderWidth: 2,
-    borderColor: '#dcdcdc',
-    alignItems: 'center',
-    justifyContent: 'center',
     marginRight: 10,
-  },
-  checkboxInner: {
-    color: '#000000',
-    fontSize: 14,
   },
   checkboxLabel: {
     color: '#000',
@@ -272,9 +252,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   loginText: {
-    marginTop: 20,
     color: '#000',
     fontSize: 14,
+    marginTop: 20,
   },
   errorInput: {
     borderColor: 'red',
