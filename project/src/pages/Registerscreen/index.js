@@ -1,6 +1,8 @@
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import React, { useState } from 'react';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import axios from 'axios';
+import { Alert } from 'react-native';
 
 const RegisterScreen = ({ navigation }) => {
   const [name, setName] = useState('');
@@ -58,7 +60,25 @@ const RegisterScreen = ({ navigation }) => {
     }
 
     if (valid) {
-      // Handle signup action
+      const UserData = {
+        name: name,
+        username: username,
+        email,
+        password
+      }
+
+      axios
+        .post("http://192.168.137.44:5001/register", UserData)
+        .then(res => {
+          console.log(res.data)
+          if (res.data.status == "ok") {
+            Alert.alert("Registered Successfully!!")
+            navigation.navigate('Signin')
+          } else {
+            Alert.alert(JSON.stringify(res.data))
+          }
+        })
+        .catch(e => console.log(e))
     }
   };
 
@@ -149,7 +169,7 @@ const RegisterScreen = ({ navigation }) => {
       <TouchableOpacity style={styles.buttonSignup} onPress={handleSignup}>
         <Text style={styles.textSignUp}>Sign Up</Text>
       </TouchableOpacity>
-      
+
       <Text style={styles.loginText}>Already signed up? <Text style={styles.loginLink} onPress={() => navigation.navigate('Signin')} >Log In</Text></Text>
     </ScrollView>
   );
