@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
 import React, { useState } from 'react';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import axios from "axios"
 
 const Signinscreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -27,12 +28,20 @@ const Signinscreen = ({ navigation }) => {
     }
 
     if (valid) {
-      navigation.navigate('Home');
+      console.log(email, password);
+      const userData = {
+        email: email,
+        password,
+      }
+      axios
+        .post("http://192.168.137.44:5001/login-user", userData)
+        .then(res => console.log(res.data))
+      // navigation.navigate('Home');
     }
   };
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} keyboardShouldPersistTab={"always"}>
       <Text style={styles.title}>Log In</Text>
       <TextInput
         style={[styles.input, emailError ? styles.errorInput : null]}

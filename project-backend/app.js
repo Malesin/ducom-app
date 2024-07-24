@@ -50,16 +50,18 @@ app.post("/register", async (req, res) => {
 })
 
 app.post("/login-user", async (req, res) => {
-    const { email, username, password } = req.body
+    const { email, password } = req.body
 
     const oldUserEmail = await User.findOne({ email: email })
-    const oldUserUsername = await User.findOne({ username: username })
+    // const oldUserUsername = await User.findOne({ email: username })
 
     if (!oldUserEmail) {
         return res.send({ data: "Email Doesn't Exists!!" })
-    } else if (!oldUserUsername) {
-        return res.send({ data: "User Doesn't Exists!!" })
-    }
+    } 
+    // else if (!oldUserUsername) {
+    //     return res.send({ data: "User Doesn't Exists!!" })
+    // }
+    // SEMENTARA KITA PAKAI EMAIL DULU
 
     if (await bcrypt.compare(password, oldUserEmail.password)) {
         const token = jwt.sign({ email: oldUserEmail.email }, JWT_SECRET)
