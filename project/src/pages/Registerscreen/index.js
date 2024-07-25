@@ -87,15 +87,23 @@ const RegisterScreen = ({ navigation }) => {
               title: 'Success',
               textBody: 'Registered Successfully!!',
               button: 'close',
+              visibilityTime: 2000,
               onHide: () => {
+                navigation.navigate('Signin');
               },
             });
-            navigation.navigate('Signin');
-          } else {
+          } else if (res.data.status == "alreadyUser") {
             Toast.show({
               type: ALERT_TYPE.DANGER,
               title: 'Error',
-              textBody: JSON.stringify(res.data),
+              textBody: "User Already Exists!!",
+              button: 'close',
+            });
+          } else if (res.data.status == "alreadyEmail") {
+            Toast.show({
+              type: ALERT_TYPE.DANGER,
+              title: 'Error',
+              textBody: "Email Already Exists!!",
               button: 'close',
             });
           }
