@@ -17,6 +17,9 @@ const RegisterScreen = ({ navigation }) => {
   const [usernameError, setUsernameError] = useState('');
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
+  const handlePasswordChange = (text) => {
+    setPassword(text.slice(0, 25));
+  };
 
   const handleSignup = () => {
     let valid = true;
@@ -144,7 +147,7 @@ const RegisterScreen = ({ navigation }) => {
         <View style={[styles.passwordContainer, passwordError ? styles.errorInput : null]}>
           <TextInput
             style={styles.passwordInput}
-            onChangeText={setPassword}
+            onChangeText={handlePasswordChange}
             value={password}
             placeholder="Password"
             secureTextEntry={!showPassword}
@@ -167,7 +170,7 @@ const RegisterScreen = ({ navigation }) => {
         <View style={styles.passwordContainer}>
           <TextInput
             style={styles.passwordInput}
-            onChangeText={setConfirmPassword}
+            onChangeText={handlePasswordChange}
             value={confirmpassword}
             placeholder="Confirm Password"
             secureTextEntry={!showConfirmPassword}

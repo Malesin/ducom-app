@@ -1,4 +1,5 @@
 import React from 'react';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { View, TouchableOpacity, StyleSheet, Image } from 'react-native';
 
 const Header = () => {
@@ -6,11 +7,9 @@ const Header = () => {
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
-        <TouchableOpacity style={styles.burgerContainer}>
-          <View style={styles.burgerLine} />
-          <View style={styles.burgerLine} />
-          <View style={styles.burgerLine} />
-        </TouchableOpacity>
+        <TouchableOpacity style={styles.menuContainer} onPress={() => alert('Menubar Pressed!')} >
+          <MaterialCommunityIcons name="menu" size={35} color="#000" />        
+          </TouchableOpacity>
         <View style={styles.centerContainer}>
           <Image
             source={require('./../assets/logo1.png')}
@@ -36,18 +35,6 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#ddd'
-  },
-  burgerContainer: {
-    width: 45,
-    height: 45,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  burgerLine: {
-    width: 25,
-    height: 3,
-    backgroundColor: '#000',
-    marginVertical: 2,
   },
   centerContainer: {
     flex: 1,

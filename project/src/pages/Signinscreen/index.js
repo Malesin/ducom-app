@@ -31,6 +31,10 @@ const Signinscreen = ({ navigation }) => {
     }
   };
 
+  const handlePasswordChange = (text) => {
+    setPassword(text.slice(0, 25));
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Log In</Text>
@@ -46,7 +50,7 @@ const Signinscreen = ({ navigation }) => {
       <View style={[styles.passwordContainer, passwordError ? styles.errorInput : null]}>
         <TextInput
           style={styles.passwordInput}
-          onChangeText={setPassword}
+          onChangeText={handlePasswordChange}
           value={password}
           placeholder="Password"
           secureTextEntry={!showPassword} // Toggle password visibility based on state
