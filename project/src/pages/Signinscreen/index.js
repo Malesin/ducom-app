@@ -45,21 +45,36 @@ const Signinscreen = ({ navigation }) => {
               title: 'Success',
               textBody: 'Login Successfully!!',
               button: 'close',
-              onHide(){
-                navigation.navigate('Home');
+              onShow: () => {
+                setTimeout(() => {
+                  Toast.hide();
+                  navigation.navigate('Home');
+                }, 1500); // MENAMPILKAN TOAST SELAMA 1.5 DETIK
               }
             });
+
             AsyncStorage.setItem("token", res.data.data)
-          } else {
+          } else if (res.data.status == "error") {
             Toast.show({
               type: ALERT_TYPE.DANGER,
               title: 'Error',
-              textBody: JSON.stringify(res.data),
+              textBody: "Email or User Doesn't Exists!!",
+              button: 'close',
+            });
+          } else if (res.data.status == "errorPass") {
+            Toast.show({
+              type: ALERT_TYPE.DANGER,
+              title: 'Error',
+              textBody: "Incorrect Password",
               button: 'close',
             });
           }
         })
     }
+  };
+
+  const handlePasswordChange = (text) => {
+    setPassword(text.slice(0, 25));
   };
 
   return (

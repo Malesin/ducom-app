@@ -17,6 +17,9 @@ const RegisterScreen = ({ navigation }) => {
   const [usernameError, setUsernameError] = useState('');
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
+  const handlePasswordChange = (text) => {
+    setPassword(text.slice(0, 25));
+  };
 
   const handleSignup = () => {
     let valid = true;
@@ -87,15 +90,23 @@ const RegisterScreen = ({ navigation }) => {
               title: 'Success',
               textBody: 'Registered Successfully!!',
               button: 'close',
+              visibilityTime: 2000,
               onHide: () => {
                 navigation.navigate('Signin');
               },
             });
-          } else {
+          } else if (res.data.status == "alreadyUser") {
             Toast.show({
               type: ALERT_TYPE.DANGER,
               title: 'Error',
-              textBody: JSON.stringify(res.data),
+              textBody: "User Already Exists!!",
+              button: 'close',
+            });
+          } else if (res.data.status == "alreadyEmail") {
+            Toast.show({
+              type: ALERT_TYPE.DANGER,
+              title: 'Error',
+              textBody: "Email Already Exists!!",
               button: 'close',
             });
           }
@@ -144,7 +155,7 @@ const RegisterScreen = ({ navigation }) => {
         <View style={[styles.passwordContainer, passwordError ? styles.errorInput : null]}>
           <TextInput
             style={styles.passwordInput}
-            onChangeText={setPassword}
+            onChangeText={handlePasswordChange}
             value={password}
             placeholder="Password"
             secureTextEntry={!showPassword}
@@ -167,7 +178,7 @@ const RegisterScreen = ({ navigation }) => {
         <View style={styles.passwordContainer}>
           <TextInput
             style={styles.passwordInput}
-            onChangeText={setConfirmPassword}
+            onChangeText={handlePasswordChange}
             value={confirmpassword}
             placeholder="Confirm Password"
             secureTextEntry={!showConfirmPassword}
