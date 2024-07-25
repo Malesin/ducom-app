@@ -178,7 +178,7 @@ const RegisterScreen = ({ navigation }) => {
         <View style={styles.passwordContainer}>
           <TextInput
             style={styles.passwordInput}
-            onChangeText={handlePasswordChange}
+            onChangeText={setConfirmPassword}
             value={confirmpassword}
             placeholder="Confirm Password"
             secureTextEntry={!showConfirmPassword}
