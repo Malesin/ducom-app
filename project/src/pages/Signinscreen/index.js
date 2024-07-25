@@ -36,7 +36,7 @@ const Signinscreen = ({ navigation }) => {
         password,
       }
       axios
-        .post("http://192.168.137.44:5001/login-user", userData)
+        .post("http://10.224.21.22:5001/login-user", userData)
         .then(res => {
           console.log(res.data)
           if (res.data.status == "ok") {
