@@ -73,6 +73,10 @@ const Signinscreen = ({ navigation }) => {
     }
   };
 
+  const handlePasswordChange = (text) => {
+    setPassword(text.slice(0, 25));
+  };
+
   return (
     <AlertNotificationRoot>
       <View style={styles.container}>
