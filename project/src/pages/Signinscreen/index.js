@@ -1,6 +1,9 @@
 import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
 import React, { useState } from 'react';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import axios from "axios"
+import { ALERT_TYPE, AlertNotificationRoot, Toast } from 'react-native-alert-notification';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Signinscreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -27,7 +30,46 @@ const Signinscreen = ({ navigation }) => {
     }
 
     if (valid) {
-      navigation.navigate('Home');
+      console.log(email, password);
+      const userData = {
+        email: email,
+        password,
+      }
+      axios
+        .post("http://192.168.137.44:5001/login-user", userData)
+        .then(res => {
+          console.log(res.data)
+          if (res.data.status == "ok") {
+            Toast.show({
+              type: ALERT_TYPE.SUCCESS,
+              title: 'Success',
+              textBody: 'Login Successfully!!',
+              button: 'close',
+              onShow: () => {
+                setTimeout(() => {
+                  Toast.hide();
+                  navigation.navigate('Home');
+                }, 1500); // MENAMPILKAN TOAST SELAMA 1.5 DETIK
+              }
+            });
+
+            AsyncStorage.setItem("token", res.data.data)
+          } else if (res.data.status == "error") {
+            Toast.show({
+              type: ALERT_TYPE.DANGER,
+              title: 'Error',
+              textBody: "Email or User Doesn't Exists!!",
+              button: 'close',
+            });
+          } else if (res.data.status == "errorPass") {
+            Toast.show({
+              type: ALERT_TYPE.DANGER,
+              title: 'Error',
+              textBody: "Incorrect Password",
+              button: 'close',
+            });
+          }
+        })
     }
   };
 
@@ -36,50 +78,52 @@ const Signinscreen = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Log In</Text>
-      <TextInput
-        style={[styles.input, emailError ? styles.errorInput : null]}
-        onChangeText={setEmail}
-        value={email}
-        placeholder="Email"
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
-      {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
-      <View style={[styles.passwordContainer, passwordError ? styles.errorInput : null]}>
+    <AlertNotificationRoot>
+      <View style={styles.container}>
+        <Text style={styles.title}>Log In</Text>
         <TextInput
-          style={styles.passwordInput}
-          onChangeText={handlePasswordChange}
-          value={password}
-          placeholder="Password"
-          secureTextEntry={!showPassword} // Toggle password visibility based on state
+          style={[styles.input, emailError ? styles.errorInput : null]}
+          onChangeText={setEmail}
+          value={email}
+          placeholder="Email"
+          keyboardType="email-address"
           autoCapitalize="none"
         />
-        <TouchableOpacity
-          style={styles.eyeIcon}
-          onPress={() => {
-            setIsChecked(!isChecked);
-            setShowPassword(!showPassword); // Update showPassword state
-          }}
-        >
-          {isChecked ? (
-            <Icon name="visibility" size={18} color="#000000" /> // Use visibility icon
-          ) : (
-            <Icon name="visibility-off" size={18} color="#000000" /> // Use visibility-off icon
-          )}
+        {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
+        <View style={[styles.passwordContainer, passwordError ? styles.errorInput : null]}>
+          <TextInput
+            style={styles.passwordInput}
+            onChangeText={setPassword}
+            value={password}
+            placeholder="Password"
+            secureTextEntry={!showPassword} // Toggle password visibility based on state
+            autoCapitalize="none"
+          />
+          <TouchableOpacity
+            style={styles.eyeIcon}
+            onPress={() => {
+              setIsChecked(!isChecked);
+              setShowPassword(!showPassword); // Update showPassword state
+            }}
+          >
+            {isChecked ? (
+              <Icon name="visibility" size={18} color="#000000" /> // Use visibility icon
+            ) : (
+              <Icon name="visibility-off" size={18} color="#000000" /> // Use visibility-off icon
+            )}
+          </TouchableOpacity>
+        </View>
+        {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
+        <TouchableOpacity style={styles.buttonLogin} onPress={handleLogin}>
+          <Text style={styles.textLogin}>Log In</Text>
         </TouchableOpacity>
-      </View>
-      {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
-      <TouchableOpacity style={styles.buttonLogin} onPress={handleLogin}>
-        <Text style={styles.textLogin}>Log In</Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.navigate('Forgotpass')}>
-        <Text style={styles.forgotPassLink}>Forgot Password?</Text>
-      </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('Forgotpass')}>
+          <Text style={styles.forgotPassLink}>Forgot Password?</Text>
+        </TouchableOpacity>
 
-      <Text style={styles.signupText}>Don’t have an account? <Text style={styles.signupLink} onPress={() => navigation.navigate('Register')} >Sign Up</Text></Text>
-    </View>
+        <Text style={styles.signupText}>Don’t have an account? <Text style={styles.signupLink} onPress={() => navigation.navigate('Register')} >Sign Up</Text></Text>
+      </View>
+    </AlertNotificationRoot>
   );
 };
 

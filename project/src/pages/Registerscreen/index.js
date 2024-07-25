@@ -81,7 +81,7 @@ const RegisterScreen = ({ navigation }) => {
       }
 
       axios
-        .post("http://10.224.21.21:5001/register", UserData)
+        .post("http://192.168.137.44:5001/register", UserData)
         .then(res => {
           console.log(res.data)
           if (res.data.status == "ok") {
@@ -90,15 +90,23 @@ const RegisterScreen = ({ navigation }) => {
               title: 'Success',
               textBody: 'Registered Successfully!!',
               button: 'close',
+              visibilityTime: 2000,
               onHide: () => {
                 navigation.navigate('Signin');
               },
             });
-          } else {
+          } else if (res.data.status == "alreadyUser") {
             Toast.show({
               type: ALERT_TYPE.DANGER,
               title: 'Error',
-              textBody: JSON.stringify(res.data),
+              textBody: "User Already Exists!!",
+              button: 'close',
+            });
+          } else if (res.data.status == "alreadyEmail") {
+            Toast.show({
+              type: ALERT_TYPE.DANGER,
+              title: 'Error',
+              textBody: "Email Already Exists!!",
               button: 'close',
             });
           }
