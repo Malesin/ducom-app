@@ -88,7 +88,7 @@ const RegisterScreen = ({ navigation }) => {
             Toast.show({
               type: ALERT_TYPE.SUCCESS,
               title: 'Success',
-              textBody: 'Login Successfully!!',
+              textBody: 'Registered Successfully!!',
               button: 'close',
               onShow: () => {
                 setTimeout(() => {
