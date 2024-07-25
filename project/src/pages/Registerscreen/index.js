@@ -90,10 +90,12 @@ const RegisterScreen = ({ navigation }) => {
               title: 'Success',
               textBody: 'Registered Successfully!!',
               button: 'close',
-              visibilityTime: 2000,
-              onHide: () => {
-                navigation.navigate('Signin');
-              },
+              onShow: () => {
+                setTimeout(() => {
+                  Toast.hide();
+                  navigation.navigate('Signin');
+                }, 1500); // MENAMPILKAN TOAST SELAMA 1.5 DETIK
+              }
             });
           } else if (res.data.status == "alreadyUser") {
             Toast.show({
