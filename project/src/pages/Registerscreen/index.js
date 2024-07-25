@@ -81,7 +81,7 @@ const RegisterScreen = ({ navigation }) => {
       }
 
       axios
-        .post("http://192.168.137.44:5001/register", UserData)
+        .post("http://10.224.21.21:5001/register", UserData)
         .then(res => {
           console.log(res.data)
           if (res.data.status == "ok") {
@@ -178,7 +178,7 @@ const RegisterScreen = ({ navigation }) => {
         <View style={styles.passwordContainer}>
           <TextInput
             style={styles.passwordInput}
-            onChangeText={handlePasswordChange}
+            onChangeText={setConfirmPassword}
             value={confirmpassword}
             placeholder="Confirm Password"
             secureTextEntry={!showConfirmPassword}
