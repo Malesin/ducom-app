@@ -1,21 +1,28 @@
 import { StyleSheet, View, Image } from 'react-native';
 import React, { useEffect } from 'react';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const Splashscreen = () => {
-  const navigation = useNavigation();
+const Splashscreen = ({ navigation }) => {
 
   useEffect(() => {
-    const timeOut = setTimeout(() => {
-      navigation.navigate('Auths');
-    }, 2000);
+    const checkLoginStatus = async () => {
+      const token = await AsyncStorage.getItem('token');
+      if (token) {
+        navigation.navigate('Home');
+      } else {
+        navigation.navigate('Auths');
+      }
+    };
+
+    checkLoginStatus();
   }, [navigation]);
 
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }} >
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }} >
+    <View style={styles.container}>
+      <View style={styles.innerContainer}>
         <Image
-          style={{ height: 130, width: 215 }}
+          style={styles.logo}
           source={require('../../assets/logo1.png')}
         />
       </View>
@@ -23,6 +30,21 @@ const Splashscreen = () => {
   );
 };
 
-export default Splashscreen;
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  innerContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  logo: {
+    height: 130,
+    width: 215,
+  },
+});
 
-const styles = StyleSheet.create({});
+export default Splashscreen;

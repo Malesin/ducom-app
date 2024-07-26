@@ -1,12 +1,12 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { Authscreen, FAQscreen, Forgotpassword, Homescreen, Registerscreen, Signinscreen, Splashscreen } from './../pages';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 const Stack = createNativeStackNavigator();
 
+const MainNavigation = ({ }) => {
 
-const MainNavigation = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Splash" screenOptions={{ headerShown: false }} >
@@ -21,7 +21,5 @@ const MainNavigation = () => {
     </NavigationContainer>
   );
 };
-
-
 
 export default MainNavigation;
