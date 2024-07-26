@@ -5,8 +5,9 @@ import Registerscreen from "./Registerscreen";
 import Homescreen from "./Homescreen";
 import Forgotpassword from "./Forgotpassword";
 import FAQscreen from "./FAQscreen";
-// import Marksscreen from "./Marksscreen";
-// import Settingsscreen from "./Settingsscreen";
+import Marksscreen from "./Marksscreen";
+import Settingsscreen from "./Settingsscreen";
+import TandGscreen from "./TandGscreen";
 
 export {
     Splashscreen,
@@ -16,6 +17,7 @@ export {
     Homescreen,
     Forgotpassword,
     FAQscreen,
-    // Marksscreen,
-    // Settingsscreen
+    Marksscreen,
+    Settingsscreen,
+    TandGscreen
 }

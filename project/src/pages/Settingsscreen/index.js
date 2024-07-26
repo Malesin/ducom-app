@@ -1,14 +1,24 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+// SettingsScreen.js
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 
 const Settingsscreen = () => {
   return (
-    <View>
-      <Text>Settingsscreen</Text>
+    <View style={styles.container}>
+      <Text style={styles.text}>Settings and Support Screen</Text>
     </View>
-  )
-}
+  );
+};
 
-export default Settingsscreen
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  text: {
+    fontSize: 20,
+  },
+});
 
-const styles = StyleSheet.create({})
+export default Settingsscreen;

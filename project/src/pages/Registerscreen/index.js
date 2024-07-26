@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import React, { useState } from 'react';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { ALERT_TYPE, AlertNotificationRoot, Toast } from 'react-native-alert-notification';
@@ -17,6 +17,27 @@ const RegisterScreen = ({ navigation }) => {
   const [usernameError, setUsernameError] = useState('');
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
+
+  const handleNameChange = (text) => {
+    setName(text.slice(0, 40)); // Limit the length to 40 characters
+  };
+
+  const handleUsernameChange = (text) => {
+    const sanitizedText = text.replace(/\s+/g, '').slice(0, 15);
+    setUsername(sanitizedText);
+
+    const usernameRegex = /^[a-z0-9._]+$/;
+    if (sanitizedText.length < 4) {
+      setUsernameError('Username must be at least 4 characters');
+    } else if (sanitizedText.length > 15) {
+      setUsernameError('Username must be at most 15 characters');
+    } else if (!usernameRegex.test(sanitizedText)) {
+      setUsernameError('Username can only contain lowercase letters, digits, dots, and underscores');
+    } else {
+      setUsernameError('');
+    }
+  };
+
   const handlePasswordChange = (text) => {
     setPassword(text.slice(0, 25));
   };
@@ -33,8 +54,8 @@ const RegisterScreen = ({ navigation }) => {
     if (!username) {
       setUsernameError('Username cannot be empty');
       valid = false;
-    } else {
-      setUsernameError('');
+    } else if (usernameError) {
+      valid = false;
     }
 
     if (!email) {
@@ -52,6 +73,9 @@ const RegisterScreen = ({ navigation }) => {
       valid = false;
     } else if (password.length < 8) {
       setPasswordError('Password must be at least 8 characters');
+      valid = false;
+    } else if (!/[a-zA-Z]/.test(password) || !/\d/.test(password)) {
+      setPasswordError('Password must contain both letters and numbers');
       valid = false;
     } else {
       setPasswordError('');
@@ -78,13 +102,13 @@ const RegisterScreen = ({ navigation }) => {
         username: username,
         email,
         password
-      }
+      };
 
       axios
         .post("http://10.224.21.21:5001/register", UserData)
         .then(res => {
-          console.log(res.data)
-          if (res.data.status == "ok") {
+          console.log(res.data);
+          if (res.data.status === "ok") {
             Toast.show({
               type: ALERT_TYPE.SUCCESS,
               title: 'Success',
@@ -94,17 +118,17 @@ const RegisterScreen = ({ navigation }) => {
                 setTimeout(() => {
                   Toast.hide();
                   navigation.navigate('Signin');
-                }, 1500); // MENAMPILKAN TOAST SELAMA 1.5 DETIK
+                }, 1500);
               }
             });
-          } else if (res.data.status == "alreadyUser") {
+          } else if (res.data.status === "alreadyUser") {
             Toast.show({
               type: ALERT_TYPE.DANGER,
               title: 'Error',
               textBody: "User Already Exists!!",
               button: 'close',
             });
-          } else if (res.data.status == "alreadyEmail") {
+          } else if (res.data.status === "alreadyEmail") {
             Toast.show({
               type: ALERT_TYPE.DANGER,
               title: 'Error',
@@ -131,15 +155,16 @@ const RegisterScreen = ({ navigation }) => {
         <Text style={styles.title}>Sign Up</Text>
         <TextInput
           style={[styles.input, nameError ? styles.errorInput : null]}
-          onChangeText={setName}
+          onChangeText={handleNameChange}
           value={name}
           placeholder="Name"
+          maxLength={40}
           autoCapitalize="none"
         />
         {nameError ? <Text style={styles.errorText}>{nameError}</Text> : null}
         <TextInput
           style={[styles.input, usernameError ? styles.errorInput : null]}
-          onChangeText={setUsername}
+          onChangeText={handleUsernameChange}
           value={username}
           placeholder="Username"
           autoCapitalize="none"
@@ -165,9 +190,7 @@ const RegisterScreen = ({ navigation }) => {
           />
           <TouchableOpacity
             style={styles.eyeIcon}
-            onPress={() => {
-              setShowPassword(!showPassword);
-            }}
+            onPress={() => setShowPassword(!showPassword)}
           >
             {showPassword ? (
               <Icon name="visibility" size={18} color="#000000" />
@@ -188,9 +211,7 @@ const RegisterScreen = ({ navigation }) => {
           />
           <TouchableOpacity
             style={styles.eyeIcon}
-            onPress={() => {
-              setShowConfirmPassword(!showConfirmPassword);
-            }}
+            onPress={() => setShowConfirmPassword(!showConfirmPassword)}
           >
             {showConfirmPassword ? (
               <Icon name="visibility" size={18} color="#000000" />
@@ -202,21 +223,25 @@ const RegisterScreen = ({ navigation }) => {
         <View style={styles.checkboxContainer}>
           <TouchableOpacity
             style={styles.checkbox}
-            onPress={() => {
-              setIsCheckedTerms(!isCheckedTerms);
-            }}
+            onPress={() => setIsCheckedTerms(!isCheckedTerms)}
           >
             <Icon name={isCheckedTerms ? "check-box" : "check-box-outline-blank"} size={24} color="#000000" />
           </TouchableOpacity>
-          <Text style={styles.checkboxLabel}>I agree to the <Text style={styles.termslink} >terms and conditions</Text></Text>
+          <Text style={styles.checkboxLabel}>
+            I agree to the <Text style={styles.termslink} onPress={() => navigation.navigate('TandG')}>terms and conditions
+            </Text>
+          </Text>
         </View>
         <TouchableOpacity style={styles.buttonSignup} onPress={handleSignup}>
           <Text style={styles.textSignUp}>Sign Up</Text>
         </TouchableOpacity>
 
-        <Text style={styles.loginText}>Already signed up? <Text style={styles.loginLink}
-          onPress={() =>
-            navigation.navigate('Signin')} >Log In</Text></Text>
+        <Text style={styles.loginText}>
+          Already signed up?
+          <Text style={styles.loginLink} onPress={() => navigation.navigate('Signin')}
+          > Log In
+          </Text>
+        </Text>
       </ScrollView>
     </AlertNotificationRoot>
   );
@@ -306,7 +331,7 @@ const styles = StyleSheet.create({
   termslink: {
     color: '#0a3e99',
     fontWeight: 'bold',
-    textDecorationLine: 'underline'
+    textDecorationLine: 'underline',
   },
   errorText: {
     color: 'red',

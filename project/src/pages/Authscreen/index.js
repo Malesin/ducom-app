@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 
 const Authscreen = ({ navigation }) => {
   const [selectedButton, setSelectedButton] = useState('login');
-  const [slideAnim, setSlideAnim] = useState(new Animated.Value(0));
+  const [slideAnim] = useState(new Animated.Value(0));
 
   const handlePress = (button) => {
     setSelectedButton(button);

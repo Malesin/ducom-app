@@ -8,23 +8,26 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const HomeScreen = () => {
 
-  const [userData, setUserData] = useState("")
+  const [userData, setUserData] = useState({ name: 'Guest' }); 
+
   async function getData() {
-    const token = await AsyncStorage.getItem("token")
-    console.log(token)
-    axios
-      .post("http://10.224.21.22:5001/userdata", { token: token })
-      .then(res => {
-        console.log(res.data)
-        setUserData(res.data.data)
-        // UNTUK CONTOH PENGAPLIKASIAN DATANYA = {userData.name}
-      })
+    try {
+      const token = await AsyncStorage.getItem("token");
+      if (token) {
+        console.log(token);
+        const response = await axios.post("http://10.224.21.21:5001/userdata", { token: token });
+        console.log(response.data);
+        setUserData(response.data.data || { name: 'Guest' }); 
+      } else {
+        console.log("No token found");
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
   }
 
   useEffect(() => {
-
-    getData()
-
+    getData();
   }, []);
 
   return (
@@ -32,17 +35,19 @@ const HomeScreen = () => {
       <Header />
       <ScrollView contentContainerStyle={styles.contentContainer}>
         <Text style={styles.contentText}>Welcome to the Home Screen!</Text>
-        <TouchableOpacity style={styles.buttonContainer}>
-          <MaterialCommunityIcons name="plus" size={40} color="#fff"/>
-        </TouchableOpacity>
-      </ScrollView>
         <Text style={styles.contentText}>Hi, {userData.name}</Text>
+        <View style={styles.buttonWrapper}>
+          <TouchableOpacity style={styles.buttonContainer}>
+            <MaterialCommunityIcons name="plus" size={40} color="#fff"/>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
       <Footer />
     </View>
-  )
+  );
 }
 
-export default HomeScreen
+export default HomeScreen;
 
 const styles = StyleSheet.create({
   container: {
@@ -59,13 +64,18 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#000',
   },
-
+  buttonWrapper: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginVertical: 20,
+  },
   buttonContainer: {
     width: 60,
     height: 60,
-    backgroundColor: '#001374', 
+    backgroundColor: '#001374',
     borderRadius: 30,
-    justifyContent: 'center', 
-    alignItems: 'center', 
-  }
+    justifyContent: 'center',
+    alignItems: 'center', // Fixed to center
+  },
 });
