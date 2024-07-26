@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import axios from "axios"
 import { ALERT_TYPE, AlertNotificationRoot, Toast } from 'react-native-alert-notification';
@@ -12,6 +12,17 @@ const Signinscreen = ({ navigation }) => {
   const [showPassword, setShowPassword] = useState(false); // State for showing password
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
+
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      const token = await AsyncStorage.getItem('token');
+      if (token) {
+        navigation.navigate('Home');
+      }
+    };
+
+    checkLoginStatus();
+  }, []);
 
   const handleLogin = () => {
     let valid = true;
@@ -36,7 +47,7 @@ const Signinscreen = ({ navigation }) => {
         password,
       }
       axios
-        .post("http://10.224.21.22:5001/login-user", userData)
+        .post("http://192.168.137.44:5001/login-user", userData)
         .then(res => {
           console.log(res.data)
           if (res.data.status == "ok") {
