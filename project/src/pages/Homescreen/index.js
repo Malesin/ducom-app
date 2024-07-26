@@ -1,10 +1,11 @@
-import { StyleSheet, ScrollView, View, Text, TouchableOpacity } from 'react-native';
+import { StyleSheet, ScrollView, View, Text, TouchableOpacity, BackHandler, Alert } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import React, { useState, useEffect } from 'react';
 import Header from './../../components/header';
 import Footer from '../../components/footer';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
 import { ALERT_TYPE, AlertNotificationRoot, Toast } from 'react-native-alert-notification';
 import { useNavigation } from '@react-navigation/native';
 
@@ -23,6 +24,33 @@ const HomeScreen = ({ navigation }) => {
       })
   }
 
+  const handleBackPress = () => {
+    Alert.alert(
+      'Exit App',
+      'Are you sure want to exit',
+      [{
+        text: 'cancel',
+        onPress: () => null,
+        style: 'cancel'
+      }, {
+        text: 'Exit',
+        onPress: () => BackHandler.exitApp()
+      },
+      ])
+    return true
+  }
+
+  useFocusEffect(
+    React.useCallback(() => {
+      BackHandler.addEventListener("hardwareBackPress", handleBackPress)
+
+      return () => {
+        BackHandler.removeEventListener("hardwareBackPress", handleBackPress)
+
+      }
+    })
+  )
+
   useEffect(() => {
 
     getData()
@@ -31,19 +59,22 @@ const HomeScreen = ({ navigation }) => {
 
   const handleLogout = async () => {
     const removeToken = await AsyncStorage.removeItem('token');
-    Toast.show({
-      type: ALERT_TYPE.SUCCESS,
-      title: 'Success',
-      textBody: 'Logout Successfully!!',
-      button: 'close',
-      onShow: () => {
-        setTimeout(() => {
-          Toast.hide();
+    Alert.alert(
+      'Logout Account',
+      'Are you sure want to Logout',
+      [{
+        text: 'cancel',
+        onPress: () => null,
+        style: 'cancel'
+      }, {
+        text: 'Exit',
+        onPress: () => {
           removeToken
+          console.log(removeToken);
           navigation.navigate('Auths');
-        }, 300); // MENAMPILKAN TOAST SELAMA 1.5 DETIK
-      }
-    });    
+        },
+      },
+      ])
   };
 
   return (
