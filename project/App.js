@@ -1,9 +1,9 @@
 import React from 'react';
-import MainNavigation from './src/navigation/MainNavigation';
+import AuthNavigator from './src/navigation/AuthNavigator';
 
 const App = () => {
   return (
-    <MainNavigation />
+    <AuthNavigator />
   );
 };
 
