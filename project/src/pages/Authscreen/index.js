@@ -1,5 +1,6 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity, Animated } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, Animated, Alert, BackHandler } from 'react-native';
 import React, { useState } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 
 const Authscreen = ({ navigation }) => {
   const [selectedButton, setSelectedButton] = useState('login');
@@ -18,6 +19,33 @@ const Authscreen = ({ navigation }) => {
       navigation.navigate('Register');
     }
   };
+
+  const handleBackPress = () => {
+    Alert.alert(
+      'Exit App',
+      'Are you sure want to exit',
+      [{
+        text: 'cancel',
+        onPress: () => null,
+        style: 'cancel'
+      }, {
+        text: 'Exit',
+        onPress: () => BackHandler.exitApp()
+      },
+      ])
+    return true
+  }
+
+  useFocusEffect(
+    React.useCallback(() => {
+      BackHandler.addEventListener("hardwareBackPress", handleBackPress)
+
+      return () => {
+        BackHandler.removeEventListener("hardwareBackPress", handleBackPress)
+
+      }
+    })
+  )
 
   const slideInterpolation = slideAnim.interpolate({
     inputRange: [0, 1],

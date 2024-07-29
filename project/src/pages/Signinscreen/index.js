@@ -1,8 +1,8 @@
 import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import axios from "axios"
-import { ALERT_TYPE, AlertNotificationRoot, Toast } from 'react-native-alert-notification';
+import { ALERT_TYPE, AlertNotificationRoot, Dialog } from 'react-native-alert-notification';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Signinscreen = ({ navigation }) => {
@@ -12,6 +12,17 @@ const Signinscreen = ({ navigation }) => {
   const [showPassword, setShowPassword] = useState(false); // State for showing password
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
+
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      const token = await AsyncStorage.getItem('token');
+      if (token) {
+        navigation.navigate('Home');
+      }
+    };
+
+    checkLoginStatus();
+  }, []);
 
   const handleLogin = () => {
     let valid = true;
@@ -30,24 +41,23 @@ const Signinscreen = ({ navigation }) => {
     }
 
     if (valid) {
-      console.log(email, password);
+      // console.log(email, password);
       const userData = {
         email: email,
         password,
       }
       axios
-        .post("http://192.168.1.17:5001/login-user", userData)
+        .post("http://10.224.21.21:5001/login-user", userData)
         .then(res => {
           console.log(res.data)
           if (res.data.status == "ok") {
-            Toast.show({
+            Dialog.show({
               type: ALERT_TYPE.SUCCESS,
               title: 'Success',
               textBody: 'Login Successfully!!',
-              button: 'close',
               onShow: () => {
                 setTimeout(() => {
-                  Toast.hide();
+                  Dialog.hide();
                   navigation.navigate('Home');
                 }, 1500); // MENAMPILKAN TOAST SELAMA 1.5 DETIK
               }
@@ -55,18 +65,28 @@ const Signinscreen = ({ navigation }) => {
 
             AsyncStorage.setItem("token", res.data.data)
           } else if (res.data.status == "error") {
-            Toast.show({
+            Dialog.show({
               type: ALERT_TYPE.DANGER,
               title: 'Error',
               textBody: "Email or User Doesn't Exists!!",
-              button: 'close',
+              onShow: () => {
+                setTimeout(() => {
+                  Dialog.hide();
+                  navigation.navigate('Signin');
+                }, 1500); // MENAMPILKAN TOAST SELAMA 1.5 DETIK
+              }
             });
           } else if (res.data.status == "errorPass") {
-            Toast.show({
+            Dialog.show({
               type: ALERT_TYPE.DANGER,
               title: 'Error',
               textBody: "Incorrect Password",
-              button: 'close',
+              onShow: () => {
+                setTimeout(() => {
+                  Dialog.hide();
+                  navigation.navigate('Signin');
+                }, 1500); // MENAMPILKAN TOAST SELAMA 1.5 DETIK
+              }
             });
           }
         })
@@ -107,9 +127,9 @@ const Signinscreen = ({ navigation }) => {
             }}
           >
             {isChecked ? (
-              <Icon name="visibility" size={18} color="#000000" /> // Use visibility icon
+              <Icon name="visibility" size={18} color="#000000" /> 
             ) : (
-              <Icon name="visibility-off" size={18} color="#000000" /> // Use visibility-off icon
+              <Icon name="visibility-off" size={18} color="#000000" /> 
             )}
           </TouchableOpacity>
         </View>

@@ -2,14 +2,14 @@ import React from 'react';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { View, TouchableOpacity, StyleSheet, Image } from 'react-native';
 
-const Header = () => {
+const Header = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
-        <TouchableOpacity style={styles.menuContainer} onPress={() => alert('Menubar Pressed!')} >
-          <MaterialCommunityIcons name="menu" size={35} color="#000" />        
-          </TouchableOpacity>
+        <TouchableOpacity style={styles.menuContainer} onPress={() => navigation.openDrawer()} >
+          <MaterialCommunityIcons name="menu" size={35} color="#000" />
+        </TouchableOpacity>
         <View style={styles.centerContainer}>
           <Image
             source={require('./../assets/logo1.png')}
@@ -18,7 +18,7 @@ const Header = () => {
         </View>
         <View style={styles.emptySpace} />
       </View>
-      </View>
+    </View>
   );
 };
 
@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   emptySpace: {
-    width: 45, 
+    width: 45,
   },
   logoImage: {
     width: 110,
