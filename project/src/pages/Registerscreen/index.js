@@ -81,7 +81,7 @@ const RegisterScreen = ({ navigation }) => {
       }
 
       axios
-        .post("http://10.224.21.22:/register", UserData)
+        .post("http://192.168.1.17:5001/register", UserData)
         .then(res => {
           console.log(res.data)
           if (res.data.status == "ok") {
