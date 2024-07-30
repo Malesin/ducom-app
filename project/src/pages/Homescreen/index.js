@@ -13,7 +13,7 @@ const HomeScreen = ({ navigation }) => {
     const token = await AsyncStorage.getItem("token");
     console.log(token);
     axios
-      .post("http://10.224.21.21:5001/userdata", { token: token })
+      .post("http://10.224.21.22:5001/userdata", { token: token })
       .then(res => {
         console.log(res.data);
         setUserData(res.data.data);
