@@ -9,6 +9,7 @@ import Marksscreen from "./Marksscreen";
 import Settingsscreen from "./Settingsscreen";
 import Profilescreen from "./Profilescreen";
 import Notificationscreen from "./Notificationscreen";
+import TermsandConditionscreen from "./TermsandConditionscreen";
 
 export {
     Splashscreen,
@@ -21,5 +22,6 @@ export {
     Marksscreen,
     Settingsscreen,
     Profilescreen,
-    Notificationscreen
+    Notificationscreen,
+    TermsandConditionscreen
 }

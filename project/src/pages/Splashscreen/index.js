@@ -1,18 +1,20 @@
 import { StyleSheet, View, Image } from 'react-native';
 import React, { useEffect } from 'react';
-import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Splashscreen = ({ navigation }) => {
-
+  
   useEffect(() => {
     const checkLoginStatus = async () => {
-      const token = await AsyncStorage.getItem('token');
-      if (token) {
-        navigation.navigate('Home');
-      } else {
-        navigation.navigate('Auths');
-      }
+      // Simulasi delay sebelum memeriksa status login
+      setTimeout(async () => {
+        const token = await AsyncStorage.getItem('token');
+        if (token) {
+          navigation.navigate('Home');
+        } else {
+          navigation.navigate('Auths');
+        }
+      }, 1500); // Delay selama 2 detik
     };
 
     checkLoginStatus();
