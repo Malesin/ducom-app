@@ -25,7 +25,6 @@ app.get("/", (req, res) => {
 
 app.post("/register", async (req, res) => {
     const { name, username, email, password } = req.body
-
     const oldUserEmail = await User.findOne({ email: email })
     const oldUserUsername = await User.findOne({ username: username })
 
@@ -54,28 +53,41 @@ app.post("/register", async (req, res) => {
 })
 
 app.post("/login-user", async (req, res) => {
-    const { email, password } = req.body
+    const { email, username, password } = req.body;
 
-    const oldUser = await User.findOne({ email: email })
+    let oldUser;
 
-    if (!oldUser) {
-        return res.send({ status: "error", data: "Email Doesn't Exists!!" })
+    // Jika email disediakan, cari berdasarkan email
+    if (email || username) {
+        if (email) oldUser = await User.findOne({ email: email });
+        // Jika username disediakan, cari berdasarkan username
+        if (!oldUser) {
+            oldUser = await User.findOne({ username: email });
+        }
+    }
+    // Jika tidak ada email atau username yang disediakan
+    else {
+        return res.send({ status: "error", data: "Email or Username is required" });
     }
 
+    // Jika pengguna tidak ditemukan
+    if (!oldUser) {
+        return res.send({ status: "error", data: "User Not Found" });
+    }
+
+    // Periksa apakah password valid
     const isPasswordValid = await bcrypt.compare(password, oldUser.password);
 
+    // Jika password valid, buat token JWT
     if (isPasswordValid) {
-        // Jika password cocok, buat token JWT
         const token = jwt.sign({ email: oldUser.email }, JWT_SECRET);
-
-        // Mengirim respons dengan status 201 dan token JWT
         return res.status(201).send({ status: "ok", data: token });
     } else {
-        // Jika password tidak cocok, kirim respons error
         return res.send({ status: "errorPass", data: "Incorrect Password" });
     }
+});
 
-})
+
 
 app.post("/userdata", async (req, res) => {
     const { token } = req.body

@@ -7,7 +7,7 @@ const Header = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
-        <TouchableOpacity style={styles.menuContainer} onPress={() => navigation.openDrawer()} >
+        <TouchableOpacity style={styles.menuContainer} onPress={() => navigation.navigate('Drawer')} >
           <MaterialCommunityIcons name="menu" size={35} color="#000" />
         </TouchableOpacity>
         <View style={styles.centerContainer}>
