@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { ALERT_TYPE, AlertNotificationRoot, Toast } from 'react-native-alert-notification';
 import axios from 'axios';
+import config from '../../config';
+const serverUrl = config.SERVER_URL;
 
 const RegisterScreen = ({ navigation }) => {
   const [name, setName] = useState('');
@@ -81,7 +83,7 @@ const RegisterScreen = ({ navigation }) => {
       }
 
       axios
-        .post("http://192.168.1.5:5001/register", UserData)
+        .post(`${serverUrl}/register`, UserData)
         .then(res => {
           console.log(res.data)
           if (res.data.status == "ok") {

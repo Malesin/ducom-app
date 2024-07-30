@@ -30,11 +30,11 @@ app.post("/register", async (req, res) => {
     const oldUserUsername = await User.findOne({ username: username })
 
     if (oldUserUsername) {
-        return res.send({ status:"alreadyUser", data: "User Already Exists!!" })
+        return res.send({ status: "alreadyUser", data: "User Already Exists!!" })
     }
 
     if (oldUserEmail) {
-        return res.send({ status:"alreadyEmail", data: "Email Already Exists!!" })
+        return res.send({ status: "alreadyEmail", data: "Email Already Exists!!" })
     }
 
     const encryptedpassword = await bcrypt.hash(password, 10)
@@ -57,25 +57,10 @@ app.post("/login-user", async (req, res) => {
     const { email, password } = req.body
 
     const oldUser = await User.findOne({ email: email })
-    // const oldUserUsername = await User.findOne({ email: username })
 
     if (!oldUser) {
         return res.send({ status: "error", data: "Email Doesn't Exists!!" })
     }
-    // else if (!oldUserUsername) {
-    //     return res.send({ data: "User Doesn't Exists!!" })
-    // }
-    // SEMENTARA KITA PAKAI EMAIL DULU
-
-    // if (await bcrypt.compare(password, oldUser.password)) {
-    //     const token = jwt.sign({ email: oldUser.email }, JWT_SECRET)
-
-    //     if (res.status(201)) {
-    //         return res.send({ status: "ok", data: token })
-    //     } else {
-    //         return res.send({ status: "error" })
-    //     }
-    // }
 
     const isPasswordValid = await bcrypt.compare(password, oldUser.password);
 
@@ -104,7 +89,7 @@ app.post("/userdata", async (req, res) => {
                 return res.send({ status: "ok", data: data })
             })
     } catch (error) {
-        return res.send({ error: error })
+        return res.send({ status: 'error', error: error })
     }
 })
 

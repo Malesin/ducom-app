@@ -4,8 +4,11 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import axios from "axios"
 import { ALERT_TYPE, AlertNotificationRoot, Dialog } from 'react-native-alert-notification';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import config from '../../config';
+const serverUrl = config.SERVER_URL;
 
 const Signinscreen = ({ navigation }) => {
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isChecked, setIsChecked] = useState(false); // State for checkbox
@@ -47,7 +50,7 @@ const Signinscreen = ({ navigation }) => {
         password,
       }
       axios
-        .post("http://10.224.21.21:5001/login-user", userData)
+        .post(`${serverUrl}/login-user`, userData)
         .then(res => {
           console.log(res.data)
           if (res.data.status == "ok") {
@@ -127,9 +130,9 @@ const Signinscreen = ({ navigation }) => {
             }}
           >
             {isChecked ? (
-              <Icon name="visibility" size={18} color="#000000" /> 
+              <Icon name="visibility" size={18} color="#000000" />
             ) : (
-              <Icon name="visibility-off" size={18} color="#000000" /> 
+              <Icon name="visibility-off" size={18} color="#000000" />
             )}
           </TouchableOpacity>
         </View>

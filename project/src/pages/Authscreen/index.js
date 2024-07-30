@@ -1,10 +1,12 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity, Animated, Alert, BackHandler } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, Animated, Alert, BackHandler, ScrollView } from 'react-native';
 import React, { useState } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
+import CheckInternet from '../../components/CheckInternet';
 
 const Authscreen = ({ navigation }) => {
   const [selectedButton, setSelectedButton] = useState('login');
   const [slideAnim, setSlideAnim] = useState(new Animated.Value(0));
+  const [isConnected, setIsConnected] = useState(false)
 
   const handlePress = (button) => {
     setSelectedButton(button);
@@ -57,30 +59,34 @@ const Authscreen = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
-      <Image
-        source={require('../../assets/logo1.png')}
-        style={styles.logo}
-      />
-      <Text style={styles.title}>Welcome Dugam Community</Text>
+    <ScrollView>
+      <View style={styles.container}>
+        <Image
+          source={require('../../assets/logo1.png')}
+          style={styles.logo}
+        />
+        <Text style={styles.title}>Welcome Dugam Community</Text>
 
-      <Text style={styles.subtitle}>
-        Log In or Sign Up to our community.{'\n'}
-        Share your ideas, connect with the community,{'\n'}
-        and explore in the Ducom App.
-      </Text>
+        <Text style={styles.subtitle}>
+          Log In or Sign Up to our community.{'\n'}
+          Share your ideas, connect with the community,{'\n'}
+          and explore in the Ducom App.
+        </Text>
 
-      <View style={styles.buttonContainer}>
-        <Animated.View style={[styles.buttonBackground, slideStyle]} />
-        <TouchableOpacity style={styles.buttonLogin} onPress={() => handlePress('login')}>
-          <Text style={selectedButton === 'login' ? styles.buttonTextLogin : styles.buttonTextInactive}>Log In</Text>
-        </TouchableOpacity>
+        <View style={styles.buttonContainer}>
+          <Animated.View style={[styles.buttonBackground, slideStyle]} />
+          <TouchableOpacity style={styles.buttonLogin} onPress={() => handlePress('login')}>
+            <Text style={selectedButton === 'login' ? styles.buttonTextLogin : styles.buttonTextInactive}>Log In</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity style={styles.buttonSignUp} onPress={() => handlePress('register')}>
-          <Text style={selectedButton === 'register' ? styles.buttonTextSignUp : styles.buttonTextInactive}>Sign Up</Text>
-        </TouchableOpacity>
+          <TouchableOpacity style={styles.buttonSignUp} onPress={() => handlePress('register')}>
+            <Text style={selectedButton === 'register' ? styles.buttonTextSignUp : styles.buttonTextInactive}>Sign Up</Text>
+          </TouchableOpacity>
+        </View>
+
       </View>
-    </View>
+      <CheckInternet isConnected={isConnected} setIsConnected={setIsConnected} />
+    </ScrollView>
   );
 };
 

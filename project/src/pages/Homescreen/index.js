@@ -5,6 +5,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
+import config from '../../config';
+const serverUrl = config.SERVER_URL;
 
 const HomeScreen = ({ navigation }) => {
 
@@ -13,11 +15,24 @@ const HomeScreen = ({ navigation }) => {
     const token = await AsyncStorage.getItem("token");
     console.log(token);
     axios
-      .post("http://10.224.21.21:5001/userdata", { token: token })
+      .post(`${serverUrl}/userdata`, { token: token })
       .then(res => {
         console.log(res.data);
         setUserData(res.data.data);
-      });
+        if (res.data.status == "error") {
+          Dialog.show({
+            type: ALERT_TYPE.DANGER,
+            title: 'Error',
+            textBody: "Anda Telah Keluar dari Akun",
+            onShow: () => {
+              setTimeout(() => {
+                Dialog.hide();
+                navigation.navigate('Signin');
+              }, 1500); // MENAMPILKAN TOAST SELAMA 1.5 DETIK
+            }
+          });
+        };
+      })
   }
 
   const handleBackPress = () => {
