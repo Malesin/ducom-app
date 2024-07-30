@@ -1,8 +1,10 @@
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import React, { useState } from 'react';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { ALERT_TYPE, AlertNotificationRoot, Toast } from 'react-native-alert-notification';
 import axios from 'axios';
+import config from '../../config'
+const serverUrl = config.SERVER_URL
 
 const RegisterScreen = ({ navigation }) => {
   const [name, setName] = useState('');
@@ -13,52 +15,46 @@ const RegisterScreen = ({ navigation }) => {
   const [isCheckedTerms, setIsCheckedTerms] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [nameError, setNameError] = useState('');
-  const [usernameError, setUsernameError] = useState('');
-  const [emailError, setEmailError] = useState('');
-  const [passwordError, setPasswordError] = useState('');
-  const handlePasswordChange = (text) => {
-    setPassword(text.slice(0, 25));
+  const [errors, setErrors] = useState({});
+
+  const validateUsername = (username) => {
+    const usernameRegex = /^[a-zA-Z0-9_]{3,15}$/; // Lowercase letters and numbers only, 4-15 characters
+    return usernameRegex.test(username) && !username.includes(' '); // No spaces
   };
 
   const handleSignup = () => {
+    const newErrors = {};
     let valid = true;
+
     if (!name) {
-      setNameError('Name cannot be empty');
+      newErrors.name = 'Name cannot be empty';
       valid = false;
-    } else {
-      setNameError('');
     }
 
     if (!username) {
-      setUsernameError('Username cannot be empty');
+      newErrors.username = 'Username cannot be empty';
       valid = false;
-    } else {
-      setUsernameError('');
+    } else if (!validateUsername(username)) {
+      newErrors.username = 'Invalid username. Must be 4-15 characters long, lowercase letters and numbers only, with no spaces.';
+      valid = false;
     }
 
     if (!email) {
-      setEmailError('Email cannot be empty');
+      newErrors.email = 'Email cannot be empty';
       valid = false;
     } else if (!email.includes('@')) {
-      setEmailError('Invalid email address');
+      newErrors.email = 'Invalid email address';
       valid = false;
-    } else {
-      setEmailError('');
     }
 
     if (!password) {
-      setPasswordError('Password cannot be empty');
+      newErrors.password = 'Password cannot be empty';
       valid = false;
-    } else if (password.length < 8) {
-      setPasswordError('Password must be at least 8 characters');
+    } else if (password.length < 8 || password.length > 15) {
+      newErrors.password = 'Password must be between 8 and 15 characters';
       valid = false;
-    } else {
-      setPasswordError('');
-    }
-
-    if (password !== confirmpassword) {
-      setPasswordError('Passwords do not match');
+    } else if (password !== confirmpassword) {
+      newErrors.password = 'Passwords do not match';
       valid = false;
     }
 
@@ -72,45 +68,53 @@ const RegisterScreen = ({ navigation }) => {
       valid = false;
     }
 
+    setErrors(newErrors);
+
     if (valid) {
-      const UserData = {
-        name: name,
-        username: username,
-        email,
-        password
-      }
+      const userData = { name, username, email, password };
 
       axios
-        .post("http://10.224.21.22:5001/register", UserData)
+        .post(`${serverUrl}/register`, userData, console.log(serverUrl))
         .then(res => {
-          console.log(res.data)
-          if (res.data.status == "ok") {
-            Toast.show({
-              type: ALERT_TYPE.SUCCESS,
-              title: 'Success',
-              textBody: 'Registered Successfully!!',
-              button: 'close',
-              onShow: () => {
-                setTimeout(() => {
-                  Toast.hide();
-                  navigation.navigate('Signin');
-                }, 1500); // MENAMPILKAN TOAST SELAMA 1.5 DETIK
-              }
-            });
-          } else if (res.data.status == "alreadyUser") {
-            Toast.show({
-              type: ALERT_TYPE.DANGER,
-              title: 'Error',
-              textBody: "User Already Exists!!",
-              button: 'close',
-            });
-          } else if (res.data.status == "alreadyEmail") {
-            Toast.show({
-              type: ALERT_TYPE.DANGER,
-              title: 'Error',
-              textBody: "Email Already Exists!!",
-              button: 'close',
-            });
+          const { status } = res.data;
+          switch (status) {
+            case "ok":
+              Toast.show({
+                type: ALERT_TYPE.SUCCESS,
+                title: 'Success',
+                textBody: 'Registered Successfully!!',
+                button: 'close',
+                onShow: () => {
+                  setTimeout(() => {
+                    Toast.hide();
+                    navigation.navigate('Signin');
+                  }, 1500);
+                }
+              });
+              break;
+            case "alreadyUser":
+              Toast.show({
+                type: ALERT_TYPE.DANGER,
+                title: 'Error',
+                textBody: "User Already Exists!!",
+                button: 'close',
+              });
+              break;
+            case "alreadyEmail":
+              Toast.show({
+                type: ALERT_TYPE.DANGER,
+                title: 'Error',
+                textBody: "Email Already Exists!!",
+                button: 'close',
+              });
+              break;
+            default:
+              Toast.show({
+                type: ALERT_TYPE.DANGER,
+                title: 'Error',
+                textBody: 'An error occurred. Please try again later.',
+                button: 'close',
+              });
           }
         })
         .catch(e => {
@@ -130,34 +134,34 @@ const RegisterScreen = ({ navigation }) => {
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.title}>Sign Up</Text>
         <TextInput
-          style={[styles.input, nameError ? styles.errorInput : null]}
-          onChangeText={setName}
+          style={[styles.input, errors.name ? styles.errorInput : null]}
+          onChangeText={text => setName(text.slice(0, 40))}
           value={name}
           placeholder="Name"
           autoCapitalize="none"
         />
-        {nameError ? <Text style={styles.errorText}>{nameError}</Text> : null}
+        {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
         <TextInput
-          style={[styles.input, usernameError ? styles.errorInput : null]}
-          onChangeText={setUsername}
+          style={[styles.input, errors.username ? styles.errorInput : null]}
+          onChangeText={text => setUsername(text.slice(0, 15))}
           value={username}
           placeholder="Username"
           autoCapitalize="none"
         />
-        {usernameError ? <Text style={styles.errorText}>{usernameError}</Text> : null}
+        {errors.username && <Text style={styles.errorText}>{errors.username}</Text>}
         <TextInput
-          style={[styles.input, emailError ? styles.errorInput : null]}
-          onChangeText={setEmail}
+          style={[styles.input, errors.email ? styles.errorInput : null]}
+          onChangeText={text => setEmail(text)}
           value={email}
           placeholder="Email"
           keyboardType="email-address"
           autoCapitalize="none"
         />
-        {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
-        <View style={[styles.passwordContainer, passwordError ? styles.errorInput : null]}>
+        {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
+        <View style={[styles.passwordContainer, errors.password ? styles.errorInput : null]}>
           <TextInput
             style={styles.passwordInput}
-            onChangeText={handlePasswordChange}
+            onChangeText={text => setPassword(text.slice(0, 25))}
             value={password}
             placeholder="Password"
             secureTextEntry={!showPassword}
@@ -165,18 +169,12 @@ const RegisterScreen = ({ navigation }) => {
           />
           <TouchableOpacity
             style={styles.eyeIcon}
-            onPress={() => {
-              setShowPassword(!showPassword);
-            }}
+            onPress={() => setShowPassword(!showPassword)}
           >
-            {showPassword ? (
-              <Icon name="visibility" size={18} color="#000000" />
-            ) : (
-              <Icon name="visibility-off" size={18} color="#000000" />
-            )}
+            <Icon name={showPassword ? "visibility" : "visibility-off"} size={18} color="#000000" />
           </TouchableOpacity>
         </View>
-        {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
+        {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
         <View style={styles.passwordContainer}>
           <TextInput
             style={styles.passwordInput}
@@ -188,41 +186,28 @@ const RegisterScreen = ({ navigation }) => {
           />
           <TouchableOpacity
             style={styles.eyeIcon}
-            onPress={() => {
-              setShowConfirmPassword(!showConfirmPassword);
-            }}
+            onPress={() => setShowConfirmPassword(!showConfirmPassword)}
           >
-            {showConfirmPassword ? (
-              <Icon name="visibility" size={18} color="#000000" />
-            ) : (
-              <Icon name="visibility-off" size={18} color="#000000" />
-            )}
+            <Icon name={showConfirmPassword ? "visibility" : "visibility-off"} size={18} color="#000000" />
           </TouchableOpacity>
         </View>
         <View style={styles.checkboxContainer}>
           <TouchableOpacity
             style={styles.checkbox}
-            onPress={() => {
-              setIsCheckedTerms(!isCheckedTerms);
-            }}
+            onPress={() => setIsCheckedTerms(!isCheckedTerms)}
           >
             <Icon name={isCheckedTerms ? "check-box" : "check-box-outline-blank"} size={24} color="#000000" />
           </TouchableOpacity>
-          <Text style={styles.checkboxLabel}>I agree to the <Text style={styles.termslink} >terms and conditions</Text></Text>
+          <Text style={styles.checkboxLabel}>I agree to the <Text style={styles.termslink} onPress={() => navigation.navigate('Termsandcondition')}>terms and conditions</Text></Text>
         </View>
         <TouchableOpacity style={styles.buttonSignup} onPress={handleSignup}>
           <Text style={styles.textSignUp}>Sign Up</Text>
         </TouchableOpacity>
-
-        <Text style={styles.loginText}>Already signed up? <Text style={styles.loginLink}
-          onPress={() =>
-            navigation.navigate('Signin')} >Log In</Text></Text>
+        <Text style={styles.loginText}>Already signed up? <Text style={styles.loginLink} onPress={() => navigation.navigate('Signin')}>Log In</Text></Text>
       </ScrollView>
     </AlertNotificationRoot>
   );
 };
-
-export default RegisterScreen;
 
 const styles = StyleSheet.create({
   container: {
@@ -294,15 +279,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
-  forgotPassLink: {
-    color: '#0a3e99',
-    marginTop: 20,
-  },
-  agreeText: {
-    marginTop: 20,
-    color: '#000',
-    fontFamily: 'arial'
-  },
   termslink: {
     color: '#0a3e99',
     fontWeight: 'bold',
@@ -327,3 +303,5 @@ const styles = StyleSheet.create({
     borderColor: 'red',
   },
 });
+
+export default RegisterScreen;

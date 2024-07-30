@@ -25,16 +25,15 @@ app.get("/", (req, res) => {
 
 app.post("/register", async (req, res) => {
     const { name, username, email, password } = req.body
-
     const oldUserEmail = await User.findOne({ email: email })
     const oldUserUsername = await User.findOne({ username: username })
 
     if (oldUserUsername) {
-        return res.send({ status:"alreadyUser", data: "User Already Exists!!" })
+        return res.send({ status: "alreadyUser", data: "User Already Exists!!" })
     }
 
     if (oldUserEmail) {
-        return res.send({ status:"alreadyEmail", data: "Email Already Exists!!" })
+        return res.send({ status: "alreadyEmail", data: "Email Already Exists!!" })
     }
 
     const encryptedpassword = await bcrypt.hash(password, 10)
@@ -54,43 +53,41 @@ app.post("/register", async (req, res) => {
 })
 
 app.post("/login-user", async (req, res) => {
-    const { email, password } = req.body
+    const { email, username, password } = req.body;
 
-    const oldUser = await User.findOne({ email: email })
-    // const oldUserUsername = await User.findOne({ email: username })
+    let oldUser;
 
-    if (!oldUser) {
-        return res.send({ status: "error", data: "Email Doesn't Exists!!" })
+    // Jika email disediakan, cari berdasarkan email
+    if (email || username) {
+        if (email) oldUser = await User.findOne({ email: email });
+        // Jika username disediakan, cari berdasarkan username
+        if (!oldUser) {
+            oldUser = await User.findOne({ username: email });
+        }
     }
-    // else if (!oldUserUsername) {
-    //     return res.send({ data: "User Doesn't Exists!!" })
-    // }
-    // SEMENTARA KITA PAKAI EMAIL DULU
+    // Jika tidak ada email atau username yang disediakan
+    else {
+        return res.send({ status: "error", data: "Email or Username is required" });
+    }
 
-    // if (await bcrypt.compare(password, oldUser.password)) {
-    //     const token = jwt.sign({ email: oldUser.email }, JWT_SECRET)
+    // Jika pengguna tidak ditemukan
+    if (!oldUser) {
+        return res.send({ status: "error", data: "User Not Found" });
+    }
 
-    //     if (res.status(201)) {
-    //         return res.send({ status: "ok", data: token })
-    //     } else {
-    //         return res.send({ status: "error" })
-    //     }
-    // }
-
+    // Periksa apakah password valid
     const isPasswordValid = await bcrypt.compare(password, oldUser.password);
 
+    // Jika password valid, buat token JWT
     if (isPasswordValid) {
-        // Jika password cocok, buat token JWT
         const token = jwt.sign({ email: oldUser.email }, JWT_SECRET);
-
-        // Mengirim respons dengan status 201 dan token JWT
         return res.status(201).send({ status: "ok", data: token });
     } else {
-        // Jika password tidak cocok, kirim respons error
         return res.send({ status: "errorPass", data: "Incorrect Password" });
     }
+});
 
-})
+
 
 app.post("/userdata", async (req, res) => {
     const { token } = req.body

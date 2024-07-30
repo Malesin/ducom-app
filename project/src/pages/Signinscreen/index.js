@@ -2,8 +2,10 @@ import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-nativ
 import React, { useState, useEffect } from 'react';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import axios from "axios"
-import { ALERT_TYPE, AlertNotificationRoot, Dialog } from 'react-native-alert-notification';
+import { ALERT_TYPE, AlertNotificationRoot, Toast } from 'react-native-alert-notification';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import config from '../../config'
+const serverUrl = config.SERVER_URL
 
 const Signinscreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -23,8 +25,7 @@ const Signinscreen = ({ navigation }) => {
 
     checkLoginStatus();
   }, []);
-
-  const handleLogin = () => {
+ const handleLogin = () => {
     let valid = true;
     if (email === '') {
       setEmailError('Email cannot be empty');
@@ -47,51 +48,53 @@ const Signinscreen = ({ navigation }) => {
         password,
       }
       axios
-        .post("http://10.224.21.22:5001/login-user", userData)
+        .post(`${serverUrl}/login-user`, userData)
         .then(res => {
           console.log(res.data)
           if (res.data.status == "ok") {
-            Dialog.show({
+            Toast.show({
               type: ALERT_TYPE.SUCCESS,
               title: 'Success',
               textBody: 'Login Successfully!!',
               onShow: () => {
                 setTimeout(() => {
-                  Dialog.hide();
+                  Toast.hide();
                   navigation.navigate('Home');
-                }, 1500); // MENAMPILKAN TOAST SELAMA 1.5 DETIK
+                }, 1100); // MENAMPILKAN TOAST SELAMA 1.2 DETIK
               }
             });
 
             AsyncStorage.setItem("token", res.data.data)
           } else if (res.data.status == "error") {
-            Dialog.show({
+            console.log(res.data);
+            Toast.show({
               type: ALERT_TYPE.DANGER,
               title: 'Error',
               textBody: "Email or User Doesn't Exists!!",
               onShow: () => {
                 setTimeout(() => {
-                  Dialog.hide();
+                  Toast.hide();
                   navigation.navigate('Signin');
-                }, 1500); // MENAMPILKAN TOAST SELAMA 1.5 DETIK
+                }, 1100); // MENAMPILKAN TOAST SELAMA 1.2 DETIK
               }
             });
           } else if (res.data.status == "errorPass") {
-            Dialog.show({
+            Toast.show({
               type: ALERT_TYPE.DANGER,
               title: 'Error',
               textBody: "Incorrect Password",
               onShow: () => {
                 setTimeout(() => {
-                  Dialog.hide();
+                  Toast.hide();
                   navigation.navigate('Signin');
-                }, 1500); // MENAMPILKAN TOAST SELAMA 1.5 DETIK
+                }, 1100); // MENAMPILKAN TOAST SELAMA 1.2 DETIK
               }
             });
           }
         })
     }
   };
+ 
 
   const handlePasswordChange = (text) => {
     setPassword(text.slice(0, 25));
@@ -105,7 +108,7 @@ const Signinscreen = ({ navigation }) => {
           style={[styles.input, emailError ? styles.errorInput : null]}
           onChangeText={setEmail}
           value={email}
-          placeholder="Email"
+          placeholder="Email or Username"
           keyboardType="email-address"
           autoCapitalize="none"
         />
@@ -127,9 +130,9 @@ const Signinscreen = ({ navigation }) => {
             }}
           >
             {isChecked ? (
-              <Icon name="visibility" size={18} color="#000000" /> 
+              <Icon name="visibility" size={18} color="#000000" />
             ) : (
-              <Icon name="visibility-off" size={18} color="#000000" /> 
+              <Icon name="visibility-off" size={18} color="#000000" />
             )}
           </TouchableOpacity>
         </View>
