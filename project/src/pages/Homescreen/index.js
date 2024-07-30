@@ -5,15 +5,18 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
+import config from '../../config'
+const serverUrl = config.SERVER_URL
 
 const HomeScreen = ({ navigation }) => {
 
+  const [open, setOpen] = useState(false)
   const [userData, setUserData] = useState("");
   async function getData() {
     const token = await AsyncStorage.getItem("token");
     console.log(token);
     axios
-      .post("http://10.224.21.21:5001/userdata", { token: token })
+      .post(`${serverUrl}/userdata`, { token: token })
       .then(res => {
         console.log(res.data);
         setUserData(res.data.data);
@@ -72,11 +75,11 @@ const HomeScreen = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header />
+      {/* <Header /> */}
       <ScrollView contentContainerStyle={styles.contentContainer}>
         <Text style={styles.contentText}>Welcome to the Home Screen!</Text>
         <Text style={styles.contentText}>Hi, {userData.name}</Text>
-        <TouchableOpacity style={styles.buttonLogout} onPress={handleLogout}>
+        <TouchableOpacity style={styles.buttonLogout} onPress={() => { setOpen(true) }}>
           <Text style={styles.contentText}>Logout</Text>
         </TouchableOpacity>
       </ScrollView>
@@ -129,4 +132,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  modal: {
+    // marginBottom: -40,
+    marginTop: -40,
+    marginLeft: 1,
+  }
 });
