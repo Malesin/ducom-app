@@ -1,11 +1,12 @@
 import React from 'react';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { Homescreen, FAQscreen, Marksscreen, Settingsscreen } from '../pages';
+import BottomTabNavigator from './BottomTabNavigator';
 
 
 const Drawer = createDrawerNavigator();
 
-function DrawerNavigator() {
+const DrawerNavigator = () => {
     return (
         <Drawer.Navigator>
             <Drawer.Screen name="HomeDrawer" component={Homescreen} />

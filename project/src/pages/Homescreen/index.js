@@ -1,6 +1,5 @@
 import { StyleSheet, ScrollView, View, Text, TouchableOpacity, BackHandler, Alert, SafeAreaView } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import Header from '../../components/header';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -10,7 +9,6 @@ const serverUrl = config.SERVER_URL
 
 const HomeScreen = ({ navigation }) => { 
 
-  const [open, setOpen] = useState(false)
   const [userData, setUserData] = useState("");
   async function getData() {
     const token = await AsyncStorage.getItem("token");
@@ -75,10 +73,9 @@ const HomeScreen = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* <Header /> */}
       <ScrollView contentContainerStyle={styles.contentContainer}>
         <Text style={styles.contentText}>Welcome to the Home Screen!</Text>
-        <Text style={styles.contentText}>Hi, {userData.name}</Text>
+        <Text style={styles.contentText}>Hi, {userData.username}</Text>
         <TouchableOpacity style={styles.buttonLogout} onPress={handleLogout}>
           <Text style={styles.contentText}>Logout</Text>
         </TouchableOpacity>
@@ -132,9 +129,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  modal: {
-    // marginBottom: -40,
-    marginTop: -40,
-    marginLeft: 1,
-  }
+
 });
