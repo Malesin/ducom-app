@@ -1,15 +1,15 @@
-import Splashscreen from "./Splashscreen";
-import Authscreen from "./Authscreen";
-import Signinscreen from "./Signinscreen";
-import Registerscreen from "./Registerscreen";
-import Homescreen from "./Homescreen";
-import Forgotpassword from "./Forgotpassword";
-import FAQscreen from "./FAQscreen";
-import Marksscreen from "./Marksscreen";
-import Settingsscreen from "./Settingsscreen";
-import Profilescreen from "./Profilescreen";
-import Notificationscreen from "./Notificationscreen";
-import TermsandConditionscreen from "./TermsandConditionscreen";
+import Splashscreen from "./Other/Splashscreen";
+import Authscreen from "./Auth/Authscreen";
+import Signinscreen from "./Auth/Signinscreen";
+import Registerscreen from "./Auth/Registerscreen";
+import Homescreen from "./Home/Homescreen";
+import Forgotpassword from "./Auth/Forgotpassword";
+import FAQscreen from "./Settings/FAQscreen";
+import Marksscreen from "./Other/Marksscreen";
+import Settingsscreen from "./Settings/Settingsscreen";
+import Profilescreen from "./Home/Profilescreen";
+import Notificationscreen from "./Home/Notificationscreen";
+import TermsandConditionscreen from "./Settings/TermsandConditionscreen";
 
 export {
     Splashscreen,

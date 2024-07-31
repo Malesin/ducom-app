@@ -101,7 +101,7 @@ app.post("/userdata", async (req, res) => {
                 return res.send({ status: "ok", data: data })
             })
     } catch (error) {
-        return res.send({ error: error })
+        return res.send({ status: 'error', error: error })
     }
 })
 
