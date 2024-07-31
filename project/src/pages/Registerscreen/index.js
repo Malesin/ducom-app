@@ -74,7 +74,7 @@ const RegisterScreen = ({ navigation }) => {
       const userData = { name, username, email, password };
 
       axios
-        .post(`${serverUrl}/register`, userData, console.log(serverUrl))
+        .post(`${serverUrl}/register`, userData)
         .then(res => {
           const { status } = res.data;
           switch (status) {
