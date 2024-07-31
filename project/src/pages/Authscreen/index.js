@@ -85,7 +85,6 @@ const Authscreen = ({ navigation }) => {
         </View>
 
       </View>
-      <CheckInternet isConnected={isConnected} setIsConnected={setIsConnected} />
     </ScrollView>
   );
 };
