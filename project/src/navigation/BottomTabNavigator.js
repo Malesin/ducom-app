@@ -3,6 +3,8 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { Image, StyleSheet } from 'react-native'; // Import StyleSheet for styles
 import { Homescreen, Profilescreen, Notificationscreen } from '../pages';
+import DrawerNavigator from './DrawerNavigator';
+
 
 // Import the profile image
 import profileImage from './../assets/profile.png';
@@ -43,7 +45,7 @@ function BottomTabNavigator() {
                 tabBarInactiveTintColor: 'gray', // Color of the icon when inactive
             })}
         >
-            <Tab.Screen name="HomeTab" component={Homescreen} />
+            <Tab.Screen name="HomeTab" component={DrawerNavigator} />
             <Tab.Screen name="Notification" component={Notificationscreen} />
             <Tab.Screen name="Profile" component={Profilescreen} />
         </Tab.Navigator>

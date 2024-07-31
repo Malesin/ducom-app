@@ -79,7 +79,7 @@ const HomeScreen = ({ navigation }) => {
       <ScrollView contentContainerStyle={styles.contentContainer}>
         <Text style={styles.contentText}>Welcome to the Home Screen!</Text>
         <Text style={styles.contentText}>Hi, {userData.name}</Text>
-        <TouchableOpacity style={styles.buttonLogout} onPress={() => { setOpen(true) }}>
+        <TouchableOpacity style={styles.buttonLogout} onPress={handleLogout}>
           <Text style={styles.contentText}>Logout</Text>
         </TouchableOpacity>
       </ScrollView>

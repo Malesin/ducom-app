@@ -4,11 +4,9 @@ import { StyleSheet, View, Text } from 'react-native';
 const FAQscreen = () => {
     return (
         <View style={styles.container}>
-            <Header />
             <View style={styles.contentContainer}>
                 <Text style={styles.contentText}>Welcome to the FAQ!</Text>
             </View>
-            <Footer />
         </View>
     );
 };
