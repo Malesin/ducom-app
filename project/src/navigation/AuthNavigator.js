@@ -3,32 +3,23 @@ import { Authscreen, Forgotpassword, Homescreen, Registerscreen, Signinscreen, S
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import BottomTabNavigator from './BottomTabNavigator';
-import DrawerNavigator from '../navigation/DrawerNavigator'
-// Main Navigation
 
 const Stack = createNativeStackNavigator();
 
 export default function MainNavigation() {
   return (
     <NavigationContainer>
-      <Stack.Navigator 
+      <Stack.Navigator
         initialRouteName="Splash"
-        screenOptions={({ route }) => ({
-          headerShown: route.name === 'Home'  // Show header only for 'Home'
-        })}
       >
-        
-        
-        <Stack.Screen name='Splash' component={Splashscreen} />
-        <Stack.Screen name='Drawer' component={DrawerNavigator} />
-
-        <Stack.Screen name='Auths' component={Authscreen} />
-        <Stack.Screen name='Signin' component={Signinscreen} />
-        <Stack.Screen name='Register' component={Registerscreen} />
-        <Stack.Screen name='Forgotpass' component={Forgotpassword} />
-        <Stack.Screen name='Termsandcondition' component={TermsandConditionscreen} />
+        <Stack.Screen name='Splash' component={Splashscreen} options={{ headerShown: false }} />
+        <Stack.Screen name='Auths' component={Authscreen} options={{ headerShown: false }} />
+        <Stack.Screen name='Signin' component={Signinscreen} options={{ headerShown: false }} />
+        <Stack.Screen name='Register' component={Registerscreen} options={{ headerShown: false }} />
+        <Stack.Screen name='Forgotpass' component={Forgotpassword} options={{ headerShown: false }} />
+        <Stack.Screen name='Termsandcondition' component={TermsandConditionscreen} options={{ headerShown: false }} />
         <Stack.Screen name='Home' component={BottomTabNavigator} />
       </Stack.Navigator>
     </NavigationContainer>
   );
-};
+}
