@@ -1,8 +1,6 @@
 import React from 'react';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import { Homescreen, FAQscreen, Marksscreen, Settingsscreen, Profilescreen } from '../pages';
-import { TabRouter } from '@react-navigation/native';
-import BottomTabNavigator from './BottomTabNavigator';
+import { Homescreen, FAQscreen, Marksscreen, Settingsscreen } from '../pages';
 
 
 const Drawer = createDrawerNavigator();
