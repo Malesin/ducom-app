@@ -46,7 +46,7 @@ function BottomTabNavigator() {
             })}
         >
             <Tab.Screen name="HomeTab" component={DrawerNavigator} />
-            <Tab.Screen name="Notification" component={Notificationscreen} />
+            <Tab.Screen name="Notification" component={Notificationscreen} options={{ headerShown: true }} />
             <Tab.Screen name="Profile" component={Profilescreen} />
         </Tab.Navigator>
     );
