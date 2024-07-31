@@ -18,7 +18,7 @@ export default function MainNavigation() {
         <Stack.Screen name='Register' component={Registerscreen} options={{ headerShown: false }} />
         <Stack.Screen name='Forgotpass' component={Forgotpassword} options={{ headerShown: false }} />
         <Stack.Screen name='Termsandcondition' component={TermsandConditionscreen} options={{ headerShown: false }} />
-        <Stack.Screen name='Home' component={BottomTabNavigator} />
+        <Stack.Screen name='Home' component={BottomTabNavigator} options={{headerShown: false}}/>
       </Stack.Navigator>
     </NavigationContainer>
   );

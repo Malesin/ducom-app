@@ -8,7 +8,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import config from '../../config'
 const serverUrl = config.SERVER_URL
 
-const HomeScreen = ({ navigation }) => {
+const HomeScreen = ({ navigation }) => { 
 
   const [open, setOpen] = useState(false)
   const [userData, setUserData] = useState("");
@@ -22,7 +22,7 @@ const HomeScreen = ({ navigation }) => {
         setUserData(res.data.data);
       });
   }
-
+  
   const handleBackPress = () => {
     Alert.alert(
       'Exit App',
