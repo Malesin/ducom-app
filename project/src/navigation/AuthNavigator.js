@@ -1,5 +1,5 @@
 import React from 'react';
-import { Authscreen, Forgotpassword, Homescreen, Notificationscreen, Registerscreen, Signinscreen, Splashscreen, TermsandConditionscreen } from './../pages';
+import { Authscreen, Forgotpassword, Registerscreen, Signinscreen, Splashscreen, TermsandConditionscreen } from './../pages';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import BottomTabNavigator from './BottomTabNavigator';

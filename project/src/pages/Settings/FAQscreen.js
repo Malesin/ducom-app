@@ -1,18 +1,39 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { StyleSheet, View, Text, SafeAreaView, TouchableOpacity } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
-import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
+import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+
+// Debounce utility function
+const debounce = (func, delay) => {
+    let timer;
+    return (...args) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => func.apply(this, args), delay);
+    };
+};
 
 const Accordion = ({ title, content, isExpanded, onPress }) => {
     const height = useSharedValue(0);
+    const borderOpacity = useSharedValue(0);
 
-    // Update the height when `isExpanded` changes
+    // Update the height and border opacity when `isExpanded` changes
     height.value = withSpring(isExpanded ? 100 : 0, { damping: 20, stiffness: 100 });
+    borderOpacity.value = withTiming(isExpanded ? 1 : 0, { duration: 300 });
 
     const animatedStyle = useAnimatedStyle(() => {
         return {
             height: height.value,
             overflow: 'hidden',
+        };
+    });
+
+    const contentTextStyle = useAnimatedStyle(() => {
+        return {
+            borderWidth: height.value > 0 ? 1 : 0, // Ensure border is visible during expansion
+            borderColor: '#ccc', // Static border color
+            opacity: borderOpacity.value, // Animated border opacity
+            padding: height.value > 0 ? 10 : 0, // Add padding when expanded
         };
     });
 
@@ -23,9 +44,16 @@ const Accordion = ({ title, content, isExpanded, onPress }) => {
                 onPress={onPress}
             >
                 <Text style={styles.accordionHeaderText}>{title}</Text>
+                <Icon
+                    name={isExpanded ? 'expand-less' : 'expand-more'}
+                    size={24}
+                    color="#000"
+                />
             </TouchableOpacity>
             <Animated.View style={[styles.accordionContent, animatedStyle]}>
-                <Text style={styles.accordionContentText}>{content}</Text>
+                <Animated.Text style={[styles.accordionContentText, contentTextStyle]}>
+                    {content}
+                </Animated.Text>
             </Animated.View>
         </View>
     );
@@ -34,9 +62,10 @@ const Accordion = ({ title, content, isExpanded, onPress }) => {
 const FAQscreen = () => {
     const [expandedIndex, setExpandedIndex] = useState(null);
 
-    const toggleAccordion = (index) => {
+    // Wrap toggleAccordion in debounce
+    const toggleAccordion = useCallback(debounce((index) => {
         setExpandedIndex(expandedIndex === index ? null : index);
-    };
+    }, 300), [expandedIndex]);
 
     const accordionData = [
         { title: 'What is Ducom?', content: 'Ducom is an app developed by students from SMKN 2 Jakarta.' },
@@ -76,8 +105,6 @@ const FAQscreen = () => {
     );
 };
 
-export default FAQscreen;
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -100,28 +127,33 @@ const styles = StyleSheet.create({
     },
     accordionContainer: {
         width: '100%',
-        marginBottom: 10,
+        marginBottom: 15,
     },
     accordionHeader: {
         backgroundColor: '#FFFFFF',
-        padding: 15,
+        padding: 10,
         borderRadius: 5,
         borderWidth: 0.5,
         borderColor: '#ccc',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
     },
     accordionHeaderText: {
         fontSize: 16,
         color: '#000',
     },
     accordionContent: {
-        borderRadius: 5,
-        borderWidth: 0.5,
-        borderColor: '#ccc',
+        borderRadius: 5, // Ensure rounded corners
         backgroundColor: '#FFFFFF',
-        padding: 10,
+        padding: 0,
+        overflow: 'hidden', // Ensure the rounded corners effect
     },
     accordionContentText: {
         fontSize: 14,
         color: '#333',
+        borderRadius: 5, // Ensure rounded corners for text as well
     },
 });
+
+export default FAQscreen;
