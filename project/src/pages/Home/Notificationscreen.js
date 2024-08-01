@@ -1,14 +1,20 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { SafeAreaView, StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 
 const Notificationscreen = () => {
   return (
-    <View>
-      <Text>Notificationscreen</Text>
-    </View>
+    <SafeAreaView style={styles.container} >
+      <View>
+        <Text>Notificationscreen</Text>
+      </View>
+    </SafeAreaView>
   )
 }
 
 export default Notificationscreen
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+    container: {
+      color: "#FFFFFF"
+    }
+})
