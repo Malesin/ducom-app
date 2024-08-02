@@ -1,10 +1,11 @@
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import React, { useState } from 'react';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { ALERT_TYPE, AlertNotificationRoot, Toast } from 'react-native-alert-notification';
+import Toast from 'react-native-toast-message';
 import axios from 'axios';
-import config from '../../config'
-const serverUrl = config.SERVER_URL
+import config from '../../config';
+
+const serverUrl = config.SERVER_URL;
 
 const RegisterScreen = ({ navigation }) => {
   const [name, setName] = useState('');
@@ -22,12 +23,25 @@ const RegisterScreen = ({ navigation }) => {
     return usernameRegex.test(username) && !username.includes(' '); // No spaces
   };
 
+  const validateName = (name) => {
+    const nameRegex = /^[a-z0-9]{4,15}$/;
+    return nameRegex.test(name);
+  };
+
+  const validatePassword = (password) => {
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,15}$/;
+    return passwordRegex.test(password);
+  };
+
   const handleSignup = () => {
     const newErrors = {};
     let valid = true;
 
     if (!name) {
       newErrors.name = 'Name cannot be empty';
+      valid = false;
+    } else if (!validateName(name)) {
+      newErrors.name = 'Can only use letters of the alphabet and a maximum of 45 letters.';
       valid = false;
     }
 
@@ -50,20 +64,16 @@ const RegisterScreen = ({ navigation }) => {
     if (!password) {
       newErrors.password = 'Password cannot be empty';
       valid = false;
-    } else if (password.length < 8 || password.length > 15) {
-      newErrors.password = 'Password must be between 8 and 15 characters';
-      valid = false;
-    } else if (password !== confirmpassword) {
-      newErrors.password = 'Passwords do not match';
+    } else if (!validatePassword(password)) {
+      newErrors.password = 'Password must be more than 8 - 15 characters and character combinations.';
       valid = false;
     }
 
     if (!isCheckedTerms) {
       Toast.show({
-        type: ALERT_TYPE.WARNING,
-        title: 'Terms and Conditions',
-        textBody: 'You must agree to the terms and conditions to register.',
-        button: 'close',
+        type: 'info',
+        text1: 'Terms and Conditions',
+        text2: 'You must agree to the terms and conditions to register.',
       });
       valid = false;
     }
@@ -73,64 +83,61 @@ const RegisterScreen = ({ navigation }) => {
     if (valid) {
       const userData = { name, username, email, password };
 
-      axios
-        .post(`${serverUrl}/register`, userData)
-        .then(res => {
-          const { status } = res.data;
-          switch (status) {
-            case "ok":
-              Toast.show({
-                type: ALERT_TYPE.SUCCESS,
-                title: 'Success',
-                textBody: 'Registered Successfully!!',
-                button: 'close',
-                onShow: () => {
-                  setTimeout(() => {
-                    Toast.hide();
-                    navigation.navigate('Signin');
-                  }, 1500);
-                }
-              });
-              break;
-            case "alreadyUser":
-              Toast.show({
-                type: ALERT_TYPE.DANGER,
-                title: 'Error',
-                textBody: "User Already Exists!!",
-                button: 'close',
-              });
-              break;
-            case "alreadyEmail":
-              Toast.show({
-                type: ALERT_TYPE.DANGER,
-                title: 'Error',
-                textBody: "Email Already Exists!!",
-                button: 'close',
-              });
-              break;
-            default:
-              Toast.show({
-                type: ALERT_TYPE.DANGER,
-                title: 'Error',
-                textBody: 'An error occurred. Please try again later.',
-                button: 'close',
-              });
-          }
-        })
-        .catch(e => {
-          console.log(e);
-          Toast.show({
-            type: ALERT_TYPE.DANGER,
-            title: 'Error',
-            textBody: 'An error occurred. Please try again later.',
-            button: 'close',
+      setTimeout(() => {
+        axios
+          .post(`${serverUrl}/register`, userData)
+          .then(res => {
+            const { status } = res.data;
+            switch (status) {
+              case "ok":
+                Toast.show({
+                  type: 'success',
+                  text1: 'Success',
+                  text2: 'Registered Successfully!!',
+                  onHide: () => {
+                    setTimeout(() => {
+                      navigation.navigate('Signin');
+                    }, 1500);
+                  }
+                });
+                break;
+              case "alreadyUser":
+                Toast.show({
+                  type: 'error',
+                  text1: 'Error',
+                  text2: "User Already Exists!!",
+                });
+                break;
+              case "alreadyEmail":
+                Toast.show({
+                  type: 'error',
+                  text1: 'Error',
+                  text2: "Email Already Exists!!",
+                });
+                break;
+              default:
+                Toast.show({
+                  type: 'error',
+                  text1: 'Error',
+                  text2: 'An error occurred. Please try again later.',
+                });
+            }
+          })
+          .catch(e => {
+            console.log(e);
+            Toast.show({
+              type: 'error',
+              text1: 'Error',
+              text2: 'An error occurred. Please try again later.',
+            });
           });
-        });
+      }, 1000); // Delay 1 detik
     }
   };
 
+
   return (
-    <AlertNotificationRoot>
+    <>
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.title}>Sign Up</Text>
         <TextInput
@@ -205,10 +212,10 @@ const RegisterScreen = ({ navigation }) => {
         </TouchableOpacity>
         <Text style={styles.loginText}>Already signed up? <Text style={styles.loginLink} onPress={() => navigation.navigate('Signin')}>Log In</Text></Text>
       </ScrollView>
-    </AlertNotificationRoot>
+      <Toast ref={(ref) => Toast.setRef(ref)} />
+    </>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,

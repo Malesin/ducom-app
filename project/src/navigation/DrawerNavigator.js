@@ -19,9 +19,11 @@ const DrawerNavigator = () => {
                     </View>
                 ),
                 headerStyle: {
-                    backgroundColor: '#fff', // Optional: Set a background color for the header
+                    backgroundColor: '#fff', // Background color for the header
+                    borderBottomWidth: 1, // Border width
+                    borderBottomColor: '#e1e8ed', // Border color
                 },
-                headerTintColor: '#000', // Optional: Set the color for any text or icons
+                headerTintColor: '#000', // Color for any text or icons
                 headerTitleAlign: 'center', // Center align the header title (logo in this case)
                 drawerStyle: {
                     backgroundColor: '#fff', // Background color for the drawer
@@ -29,11 +31,9 @@ const DrawerNavigator = () => {
                 drawerActiveTintColor: 'black', // Active color for drawer items
                 drawerInactiveTintColor: 'gray', // Inactive color for drawer items
                 drawerItemStyle: {
-                    // Remove tint color effect from drawer items
-                    color: 'black', // Set color for drawer item text
+                    color: 'black', // Color for drawer item text
                 },
                 drawerIcon: ({ color, size, focused }) => ({
-                    // Remove tint color from icons
                     color: 'black', // Set color for drawer icons
                 }),
             }}

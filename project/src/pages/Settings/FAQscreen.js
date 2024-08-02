@@ -18,7 +18,7 @@ const Accordion = ({ title, content, isExpanded, onPress }) => {
     const borderOpacity = useSharedValue(0);
 
     // Update the height and border opacity when `isExpanded` changes
-    height.value = withSpring(isExpanded ? 100 : 0, { damping: 20, stiffness: 100 });
+    height.value = withSpring(isExpanded ? 60 : 0, { damping: 20, stiffness: 100 });
     borderOpacity.value = withTiming(isExpanded ? 1 : 0, { duration: 300 });
 
     const animatedStyle = useAnimatedStyle(() => {
@@ -69,7 +69,7 @@ const FAQscreen = () => {
 
     const accordionData = [
         { title: 'What is Ducom?', content: 'Ducom is an app developed by students from SMKN 2 Jakarta.' },
-        { title: 'How to use Ducom', content: 'To use Ducom, you need to sign up and log in.' },
+        { title: 'How to use Ducom', content: 'To use Ducom, you need to register an account and sign in.' },
         { title: 'Features of Ducom', content: 'Ducom offers various features including discussion forums and feedback systems.' },
         { title: 'Contact Support', content: 'You can contact support via email or through the app’s support feature.' },
         { title: 'Privacy Policy', content: 'Your data is protected according to our privacy policy.' },
