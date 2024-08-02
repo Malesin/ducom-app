@@ -1,14 +1,14 @@
 import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import axios from "axios"
-import { ALERT_TYPE, AlertNotificationRoot, Toast } from 'react-native-alert-notification';
+import axios from 'axios';
+import Toast from 'react-native-toast-message';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import config from '../../config'
-const serverUrl = config.SERVER_URL
+import config from '../../config';
+
+const serverUrl = config.SERVER_URL;
 
 const Signinscreen = ({ navigation }) => {
-
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isChecked, setIsChecked] = useState(false); // State for checkbox
@@ -26,7 +26,8 @@ const Signinscreen = ({ navigation }) => {
 
     checkLoginStatus();
   }, []);
- const handleLogin = () => {
+
+  const handleLogin = () => {
     let valid = true;
     if (email === '') {
       setEmailError('Email cannot be empty');
@@ -43,66 +44,68 @@ const Signinscreen = ({ navigation }) => {
     }
 
     if (valid) {
-      // console.log(email, password);
       const userData = {
         email: email,
         password,
-      }
+      };
       axios
         .post(`${serverUrl}/login-user`, userData)
         .then(res => {
-          console.log(res.data)
-          if (res.data.status == "ok") {
+          console.log(res.data);
+          if (res.data.status === "ok") {
             Toast.show({
-              type: ALERT_TYPE.SUCCESS,
-              title: 'Success',
-              textBody: 'Login Successfully!!',
-              onShow: () => {
+              type: 'success',
+              text1: 'Success',
+              text2: 'Login Successfully!!',
+              onHide: () => {
                 setTimeout(() => {
-                  Toast.hide();
                   navigation.navigate('Home');
-                }, 1100); // MENAMPILKAN TOAST SELAMA 1.2 DETIK
-              }
+                }, 1000); // Delay 1 detik sebelum navigasi
+              },
             });
 
-            AsyncStorage.setItem("token", res.data.data)
-          } else if (res.data.status == "error") {
-            console.log(res.data);
+            AsyncStorage.setItem("token", res.data.data);
+          } else if (res.data.status === "error") {
             Toast.show({
-              type: ALERT_TYPE.DANGER,
-              title: 'Error',
-              textBody: "Email or User Doesn't Exists!!",
-              onShow: () => {
+              type: 'error',
+              text1: 'Error',
+              text2: "Email or User Doesn't Exist!!",
+              onHide: () => {
                 setTimeout(() => {
-                  Toast.hide();
                   navigation.navigate('Signin');
-                }, 1100); // MENAMPILKAN TOAST SELAMA 1.2 DETIK
-              }
+                }, 1000); // Delay 1 detik sebelum navigasi
+              },
             });
-          } else if (res.data.status == "errorPass") {
+          } else if (res.data.status === "errorPass") {
             Toast.show({
-              type: ALERT_TYPE.DANGER,
-              title: 'Error',
-              textBody: "Incorrect Password",
-              onShow: () => {
+              type: 'error',
+              text1: 'Error',
+              text2: "Incorrect Password",
+              onHide: () => {
                 setTimeout(() => {
-                  Toast.hide();
                   navigation.navigate('Signin');
-                }, 1100); // MENAMPILKAN TOAST SELAMA 1.2 DETIK
-              }
+                }, 1000); // Delay 1 detik sebelum navigasi
+              },
             });
           }
         })
+        .catch(e => {
+          console.log(e);
+          Toast.show({
+            type: 'error',
+            text1: 'Error',
+            text2: 'An error occurred. Please try again later.',
+          });
+        });
     }
   };
- 
 
   const handlePasswordChange = (text) => {
     setPassword(text.slice(0, 25));
   };
 
   return (
-    <AlertNotificationRoot>
+    <>
       <View style={styles.container}>
         <Text style={styles.title}>Log In</Text>
         <TextInput
@@ -117,7 +120,7 @@ const Signinscreen = ({ navigation }) => {
         <View style={[styles.passwordContainer, passwordError ? styles.errorInput : null]}>
           <TextInput
             style={styles.passwordInput}
-            onChangeText={setPassword}
+            onChangeText={handlePasswordChange}
             value={password}
             placeholder="Password"
             secureTextEntry={!showPassword} // Toggle password visibility based on state
@@ -144,10 +147,13 @@ const Signinscreen = ({ navigation }) => {
         <TouchableOpacity onPress={() => navigation.navigate('Forgotpass')}>
           <Text style={styles.forgotPassLink}>Forgot Password?</Text>
         </TouchableOpacity>
-
-        <Text style={styles.signupText}>Don’t have an account? <Text style={styles.signupLink} onPress={() => navigation.navigate('Register')} >Sign Up</Text></Text>
+        <Text style={styles.signupText}>
+          Don’t have an account?
+          <Text style={styles.signupLink} onPress={() => navigation.navigate('Register')}> Sign Up</Text>
+        </Text>
       </View>
-    </AlertNotificationRoot>
+      <Toast ref={(ref) => Toast.setRef(ref)} />
+    </>
   );
 };
 

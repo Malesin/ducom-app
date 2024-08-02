@@ -1,14 +1,13 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import { Image, StyleSheet, View } from 'react-native'; // Import StyleSheet for styles
+import { Image, StyleSheet, View, Text } from 'react-native';
 import { Profilescreen, Notificationscreen } from '../pages';
 import DrawerNavigator from './DrawerNavigator';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
-// Import the profile image and logo
+// Import the profile image
 import profileImage from './../assets/profile.png';
-import logo from './../assets/logo1.png'; // Update the path according to your project structure
 
 const Tab = createBottomTabNavigator();
 
@@ -19,7 +18,7 @@ function BottomTabNavigator() {
                 screenOptions={({ route }) => ({
                     tabBarIcon: ({ color }) => {
                         let iconName;
-                        const iconSize = 30; // Adjust the icon size here
+                        const iconSize = 30;
 
                         if (route.name === 'HomeTab') {
                             iconName = 'home';
@@ -28,23 +27,22 @@ function BottomTabNavigator() {
                             iconName = 'notifications';
                             return <MaterialIcons name={iconName} size={iconSize} color={color} />;
                         } else if (route.name === 'Profile') {
-                            // Use Image component for Profile tab with circular style
                             return (
                                 <Image
                                     source={profileImage}
-                                    style={[styles.icon, { tintColor: undefined }]} // Remove tintColor for the profile image
+                                    style={[styles.icon, { tintColor: undefined }]}
                                 />
                             );
                         }
                     },
-                    tabBarLabel: () => null, // Hide tab bar labels
+                    tabBarLabel: () => null,
                     tabBarStyle: {
-                        paddingBottom: 10, // Adjust the bottom padding here
-                        height: 60, // Optionally adjust the height of the tab bar
+                        paddingBottom: 10,
+                        height: 60,
                     },
-                    headerShown: false, // Hide the header for all screens
-                    tabBarActiveTintColor: 'black', // Color of the icon when active
-                    tabBarInactiveTintColor: 'gray', // Color of the icon when inactive
+                    headerShown: false,
+                    tabBarActiveTintColor: 'black',
+                    tabBarInactiveTintColor: 'gray',
                 })}
             >
                 <Tab.Screen name="HomeTab" component={DrawerNavigator} />
@@ -55,15 +53,19 @@ function BottomTabNavigator() {
                         headerShown: true,
                         headerTitle: () => (
                             <View style={styles.headerTitleContainer}>
-                                <Image source={logo} style={styles.logo} />
+                                <MaterialIcons name="notifications" size={24} color="black" style={styles.headerIcon} />
+                                <Text style={styles.headerTitle}>Notifications</Text>
                             </View>
                         ),
                         headerStyle: {
-                            backgroundColor: '#fff', // Optional: Set a background color for the header
-                            paddingHorizontal: 50, // Add horizontal padding to the header
-                            paddingVertical: 50, // Add vertical padding to the header
+                            backgroundColor: '#fff',
+                            borderBottomWidth: 1,
+                            borderBottomColor: '#e1e8ed',
                         },
-                        headerTitleAlign: 'center', // Center align the header title (logo in this case)
+                        headerTitleAlign: 'left',
+                        headerTitleStyle: {
+                            fontSize: 18,
+                        },
                     }}
                 />
                 <Tab.Screen name="Profile" component={Profilescreen} />
@@ -74,18 +76,21 @@ function BottomTabNavigator() {
 
 const styles = StyleSheet.create({
     icon: {
-        width: 30, // Size of the icon
-        height: 30, // Size of the icon
-        borderRadius: 15, // Half of the width/height to make it circular
+        width: 30,
+        height: 30,
+        borderRadius: 15,
     },
     headerTitleContainer: {
         flexDirection: 'row',
         alignItems: 'center',
     },
-    logo: {
-        width: 160, // Set your desired width
-        height: 60, // Set your desired height
-        resizeMode: 'contain', // Ensure the logo maintains its aspect ratio
+    headerIcon: {
+        marginRight: 8, // Space between icon and text
+    },
+    headerTitle: {
+        fontSize: 18,
+        color: 'black',
+        fontWeight: 'bold'
     },
 });
 
