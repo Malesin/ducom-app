@@ -26,7 +26,7 @@ const HomeScreen = ({ navigation }) => {
         }
       });
 
-    // Fetch tweets 
+    // Fetch tweets
     // Replace with your actual data fetching logic
     setTweets([
       {
@@ -34,7 +34,8 @@ const HomeScreen = ({ navigation }) => {
         userHandle: 'nesir',
         userAvatar: '',
         content: 'banyak bertanya makin tersesat',
-        image: 'null',
+        image: '',
+        video: '', // Add video URL if available
         commentsCount: 12,
         likesCount: 56,
         bookMarksCount: 2,
@@ -43,8 +44,9 @@ const HomeScreen = ({ navigation }) => {
         userName: 'frontendgariskeras',
         userHandle: 'frontend',
         userAvatar: '',
-        content: 'nanya mulu kayak tamu',
-        image: '',
+        content: '2 stroke menolak punah ',
+        image: 'https://i.pinimg.com/564x/43/7e/a8/437ea88ad75d8ab66c26b75e4b5d28e8.jpg',
+        video: '', // Add video URL if available
         commentsCount: 12,
         likesCount: 56,
         bookMarksCount: 2,
@@ -53,18 +55,20 @@ const HomeScreen = ({ navigation }) => {
         userName: 'admin',
         userHandle: 'adminsl0t',
         userAvatar: '',
-        content: 'kuntul puqimak',
-        image: 'null',
+        content: 'kakak aknes ygy',
+        image: '',
+        video: '', // Example video URL
         commentsCount: 12,
         likesCount: 56,
         bookMarksCount: 2,
       },
       {
-        userName: 'noturfavmikaa',
+        userName: 'noturfavmikaaa',
         userHandle: 'mikaa',
         userAvatar: '',
         content: 'sigma skibidi toilet',
         image: '',
+        video: '', // Add video URL if available
         commentsCount: 12,
         likesCount: 56,
         bookMarksCount: 2,
@@ -133,10 +137,10 @@ const HomeScreen = ({ navigation }) => {
       </ScrollView>
 
       <TouchableOpacity style={styles.fab} onPress={() => console.log('Button pressed')}>
-        <MaterialCommunityIcons name="plus" size={50} color="#fff" />
+        <MaterialCommunityIcons name="plus" size={40} color="#fff" />
       </TouchableOpacity>
     </SafeAreaView>
-  )
+  );
 }
 
 export default HomeScreen;
@@ -153,8 +157,8 @@ const styles = StyleSheet.create({
   },
   tweetContainer: {
     width: '100%', // Ensures the TweetCard takes full width of the screen
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
   },
   contentText: {
     fontSize: 18,
