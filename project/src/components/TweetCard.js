@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, Modal, TouchableWithoutFeedback } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import Video from 'react-native-video'; // Import Video component
+import Video from 'react-native-video';
 import DefaultAvatar from '../assets/avatar.jpg'; // Update path if needed
 
 const TweetCard = ({ tweet }) => {
@@ -14,20 +14,18 @@ const TweetCard = ({ tweet }) => {
     const [modalMediaUri, setModalMediaUri] = useState('');
 
     const handleLike = () => {
-        setLiked(!liked);
-        setLikesCount(liked ? likesCount - 1 : likesCount + 1);
+        setLiked(prev => !prev);
+        setLikesCount(prev => liked ? prev - 1 : prev + 1);
     };
 
     const handleBookmark = () => {
-        setBookmarked(!bookmarked);
-        setBookMarksCount(bookmarked ? bookMarksCount - 1 : bookMarksCount + 1);
+        setBookmarked(prev => !prev);
+        setBookMarksCount(prev => bookmarked ? prev - 1 : prev + 1);
     };
 
-    const handleComment = () => {
-        setCommentsCount(commentsCount + 1);
-    };
+    const handleComment = () => setCommentsCount(prev => prev + 1);
 
-    const openMediaPreview = (uri) => {
+    const openMediaPreview = uri => {
         setModalMediaUri(uri);
         setIsModalVisible(true);
     };
@@ -58,60 +56,42 @@ const TweetCard = ({ tweet }) => {
             {tweet.image || tweet.video ? (
                 <TouchableOpacity onPress={() => openMediaPreview(tweet.image || tweet.video)}>
                     {tweet.image ? (
-                        <Image
-                            source={{ uri: tweet.image }}
-                            style={styles.tweetImage}
-                        />
+                        <Image source={{ uri: tweet.image }} style={styles.tweetImage} />
                     ) : (
-                        <Video
-                            source={{ uri: tweet.video }}
-                            style={styles.tweetImage} // This should control the size
-                            controls
-                            resizeMode="contain" // Apply resizeMode here, not in style
-                        />
+                        <Video source={{ uri: tweet.video }} style={styles.tweetImage} controls resizeMode="contain" />
                     )}
                 </TouchableOpacity>
             ) : null}
 
             {/* Interactions */}
             <View style={styles.actions}>
-                <TouchableOpacity style={styles.actionButton} onPress={handleLike}>
-                    <MaterialCommunityIcons
-                        name={liked ? "heart" : "heart-outline"}
-                        size={20}
-                        color={liked ? "#E0245E" : "#040608"}
-                    />
-                    <Text style={styles.actionText}>{likesCount}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.actionButton} onPress={handleBookmark}>
-                    <MaterialCommunityIcons
-                        name={bookmarked ? "bookmark" : "bookmark-outline"}
-                        size={20}
-                        color={bookmarked ? "#00c5ff" : "#040608"}
-                    />
-                    <Text style={styles.actionText}>{bookMarksCount}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.actionButton} onPress={handleComment}>
-                    <MaterialCommunityIcons
-                        name="message-reply-outline"
-                        size={20}
-                        color="#040608"
-                    />
-                    <Text style={styles.actionText}>{commentsCount}</Text>
-                </TouchableOpacity>
+                <InteractionButton
+                    icon={liked ? "heart" : "heart-outline"}
+                    color={liked ? "#E0245E" : "#040608"}
+                    count={likesCount}
+                    onPress={handleLike}
+                />
+                <InteractionButton
+                    icon={bookmarked ? "bookmark" : "bookmark-outline"}
+                    color={bookmarked ? "#00c5ff" : "#040608"}
+                    count={bookMarksCount}
+                    onPress={handleBookmark}
+                />
+                <InteractionButton
+                    icon="message-reply-outline"
+                    color="#040608"
+                    count={commentsCount}
+                    onPress={handleComment}
+                />
                 <TouchableOpacity style={styles.actionButton}>
-                    <MaterialCommunityIcons
-                        name="export-variant"
-                        size={20}
-                        color="#657786"
-                    />
+                    <MaterialCommunityIcons name="export-variant" size={20} color="#657786" />
                 </TouchableOpacity>
             </View>
 
             {/* Modal for Media Preview */}
             <Modal
                 visible={isModalVisible}
-                transparent={true}
+                transparent
                 onRequestClose={closeMediaPreview}
                 animationType="fade"
             >
@@ -119,26 +99,24 @@ const TweetCard = ({ tweet }) => {
                     <View style={styles.modalBackground}>
                         <View style={styles.modalContainer}>
                             {modalMediaUri.endsWith('.mp4') ? (
-                                <Video
-                                    source={{ uri: modalMediaUri }}
-                                    style={styles.modalImage}
-                                    controls
-                                    resizeMode="contain" // Apply resizeMode here as well
-                                />
+                                <Video source={{ uri: modalMediaUri }} style={styles.modalImage} controls resizeMode="contain" />
                             ) : (
-                                <Image
-                                    source={{ uri: modalMediaUri }}
-                                    style={styles.modalImage}
-                                />
+                                <Image source={{ uri: modalMediaUri }} style={styles.modalImage} />
                             )}
                         </View>
                     </View>
                 </TouchableWithoutFeedback>
             </Modal>
-
         </View>
     );
 };
+
+const InteractionButton = ({ icon, color, count, onPress }) => (
+    <TouchableOpacity style={styles.actionButton} onPress={onPress}>
+        <MaterialCommunityIcons name={icon} size={20} color={color} />
+        <Text style={styles.actionText}>{count}</Text>
+    </TouchableOpacity>
+);
 
 const styles = StyleSheet.create({
     card: {
@@ -150,8 +128,8 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 4,
         elevation: 1,
-        width: '100%', // Changed from 100% to 90% for a wider card
-        maxWidth: 600, // Optional: to set a maximum width
+        width: '100%',
+        maxWidth: 800,
         borderColor: '#E1E8ED',
         borderWidth: 1,
     },
