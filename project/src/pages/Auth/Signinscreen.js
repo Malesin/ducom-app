@@ -6,6 +6,11 @@ import Toast from 'react-native-toast-message';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import config from '../../config';
 
+
+// usn/gmail:nimyonim/frontendganteng@gmail.com
+// pw:raisya123
+
+
 const serverUrl = config.SERVER_URL;
 
 const Signinscreen = ({ navigation }) => {

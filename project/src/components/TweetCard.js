@@ -144,13 +144,14 @@ const styles = StyleSheet.create({
     card: {
         backgroundColor: '#fff',
         borderRadius: 7,
-        padding: 14,
+        padding: 10,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 4,
-        elevation: 2,
-        width: '100%',
+        elevation: 1,
+        width: '100%', // Changed from 100% to 90% for a wider card
+        maxWidth: 600, // Optional: to set a maximum width
         borderColor: '#E1E8ED',
         borderWidth: 1,
     },
