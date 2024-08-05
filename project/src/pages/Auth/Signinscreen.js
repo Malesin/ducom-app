@@ -152,7 +152,7 @@ const Signinscreen = ({ navigation }) => {
           <Text style={styles.signupLink} onPress={() => navigation.navigate('Register')}> Sign Up</Text>
         </Text>
       </View>
-      <Toast ref={(ref) => Toast.setRef(ref)} />
+      <Toast />
     </>
   );
 };

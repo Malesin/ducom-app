@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, Modal, TouchableWithoutFeedback } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-
-// Import gambar default dari folder assets
-import DefaultAvatar from '../assets/avatar.jpg'; // Ubah sesuai lokasi avatar Anda
+import Video from 'react-native-video'; // Import Video component
+import DefaultAvatar from '../assets/avatar.jpg'; // Update path if needed
 
 const TweetCard = ({ tweet }) => {
     const [liked, setLiked] = useState(false);
@@ -11,6 +10,8 @@ const TweetCard = ({ tweet }) => {
     const [likesCount, setLikesCount] = useState(tweet.likesCount);
     const [bookMarksCount, setBookMarksCount] = useState(tweet.bookMarksCount);
     const [commentsCount, setCommentsCount] = useState(tweet.commentsCount);
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [modalMediaUri, setModalMediaUri] = useState('');
 
     const handleLike = () => {
         setLiked(!liked);
@@ -24,6 +25,16 @@ const TweetCard = ({ tweet }) => {
 
     const handleComment = () => {
         setCommentsCount(commentsCount + 1);
+    };
+
+    const openMediaPreview = (uri) => {
+        setModalMediaUri(uri);
+        setIsModalVisible(true);
+    };
+
+    const closeMediaPreview = () => {
+        setIsModalVisible(false);
+        setModalMediaUri('');
     };
 
     return (
@@ -43,9 +54,23 @@ const TweetCard = ({ tweet }) => {
             {/* Tweet Content */}
             <Text style={styles.tweetText}>{tweet.content}</Text>
 
-            {/* Tweet Image */}
-            {tweet.image ? (
-                <Image source={{ uri: tweet.image }} style={styles.tweetImage} /> // Menampilkan gambar
+            {/* Tweet Media */}
+            {tweet.image || tweet.video ? (
+                <TouchableOpacity onPress={() => openMediaPreview(tweet.image || tweet.video)}>
+                    {tweet.image ? (
+                        <Image
+                            source={{ uri: tweet.image }}
+                            style={styles.tweetImage}
+                        />
+                    ) : (
+                        <Video
+                            source={{ uri: tweet.video }}
+                            style={styles.tweetImage} // This should control the size
+                            controls
+                            resizeMode="contain" // Apply resizeMode here, not in style
+                        />
+                    )}
+                </TouchableOpacity>
             ) : null}
 
             {/* Interactions */}
@@ -82,6 +107,35 @@ const TweetCard = ({ tweet }) => {
                     />
                 </TouchableOpacity>
             </View>
+
+            {/* Modal for Media Preview */}
+            <Modal
+                visible={isModalVisible}
+                transparent={true}
+                onRequestClose={closeMediaPreview}
+                animationType="fade"
+            >
+                <TouchableWithoutFeedback onPress={closeMediaPreview}>
+                    <View style={styles.modalBackground}>
+                        <View style={styles.modalContainer}>
+                            {modalMediaUri.endsWith('.mp4') ? (
+                                <Video
+                                    source={{ uri: modalMediaUri }}
+                                    style={styles.modalImage}
+                                    controls
+                                    resizeMode="contain" // Apply resizeMode here as well
+                                />
+                            ) : (
+                                <Image
+                                    source={{ uri: modalMediaUri }}
+                                    style={styles.modalImage}
+                                />
+                            )}
+                        </View>
+                    </View>
+                </TouchableWithoutFeedback>
+            </Modal>
+
         </View>
     );
 };
@@ -90,14 +144,13 @@ const styles = StyleSheet.create({
     card: {
         backgroundColor: '#fff',
         borderRadius: 7,
-        marginVertical: 10, // Increased margin to make space between cards
         padding: 14,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 4,
         elevation: 2,
-        width: '100%', // Ensure the card spans the full width of the screen
+        width: '100%',
         borderColor: '#E1E8ED',
         borderWidth: 1,
     },
@@ -143,6 +196,23 @@ const styles = StyleSheet.create({
     actionText: {
         marginLeft: 4,
         color: '#040608'
+    },
+    modalBackground: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    },
+    modalContainer: {
+        width: '90%',
+        height: '80%',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    modalImage: {
+        width: '100%',
+        height: '100%',
+        resizeMode: 'contain',
     },
 });
 

@@ -212,7 +212,7 @@ const RegisterScreen = ({ navigation }) => {
         </TouchableOpacity>
         <Text style={styles.loginText}>Already signed up? <Text style={styles.loginLink} onPress={() => navigation.navigate('Signin')}>Log In</Text></Text>
       </ScrollView>
-      <Toast ref={(ref) => Toast.setRef(ref)} />
+      <Toast />
     </>
   );
 };

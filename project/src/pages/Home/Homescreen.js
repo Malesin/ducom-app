@@ -26,7 +26,7 @@ const HomeScreen = ({ navigation }) => {
         }
       });
 
-    // Fetch tweets 
+    // Fetch tweets
     // Replace with your actual data fetching logic
     setTweets([
       {
@@ -34,7 +34,8 @@ const HomeScreen = ({ navigation }) => {
         userHandle: 'nesir',
         userAvatar: '',
         content: 'banyak bertanya makin tersesat',
-        image: 'null',
+        image: '',
+        video: 'https://rr5---sn-aigl6ney.googlevideo.com/videoplayback?expire=1722702805&ei=dQeuZrC_MZGkp-oProGcmAY&ip=41.216.203.29&id=o-ALbOzTu2tWguFpQuKNDHB_oPZq8o6ZvNX6gyh4TDRF80&itag=18&source=youtube&requiressl=yes&xpc=EgVo2aDSNQ%3D%3D&bui=AXc671JXfdY4i7DD5I82dLPs3rHUUiuKBKSYozuKi6lZjBOyrVTcXeervA84DXlcOS1RRVFSJaNN1HFv&spc=NO7bAcnhti3_SBZCfAWyZzGIW1hjzNxm0cI-i4YnVhMHV2THR8lnFd2IZTaylkA&vprv=1&svpuc=1&mime=video%2Fmp4&ns=sQiOOQ08dIf121FBjmVNw74Q&rqh=1&gir=yes&clen=40289460&ratebypass=yes&dur=477.982&lmt=1722607431566185&c=WEB&sefc=1&txp=5538434&n=v6ovJiNh-mpzSw&sparams=expire%2Cei%2Cip%2Cid%2Citag%2Csource%2Crequiressl%2Cxpc%2Cbui%2Cspc%2Cvprv%2Csvpuc%2Cmime%2Cns%2Crqh%2Cgir%2Cclen%2Cratebypass%2Cdur%2Clmt&sig=AJfQdSswRgIhAMfn5m2dkbY3So3ZalhvLa0Tei9-mf4_hZXE3BCHfiyAAiEAitaoCF4U1pGwIgmhQgi3sZjp3qFPPvrFFGbyL1YG-R0%3D&title=%5BONCAM%5D%20PANAS%20YA%20BANG%3F%20MATCH%20VIRAL%20%20GSX%20STD%20PORTING%20!&rm=sn-g5po15-j2ue7l,sn-woce776&rrc=79,104&fexp=24350516,24350518,24350557&req_id=a7b5255fcad9a3ee&redirect_counter=2&cms_redirect=yes&cmsv=e&ipbypass=yes&mh=Ev&mip=110.138.90.203&mm=29&mn=sn-aigl6ney&ms=rdu&mt=1722689646&mv=D&mvi=5&pl=0&lsparams=ipbypass,mh,mip,mm,mn,ms,mv,mvi,pl&lsig=AGtxev0wRgIhAPYOE3xoSFQn_VBnXE3AIrUXqZSg_viLfssgTvTkJcGOAiEAwNmNhSjsRxvr76JrInysUbfyf6PzYN3f57XUUqGLELY%3D', // Add video URL if available
         commentsCount: 12,
         likesCount: 56,
         bookMarksCount: 2,
@@ -43,8 +44,9 @@ const HomeScreen = ({ navigation }) => {
         userName: 'frontendgariskeras',
         userHandle: 'frontend',
         userAvatar: '',
-        content: 'nanya mulu kayak tamu',
-        image: '',
+        content: '2 stroke menolak punah ',
+        image: 'https://i.pinimg.com/564x/43/7e/a8/437ea88ad75d8ab66c26b75e4b5d28e8.jpg',
+        video: '', // Add video URL if available
         commentsCount: 12,
         likesCount: 56,
         bookMarksCount: 2,
@@ -53,18 +55,20 @@ const HomeScreen = ({ navigation }) => {
         userName: 'admin',
         userHandle: 'adminsl0t',
         userAvatar: '',
-        content: 'kuntul puqimak',
-        image: 'null',
+        content: 'kakak aknes ygy',
+        image: '',
+        video: '', // Example video URL
         commentsCount: 12,
         likesCount: 56,
         bookMarksCount: 2,
       },
       {
-        userName: 'noturfavmikaa',
+        userName: 'noturfavmikaaa',
         userHandle: 'mikaa',
         userAvatar: '',
         content: 'sigma skibidi toilet',
         image: '',
+        video: '', // Add video URL if available
         commentsCount: 12,
         likesCount: 56,
         bookMarksCount: 2,
@@ -133,10 +137,10 @@ const HomeScreen = ({ navigation }) => {
       </ScrollView>
 
       <TouchableOpacity style={styles.fab} onPress={() => console.log('Button pressed')}>
-        <MaterialCommunityIcons name="plus" size={50} color="#fff" />
+        <MaterialCommunityIcons name="plus" size={40} color="#fff" />
       </TouchableOpacity>
     </SafeAreaView>
-  )
+  );
 }
 
 export default HomeScreen;
