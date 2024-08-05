@@ -63,6 +63,8 @@ const FAQscreen = () => {
         setExpandedIndex(expandedIndex === index ? null : index);
     }, 300), [expandedIndex]);
 
+
+    // Email API
     const handlePress = async () => {
         const email = 'reysend01@gmail.com'; // Replace with admin email
         const subject = 'Support Request';
