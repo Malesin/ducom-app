@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { StyleSheet, View, Text, SafeAreaView, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Text, SafeAreaView, TouchableOpacity, Linking } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -21,21 +21,17 @@ const Accordion = ({ title, content, isExpanded, onPress }) => {
     height.value = withSpring(isExpanded ? 60 : 0, { damping: 20, stiffness: 100 });
     borderOpacity.value = withTiming(isExpanded ? 1 : 0, { duration: 300 });
 
-    const animatedStyle = useAnimatedStyle(() => {
-        return {
-            height: height.value,
-            overflow: 'hidden',
-        };
-    });
+    const animatedStyle = useAnimatedStyle(() => ({
+        height: height.value,
+        overflow: 'hidden',
+    }));
 
-    const contentTextStyle = useAnimatedStyle(() => {
-        return {
-            borderWidth: height.value > 0 ? 1 : 0, // Ensure border is visible during expansion
-            borderColor: '#ccc', // Static border color
-            opacity: borderOpacity.value, // Animated border opacity
-            padding: height.value > 0 ? 10 : 0, // Add padding when expanded
-        };
-    });
+    const contentTextStyle = useAnimatedStyle(() => ({
+        borderWidth: height.value > 0 ? 1 : 0, // Ensure border is visible during expansion
+        borderColor: '#ccc', // Static border color
+        opacity: borderOpacity.value, // Animated border opacity
+        padding: height.value > 0 ? 10 : 0, // Add padding when expanded
+    }));
 
     return (
         <View style={styles.accordionContainer}>
@@ -66,6 +62,21 @@ const FAQscreen = () => {
     const toggleAccordion = useCallback(debounce((index) => {
         setExpandedIndex(expandedIndex === index ? null : index);
     }, 300), [expandedIndex]);
+
+
+    // Email API
+    const handlePress = async () => {
+        const email = 'reysend01@gmail.com'; // Replace with admin email
+        const subject = 'Support Request';
+        const body = 'Please describe your issue here.';
+        const url = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+        try {
+            await Linking.openURL(url);
+        } catch (error) {
+            console.error('An error occurred while opening the email client:', error);
+        }
+    };
 
     const accordionData = [
         { title: 'What is Ducom?', content: 'Ducom is an app developed by students from SMKN 2 Jakarta.' },
@@ -100,6 +111,14 @@ const FAQscreen = () => {
                         />
                     ))}
                 </View>
+
+                {/* Section for text and button */}
+                <View style={styles.helpSection}>
+                    <Text style={styles.helpText}>Let Us Help You</Text>
+                    <TouchableOpacity style={styles.pillButton} onPress={handlePress}>
+                        <Text style={styles.pillButtonText}>Send a Question?</Text>
+                    </TouchableOpacity>
+                </View>
             </ScrollView>
         </SafeAreaView>
     );
@@ -109,10 +128,9 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#fff',
-        padding: 20,
     },
     contentContainer: {
-        flex: 1,
+        padding: 20,
     },
     contentTitle: {
         fontSize: 24,
@@ -144,15 +162,43 @@ const styles = StyleSheet.create({
         color: '#000',
     },
     accordionContent: {
-        borderRadius: 5, // Ensure rounded corners
+        borderRadius: 5,
         backgroundColor: '#FFFFFF',
         padding: 0,
-        overflow: 'hidden', // Ensure the rounded corners effect
+        overflow: 'hidden',
     },
     accordionContentText: {
         fontSize: 14,
         color: '#333',
-        borderRadius: 5, // Ensure rounded corners for text as well
+        borderRadius: 5,
+    },
+    helpSection: {
+        backgroundColor: '#d3d3d3',
+        shadowColor: '#d3d3d3',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+        elevation: 4,
+        padding: 20,
+        alignItems: 'center',
+    },
+    helpText: {
+        fontSize: 16,
+        color: '#000',
+        marginBottom: 10,
+        textAlign: 'center',
+    },
+    pillButton: {
+        backgroundColor: '#001374',
+        paddingVertical: 16,
+        paddingHorizontal: 36,
+        borderRadius: 50,
+        alignItems: 'center',
+    },
+    pillButtonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
     },
 });
 
