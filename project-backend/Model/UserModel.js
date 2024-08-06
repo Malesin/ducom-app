@@ -6,7 +6,7 @@ const UserDetailSchema = new mongoose.Schema({
     email: { type: String, unique: true },
     password: String,
 }, {
-    collection: "UserInfo"
+    collection: "UserModel"
 })
 
-mongoose.model("UserInfo", UserDetailSchema)
+mongoose.model("UserModel", UserDetailSchema)
