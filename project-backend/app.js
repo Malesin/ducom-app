@@ -3,25 +3,33 @@ const app = express()
 const mongoose = require("mongoose")
 const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
+const multer = require("multer")
+const bodyParser = require('body-parser');
+
 
 app.use(express.json())
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
-const mongoUrl = "mongodb+srv://rifzky:admin@cluster0.as0eld6.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
-
-const JWT_SECRET = "dskfbdsaifvdsfvqueqbegfdbhfvsdbfioh23b4235145bj134[][ewfddsafcdsacdsj13"
+const mongoUrl = "mongodb+srv://ducombackend:ducomadmin@ducomapp.nqicz5h.mongodb.net/?retryWrites=true&w=majority&appName=DucomApp"
+const JWT_SECRET = "bfidkfdsajciusfweubfsdihugigfbrecfnsdprisca[][ewfddsafcdsacdsj13"
 
 mongoose.connect(mongoUrl).then(() => {
     console.log("MongoDB Connected")
 }).catch((err) => {
     console.log(err)
 })
-require('./UserDetails')
 
-const User = mongoose.model("UserInfo")
-
-app.get("/", (req, res) => {
+app.get("/", (res) => {
     res.send({ status: "Hello World" })
 })
+
+app.listen(5001, () => {
+    console.log("server is running on port 5001")
+})
+
+require('./Model/UserModel')
+const User = mongoose.model("UserModel")
 
 app.post("/register", async (req, res) => {
     const { name, username, email, password } = req.body
@@ -87,8 +95,6 @@ app.post("/login-user", async (req, res) => {
     }
 });
 
-
-
 app.post("/userdata", async (req, res) => {
     const { token } = req.body
     try {
@@ -105,6 +111,43 @@ app.post("/userdata", async (req, res) => {
     }
 })
 
-app.listen(5001, () => {
-    console.log("server is running on port 5001")
-})
+// Multer configuration for image uploads
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+
+require('./Model/ImageModel')
+const Image = mongoose.model("ImageModel")
+
+// Endpoint to upload image
+app.post('/upload-image', upload.single('image'), async (req, res) => {
+    try {
+        const image = new Image({
+            filename: req.file.originalname,
+            contentType: req.file.mimetype,
+            imageBase64: req.file.buffer.toString('base64'),
+        });
+
+        await image.save();
+        res.status(201).send({ status: 'ok', data: 'Image uploaded successfully' });
+    } catch (error) {
+        res.status(500).send({ status: 'error', data: error.message });
+    }
+});
+
+// Endpoint to get image by filename
+app.get('/image/:filename', async (req, res) => {
+    try {
+        const image = await Image.findOne({ filename: req.params.filename });
+
+        if (!image) {
+            return res.status(404).send({ status: 'error', data: 'Image not found' });
+        }
+
+        res.set('Content-Type', image.contentType);
+        res.send(Buffer.from(image.imageBase64, 'base64'));
+    } catch (error) {
+        res.status(500).send({ status: 'error', data: error.message });
+    }
+});
+
+
