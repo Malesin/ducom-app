@@ -20,13 +20,16 @@ mongoose.connect(mongoUrl).then(() => {
     console.log(err)
 })
 
-require('./Model/UserModel')
-
-const User = mongoose.model("UserModel")
-
-app.get("/", (req, res) => {
+app.get("/", (res) => {
     res.send({ status: "Hello World" })
 })
+
+app.listen(5001, () => {
+    console.log("server is running on port 5001")
+})
+
+require('./Model/UserModel')
+const User = mongoose.model("UserModel")
 
 app.post("/register", async (req, res) => {
     const { name, username, email, password } = req.body
@@ -112,14 +115,8 @@ app.post("/userdata", async (req, res) => {
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-// Image schema and model
-const imageSchema = new mongoose.Schema({
-    filename: String,
-    contentType: String,
-    imageBase64: String,
-});
-
-const Image = mongoose.model('Image', imageSchema);
+require('./Model/ImageModel')
+const Image = mongoose.model("ImageModel")
 
 // Endpoint to upload image
 app.post('/upload-image', upload.single('image'), async (req, res) => {
@@ -154,6 +151,3 @@ app.get('/image/:filename', async (req, res) => {
 });
 
 
-app.listen(5001, () => {
-    console.log("server is running on port 5001")
-})
