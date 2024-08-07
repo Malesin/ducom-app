@@ -7,7 +7,7 @@ import Forgotpassword from "./Auth/Forgotpassword";
 import FAQscreen from "./Settings/FAQscreen";
 import Marksscreen from "./Other/Marksscreen";
 import Settingsscreen from "./Settings/Settingsscreen";
-import Profilescreen from "./Home/Profilescreen";
+import Profilescreen from "./Profile/Profilescreen";
 import Notificationscreen from "./Home/Notificationscreen";
 import TermsandConditionscreen from "./Settings/TermsandConditionscreen";
 
