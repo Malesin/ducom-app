@@ -28,7 +28,7 @@ app.listen(5001, () => {
     console.log("server is running on port 5001")
 })
 
-require('./Model/UserModel')
+require('./Model/UserModel') 
 const User = mongoose.model("UserModel")
 
 app.post("/register", async (req, res) => {
