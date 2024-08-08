@@ -6,6 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 import config from '../../config';
 import TweetCard from '../../components/TweetCard'; // Import TweetCard
+import moment from 'moment';
 
 const serverUrl = config.SERVER_URL;
 
@@ -21,7 +22,7 @@ const HomeScreen = ({ navigation }) => {
         setUserData(res.data.data);
         if (res.data.status === "error") {
           Alert.alert('Error', "Anda Telah Keluar dari Akun", [
-            { text: 'OK', onPress: () => navigation.navigate('Signin') }
+            { text: 'OK', onPress: () => navigation.navigate('Auths') }
           ]);
         }
       });
@@ -122,6 +123,8 @@ const HomeScreen = ({ navigation }) => {
     );
   };
 
+  const joinDate = moment(userData.join_date).format("D MMMM YYYY");
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.contentContainer}>
@@ -131,6 +134,7 @@ const HomeScreen = ({ navigation }) => {
           </View>
         ))}
         <Text style={styles.contentText}>Hi, {userData.username}</Text>
+        <Text style={styles.contentText}>Tanggal Join : {joinDate}</Text>
         <TouchableOpacity style={styles.buttonLogout} onPress={handleLogout}>
           <Text style={styles.contentText}>Logout</Text>
         </TouchableOpacity>
