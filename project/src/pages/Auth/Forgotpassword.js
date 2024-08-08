@@ -2,28 +2,25 @@ import {
   StyleSheet,
   Text,
   View,
-  TextInput, TouchableOpacity,
+  TextInput,
   SafeAreaView,
   TouchableOpacity,
-} from 'react-native';;
-import React, {useState} from 'react';
-import {useNavigation} from '@react-navigation/native'; // Import useNavigation
-import axios from 'axios';
-import config from '../../config';
-const serverUrl = config.SERVER_URL;
+} from 'react-native';
+import React, { useState } from 'react';
+import { useNavigation } from '@react-navigation/native'; // Import useNavigation
 
-const Forgotpassword = ({ navigation }) => {
+const Forgotpassword = () => {
   const [input, setInput] = useState('');
   const [error, setError] = useState('');
   const navigation = useNavigation(); // Get the navigation prop
 
   const handleContinue = () => {
-    // Validation for email or username
+    // Validation for email 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!input) {
-      setError('Username or Email is required.');
+      setError('Email is required.');
     } else if (!emailRegex.test(input) && input.length < 4) {
-      setError('Please enter a valid email address or username.');
+      setError('Please enter a valid email address');
     } else {
       setError('');
       // Navigate to the Captcha screen on successful input
@@ -31,74 +28,31 @@ const Forgotpassword = ({ navigation }) => {
     }
   };
 
-  const [otp, setOtp] = useState('');
-  const [isOtpSent, setIsOtpSent] = useState(false);
-
-  const handleForgPass = async () => {
-    console.log("Sending OTP to email:", email);
-    try {
-      const response = await axios.post(`${serverUrl}/forgot-password`, { email });
-      console.log("OTP Response:", response.data);
-      if (response.data.status === 'ok') {
-        setIsOtpSent(true);
-      }
-    } catch (error) {
-      console.error("Error in sending OTP:", error);
-    }
-  };
-
-  const handleVerifyOtp = async () => {
-    console.log("Verifying OTP:", otp);
-    try {
-      const response = await axios.post(`${serverUrl}/verify-otp`, { email, otp });
-      console.log("Verify OTP Response:", response.data);
-      if (response.data.status === 'ok') {
-        // Handle successful OTP verification
-        console.log("OTP verified successfully");
-        navigation.navigate('Auths')
-      }
-    } catch (error) {
-      console.error("Error in verifying OTP:", error);
-    }
-  };
-
   return (
-    <View style={styles.view}>
-      {!isOtpSent ? (
-        <>
-          <Text style={styles.title}>Enter your Username or Email</Text>
-          <TextInput
-            style={styles.input}
-            onChangeText={setEmail}
-            value={email}
-            placeholder="Email"
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
-          <TouchableOpacity style={styles.button} onPress={handleForgPass}>
-            <Text style={styles.textButton}>Send OTP</Text>
-          </TouchableOpacity>
-        </>
-      ) : (
-        <>
-          <Text style={styles.title}>Enter the OTP sent to your email</Text>
-          <TextInput
-            style={styles.input}
-            onChangeText={setOtp}
-            value={otp}
-            placeholder="OTP"
-            keyboardType="numeric"
-          />
-          <TouchableOpacity style={styles.button} onPress={handleVerifyOtp}>
-            <Text style={styles.textButton}>Verify OTP</Text>
-          </TouchableOpacity>
-        </>
-      )}
-    </View>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.innerContainer}>
+        <Text style={styles.title}>Enter your Email</Text>
+        <TextInput
+          style={styles.input}
+          onChangeText={setInput}
+          value={input}
+          placeholder="Email"
+          keyboardType="email-address" // This can be kept as 'email-address' for better UX
+          autoCapitalize="none"
+        />
+        {error ? <Text style={styles.error}>{error}</Text> : null}
+        <Text style={styles.subtitle}>
+          You may receive Gmail notifications from us for security
+        </Text>
+        <TouchableOpacity style={styles.buttonForgot} onPress={handleContinue}>
+          <Text style={styles.textForgot}>Continue</Text>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
   );
-}
+};
 
-export default Forgotpassword;;
+export default Forgotpassword;
 
 const styles = StyleSheet.create({
   container: {
@@ -107,9 +61,6 @@ const styles = StyleSheet.create({
   },
   innerContainer: {
     alignItems: 'center',
-  },
-  view: {
-    padding: 20,
   },
   title: {
     fontSize: 20,
@@ -141,7 +92,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 20,
-    alignItems: 'center',
   },
   textForgot: {
     color: '#fff',
@@ -152,20 +102,5 @@ const styles = StyleSheet.create({
     color: 'red',
     width: '90%',
     textAlign: 'left',
-  },
-});
-  button: {
-    width: '80%',
-    height: 50,
-    backgroundColor: '#0a3e99',
-    borderRadius: 25,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  textButton: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
   },
 });
