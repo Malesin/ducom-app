@@ -1,14 +1,41 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import {StyleSheet, Text, View, TouchableOpacity, Alert} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import React from 'react';
+
+const handleLogout = async () => {
+  await AsyncStorage.removeItem('token');
+  Alert.alert('Logout Account', 'Are you sure want to Logout', [
+    {
+      text: 'Cancel',
+      onPress: () => null,
+      style: 'cancel',
+    },
+    {
+      text: 'Logout',
+      onPress: () => navigation.navigate('Auths'),
+    },
+  ]);
+};
 
 const Settingsscreen = () => {
   return (
     <View>
-      <Text>Settingsscreen</Text>
+      <TouchableOpacity style={styles.buttonLogout} onPress={handleLogout}>
+        <Text style={styles.contentText}>Logout</Text>
+      </TouchableOpacity>
     </View>
-  )
-}
+  );
+};
 
-export default Settingsscreen
+export default Settingsscreen;
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+  buttonLogout: {
+    width: 100,
+    height: 60,
+    backgroundColor: 'red',
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+});

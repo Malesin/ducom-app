@@ -33,6 +33,7 @@ const HomeScreen = ({navigation}) => {
   const [tweets, setTweets] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [newPostContent, setNewPostContent] = useState('');
+  const [inputHeight, setInputHeight] = useState(40); // Initialize with default height
   const isExpanded = useSharedValue(false);
 
   async function getData() {
@@ -47,7 +48,8 @@ const HomeScreen = ({navigation}) => {
         ]);
         return;
       }
-      setTweets(data); // Assuming `data` is an array of tweets
+      // Fetch Data Tweet
+      setTweets(data); 
     } catch (error) {
       console.error('Error fetching data:', error);
     }
@@ -82,13 +84,16 @@ const HomeScreen = ({navigation}) => {
   }, []);
 
   const handleCreatePost = async () => {
+    console.log('Creating post with content:', newPostContent); // Log the content of the post
+
     try {
       await axios.post(`${serverUrl}/createPost`, {content: newPostContent});
       setNewPostContent('');
       setModalVisible(false);
       getData(); // Refresh the tweet list after creating a new post
+      console.log('Post created successfully'); // Log success
     } catch (error) {
-      console.error('Error creating post:', error);
+      console.error('Error creating post:', error); // Log error
     }
   };
 
@@ -194,12 +199,15 @@ const HomeScreen = ({navigation}) => {
                 style={styles.profileImage}
               />
               <TextInput
-                style={styles.textInput}
+                style={[styles.textInput, {height: inputHeight}]}
                 placeholder="What's on your mind?"
                 multiline
                 numberOfLines={4}
                 value={newPostContent}
                 onChangeText={setNewPostContent}
+                onContentSizeChange={(contentWidth, contentHeight) => {
+                  setInputHeight(contentHeight);
+                }}
               />
             </View>
             <TouchableOpacity
@@ -292,9 +300,11 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     width: '100%',
+    height: '100%',
     backgroundColor: '#fff',
     padding: 20,
-    borderRadius: 20,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
     justifyContent: 'space-between',
   },
   inputContainer: {
@@ -307,16 +317,17 @@ const styles = StyleSheet.create({
     height: 50,
     borderRadius: 25,
     marginRight: 10,
+    marginTop: 25,
   },
   textInput: {
     flex: 1,
     fontFamily: 'Inter',
     fontSize: 16,
     padding: 10,
-    borderColor: '#ddd',
+    borderColor: 'transparent',
     borderWidth: 1,
     borderRadius: 10,
-    marginTop: 10,
+    marginTop: 20,
   },
   buttonCancel: {
     position: 'absolute',
@@ -344,7 +355,7 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   noTweetsText: {
-    textAlign: 'center',
+    textAlign: 'left',
     color: '#888',
     marginTop: 20,
   },
