@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
   buttonLogin: {
     width: '80%',
     height: 50,
-    backgroundColor: '#0a3e99',
+    backgroundColor: '#001374',
     borderRadius: 25,
     justifyContent: 'center',
     alignItems: 'center',
