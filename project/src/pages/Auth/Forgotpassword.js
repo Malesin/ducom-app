@@ -1,11 +1,36 @@
-import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
-import React, { useState } from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TextInput, TouchableOpacity,
+  SafeAreaView,
+  TouchableOpacity,
+} from 'react-native';;
+import React, {useState} from 'react';
+import {useNavigation} from '@react-navigation/native'; // Import useNavigation
 import axios from 'axios';
 import config from '../../config';
 const serverUrl = config.SERVER_URL;
 
 const Forgotpassword = ({ navigation }) => {
-  const [email, setEmail] = useState('');
+  const [input, setInput] = useState('');
+  const [error, setError] = useState('');
+  const navigation = useNavigation(); // Get the navigation prop
+
+  const handleContinue = () => {
+    // Validation for email or username
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!input) {
+      setError('Username or Email is required.');
+    } else if (!emailRegex.test(input) && input.length < 4) {
+      setError('Please enter a valid email address or username.');
+    } else {
+      setError('');
+      // Navigate to the Captcha screen on successful input
+      navigation.navigate('Captcha'); // Replace 'Captcha' with the name of your Captcha screen
+    }
+  };
+
   const [otp, setOtp] = useState('');
   const [isOtpSent, setIsOtpSent] = useState(false);
 
@@ -73,30 +98,62 @@ const Forgotpassword = ({ navigation }) => {
   );
 }
 
-export default Forgotpassword;
+export default Forgotpassword;;
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#FFF',
+  },
+  innerContainer: {
+    alignItems: 'center',
+  },
   view: {
     padding: 20,
   },
   title: {
     fontSize: 20,
     fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 20,
-    color: '#000000',
+    textAlign: 'left',
+    paddingTop: 20,
+    marginBottom: 10,
+    color: '#000',
   },
   input: {
+    width: '90%',
+    height: 60,
+    margin: 10,
+    borderWidth: 1,
+    borderColor: '#000',
+    borderRadius: 20,
+    padding: 10,
+    backgroundColor: '#ECECEC',
+  },
+  subtitle: {
+    color: '#A19F9F',
+    fontSize: 14,
+  },
+  buttonForgot: {
     width: '80%',
     height: 50,
-    margin: 12,
-    borderWidth: 1,
-    borderColor: '#dcdcdc',
-    borderRadius: 5,
-    padding: 10,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#001374',
+    borderRadius: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 20,
     alignItems: 'center',
   },
+  textForgot: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  error: {
+    color: 'red',
+    width: '90%',
+    textAlign: 'left',
+  },
+});
   button: {
     width: '80%',
     height: 50,
