@@ -31,12 +31,12 @@ const Forgotpassword = () => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.innerContainer}>
-        <Text style={styles.title}>Enter your Username or Email</Text>
+        <Text style={styles.title}>Enter your Email</Text>
         <TextInput
           style={styles.input}
           onChangeText={setInput}
           value={input}
-          placeholder="Username or Email"
+          placeholder="Enter your Email Address"
           keyboardType="email-address" // This can be kept as 'email-address' for better UX
           autoCapitalize="none"
         />

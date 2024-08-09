@@ -17,7 +17,22 @@ const handleLogout = async () => {
   ]);
 };
 
-const Settingsscreen = () => {
+const Settingsscreen = ({navigation}) => {
+  const handleLogout = async () => {
+    await AsyncStorage.removeItem('token');
+    Alert.alert('Logout Account', 'Are you sure want to Logout', [
+      {
+        text: 'Cancel',
+        onPress: () => null,
+        style: 'cancel',
+      },
+      {
+        text: 'Logout',
+        onPress: () => navigation.navigate('Auths'),
+      },
+    ]);
+  };
+
   return (
     <View>
       <TouchableOpacity style={styles.buttonLogout} onPress={handleLogout}>
