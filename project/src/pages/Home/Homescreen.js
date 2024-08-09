@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useCallback} from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   StyleSheet,
   ScrollView,
@@ -12,10 +12,8 @@ import {
   Text,
   Image,
 } from 'react-native';
-import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useFocusEffect} from '@react-navigation/native';
-import config from '../../config';
+import { useFocusEffect } from '@react-navigation/native';
 import TweetCard from '../../components/TweetCard'; // Import TweetCard
 import Animated, {
   withDelay,
@@ -26,10 +24,12 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'; // Import MaterialCommunityIcons
-
+import moment from 'moment';
+import axios from 'axios';
+import config from '../../config';
 const serverUrl = config.SERVER_URL;
 
-const HomeScreen = ({navigation}) => {
+const HomeScreen = ({ navigation }) => {
   const [tweets, setTweets] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [newPostContent, setNewPostContent] = useState('');
@@ -39,17 +39,17 @@ const HomeScreen = ({navigation}) => {
   async function getData() {
     const token = await AsyncStorage.getItem('token');
     try {
-      const response = await axios.post(`${serverUrl}/userdata`, {token});
-      const {data, status} = response.data;
+      const response = await axios.post(`${serverUrl}/userdata`, { token });
+      const { data, status } = response.data;
       console.log('Data received:', data); // Add this log to check the data
       if (status === 'error') {
         Alert.alert('Error', 'Anda Telah Keluar dari Akun', [
-          {text: 'OK', onPress: () => navigation.navigate('Signin')},
+          { text: 'OK', onPress: () => navigation.navigate('Auths') },
         ]);
         return;
       }
       // Fetch Data Tweet
-      setTweets(data); 
+      setTweets(data);
     } catch (error) {
       console.error('Error fetching data:', error);
     }
@@ -87,7 +87,8 @@ const HomeScreen = ({navigation}) => {
     console.log('Creating post with content:', newPostContent); // Log the content of the post
 
     try {
-      await axios.post(`${serverUrl}/createPost`, {content: newPostContent});
+      await axios
+        .post(`${serverUrl}/createPost`, { content: newPostContent });
       setNewPostContent('');
       setModalVisible(false);
       getData(); // Refresh the tweet list after creating a new post
@@ -97,7 +98,7 @@ const HomeScreen = ({navigation}) => {
     }
   };
 
-  const FloatingActionButton = ({isExpanded, index, iconName, onPress}) => {
+  const FloatingActionButton = ({ isExpanded, index, iconName, onPress }) => {
     const animatedStyles = useAnimatedStyle(() => {
       const moveValue = isExpanded.value ? OFFSET * index : 0;
       const translateValue = withSpring(-moveValue, SPRING_CONFIG);
@@ -106,8 +107,8 @@ const HomeScreen = ({navigation}) => {
 
       return {
         transform: [
-          {translateY: translateValue},
-          {scale: withDelay(delay, withTiming(scaleValue))},
+          { translateY: translateValue },
+          { scale: withDelay(delay, withTiming(scaleValue)) },
         ],
         backgroundColor: isExpanded.value ? '#F3F3F3' : '#F3F3F3',
       };
@@ -139,11 +140,13 @@ const HomeScreen = ({navigation}) => {
 
     return {
       transform: [
-        {translateX: translateValue},
-        {rotate: withTiming(rotateValue)},
+        { translateX: translateValue },
+        { rotate: withTiming(rotateValue) },
       ],
     };
   });
+
+  // const joinDate = moment(userData.join_date).format("D MMMM YYYY");
 
   return (
     <SafeAreaView style={styles.container}>
@@ -199,7 +202,7 @@ const HomeScreen = ({navigation}) => {
                 style={styles.profileImage}
               />
               <TextInput
-                style={[styles.textInput, {height: inputHeight}]}
+                style={[styles.textInput, { height: inputHeight }]}
                 placeholder="What's on your mind?"
                 multiline
                 numberOfLines={4}
@@ -285,7 +288,7 @@ const styles = StyleSheet.create({
   },
   shadow: {
     shadowColor: '#171717',
-    shadowOffset: {width: -0.5, height: 3.5},
+    shadowOffset: { width: -0.5, height: 3.5 },
     shadowOpacity: 0.2,
     shadowRadius: 3,
   },

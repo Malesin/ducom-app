@@ -6,22 +6,24 @@ import {
   SafeAreaView,
   TouchableOpacity,
 } from 'react-native';
-import React, {useState} from 'react';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import {useNavigation} from '@react-navigation/native';
+import React, { useState } from 'react';
 import Toast from 'react-native-toast-message';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import { useRoute } from '@react-navigation/native';
+import axios from 'axios'
+import config from '../../config';
+const serverUrl = config.SERVER_URL;
 
-
-const CreatePassword = () => {
+const CreatePassword = ({ navigation }) => {
   const [password, setPassword] = useState(''); // State for new password
   const [confirmPassword, setConfirmPassword] = useState(''); // State for confirm password
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const navigation = useNavigation(); // Get the navigation prop
+  const route = useRoute();
+  const { email } = route.params;
 
-  const handleContinue = () => {
-    // Validation for password fields
+  const handleContinue = async () => {
     if (!password || !confirmPassword) {
       setError('Password and Confirm Password are required.');
     } else if (password.length < 8 || password.length > 15) {
@@ -30,19 +32,31 @@ const CreatePassword = () => {
       setError('Passwords do not match.');
     } else {
       setError('');
-      // Show success toast
-      Toast.show({
-        type: 'success',
-        text1: 'Success',
-        text2:
-          'Success! Your password has been updated. Please use your new password to log in!!!',
-        onHide: () => {
-          setTimeout(() => {
-            // Navigate to the Signin screen on successful input
-            navigation.navigate('Signin');
-          }, 1000); // Delay 1 second before navigation
-        },
-      });
+      try {
+        const response = await axios.post(`${serverUrl}/change-password`, {
+          email, 
+          newPassword: password
+        });
+        if (response.data.status === 'ok') {
+          console.log('Password updated successfully');
+          Toast.show({
+            type: 'success',
+            text1: 'Success',
+            text2: 'Password updated successfully',
+            onHide: () => {
+              setTimeout(() => {
+                navigation.navigate('Signin');
+              }, 1000); // Delay 1 detik sebelum navigasi
+            },
+          })
+        } else if (response.data.status === 'errorPassSame') {
+          setError('New password cannot be same as old password')
+        } else {
+          setError(response.data.data);
+        }
+      } catch (error) {
+        setError('Failed to update password. Please try again.');
+      }
     }
   };
 
@@ -60,12 +74,12 @@ const CreatePassword = () => {
               onChangeText={setPassword}
               value={password}
               placeholder="New Password"
-              secureTextEntry={!showPassword} // Use secureTextEntry for password fields
+              secureTextEntry={!showPassword}
               autoCapitalize="none"
             />
             <TouchableOpacity
-              style={styles.eyeIcon}
-              onPress={() => setShowPassword(!showPassword)} // Toggle visibility state
+              style={styles.eyeIcon
+              onPress={() => setShowPassword(!showPassword)}
             >
               <Icon
                 name={showPassword ? 'visibility' : 'visibility-off'}
@@ -101,6 +115,7 @@ const CreatePassword = () => {
             <Text style={styles.textForgot}>Continue</Text>
           </TouchableOpacity>
         </View>
+        <Toast />
       </SafeAreaView>
     </>
   );
