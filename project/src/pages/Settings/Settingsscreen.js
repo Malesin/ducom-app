@@ -1,23 +1,25 @@
-import {StyleSheet, Text, View, TouchableOpacity, Alert} from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React from 'react';
 
-const handleLogout = async () => {
-  await AsyncStorage.removeItem('token');
-  Alert.alert('Logout Account', 'Are you sure want to Logout', [
-    {
-      text: 'Cancel',
-      onPress: () => null,
-      style: 'cancel',
-    },
-    {
-      text: 'Logout',
-      onPress: () => navigation.navigate('Auths'),
-    },
-  ]);
-};
+const Settingsscreen = ({ navigation }) => {
+  const handleLogout = async () => {
 
-const Settingsscreen = () => {
+    Alert.alert('Logout Account', 'Are you sure want to Logout', [
+      {
+        text: 'Cancel',
+        onPress: () => null,
+        style: 'cancel',
+      },
+      {
+        text: 'Logout',
+        onPress: async () => {
+          await AsyncStorage.removeItem('token');
+          navigation.navigate('Auths');
+        },
+      },
+    ]);
+  };
   return (
     <View>
       <TouchableOpacity style={styles.buttonLogout} onPress={handleLogout}>
