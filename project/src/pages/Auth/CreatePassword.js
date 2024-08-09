@@ -78,8 +78,8 @@ const CreatePassword = ({ navigation }) => {
               autoCapitalize="none"
             />
             <TouchableOpacity
-              style={styles.eyeIcon
-              onPress={() => setShowPassword(!showPassword)}
+              style={styles.eyeIcon}
+              onPress={() => setShowPassword(!showPassword)} 
             >
               <Icon
                 name={showPassword ? 'visibility' : 'visibility-off'}
