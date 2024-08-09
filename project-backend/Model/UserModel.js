@@ -13,17 +13,24 @@ const UserDetailSchema = new mongoose.Schema({
     email:
     {
         type: String,
-        unique: true
+        unique: true,
+        required: true
     },
     password: {
         type: String,
-        required: true
+        required: true,
     },
     bio: {
-        type: String
+        type: String,
+        default: null
     },
     photo_profile: {
-        type: String
+        type: String,
+        default: null
+    },
+    join_date: {
+        type: Date,
+        default: Date.now
     }
 }, {
     collection: "UserModel"

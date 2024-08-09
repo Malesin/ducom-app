@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useCallback} from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   StyleSheet,
   ScrollView,
@@ -14,10 +14,8 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useFocusEffect} from '@react-navigation/native';
-import config from '../../config';
+import { useFocusEffect } from '@react-navigation/native';
 import TweetCard from '../../components/TweetCard'; // Import TweetCard
 import Animated, {
   withDelay,
@@ -29,10 +27,12 @@ import Animated, {
 } from 'react-native-reanimated';
 import * as ImagePicker from 'react-native-image-picker';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'; // Import MaterialCommunityIcons
-
+import moment from 'moment';
+import axios from 'axios';
+import config from '../../config';
 const serverUrl = config.SERVER_URL;
 
-const HomeScreen = ({navigation}) => {
+const HomeScreen = ({ navigation }) => {
   const [tweets, setTweets] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [newPostContent, setNewPostContent] = useState('');
@@ -43,12 +43,12 @@ const HomeScreen = ({navigation}) => {
   async function getData() {
     const token = await AsyncStorage.getItem('token');
     try {
-      const response = await axios.post(`${serverUrl}/userdata`, {token});
-      const {data, status} = response.data;
+      const response = await axios.post(`${serverUrl}/userdata`, { token });
+      const { data, status } = response.data;
       console.log('Data received:', data); // Add this log to check the data
       if (status === 'error') {
         Alert.alert('Error', 'Anda Telah Keluar dari Akun', [
-          {text: 'OK', onPress: () => navigation.navigate('Signin')},
+          { text: 'OK', onPress: () => navigation.navigate('Auths') },
         ]);
         return;
       }
@@ -91,7 +91,8 @@ const HomeScreen = ({navigation}) => {
     console.log('Creating post with content:', newPostContent); // Log the content of the post
 
     try {
-      await axios.post(`${serverUrl}/createPost`, {content: newPostContent});
+      await axios
+        .post(`${serverUrl}/createPost`, { content: newPostContent });
       setNewPostContent('');
       setModalVisible(false);
       setCapturedImageUri(null); // Clear captured image URI
@@ -131,8 +132,8 @@ const HomeScreen = ({navigation}) => {
 
       return {
         transform: [
-          {translateY: translateValue},
-          {scale: withDelay(delay, withTiming(scaleValue))},
+          { translateY: translateValue },
+          { scale: withDelay(delay, withTiming(scaleValue)) },
         ],
         backgroundColor: isExpanded.value ? '#F3F3F3' : '#F3F3F3',
       };
@@ -164,11 +165,13 @@ const HomeScreen = ({navigation}) => {
 
     return {
       transform: [
-        {translateX: translateValue},
-        {rotate: withTiming(rotateValue)},
+        { translateX: translateValue },
+        { rotate: withTiming(rotateValue) },
       ],
     };
   });
+
+  // const joinDate = moment(userData.join_date).format("D MMMM YYYY");
 
   return (
     <SafeAreaView style={styles.container}>
@@ -328,7 +331,7 @@ const styles = StyleSheet.create({
   },
   shadow: {
     shadowColor: '#171717',
-    shadowOffset: {width: -0.5, height: 3.5},
+    shadowOffset: { width: -0.5, height: 3.5 },
     shadowOpacity: 0.2,
     shadowRadius: 3,
   },
