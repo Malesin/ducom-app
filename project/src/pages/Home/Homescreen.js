@@ -158,7 +158,6 @@ const HomeScreen = ({ navigation }) => {
             </View>
           ))
         ) : (
-          // <Text style={styles.contentText}>Tanggal Join : {joinDate}</Text>
           <Text style={styles.noTweetsText}>No tweets available</Text>
         )}
       </ScrollView>

@@ -2,7 +2,6 @@ import { StyleSheet, Text, View, TouchableOpacity, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React from 'react';
 
-
 const Settingsscreen = ({ navigation }) => {
   const handleLogout = async () => {
 
