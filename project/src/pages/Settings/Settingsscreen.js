@@ -2,9 +2,8 @@ import { StyleSheet, Text, View, TouchableOpacity, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React from 'react';
 
-const Settingsscreen = ({ navigation }) => {
+const Settingsscreen = ({navigation}) => {
   const handleLogout = async () => {
-
     Alert.alert('Logout Account', 'Are you sure want to Logout', [
       {
         text: 'Cancel',
@@ -13,6 +12,7 @@ const Settingsscreen = ({ navigation }) => {
       },
       {
         text: 'Logout',
+
         onPress: async () => {
           await AsyncStorage.removeItem('token');
           navigation.navigate('Auths');

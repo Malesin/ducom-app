@@ -1,20 +1,43 @@
-import { SafeAreaView, StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import React from 'react';
+import {SafeAreaView, ScrollView, StyleSheet, Text, View} from 'react-native';
+import TweetCard from '../../components/TweetCard'; 
 
 const Notificationscreen = () => {
-  return (
-    <SafeAreaView style={styles.container} >
-      <View>
-        <Text>Notificationscreen</Text>
-      </View>
-    </SafeAreaView>
-  )
-}
+  const tweets = [
+    {
+      profilePicture: 'https://example.com/profile1.jpg',
+      username: 'Kontolodon',
+      handle: 'Kontolodon',
+      content: 'Mentioned You!',
+      likes: 12,
+      comments: 5,
+    },
+    {
+      profilePicture: 'https://example.com/profile2.jpg',
+      username: 'Jane Smith',
+      handle: 'janesmith',
+      content: 'Mentioned You!',
+      likes: 8,
+      comments: 2,
+    },
+  ];
 
-export default Notificationscreen
+  return (
+    <SafeAreaView style={styles.container}>
+      <ScrollView>
+        {tweets.map((tweet, index) => (
+          <TweetCard key={index} tweet={tweet} />
+        ))}
+      </ScrollView>
+    </SafeAreaView>
+  );
+};
 
 const styles = StyleSheet.create({
-    container: {
-      color: "#FFFFFF"
-    }
-})
+  container: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
+  },
+});
+
+export default Notificationscreen;
