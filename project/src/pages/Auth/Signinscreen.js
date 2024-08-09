@@ -8,11 +8,6 @@ import config from '../../config';
 const serverUrl = config.SERVER_URL;
 
 
-// usn/gmail:nimyonim/frontendganteng@gmail.com
-// pw:raisya123
-
-
-
 const Signinscreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

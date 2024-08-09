@@ -137,6 +137,7 @@ app.post('/upload-image', upload.single('image'), async (req, res) => {
     }
 });
 
+
 // Endpoint to get image by filename
 app.get('/image/:filename', async (req, res) => {
     try {
@@ -164,24 +165,30 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-let otps = {};
 
+// FORGOT PASSWORD
+const otps = {};
 app.post('/forgot-password', async (req, res) => {
     const { email } = req.body;
     try {
-        const oldUser = await User.findOne({ email: email });
-        if (!oldUser) {
-            return res.send({ status: "error", data: "User Not Found" });
+        // Periksa apakah email terdaftar di database
+        const user = await User.findOne({ email: email });
+
+        if (!user) {
+            return res.send({ status: "errorEmail", data: "Email not registered" });
         }
 
         const otp = crypto.randomInt(100000, 999999).toString();
-        otps[email] = otp;
+        const otpExpiry = Date.now() + 15 * 60 * 1000; // 15 minutes from now
+
+        // Simpan OTP dan waktu kadaluarsa di otps
+        otps[email] = { otp, otpExpiry };
 
         const mailOptions = {
             from: 'ducombackend@gmail.com',
             to: email,
             subject: 'Password Reset OTP',
-            text: `Your OTP is ${otp}`
+            text: `Your OTP is ${otp}. It will expire in 15 minutes.`
         };
 
         transporter.sendMail(mailOptions, (error, info) => {
@@ -196,12 +203,46 @@ app.post('/forgot-password', async (req, res) => {
     }
 });
 
+
+// VERIFY OTP
 app.post('/verify-otp', async (req, res) => {
     const { email, otp } = req.body;
-    if (otps[email] && otps[email] === otp) {
-        delete otps[email]; // Remove OTP after verification
+    const storedOtp = otps[email];
+
+    if (!storedOtp) {
+        return res.send({ status: "error", data: "OTP not found or expired" });
+    }
+
+    if (storedOtp.otp === otp) {
+        if (Date.now() > storedOtp.otpExpiry) {
+            delete otps[email]; // Hapus OTP jika kadaluarsa
+            return res.send({ status: "errorExpired", data: "OTP expired" });
+        }
+
+        delete otps[email]; // Hapus OTP setelah verifikasi berhasil
         return res.send({ status: "ok", data: "OTP verified" });
     } else {
         return res.send({ status: "error", data: "Invalid OTP" });
+    }
+});
+
+
+// CHANGE PASSWORD
+app.post('/change-password', async (req, res) => {
+    const { email, newPassword } = req.body;
+    try {
+        const user = await User.findOne({ email: email });
+        // Verifikasi apakah password baru sama dengan password lama
+        const isPasswordSame = await bcrypt.compare(newPassword, user.password);
+
+        if (isPasswordSame) {
+            return res.send({ status: 'errorPassSame', data: 'New password must be different from the old password' });
+        }
+
+        const encryptedPassword = await bcrypt.hash(newPassword, 10);
+        await User.updateOne({ email: email }, { $set: { password: encryptedPassword } });
+        res.send({ status: 'ok', data: 'Password updated successfully' });
+    } catch (error) {
+        res.send({ status: 'error', data: error.message });
     }
 });
