@@ -1,56 +1,47 @@
-import React, { useState } from 'react';
-import { View, Button, Image } from 'react-native';
-import * as ImagePicker from 'react-native-image-picker';
-import axios from 'axios';
-import config from '../../config';
+import { View, Text, Image, Button, StyleSheet } from 'react-native';
+import React from 'react';
 
-const serverUrl = config.SERVER_URL;
+export default function Profilescreen() {
+  return (
+    <View style={styles.container}>
+      <Image
+        source={require('../../assets/avatar.jpg')}// Ganti dengan URL gambar yang sesuai
+        style={styles.logo}
+      />
+      <Text style={styles.title}>Smkn 2 Jakarta</Text>
+      <Text style={styles.username}>@duganofficial_</Text>
+      <Text style={styles.description}>
+        "SMK BISA, SMK HEBAT, DKI JAYA. SMKN 2 JAKARTA BERADAP, BERPRESTASI, JUARA"
+      </Text>
+      <Button title="Edit Profile" onPress={() => {}} />
+    </View>
+  );
+}
 
-const Profilescreen = () => {
-    const [imageUri, setImageUri] = useState(null);
-
-    const pickImage = () => {
-        ImagePicker.launchImageLibrary({ mediaType: 'photo' }, (response) => {
-            if (response.didCancel) {
-                console.log('User cancelled image picker');
-            } else if (response.error) {
-                console.log('ImagePicker Error: ', response.error);
-            } else {
-                const source = { uri: response.assets[0].uri };
-                setImageUri(source);
-                uploadImage(response);
-            }
-        });
-    };
-
-    const uploadImage = async (response) => {
-        const formData = new FormData();
-        formData.append('image', {
-            uri: response.assets[0].uri,
-            name: response.assets[0].fileName,
-            type: response.assets[0].type,
-        });
-
-        try {
-            const res = await
-                axios
-                    .post(`${serverUrl}/upload-image`, formData, {
-                        headers: {
-                            'Content-Type': 'multipart/form-data',
-                        },
-                    });
-            console.log(res.data);
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
-    return (
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <Button title="Pick an image" onPress={pickImage} />
-            {imageUri && <Image source={imageUri} style={{ width: 200, height: 200 }} />}
-        </View>
-    );
-};
-
-export default Profilescreen;
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 20,
+  },
+  logo: {
+    width: 100,
+    height: 100,
+    marginBottom: 20,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  username: {
+    fontSize: 16,
+    color: 'gray',
+    marginBottom: 10,
+  },
+  description: {
+    fontSize: 14,
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+});
