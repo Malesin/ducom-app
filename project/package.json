@@ -25,6 +25,7 @@
     "react-native": "^0.69.0",
     "react-native-alert-notification": "^0.4.0",
     "react-native-async-storage": "^0.0.1",
+    "react-native-collapsible": "^1.6.1",
     "react-native-config": "^1.5.3",
     "react-native-drawer-layout": "^3.3.2",
     "react-native-element-dropdown": "^2.12.1",

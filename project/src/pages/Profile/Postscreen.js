@@ -8,11 +8,11 @@ function Postscreen() {
                 flex: 1,
                 justifyContent: "center",
                 alignItems: "center",
-                backgroundColor: "#03cafc"
+                backgroundColor: "#fff"
             }}
         >
-            <Text style={{ fontSize: 30, color: "#ffffff", fontWeight: "800" }}>
-                Home is Here!
+            <Text style={{ fontSize: 16, color: "#333", fontWeight: "600" }}>
+                Posts content goes here.
             </Text>
         </View>
     );
