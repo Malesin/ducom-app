@@ -232,3 +232,4 @@ const styles = StyleSheet.create({
     textAlign: 'left',
   },
 });
+  
