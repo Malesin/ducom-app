@@ -8,7 +8,7 @@ export default function Profilescreen() {
     <View style={styles.container}>
       <View style={styles.bannerContainer}>
         <Image
-          source={require('../../assets/banner.jpg')}
+          source={require('../../assets/banner.png')}
           style={styles.banner}
         />
         <TouchableOpacity style={styles.settingsButton} onPress={() => {}}>
@@ -17,7 +17,7 @@ export default function Profilescreen() {
       </View>
       <View style={styles.header}>
         <Image
-          source={require('../../assets/avatar.jpg')}
+          source={require('../../assets/avatar.png')}
           style={styles.profile}
         />
         <View style={styles.headerText}>

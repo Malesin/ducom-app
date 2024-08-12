@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Video from 'react-native-video';
-import DefaultAvatar from '../assets/avatar.jpg'; // Update path if needed
+import DefaultAvatar from '../assets/avatar.png'; // Update path if needed
 
 const TweetCard = ({tweet}) => {
   const [liked, setLiked] = useState(false);
