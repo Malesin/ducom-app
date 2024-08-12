@@ -8,6 +8,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 // Import the profile image
 import profileImage from './../assets/profile.png';
+import TopTabNavigator from './TopTabNavigator';
 
 const Tab = createBottomTabNavigator();
 
@@ -68,7 +69,7 @@ function BottomTabNavigator() {
                         },
                     }}
                 />
-                <Tab.Screen name="Profile" component={Profilescreen} />
+                <Tab.Screen name="Profile" component={TopTabNavigator} />
             </Tab.Navigator>
         </GestureHandlerRootView>
     );
