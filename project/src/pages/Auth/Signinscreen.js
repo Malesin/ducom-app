@@ -1,5 +1,11 @@
-import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native';
-import React, { useState, useEffect } from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TextInput,
+  TouchableOpacity,
+} from 'react-native';
+import React, {useState, useEffect} from 'react';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import axios from 'axios';
 import Toast from 'react-native-toast-message';
@@ -7,8 +13,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import config from '../../config';
 const serverUrl = config.SERVER_URL;
 
-
-const Signinscreen = ({ navigation }) => {
+const Signinscreen = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isChecked, setIsChecked] = useState(false); // State for checkbox
@@ -52,7 +57,7 @@ const Signinscreen = ({ navigation }) => {
         .post(`${serverUrl}/login-user`, userData)
         .then(res => {
           console.log(res.data);
-          if (res.data.status === "ok") {
+          if (res.data.status === 'ok') {
             Toast.show({
               type: 'success',
               text1: 'Success',
@@ -64,8 +69,8 @@ const Signinscreen = ({ navigation }) => {
               },
             });
 
-            AsyncStorage.setItem("token", res.data.data);
-          } else if (res.data.status === "error") {
+            AsyncStorage.setItem('token', res.data.data);
+          } else if (res.data.status === 'error') {
             Toast.show({
               type: 'error',
               text1: 'Error',
@@ -76,11 +81,11 @@ const Signinscreen = ({ navigation }) => {
                 }, 1000); // Delay 1 detik sebelum navigasi
               },
             });
-          } else if (res.data.status === "errorPass") {
+          } else if (res.data.status === 'errorPass') {
             Toast.show({
               type: 'error',
               text1: 'Error',
-              text2: "Incorrect Password",
+              text2: 'Incorrect Password',
               onHide: () => {
                 setTimeout(() => {
                   navigation.navigate('Signin');
@@ -100,7 +105,7 @@ const Signinscreen = ({ navigation }) => {
     }
   };
 
-  const handlePasswordChange = (text) => {
+  const handlePasswordChange = text => {
     setPassword(text.slice(0, 25));
   };
 
@@ -117,7 +122,11 @@ const Signinscreen = ({ navigation }) => {
           autoCapitalize="none"
         />
         {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
-        <View style={[styles.passwordContainer, passwordError ? styles.errorInput : null]}>
+        <View
+          style={[
+            styles.passwordContainer,
+            passwordError ? styles.errorInput : null,
+          ]}>
           <TextInput
             style={styles.passwordInput}
             onChangeText={handlePasswordChange}
@@ -131,8 +140,7 @@ const Signinscreen = ({ navigation }) => {
             onPress={() => {
               setIsChecked(!isChecked);
               setShowPassword(!showPassword); // Update showPassword state
-            }}
-          >
+            }}>
             {isChecked ? (
               <Icon name="visibility" size={18} color="#000000" />
             ) : (
@@ -140,7 +148,9 @@ const Signinscreen = ({ navigation }) => {
             )}
           </TouchableOpacity>
         </View>
-        {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
+        {passwordError ? (
+          <Text style={styles.errorText}>{passwordError}</Text>
+        ) : null}
         <TouchableOpacity style={styles.buttonLogin} onPress={handleLogin}>
           <Text style={styles.textLogin}>Log In</Text>
         </TouchableOpacity>
@@ -149,7 +159,12 @@ const Signinscreen = ({ navigation }) => {
         </TouchableOpacity>
         <Text style={styles.signupText}>
           Don’t have an account?
-          <Text style={styles.signupLink} onPress={() => navigation.navigate('Register')}> Sign Up</Text>
+          <Text
+            style={styles.signupLink}
+            onPress={() => navigation.navigate('Register')}>
+            {' '}
+            Sign Up
+          </Text>
         </Text>
       </View>
       <Toast />
