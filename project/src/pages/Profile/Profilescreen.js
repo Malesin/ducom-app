@@ -1,13 +1,20 @@
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import React from 'react';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 export default function Profilescreen() {
+
   return (
     <View style={styles.container}>
-      <Image
-        source={require('../../assets/banner.jpg')} // Ganti dengan path gambar banner Anda
-        style={styles.banner}
-      />
+      <View style={styles.bannerContainer}>
+        <Image
+          source={require('../../assets/banner.jpg')}
+          style={styles.banner}
+        />
+        <TouchableOpacity style={styles.settingsButton} onPress={() => {}}>
+          <MaterialCommunityIcons name="dots-vertical" size={30} color="#000" />
+        </TouchableOpacity>
+      </View>
       <View style={styles.header}>
         <Image
           source={require('../../assets/avatar.jpg')}
@@ -33,10 +40,21 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
+  bannerContainer: {
+    position: 'relative',
+  },
   banner: {
     width: '100%',
-    height: 150, // Sesuaikan tinggi banner sesuai kebutuhan
+    height: 150,
     marginBottom: 20,
+  },
+  settingsButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    borderRadius: 30,
+    padding: 3,
+    backgroundColor: 'rgba(217, 217, 217, 0.2)',
   },
   header: {
     flexDirection: 'row',
@@ -49,11 +67,11 @@ const styles = StyleSheet.create({
     height: 80,
     borderRadius: 40,
     marginRight: 20,
-    marginTop: -42, // Tambahkan margin atas negatif untuk menggeser logo lebih ke atas
+    marginTop: -42,
   },
   headerText: {
     flex: 1,
-    justifyContent: 'center', // Menyelaraskan teks secara vertikal di tengah
+    justifyContent: 'center',
   },
   name: {
     fontSize: 20,
@@ -67,10 +85,10 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 14,
     color: 'gray',
-    marginBottom: 10, // Tambahkan margin bawah untuk memberi ruang bagi tombol
+    marginBottom: 10,
   },
   editButton: {
-    alignSelf: 'flex-start', // Sejajarkan tombol dengan deskripsi
+    alignSelf: 'flex-start',
     backgroundColor: '#E1E8ED',
     paddingVertical: 10,
     paddingHorizontal: 20,
