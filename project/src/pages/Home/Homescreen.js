@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {
   StyleSheet,
   ScrollView,
@@ -15,7 +15,7 @@ import {
   Platform,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useFocusEffect } from '@react-navigation/native';
+import {useFocusEffect} from '@react-navigation/native';
 import TweetCard from '../../components/TweetCard'; // Import TweetCard
 import Animated, {
   withDelay,
@@ -27,28 +27,32 @@ import Animated, {
 } from 'react-native-reanimated';
 import * as ImagePicker from 'react-native-image-picker';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'; // Import MaterialCommunityIcons
-import moment from 'moment';
 import axios from 'axios';
 import config from '../../config';
+import {
+  ALERT_TYPE,
+  Dialog,
+  AlertNotificationRoot,
+  Toast,
+} from 'react-native-alert-notification';
 const serverUrl = config.SERVER_URL;
 
-const HomeScreen = ({ navigation }) => {
+const HomeScreen = ({navigation}) => {
   const [tweets, setTweets] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [newPostContent, setNewPostContent] = useState('');
   const [capturedImageUri, setCapturedImageUri] = useState(null); // State for captured image URI
-  const [inputHeight, setInputHeight] = useState(40); // Initialize with default height
   const isExpanded = useSharedValue(false);
 
   async function getData() {
     const token = await AsyncStorage.getItem('token');
     try {
-      const response = await axios.post(`${serverUrl}/userdata`, { token });
-      const { data, status } = response.data;
+      const response = await axios.post(`${serverUrl}/userdata`, {token});
+      const {data, status} = response.data;
       console.log('Data received:', data); // Add this log to check the data
       if (status === 'error') {
         Alert.alert('Error', 'Anda Telah Keluar dari Akun', [
-          { text: 'OK', onPress: () => navigation.navigate('Auths') },
+          {text: 'OK', onPress: () => navigation.navigate('Auths')},
         ]);
         return;
       }
@@ -59,20 +63,7 @@ const HomeScreen = ({ navigation }) => {
     }
   }
 
-  const handleBackPress = () => {
-    Alert.alert('Exit App', 'Are you sure want to exit', [
-      {
-        text: 'Cancel',
-        onPress: () => null,
-        style: 'cancel',
-      },
-      {
-        text: 'Exit',
-        onPress: () => BackHandler.exitApp(),
-      },
-    ]);
-    return true;
-  };
+  const handleBackPress = () => {};
 
   useFocusEffect(
     useCallback(() => {
@@ -91,8 +82,7 @@ const HomeScreen = ({ navigation }) => {
     console.log('Creating post with content:', newPostContent); // Log the content of the post
 
     try {
-      await axios
-        .post(`${serverUrl}/createPost`, { content: newPostContent });
+      await axios.post(`${serverUrl}/createPost`, {content: newPostContent});
       setNewPostContent('');
       setModalVisible(false);
       setCapturedImageUri(null); // Clear captured image URI
@@ -132,8 +122,8 @@ const HomeScreen = ({ navigation }) => {
 
       return {
         transform: [
-          { translateY: translateValue },
-          { scale: withDelay(delay, withTiming(scaleValue)) },
+          {translateY: translateValue},
+          {scale: withDelay(delay, withTiming(scaleValue))},
         ],
         backgroundColor: isExpanded.value ? '#F3F3F3' : '#F3F3F3',
       };
@@ -165,8 +155,8 @@ const HomeScreen = ({ navigation }) => {
 
     return {
       transform: [
-        { translateX: translateValue },
-        { rotate: withTiming(rotateValue) },
+        {translateX: translateValue},
+        {rotate: withTiming(rotateValue)},
       ],
     };
   });
@@ -329,7 +319,7 @@ const styles = StyleSheet.create({
   },
   shadow: {
     shadowColor: '#171717',
-    shadowOffset: { width: -0.5, height: 3.5 },
+    shadowOffset: {width: -0.5, height: 3.5},
     shadowOpacity: 0.2,
     shadowRadius: 3,
   },

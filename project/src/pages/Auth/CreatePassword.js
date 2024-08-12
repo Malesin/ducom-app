@@ -6,22 +6,22 @@ import {
   SafeAreaView,
   TouchableOpacity,
 } from 'react-native';
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import Toast from 'react-native-toast-message';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { useRoute } from '@react-navigation/native';
-import axios from 'axios'
+import {useRoute} from '@react-navigation/native';
+import axios from 'axios';
 import config from '../../config';
 const serverUrl = config.SERVER_URL;
 
-const CreatePassword = ({ navigation }) => {
+const CreatePassword = ({navigation}) => {
   const [password, setPassword] = useState(''); // State for new password
   const [confirmPassword, setConfirmPassword] = useState(''); // State for confirm password
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const route = useRoute();
-  const { email } = route.params;
+  const {email} = route.params;
 
   const handleContinue = async () => {
     const validatePassword = password => {
@@ -40,7 +40,7 @@ const CreatePassword = ({ navigation }) => {
       try {
         const response = await axios.post(`${serverUrl}/change-password`, {
           email,
-          newPassword: password
+          newPassword: password,
         });
         if (response.data.status === 'ok') {
           console.log('Password updated successfully');
@@ -53,9 +53,9 @@ const CreatePassword = ({ navigation }) => {
                 navigation.navigate('Signin');
               }, 1000); // Delay 1 detik sebelum navigasi
             },
-          })
+          });
         } else if (response.data.status === 'errorPassSame') {
-          setError('New password cannot be same as old password')
+          setError('New password cannot be same as old password');
         } else {
           setError(response.data.data);
         }
@@ -66,63 +66,58 @@ const CreatePassword = ({ navigation }) => {
   };
 
   return (
-    <>
-      <SafeAreaView style={styles.container}>
-        <View style={styles.innerContainer}>
-          <Text style={styles.title}>
-            Create a password with at least 8 and at most 15 characters. You’ll
-            need this password to log in into your account.
-          </Text>
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.input}
-              onChangeText={setPassword}
-              value={password}
-              placeholder="New Password"
-              secureTextEntry={!showPassword}
-              autoCapitalize="none"
-            />
-            <TouchableOpacity
-              style={styles.eyeIcon}
-              onPress={() => setShowPassword(!showPassword)}
-            >
-              <Icon
-                name={showPassword ? 'visibility' : 'visibility-off'}
-                size={24}
-                color="#000"
-              />
-            </TouchableOpacity>
-          </View>
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.input}
-              onChangeText={setConfirmPassword}
-              value={confirmPassword}
-              placeholder="Confirm Password"
-              secureTextEntry={!showConfirmPassword} // Use secureTextEntry for password fields
-              autoCapitalize="none"
-            />
-            <TouchableOpacity
-              style={styles.eyeIcon}
-              onPress={() => setShowConfirmPassword(!showConfirmPassword)} // Toggle visibility state
-            >
-              <Icon
-                name={showConfirmPassword ? 'visibility' : 'visibility-off'}
-                size={24}
-                color="#000"
-              />
-            </TouchableOpacity>
-          </View>
-          {error ? <Text style={styles.error}>{error}</Text> : null}
+    <SafeAreaView style={styles.container}>
+      <View style={styles.innerContainer}>
+        <Text style={styles.title}>
+          Create a password with at least 8 and at most 15 characters. You’ll
+          need this password to log in into your account.
+        </Text>
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            onChangeText={setPassword}
+            value={password}
+            placeholder="New Password"
+            secureTextEntry={!showPassword}
+            autoCapitalize="none"
+          />
           <TouchableOpacity
-            style={styles.buttonForgot}
-            onPress={handleContinue}>
-            <Text style={styles.textForgot}>Continue</Text>
+            style={styles.eyeIcon}
+            onPress={() => setShowPassword(!showPassword)}>
+            <Icon
+              name={showPassword ? 'visibility' : 'visibility-off'}
+              size={24}
+              color="#000"
+            />
           </TouchableOpacity>
         </View>
-        <Toast />
-      </SafeAreaView>
-    </>
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            onChangeText={setConfirmPassword}
+            value={confirmPassword}
+            placeholder="Confirm Password"
+            secureTextEntry={!showConfirmPassword} // Use secureTextEntry for password fields
+            autoCapitalize="none"
+          />
+          <TouchableOpacity
+            style={styles.eyeIcon}
+            onPress={() => setShowConfirmPassword(!showConfirmPassword)} // Toggle visibility state
+          >
+            <Icon
+              name={showConfirmPassword ? 'visibility' : 'visibility-off'}
+              size={24}
+              color="#000"
+            />
+          </TouchableOpacity>
+        </View>
+        {error ? <Text style={styles.error}>{error}</Text> : null}
+        <TouchableOpacity style={styles.buttonForgot} onPress={handleContinue}>
+          <Text style={styles.textForgot}>Continue</Text>
+        </TouchableOpacity>
+      </View>
+      <Toast />
+    </SafeAreaView>
   );
 };
 
@@ -135,20 +130,19 @@ const styles = StyleSheet.create({
   },
   innerContainer: {
     alignItems: 'center',
+    padding: 20,
   },
   title: {
     fontSize: 20,
     fontWeight: 'bold',
     textAlign: 'left',
-    paddingTop: 20,
-    padding: 10,
     marginBottom: 10,
     color: '#000',
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    width: '90%',
+    width: '95%',
     height: 60,
     margin: 10,
     borderWidth: 1,
@@ -159,7 +153,7 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     height: '100%',
-    padding: 10,
+    paddingHorizontal: 10,
   },
   eyeIcon: {
     padding: 10,
