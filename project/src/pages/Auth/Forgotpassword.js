@@ -142,7 +142,7 @@ const Forgotpassword = ({ navigation }) => {
             text2: 'OTP successfully sent to email',
             onHide: () => {
               setTimeout(() => {
-                navigation.navigate('Captcha', { email: email });
+                navigation.navigate('OTPScreen', { email: email });
               }, 1000); // Delay 1 detik sebelum navigasi
             },
           });
