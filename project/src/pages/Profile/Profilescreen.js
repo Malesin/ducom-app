@@ -1,76 +1,102 @@
-import React, { useState, useEffect } from 'react';
-import { View, Button, Image } from 'react-native';
-import * as ImagePicker from 'react-native-image-picker';
-import axios from 'axios';
-import config from '../../config';
+import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import React from 'react';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const serverUrl = config.SERVER_URL;
+export default function Profilescreen() {
 
-const Profilescreen = () => {
-    const [imageUri, setImageUri] = useState(null);
-    const [uploadedFileName, setUploadedFileName] = useState(null);
-
-    const pickImage = () => {
-        ImagePicker.launchImageLibrary({ mediaType: 'photo' }, (response) => {
-            if (response.didCancel) {
-                console.log('User cancelled image picker');
-            } else if (response.error) {
-                console.log('ImagePicker Error: ', response.error);
-            } else {
-                const source = { uri: response.assets[0].uri };
-                setImageUri(source);
-                uploadImage(response);
-            }
-        });
-    };
-
-    const uploadImage = async (response) => {
-        const formData = new FormData();
-        formData.append('image', {
-            uri: response.assets[0].uri,
-            name: response.assets[0].fileName,
-            type: response.assets[0].type,
-        });
-
-        try {
-            const res = await axios.post(`${serverUrl}/upload-image`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
-
-            console.log(res.data);
-            setUploadedFileName(response.assets[0].fileName);
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
-    useEffect(() => {
-        if (uploadedFileName) {
-            fetchImage(uploadedFileName);
-        }
-    }, [uploadedFileName]);
-
-    const fetchImage = async (filename) => {
-        try {
-            const res = await axios.get(`${serverUrl}/image/${filename}`, {
-                responseType: 'arraybuffer',
-            });
-            const base64 = Buffer.from(res.data, 'binary').toString('base64');
-            const source = { uri: `data:${res.headers['content-type']};base64,${base64}` };
-            setImageUri(source);
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
-    return (
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <Button title="Pick an image" onPress={pickImage} />
-            {imageUri && <Image source={imageUri} style={{ width: 200, height: 200 }} />}
+  return (
+    <View style={styles.container}>
+      <View style={styles.bannerContainer}>
+        <Image
+          source={require('../../assets/banner.jpg')}
+          style={styles.banner}
+        />
+        <TouchableOpacity style={styles.settingsButton} onPress={() => {}}>
+          <MaterialCommunityIcons name="dots-vertical" size={30} color="#000" />
+        </TouchableOpacity>
+      </View>
+      <View style={styles.header}>
+        <Image
+          source={require('../../assets/avatar.jpg')}
+          style={styles.profile}
+        />
+        <View style={styles.headerText}>
+          <Text style={styles.name}>Smkn 2 Jakarta</Text>
+          <Text style={styles.username}>@duganofficial_</Text>
+          <Text style={styles.description}>
+            "SMK BISA, SMK HEBAT, DKI JAYA. SMKN 2 JAKARTA BERADAP, BERPRESTASI, JUARA"
+          </Text>
+          <TouchableOpacity style={styles.editButton} onPress={() => {}}>
+            <Text style={styles.editButtonText}>Edit Profile</Text>
+          </TouchableOpacity>
         </View>
-    );
-};
+      </View>
+    </View>
+  );
+}
 
-export default Profilescreen;
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  bannerContainer: {
+    position: 'relative',
+  },
+  banner: {
+    width: '100%',
+    height: 150,
+    marginBottom: 20,
+  },
+  settingsButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    borderRadius: 30,
+    padding: 3,
+    backgroundColor: 'rgba(217, 217, 217, 0.2)',
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+    paddingHorizontal: 20,
+  },
+  profile: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    marginRight: 20,
+    marginTop: -42,
+  },
+  headerText: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  name: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  username: {
+    fontSize: 16,
+    color: 'gray',
+    marginBottom: 5,
+  },
+  description: {
+    fontSize: 14,
+    color: 'gray',
+    marginBottom: 10,
+  },
+  editButton: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#E1E8ED',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+  },
+  editButtonText: {
+    fontSize: 16,
+    color: '#000',
+    fontWeight: '600',
+  },
+});

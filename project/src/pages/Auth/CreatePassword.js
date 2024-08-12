@@ -24,10 +24,15 @@ const CreatePassword = ({navigation}) => {
   const {email} = route.params;
 
   const handleContinue = async () => {
+    const validatePassword = password => {
+      const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,15}$/;
+      return passwordRegex.test(password);
+    };
+
     if (!password || !confirmPassword) {
       setError('Password and Confirm Password are required.');
-    } else if (password.length < 8 || password.length > 15) {
-      setError('Password must be between 8 and 15 characters.');
+    } else if (!validatePassword(password)) {
+      setError('Password must be 8-15 characters long, and include both letters and numbers.')
     } else if (password !== confirmPassword) {
       setError('Passwords do not match.');
     } else {
