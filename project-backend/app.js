@@ -1,3 +1,11 @@
+// const MONGO_URL = process.env.MONGO_URL;
+// const JWT_SECRET = process.env.JWT_SECRET;
+// const PORT = process.env.PORT || 5001;
+
+const MONGO_URL = "mongodb+srv://ducombackend:ducomadmin@ducomapp.nqicz5h.mongodb.net/?retryWrites=true&w=majority&appName=DucomApp"
+const JWT_SECRET = "bfidkfdsajciusfweubfsdihugigfbrecfnsdprisca[][ewfddsafcdsacdsj13"
+const PORT = 5001
+
 const express = require("express")
 const app = express()
 const mongoose = require("mongoose")
@@ -8,27 +16,31 @@ const bodyParser = require('body-parser');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
 const cors = require('cors');
+require('dotenv').config();
 
 app.use(cors());
 app.use(express.json())
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-const mongoUrl = "mongodb+srv://ducombackend:ducomadmin@ducomapp.nqicz5h.mongodb.net/?retryWrites=true&w=majority&appName=DucomApp"
-const JWT_SECRET = "bfidkfdsajciusfweubfsdihugigfbrecfnsdprisca[][ewfddsafcdsacdsj13"
 
-mongoose.connect(mongoUrl).then(() => {
+mongoose.connect(MONGO_URL).then(() => {
     console.log("MongoDB Connected")
 }).catch((err) => {
     console.log(err)
 })
 
-app.get("/", (res) => {
-    res.send({ status: "Hello World" })
-})
+app.get('/', (req, res) => {
+    res.send('Hello World');
+});
 
-app.listen(5001, () => {
-    console.log("server is running on port 5001")
+
+app.get('*', (req, res) => {
+    res.status(404).send('404 Not Found');
+});
+
+app.listen(PORT, () => {
+    console.log("server is running on port " + PORT)
 })
 
 require('./Model/UserModel')

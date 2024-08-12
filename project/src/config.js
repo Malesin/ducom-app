@@ -1,5 +1,5 @@
 const config = {
-    SERVER_URL: 'http://192.168.1.8:5001'
+    SERVER_URL: 'https://ducom-backend.vercel.app'
 }
 
 export default config;
