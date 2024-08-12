@@ -4,7 +4,7 @@ import Signinscreen from './Auth/Signinscreen';
 import Registerscreen from './Auth/Registerscreen';
 import Homescreen from './Home/Homescreen';
 import Forgotpassword from './Auth/Forgotpassword';
-import Capthcascreen from './Auth/Capthcascreen';
+import OTPScreen from './Auth/OTPScreen';
 import CreatePassword from './Auth/CreatePassword';
 import FAQscreen from './Settings/FAQscreen';
 import Marksscreen from './Other/Marksscreen';
@@ -24,7 +24,7 @@ export {
   Registerscreen,
   Homescreen,
   Forgotpassword,
-  Capthcascreen,
+  OTPScreen,
   CreatePassword,
   FAQscreen,
   Marksscreen,

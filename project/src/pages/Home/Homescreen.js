@@ -171,8 +171,6 @@ const HomeScreen = ({ navigation }) => {
     };
   });
 
-  // const joinDate = moment(userData.join_date).format("D MMMM YYYY");
-
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.contentContainer}>

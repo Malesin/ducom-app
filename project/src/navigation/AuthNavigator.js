@@ -2,7 +2,7 @@ import React from 'react';
 import {
   Authscreen,
   Forgotpassword,
-  Capthcascreen,
+  OTPScreen,
   CreatePassword,
   Registerscreen,
   Signinscreen,
@@ -45,8 +45,8 @@ export default function MainNavigation() {
           options={{headerShown: true, title: 'Find Your Account'}}
         />
         <Stack.Screen
-          name="Captcha"
-          component={Capthcascreen}
+          name="OTPScreen"
+          component={OTPScreen}
           options={{headerShown: true, title: 'Confirm Your Account'}}
         />
         <Stack.Screen
