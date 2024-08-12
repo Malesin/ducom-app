@@ -17,6 +17,7 @@ const Settingsscreen = ({ navigation }) => {
         onPress: async () => {
           await AsyncStorage.removeItem('token');
           navigation.navigate('Auths');
+          console.log("Logout successfully");
         },
       },
     ]);
