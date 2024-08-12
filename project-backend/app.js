@@ -5,8 +5,11 @@ const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
 const multer = require("multer")
 const bodyParser = require('body-parser');
+const nodemailer = require('nodemailer');
+const crypto = require('crypto');
+const cors = require('cors');
 
-
+app.use(cors());
 app.use(express.json())
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -28,7 +31,7 @@ app.listen(5001, () => {
     console.log("server is running on port 5001")
 })
 
-require('./Model/UserModel') 
+require('./Model/UserModel')
 const User = mongoose.model("UserModel")
 
 app.post("/register", async (req, res) => {
@@ -134,6 +137,7 @@ app.post('/upload-image', upload.single('image'), async (req, res) => {
     }
 });
 
+
 // Endpoint to get image by filename
 app.get('/image/:filename', async (req, res) => {
     try {
@@ -151,3 +155,94 @@ app.get('/image/:filename', async (req, res) => {
 });
 
 
+// Nodemailer setup
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    secure: true,
+    auth: {
+        user: 'ducombackend@gmail.com',
+        pass: 'qylfvgqpmmslwivq'
+    }
+});
+
+
+// FORGOT PASSWORD
+const otps = {};
+app.post('/forgot-password', async (req, res) => {
+    const { email } = req.body;
+    try {
+        // Periksa apakah email terdaftar di database
+        const user = await User.findOne({ email: email });
+
+        if (!user) {
+            return res.send({ status: "errorEmail", data: "Email not registered" });
+        }
+
+        const otp = crypto.randomInt(100000, 999999).toString();
+        const otpExpiry = Date.now() + 15 * 60 * 1000; // 15 minutes from now
+
+        // Simpan OTP dan waktu kadaluarsa di otps
+        otps[email] = { otp, otpExpiry };
+
+        const mailOptions = {
+            from: 'ducombackend@gmail.com',
+            to: email,
+            subject: 'Password Reset OTP',
+            text: `Your OTP is ${otp}. It will expire in 15 minutes.`
+        };
+
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                return res.send({ status: "error", data: error.message });
+            } else {
+                return res.send({ status: "ok", data: "OTP sent to email" });
+            }
+        });
+    } catch (error) {
+        return res.send({ status: 'error', error: error.message });
+    }
+});
+
+
+// VERIFY OTP
+app.post('/verify-otp', async (req, res) => {
+    const { email, otp } = req.body;
+    const storedOtp = otps[email];
+
+    if (!storedOtp) {
+        return res.send({ status: "error", data: "OTP not found or expired" });
+    }
+
+    if (storedOtp.otp === otp) {
+        if (Date.now() > storedOtp.otpExpiry) {
+            delete otps[email]; // Hapus OTP jika kadaluarsa
+            return res.send({ status: "errorExpired", data: "OTP expired" });
+        }
+
+        delete otps[email]; // Hapus OTP setelah verifikasi berhasil
+        return res.send({ status: "ok", data: "OTP verified" });
+    } else {
+        return res.send({ status: "error", data: "Invalid OTP" });
+    }
+});
+
+
+// CHANGE PASSWORD
+app.post('/change-password', async (req, res) => {
+    const { email, newPassword } = req.body;
+    try {
+        const user = await User.findOne({ email: email });
+        // Verifikasi apakah password baru sama dengan password lama
+        const isPasswordSame = await bcrypt.compare(newPassword, user.password);
+
+        if (isPasswordSame) {
+            return res.send({ status: 'errorPassSame', data: 'New password must be different from the old password' });
+        }
+
+        const encryptedPassword = await bcrypt.hash(newPassword, 10);
+        await User.updateOne({ email: email }, { $set: { password: encryptedPassword } });
+        res.send({ status: 'ok', data: 'Password updated successfully' });
+    } catch (error) {
+        res.send({ status: 'error', data: error.message });
+    }
+});
