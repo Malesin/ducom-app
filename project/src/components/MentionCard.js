@@ -13,7 +13,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import Video from 'react-native-video';
 import DefaultAvatar from '../assets/avatar.jpg'; // Update path if needed
 
-const TweetCard = ({tweet}) => {
+const MentionCard = ({tweet}) => {
   const [liked, setLiked] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
   const [likesCount, setLikesCount] = useState(tweet.likesCount);
@@ -111,7 +111,6 @@ const TweetCard = ({tweet}) => {
           count={bookMarksCount}
           onPress={handleBookmark}
         />
-
         <TouchableOpacity style={styles.actionButton} onPress={handleShare}>
           <MaterialCommunityIcons
             name="export-variant"
@@ -235,4 +234,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default TweetCard;
+export default MentionCard;
