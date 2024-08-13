@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Video from 'react-native-video';
-import DefaultAvatar from '../assets/avatar.jpg'; 
+import DefaultAvatar from '../assets/avatar.png'; 
 
 
 const MentionCard = ({tweet}) => {
