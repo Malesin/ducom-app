@@ -106,9 +106,9 @@ const HomeScreen = ({navigation}) => {
         console.log('ImagePicker Error: ', response.error);
       } else {
         const uri = response.assets[0].uri;
-        setCapturedImageUri(uri); // Save the image URI to state
+        setCapturedImageUri(uri);
         console.log('Captured image URI:', uri);
-        setModalVisible(true); // Open the modal after capturing the photo
+        setModalVisible(true);
       }
     });
   };
