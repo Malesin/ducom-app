@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   SafeAreaView,
   View,
@@ -62,7 +62,8 @@ export default function Profilescreen() {
         visible={modalVisible}
         transparent
         onRequestClose={closeModal}
-        animationType="fade">
+        animationType="fade"
+      >
         <TouchableWithoutFeedback onPress={closeModal}>
           <View style={styles.modalBackground}>
             <View style={styles.modalContainer}>
