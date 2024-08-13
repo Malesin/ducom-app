@@ -1,13 +1,6 @@
-// const MONGO_URL = process.env.MONGO_URL;
-// const JWT_SECRET = process.env.JWT_SECRET;
-// const PORT = process.env.PORT || 5001;
-
-const MONGO_URL = "mongodb+srv://ducombackend:ducomadmin@ducomapp.nqicz5h.mongodb.net/?retryWrites=true&w=majority&appName=DucomApp"
-
-const JWT_SECRET = "bfidkfdsajciusfweubfsdihugigfbrecfnsdprisca[][ewfddsafcdsacdsj13"
-
-const PORT = 5001
-
+const MONGO_URL = process.env.MONGO_URL;
+const JWT_SECRET = process.env.JWT_SECRET;
+const PORT = process.env.PORT || 5001;
 
 const express = require("express")
 const app = express()
