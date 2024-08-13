@@ -2,7 +2,6 @@ const MONGO_URL = process.env.MONGO_URL;
 const JWT_SECRET = process.env.JWT_SECRET;
 const PORT = process.env.PORT || 5001;
 
-
 const express = require("express")
 const app = express()
 const mongoose = require("mongoose")
