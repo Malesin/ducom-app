@@ -5,6 +5,7 @@ import {
   TextInput,
   SafeAreaView,
   TouchableOpacity,
+  ActivityIndicator,
 } from 'react-native';
 import Toast from 'react-native-toast-message';
 import React, {useState} from 'react';
@@ -16,14 +17,18 @@ const serverUrl = config.SERVER_URL;
 const Forgotpassword = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
+  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
 
   const handleContinue = async () => {
+    setIsButtonDisabled(true); // Disable the button immediately
     // Validation for email or username
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email) {
       setError('Username or Email is required.');
+      setIsButtonDisabled(false); // Re-enable the button if validation fails
     } else if (!emailRegex.test(email) && email.length < 4) {
       setError('Please enter a valid email address or username.');
+      setIsButtonDisabled(false); // Re-enable the button if validation fails
     } else {
       setError('');
       try {
@@ -39,15 +44,18 @@ const Forgotpassword = ({navigation}) => {
             text2: 'OTP successfully sent to email',
             onHide: () => {
               setTimeout(() => {
-                navigation.navigate('Captcha', {email: email});
+                setIsButtonDisabled(true); // Button stays disabled after success
+                navigation.navigate('OTPScreen', {email: email});
               }, 1000); // Delay 1 detik sebelum navigasi
             },
           });
         } else if (response.data.status === 'errorEmail') {
           setError('Email not registered');
+          setIsButtonDisabled(false); // Re-enable button if the email is not registered
         }
       } catch (error) {
         console.error('Error in sending OTP:', error);
+        setIsButtonDisabled(false); // Re-enable button if there is an error
       }
     }
   };
@@ -57,19 +65,29 @@ const Forgotpassword = ({navigation}) => {
       <View style={styles.innerContainer}>
         <Text style={styles.title}>Enter your Email</Text>
         <TextInput
-          style={[styles.email, error ? styles.emailError : null]} // Apply error style conditionally
+          style={styles.email}
           onChangeText={setEmail}
           value={email}
           placeholder="Enter your Email Address"
-          keyboardType="email-address" // This can be kept as 'email-address' for better UX
+          keyboardType="email-address"
           autoCapitalize="none"
         />
         {error ? <Text style={styles.error}>{error}</Text> : null}
         <Text style={styles.subtitle}>
           You may receive Gmail notifications from us for security
         </Text>
-        <TouchableOpacity style={styles.buttonForgot} onPress={handleContinue}>
-          <Text style={styles.textForgot}>Continue</Text>
+        <TouchableOpacity
+          style={styles.buttonForgot}
+          onPress={isButtonDisabled ? null : handleContinue} // Prevent clicking when disabled
+          disabled={isButtonDisabled} // Disable the button
+        >
+          <Text
+            style={[
+              styles.textForgot,
+              isButtonDisabled && styles.disabledText,
+            ]}>
+            {isButtonDisabled ? 'Sent' : 'Send'}
+          </Text>
         </TouchableOpacity>
         <Toast />
       </View>
@@ -126,6 +144,9 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  disabledText: {
+    opacity: 0.5, // Reduce the opacity to visually indicate disabled state
   },
   error: {
     color: 'red',
