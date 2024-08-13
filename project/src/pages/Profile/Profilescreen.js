@@ -1,5 +1,6 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
+  SafeAreaView,
   View,
   Text,
   Image,
@@ -28,7 +29,7 @@ export default function Profilescreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.bannerContainer}>
         <Image
           source={require('../../assets/banner.jpeg')}
@@ -46,7 +47,7 @@ export default function Profilescreen() {
           <Text style={styles.name}>SMKN 2 Jakarta</Text>
           <Text style={styles.username}>@dugamofficial_</Text>
           <Text style={styles.description}>
-            Sekolah Menengah Kejuruan (SMK) adalah salah satu bentuk satuan
+            Sekolah Menengah Kejuruan (SMK) adalah salah satu bentuk satuan
             pendidikan formal yang menyelenggarakan pendidikan kejuruan
           </Text>
           <TouchableOpacity style={styles.editButton} onPress={() => {}}>
@@ -54,13 +55,13 @@ export default function Profilescreen() {
           </TouchableOpacity>
         </View>
       </View>
-
       {/* Modal for image preview */}
       <Modal
         visible={modalVisible}
         transparent
         onRequestClose={closeModal}
-        animationType="fade">
+        animationType="fade"
+      >
         <TouchableWithoutFeedback onPress={closeModal}>
           <View style={styles.modalBackground}>
             <View style={styles.modalContainer}>
@@ -71,7 +72,7 @@ export default function Profilescreen() {
           </View>
         </TouchableWithoutFeedback>
       </Modal>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -107,7 +108,7 @@ const styles = StyleSheet.create({
     height: 80,
     borderRadius: 40,
     marginRight: 20,
-    marginBottom: 20,
+    marginBottom: 30,
   },
   profileText: {
     flex: 1,
@@ -133,7 +134,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 30,
     borderRadius: 50,
-    marginTop: 10,
+    marginTop: 20,
   },
   editButtonText: {
     fontSize: 11,
