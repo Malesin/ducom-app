@@ -10,10 +10,12 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useNavigation } from '@react-navigation/native';
 
 export default function Profilescreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalImageSource, setModalImageSource] = useState(null);
+  const navigation = useNavigation();
 
   // Define the source for the profile image
   const profileImageSource = require('../../assets/profile.png');
@@ -50,7 +52,10 @@ export default function Profilescreen() {
             Sekolah Menengah Kejuruan (SMK) adalah salah satu bentuk satuan
             pendidikan formal yang menyelenggarakan pendidikan kejuruan
           </Text>
-          <TouchableOpacity style={styles.editButton} onPress={() => {}}>
+          <TouchableOpacity
+            style={styles.editButton}
+            onPress={() => navigation.navigate('EditProfile')}
+          >
             <Text style={styles.editButtonText}>Edit Profile</Text>
           </TouchableOpacity>
         </View>

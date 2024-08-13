@@ -16,6 +16,7 @@ import Likescreen from './Profile/Likescreen';
 import Mediascreen from './Profile/Mediascreen';
 import Postscreen from './Profile/Postscreen';
 import Replyscreen from './Profile/Replyscreen';
+import EditProfilePage from './Profile/EditProfilePage';
 
 export {
   Splashscreen,
@@ -36,4 +37,5 @@ export {
   Postscreen,
   Mediascreen,
   Replyscreen,
+  EditProfilePage,
 };
