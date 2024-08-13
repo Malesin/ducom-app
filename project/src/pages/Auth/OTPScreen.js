@@ -5,18 +5,19 @@ import {
   TextInput,
   SafeAreaView,
   TouchableOpacity,
-  Alert
+  Alert,
 } from 'react-native';
 import Toast from 'react-native-toast-message';
-import React, { useState, useEffect } from 'react';
-import { useRoute } from '@react-navigation/native';
+import React, {useState, useEffect} from 'react';
+import {useRoute} from '@react-navigation/native';
 import axios from 'axios';
 import config from '../../config';
+
 const serverUrl = config.SERVER_URL;
 
-const Capthcascreen = ({ navigation }) => {
+const Capthcascreen = ({navigation}) => {
   const route = useRoute();
-  const { email } = route.params;
+  const {email} = route.params;
   const [otp, setOtp] = useState('');
   const [error, setError] = useState('');
   const [timer, setTimer] = useState(60); // Hitungan mundur 60 detik
@@ -24,13 +25,15 @@ const Capthcascreen = ({ navigation }) => {
   const [attemptsLeft, setAttemptsLeft] = useState(3); // Maksimal 3 kali
 
   const handleVerifyOtp = async () => {
-    console.log("Verifying OTP:", otp);
+    console.log('Verifying OTP:', otp);
     try {
-      const response = await axios
-        .post(`${serverUrl}/verify-otp`, { email, otp });
-      console.log("Verify OTP Response:", response.data);
+      const response = await axios.post(`${serverUrl}/verify-otp`, {
+        email,
+        otp,
+      });
+      console.log('Verify OTP Response:', response.data);
       if (response.data.status === 'ok') {
-        console.log("OTP verified successfully");
+        console.log('OTP verified successfully');
         setError('');
         Toast.show({
           type: 'success',
@@ -38,17 +41,17 @@ const Capthcascreen = ({ navigation }) => {
           text2: 'OTP verified successfully',
           onHide: () => {
             setTimeout(() => {
-              navigation.navigate('CreatePassword', { email });
+              navigation.navigate('CreatePassword', {email});
             }, 1000); // Delay 1 detik sebelum navigasi
           },
-        })
+        });
       } else if (response.data.status === 'errorExpired') {
         setError('OTP expired. Try to resend the code.');
       } else {
         setError('Invalid OTP. Please try again.');
       }
     } catch (error) {
-      console.error("Error in verifying OTP:", error);
+      console.error('Error in verifying OTP:', error);
       setError('Error verifying OTP. Please try again.');
     }
   };
@@ -57,7 +60,7 @@ const Capthcascreen = ({ navigation }) => {
     let interval;
     if (isButtonDisabled) {
       interval = setInterval(() => {
-        setTimer((prev) => {
+        setTimer(prev => {
           if (prev === 1) {
             clearInterval(interval);
             setIsButtonDisabled(false); // Enable button after countdown
@@ -70,9 +73,13 @@ const Capthcascreen = ({ navigation }) => {
     return () => clearInterval(interval);
   }, [isButtonDisabled]);
 
-  const formatTime = (seconds) => {
-    const h = Math.floor(seconds / 3600).toString().padStart(2, '0');
-    const m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
+  const formatTime = seconds => {
+    const h = Math.floor(seconds / 3600)
+      .toString()
+      .padStart(2, '0');
+    const m = Math.floor((seconds % 3600) / 60)
+      .toString()
+      .padStart(2, '0');
     const s = (seconds % 60).toString().padStart(2, '0');
 
     // Jika timer lebih dari 1 jam, tampilkan format hh:mm:ss
@@ -91,24 +98,23 @@ const Capthcascreen = ({ navigation }) => {
       setAttemptsLeft(attemptsLeft - 1);
 
       try {
-        const response = await axios
-          .post(`${serverUrl}/forgot-password`, { email });
-        console.log("OTP Response:", response.data);
+        const response = await axios.post(`${serverUrl}/forgot-password`, {
+          email,
+        });
+        console.log('OTP Response:', response.data);
         if (response.data.status === 'ok') {
-          console.log("Sending OTP to email:", email);
+          console.log('Sending OTP to email:', email);
           setError('');
         }
       } catch (error) {
-        console.error("Error in sending OTP:", error);
-        Dialog.show({
-          type: ALERT_TYPE.DANGER,
-          title: 'Error',
-          textBody: 'Error in sending OTP',
-          autoClose: 1000,
-        })
+        console.error('Error in sending OTP:', error);
+        Alert.alert('Error', 'Error in sending OTP');
       }
     } else if (attemptsLeft === 0) {
-      Alert.alert('Kesempatan Habis', 'Waktu tunggu 1 jam sebelum mencoba lagi.');
+      Alert.alert(
+        'Kesempatan Habis',
+        'Waktu tunggu 1 jam sebelum mencoba lagi.',
+      );
       setIsButtonDisabled(true);
       setTimer(3600); // Set timer to 1 hour (3600 seconds)
     }
@@ -121,7 +127,7 @@ const Capthcascreen = ({ navigation }) => {
           We sent a code to your email. Enter that code to confirm your account
         </Text>
         <TextInput
-          style={styles.input}
+          style={[styles.input, error ? styles.inputError : null]} // Apply error style conditionally
           onChangeText={setOtp}
           value={otp}
           placeholder="Enter Code"
@@ -172,6 +178,10 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 10,
     backgroundColor: '#ECECEC',
+  },
+  inputError: {
+    // Error style for the input field
+    borderColor: 'red',
   },
   buttonForgot: {
     width: '80%',

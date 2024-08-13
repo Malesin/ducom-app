@@ -8,12 +8,13 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import Toast from 'react-native-toast-message';
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import axios from 'axios';
 import config from '../../config';
+
 const serverUrl = config.SERVER_URL;
 
-const Forgotpassword = ({ navigation }) => {
+const Forgotpassword = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
@@ -31,10 +32,12 @@ const Forgotpassword = ({ navigation }) => {
     } else {
       setError('');
       try {
-        const response = await axios.post(`${serverUrl}/forgot-password`, { email });
-        console.log("OTP Response:", response.data);
+        const response = await axios.post(`${serverUrl}/forgot-password`, {
+          email,
+        });
+        console.log('OTP Response:', response.data);
         if (response.data.status === 'ok') {
-          console.log("Sending OTP to email:", email);
+          console.log('Sending OTP to email:', email);
           Toast.show({
             type: 'success',
             text1: 'Success',
@@ -58,7 +61,7 @@ const Forgotpassword = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container} >
+    <SafeAreaView style={styles.container}>
       <View style={styles.innerContainer}>
         <Text style={styles.title}>Enter your Email</Text>
         <TextInput
@@ -115,6 +118,10 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 10,
     backgroundColor: '#ECECEC',
+  },
+  emailError: {
+    // Error style for the input field
+    borderColor: 'red',
   },
   subtitle: {
     color: '#A19F9F',
