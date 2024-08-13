@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Video from 'react-native-video';
-import DefaultAvatar from '../assets/avatar.jpg'; // Update path if needed
+import DefaultAvatar from '../assets/avatar.jpg'; 
 
 const MentionCard = ({tweet}) => {
   const [liked, setLiked] = useState(false);
@@ -49,12 +49,17 @@ const MentionCard = ({tweet}) => {
     try {
       await Share.share({
         message: tweet.content,
-        url: tweet.image || tweet.video, // Include media URL if available
-        title: tweet.userName, // Optional: Set title for the share
+        // url: tweet.image || tweet.video, 
+        title: tweet.userName, 
       });
     } catch (error) {
       console.error('Error sharing:', error.message);
     }
+  };
+
+  const formatDate = dateString => {
+    const date = new Date(dateString);
+    return `${date.getDate()} ${date.getMonth() + 1} ${date.getFullYear()}`;
   };
 
   return (
@@ -68,6 +73,7 @@ const MentionCard = ({tweet}) => {
         <View style={styles.userDetails}>
           <Text style={styles.userName}>{tweet.userName}</Text>
           <Text style={styles.userHandle}>@{tweet.userHandle}</Text>
+          <Text style={styles.postDate}>{formatDate(tweet.postDate)}</Text>
         </View>
       </View>
 
@@ -177,20 +183,29 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   avatar: {
-    width: 48,
-    height: 48,
+    width: 52,
+    height: 49,
     borderRadius: 24,
     marginRight: 12,
   },
   userDetails: {
-    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   userName: {
+    fontSize: 16,
     fontWeight: 'bold',
     color: '#040608',
+    marginRight: 4,
   },
   userHandle: {
-    color: '#00c5ff',
+    color: '#718096',
+    fontWeight: '700',
+    marginRight: 8,
+  },
+  postDate: {
+    color: '#718096',
+    fontSize: 12,
   },
   tweetText: {
     fontSize: 15,

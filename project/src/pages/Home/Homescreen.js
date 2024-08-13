@@ -26,22 +26,16 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import * as ImagePicker from 'react-native-image-picker';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons'; // Import MaterialCommunityIcons
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import axios from 'axios';
 import config from '../../config';
-import {
-  ALERT_TYPE,
-  Dialog,
-  AlertNotificationRoot,
-  Toast,
-} from 'react-native-alert-notification';
 const serverUrl = config.SERVER_URL;
 
 const HomeScreen = ({navigation}) => {
   const [tweets, setTweets] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [newPostContent, setNewPostContent] = useState('');
-  const [capturedImageUri, setCapturedImageUri] = useState(null); // State for captured image URI
+  const [capturedImageUri, setCapturedImageUri] = useState(null);
   const isExpanded = useSharedValue(false);
 
   async function getData() {

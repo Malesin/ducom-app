@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import {
+  SafeAreaView,
   View,
   Text,
   Image,
@@ -18,17 +19,17 @@ export default function Profilescreen() {
   const profileImageSource = require('../../assets/profile.png');
 
   const openModal = () => {
-    setModalImageSource(profileImageSource); // Set the image source to the profile image
+    setModalImageSource(profileImageSource);
     setModalVisible(true);
   };
 
   const closeModal = () => {
     setModalVisible(false);
-    setModalImageSource(null); // Clear the image source when closing the modal
+    setModalImageSource(null);
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.bannerContainer}>
         <Image
           source={require('../../assets/banner.jpeg')}
@@ -46,15 +47,16 @@ export default function Profilescreen() {
           <Text style={styles.name}>SMKN 2 Jakarta</Text>
           <Text style={styles.username}>@dugamofficial_</Text>
           <Text style={styles.description}>
-            Sekolah Menengah Kejuruan (SMK) adalah salah satu bentuk satuan
-            pendidikan formal yang menyelenggarakan pendidikan kejuruan
+            Lorem Ipsum is simply dummy text of the printing and typesetting
+            industry. Lorem Ipsum has been the industry's standard dummy text
+            ever since the 1500s, when an unknown printer took a galley of type
+            and scrambled it to make a type specimen book.
           </Text>
           <TouchableOpacity style={styles.editButton} onPress={() => {}}>
             <Text style={styles.editButtonText}>Edit Profile</Text>
           </TouchableOpacity>
         </View>
       </View>
-
       {/* Modal for image preview */}
       <Modal
         visible={modalVisible}
@@ -71,7 +73,7 @@ export default function Profilescreen() {
           </View>
         </TouchableWithoutFeedback>
       </Modal>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -86,7 +88,6 @@ const styles = StyleSheet.create({
   banner: {
     width: '100%',
     height: 150,
-    marginBottom: 20,
   },
   settingsButton: {
     position: 'absolute',
@@ -100,14 +101,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: 20,
-    paddingHorizontal: 20,
+    paddingHorizontal: 10,
   },
   profile: {
-    width: 80,
-    height: 80,
+    width: 83,
+    height: 82,
     borderRadius: 40,
     marginRight: 20,
-    marginBottom: 20,
+    marginBottom: 30,
   },
   profileText: {
     flex: 1,
@@ -119,12 +120,12 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   username: {
-    fontSize: 10,
+    fontSize: 11,
     color: '#00c5ff',
     marginBottom: 5,
   },
   description: {
-    fontSize: 10,
+    fontSize: 11,
     color: '#000',
   },
   editButton: {
@@ -133,7 +134,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 30,
     borderRadius: 50,
-    marginTop: 10,
+    marginTop: 20,
   },
   editButtonText: {
     fontSize: 11,
@@ -156,6 +157,5 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     resizeMode: 'contain',
-    borderRadius: 10,
   },
 });

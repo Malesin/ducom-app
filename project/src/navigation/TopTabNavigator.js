@@ -11,7 +11,7 @@ import {
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 
 const Tab = createMaterialTopTabNavigator();
-const {height} = Dimensions.get('window'); 
+const {height} = Dimensions.get('window');
 
 function TopTabNavigator() {
   return (
@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   navigatorWrapper: {
-    flex: 1,
+    flex: 1, 
   },
   tabBar: {
     backgroundColor: '#fff',
