@@ -13,7 +13,6 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import Video from 'react-native-video';
 import DefaultAvatar from '../assets/avatar.png'; 
 
-
 const MentionCard = ({tweet}) => {
   const [liked, setLiked] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
@@ -50,8 +49,8 @@ const MentionCard = ({tweet}) => {
     try {
       await Share.share({
         message: tweet.content,
-        // url: tweet.image || tweet.video, 
-        title: tweet.userName, 
+        // url: tweet.image || tweet.video,
+        title: tweet.userName,
       });
     } catch (error) {
       console.error('Error sharing:', error.message);

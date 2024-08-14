@@ -7,7 +7,11 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import React, {useState} from 'react';
-import Toast from 'react-native-toast-message';
+import {
+  ALERT_TYPE,
+  Dialog,
+  AlertNotificationRoot,
+} from 'react-native-alert-notification';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {useRoute} from '@react-navigation/native';
 import axios from 'axios';
@@ -39,16 +43,20 @@ const CreatePassword = ({navigation}) => {
         });
         if (response.data.status === 'ok') {
           console.log('Password updated successfully');
-          Toast.show({
-            type: 'success',
-            text1: 'Success',
-            text2: 'Password updated successfully',
+          Dialog.show({
+            type: ALERT_TYPE.SUCCESS,
+            title: 'Success',
+            textBody: ' Password successfully updated! ',
             onHide: () => {
+              Dialog.hide();
               setTimeout(() => {
                 navigation.navigate('Signin');
               }, 1000); // Delay 1 detik sebelum navigasi
             },
           });
+          setTimeout(() => {
+            Dialog.hide(); // Hide the dialog if it doesn't already
+          }, 3000); // Duration to show the dialog
         } else if (response.data.status === 'errorPassSame') {
           setError('New password cannot be same as old password');
         } else {
@@ -61,58 +69,60 @@ const CreatePassword = ({navigation}) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.innerContainer}>
-        <Text style={styles.title}>
-          Create a password with at least 8 and at most 15 characters. You’ll
-          need this password to log in into your account.
-        </Text>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            onChangeText={setPassword}
-            value={password}
-            placeholder="New Password"
-            secureTextEntry={!showPassword}
-            autoCapitalize="none"
-          />
-          <TouchableOpacity
-            style={styles.eyeIcon}
-            onPress={() => setShowPassword(!showPassword)}>
-            <Icon
-              name={showPassword ? 'visibility' : 'visibility-off'}
-              size={24}
-              color="#000"
+    <AlertNotificationRoot>
+      <SafeAreaView style={styles.container}>
+        <View style={styles.innerContainer}>
+          <Text style={styles.title}>
+            Create a password with at least 8 and at most 15 characters. You’ll
+            need this password to log in into your account.
+          </Text>
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              onChangeText={setPassword}
+              value={password}
+              placeholder="New Password"
+              secureTextEntry={!showPassword}
+              autoCapitalize="none"
             />
+            <TouchableOpacity
+              style={styles.eyeIcon}
+              onPress={() => setShowPassword(!showPassword)}>
+              <Icon
+                name={showPassword ? 'visibility' : 'visibility-off'}
+                size={24}
+                color="#000"
+              />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              onChangeText={setConfirmPassword}
+              value={confirmPassword}
+              placeholder="Confirm Password"
+              secureTextEntry={!showConfirmPassword}
+              autoCapitalize="none"
+            />
+            <TouchableOpacity
+              style={styles.eyeIcon}
+              onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
+              <Icon
+                name={showConfirmPassword ? 'visibility' : 'visibility-off'}
+                size={24}
+                color="#000"
+              />
+            </TouchableOpacity>
+          </View>
+          {error ? <Text style={styles.error}>{error}</Text> : null}
+          <TouchableOpacity
+            style={styles.buttonForgot}
+            onPress={handleContinue}>
+            <Text style={styles.textForgot}>Continue</Text>
           </TouchableOpacity>
         </View>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            onChangeText={setConfirmPassword}
-            value={confirmPassword}
-            placeholder="Confirm Password"
-            secureTextEntry={!showConfirmPassword} // Use secureTextEntry for password fields
-            autoCapitalize="none"
-          />
-          <TouchableOpacity
-            style={styles.eyeIcon}
-            onPress={() => setShowConfirmPassword(!showConfirmPassword)} // Toggle visibility state
-          >
-            <Icon
-              name={showConfirmPassword ? 'visibility' : 'visibility-off'}
-              size={24}
-              color="#000"
-            />
-          </TouchableOpacity>
-        </View>
-        {error ? <Text style={styles.error}>{error}</Text> : null}
-        <TouchableOpacity style={styles.buttonForgot} onPress={handleContinue}>
-          <Text style={styles.textForgot}>Continue</Text>
-        </TouchableOpacity>
-      </View>
-      <Toast />
-    </SafeAreaView>
+      </SafeAreaView>
+    </AlertNotificationRoot>
   );
 };
 
