@@ -219,7 +219,7 @@ const HomeScreen = ({navigation}) => {
             </TouchableOpacity>
             <View style={styles.inputContainer}>
               <Image
-                source={require('../../assets/avatar.jpg')}
+                source={require('../../assets/avatar.png')}
                 style={styles.profileImage}
               />
               <TextInput

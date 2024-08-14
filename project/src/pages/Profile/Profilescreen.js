@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   SafeAreaView,
   View,
@@ -10,10 +10,12 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useNavigation } from '@react-navigation/native';
 
 export default function Profilescreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalImageSource, setModalImageSource] = useState(null);
+  const navigation = useNavigation();
 
   // Define the source for the profile image
   const profileImageSource = require('../../assets/profile.png');
@@ -52,7 +54,10 @@ export default function Profilescreen() {
             ever since the 1500s, when an unknown printer took a galley of type
             and scrambled it to make a type specimen book.
           </Text>
-          <TouchableOpacity style={styles.editButton} onPress={() => {}}>
+          <TouchableOpacity
+            style={styles.editButton}
+            onPress={() => navigation.navigate('EditProfile')}
+          >
             <Text style={styles.editButtonText}>Edit Profile</Text>
           </TouchableOpacity>
         </View>
@@ -62,7 +67,8 @@ export default function Profilescreen() {
         visible={modalVisible}
         transparent
         onRequestClose={closeModal}
-        animationType="fade">
+        animationType="fade"
+      >
         <TouchableWithoutFeedback onPress={closeModal}>
           <View style={styles.modalBackground}>
             <View style={styles.modalContainer}>

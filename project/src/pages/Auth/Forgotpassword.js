@@ -5,6 +5,7 @@ import {
   TextInput,
   SafeAreaView,
   TouchableOpacity,
+  ActivityIndicator,
 } from 'react-native';
 import {
   ALERT_TYPE,
@@ -20,14 +21,18 @@ const serverUrl = config.SERVER_URL;
 const Forgotpassword = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
+  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
 
   const handleContinue = async () => {
+    setIsButtonDisabled(true); // Disable the button immediately
     // Validation for email or username
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email) {
       setError('Username or Email is required.');
+      setIsButtonDisabled(false); // Re-enable the button if validation fails
     } else if (!emailRegex.test(email) && email.length < 4) {
       setError('Please enter a valid email address or username.');
+      setIsButtonDisabled(false); // Re-enable the button if validation fails
     } else {
       setError('');
       try {
@@ -53,6 +58,7 @@ const Forgotpassword = ({navigation}) => {
           }, 3000); // Duration to show the dialog
         } else if (response.data.status === 'errorEmail') {
           setError('Email not registered');
+          setIsButtonDisabled(false); // Re-enable button if the email is not registered
         }
       } catch (error) {
         console.error('Error in sending OTP:', error);
@@ -149,6 +155,9 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  disabledText: {
+    opacity: 0.5, // Reduce the opacity to visually indicate disabled state
   },
   error: {
     color: 'red',
