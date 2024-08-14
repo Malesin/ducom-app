@@ -7,7 +7,11 @@ import {
   TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
-import Toast from 'react-native-toast-message';
+import {
+  ALERT_TYPE,
+  Dialog,
+  AlertNotificationRoot,
+} from 'react-native-alert-notification';
 import React, {useState} from 'react';
 import axios from 'axios';
 import config from '../../config';
@@ -38,56 +42,68 @@ const Forgotpassword = ({navigation}) => {
         console.log('OTP Response:', response.data);
         if (response.data.status === 'ok') {
           console.log('Sending OTP to email:', email);
-          Toast.show({
-            type: 'success',
-            text1: 'Success',
-            text2: 'OTP successfully sent to email',
+          Dialog.show({
+            type: ALERT_TYPE.SUCCESS,
+            title: 'Success',
+            textBody: 'OTP successfully sent to email',
             onHide: () => {
               setTimeout(() => {
-                setIsButtonDisabled(true); // Button stays disabled after success
-                navigation.navigate('OTPScreen', { email: email });
-              }, 1000); // Delay 1 detik sebelum navigasi
+                Dialog.hide(); // Hide the dialog
+                navigation.navigate('OTPScreen', {email: email});
+              }, 1000); // Delay 1 second before hiding the dialog and navigating
             },
           });
+          setTimeout(() => {
+            Dialog.hide(); // Hide the dialog if it doesn't already
+          }, 3000); // Duration to show the dialog
         } else if (response.data.status === 'errorEmail') {
           setError('Email not registered');
           setIsButtonDisabled(false); // Re-enable button if the email is not registered
         }
       } catch (error) {
-        console.error("Error in sending OTP:", error);
-        setIsButtonDisabled(false); // Re-enable button if there is an error
+        console.error('Error in sending OTP:', error);
+        Dialog.show({
+          type: ALERT_TYPE.DANGER,
+          title: 'Error',
+          textBody: 'Error in sending OTP',
+          onHide: () => {
+            setTimeout(() => {
+              Dialog.hide(); // Hide the dialog
+            }, 1000); // Delay 1 second before hiding the dialog
+          },
+        }); 
+        setTimeout(() => {
+          Dialog.hide(); // Hide the dialog if it doesn't already
+        }, 2000); // Duration to show the dialog
       }
     }
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.innerContainer}>
-        <Text style={styles.title}>Enter your Email</Text>
-        <TextInput
-          style={styles.email}
-          onChangeText={setEmail}
-          value={email}
-          placeholder="Enter your Email Address"
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
-        {error ? <Text style={styles.error}>{error}</Text> : null}
-        <Text style={styles.subtitle}>
-          You may receive Gmail notifications from us for security
-        </Text>
-        <TouchableOpacity
-          style={styles.buttonForgot}
-          onPress={isButtonDisabled ? null : handleContinue} // Prevent clicking when disabled
-          disabled={isButtonDisabled} // Disable the button
-        >
-          <Text style={[styles.textForgot, isButtonDisabled && styles.disabledText]}>
-            {isButtonDisabled ? 'Sent' : 'Send'}
+    <AlertNotificationRoot>
+      <SafeAreaView style={styles.container}>
+        <View style={styles.innerContainer}>
+          <Text style={styles.title}>Enter your Email</Text>
+          <TextInput
+            style={[styles.email, error ? styles.emailError : null]}
+            onChangeText={setEmail}
+            value={email}
+            placeholder="Enter your Email Address"
+            keyboardType="email-address"
+            autoCapitalize="none"
+          />
+          {error ? <Text style={styles.error}>{error}</Text> : null}
+          <Text style={styles.subtitle}>
+            You may receive Gmail notifications from us for security
           </Text>
-        </TouchableOpacity>
-        <Toast />
-      </View>
-    </SafeAreaView>
+          <TouchableOpacity
+            style={styles.buttonForgot}
+            onPress={handleContinue}>
+            <Text style={styles.textForgot}>Continue</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    </AlertNotificationRoot>
   );
 };
 
@@ -120,7 +136,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#ECECEC',
   },
   emailError: {
-    // Error style for the input field
     borderColor: 'red',
   },
   subtitle: {
