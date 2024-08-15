@@ -6,15 +6,19 @@ import {
   SafeAreaView,
   TouchableOpacity,
 } from 'react-native';
-import React, { useState } from 'react';
-import Toast from 'react-native-toast-message';
+import React, {useState} from 'react';
+import {
+  ALERT_TYPE,
+  Dialog,
+  AlertNotificationRoot,
+} from 'react-native-alert-notification';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { useRoute } from '@react-navigation/native';
+import {useRoute} from '@react-navigation/native';
 import axios from 'axios';
 import config from '../../config';
 const serverUrl = config.SERVER_URL;
 
-const CreatePassword = ({ navigation }) => {
+const CreatePassword = ({navigation}) => {
   const [password, setPassword] = useState(''); // State for new password
   const [confirmPassword, setConfirmPassword] = useState(''); // State for confirm password
   const [error, setError] = useState('');
@@ -22,7 +26,7 @@ const CreatePassword = ({ navigation }) => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isCheckedPass, setIsCheckedPass] = useState(false); // State for checkbox
   const route = useRoute();
-  const { email } = route.params;
+  const {email} = route.params;
 
   const handleContinue = async () => {
     if (!password || !confirmPassword) {
@@ -42,16 +46,20 @@ const CreatePassword = ({ navigation }) => {
         });
         if (response.data.status === 'ok') {
           console.log('Password updated successfully');
-          Toast.show({
-            type: 'success',
-            text1: 'Success',
-            text2: 'Password updated successfully',
+          Dialog.show({
+            type: ALERT_TYPE.SUCCESS,
+            title: 'Success',
+            textBody: 'Password updated successfully',
             onHide: () => {
               setTimeout(() => {
+                Dialog.hide(); // Hide the dialog
                 navigation.navigate('Signin');
-              }, 2000);
+              }, 1000);
             },
           });
+          setTimeout(() => {
+            Dialog.hide(); // Hide the dialog if it doesn't already
+          }, 3000); // Duration to show the dialog
         } else if (response.data.status === 'errorPassSame') {
           setError('New password cannot be same as old password');
         } else {
@@ -64,76 +72,75 @@ const CreatePassword = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.innerContainer}>
-        <Text style={styles.title}>
-          Create a password with at least 8 and at most 15 characters. You’ll
-          need this password to log in into your account.
-        </Text>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            onChangeText={setPassword}
-            value={password}
-            placeholder="New Password"
-            secureTextEntry={!showPassword}
-            autoCapitalize="none"
-          />
-          <TouchableOpacity
-            style={styles.eyeIcon}
-            onPress={() => setShowPassword(!showPassword)}>
-            <Icon
-              name={showPassword ? 'visibility' : 'visibility-off'}
-              size={24}
-              color="#000"
-            />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            onChangeText={setConfirmPassword}
-            value={confirmPassword}
-            placeholder="Confirm Password"
-            secureTextEntry={!showConfirmPassword}
-            autoCapitalize="none"
-          />
-          <TouchableOpacity
-            style={styles.eyeIcon}
-            onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-          >
-            <Icon
-              name={showConfirmPassword ? 'visibility' : 'visibility-off'}
-              size={24}
-              color="#000"
-            />
-          </TouchableOpacity>
-        </View>
-        {error ? <Text style={styles.error}>{error}</Text> : null}
-        <View style={styles.checkboxContainer}>
-          <TouchableOpacity
-            style={styles.checkbox}
-            onPress={() => setIsCheckedPass(!isCheckedPass)}>
-            <Icon
-              name={isCheckedPass ? 'check-box' : 'check-box-outline-blank'}
-              size={24}
-              color="#000000"
-            />
-          </TouchableOpacity>
-          <Text style={styles.checkboxLabel}>
-            I'm sure to change the password
+    <AlertNotificationRoot>
+      <SafeAreaView style={styles.container}>
+        <View style={styles.innerContainer}>
+          <Text style={styles.title}>
+            Create a password with at least 8 and at most 15 characters. You’ll
+            need this password to log in into your account.
           </Text>
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              onChangeText={setPassword}
+              value={password}
+              placeholder="New Password"
+              secureTextEntry={!showPassword}
+              autoCapitalize="none"
+            />
+            <TouchableOpacity
+              style={styles.eyeIcon}
+              onPress={() => setShowPassword(!showPassword)}>
+              <Icon
+                name={showPassword ? 'visibility' : 'visibility-off'}
+                size={24}
+                color="#000"
+              />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              onChangeText={setConfirmPassword}
+              value={confirmPassword}
+              placeholder="Confirm Password"
+              secureTextEntry={!showConfirmPassword}
+              autoCapitalize="none"
+            />
+            <TouchableOpacity
+              style={styles.eyeIcon}
+              onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
+              <Icon
+                name={showConfirmPassword ? 'visibility' : 'visibility-off'}
+                size={24}
+                color="#000"
+              />
+            </TouchableOpacity>
+          </View>
+          {error ? <Text style={styles.error}>{error}</Text> : null}
+          <View style={styles.checkboxContainer}>
+            <TouchableOpacity
+              style={styles.checkbox}
+              onPress={() => setIsCheckedPass(!isCheckedPass)}>
+              <Icon
+                name={isCheckedPass ? 'check-box' : 'check-box-outline-blank'}
+                size={24}
+                color="#000000"
+              />
+            </TouchableOpacity>
+            <Text style={styles.checkboxLabel}>
+              I'm sure to change the password
+            </Text>
+          </View>
+          <TouchableOpacity
+            style={[styles.buttonForgot, {opacity: isCheckedPass ? 1 : 0.5}]}
+            onPress={handleContinue}
+            disabled={!isCheckedPass}>
+            <Text style={styles.textForgot}>Continue</Text>
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity
-          style={[styles.buttonForgot, { opacity: isCheckedPass ? 1 : 0.5 }]}
-          onPress={handleContinue}
-          disabled={!isCheckedPass}
-        >
-          <Text style={styles.textForgot}>Continue</Text>
-        </TouchableOpacity>
-      </View>
-      <Toast />
-    </SafeAreaView>
+      </SafeAreaView>
+    </AlertNotificationRoot>
   );
 };
 

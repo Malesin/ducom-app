@@ -7,12 +7,8 @@ import {
   SafeAreaView,
   BackHandler,
   TouchableOpacity,
-  Modal,
-  TextInput,
   Text,
   Image,
-  KeyboardAvoidingView,
-  Platform,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useFocusEffect} from '@react-navigation/native';
@@ -29,12 +25,11 @@ import * as ImagePicker from 'react-native-image-picker';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import axios from 'axios';
 import config from '../../config';
+
 const serverUrl = config.SERVER_URL;
 
 const HomeScreen = ({navigation}) => {
   const [tweets, setTweets] = useState([]);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [newPostContent, setNewPostContent] = useState('');
   const [capturedImageUri, setCapturedImageUri] = useState(null);
   const isExpanded = useSharedValue(false);
 
@@ -81,24 +76,11 @@ const HomeScreen = ({navigation}) => {
     }, []),
   );
 
-  useEffect(() => {
-    getData();
-  }, []);
-
-  const handleCreatePost = async () => {
-    console.log('Creating post with content:', newPostContent); // Log the content of the post
-
-    try {
-      await axios.post(`${serverUrl}/createPost`, {content: newPostContent});
-      setNewPostContent('');
-      setModalVisible(false);
-      setCapturedImageUri(null); // Clear captured image URI
-      getData(); // Refresh the tweet list after creating a new post
-      console.log('Post created successfully'); // Log success
-    } catch (error) {
-      console.error('Error creating post:', error); // Log error
-    }
-  };
+  useFocusEffect(
+    useCallback(() => {
+      getData();
+    }, []),
+  );
 
   const handleOpenCamera = () => {
     const options = {
@@ -115,7 +97,8 @@ const HomeScreen = ({navigation}) => {
         const uri = response.assets[0].uri;
         setCapturedImageUri(uri);
         console.log('Captured image URI:', uri);
-        setModalVisible(true);
+        // Navigate to CreatePost and pass the image URI
+        navigation.navigate('CreatePost', {imageUri: uri});
       }
     });
   };
@@ -200,65 +183,9 @@ const HomeScreen = ({navigation}) => {
           isExpanded={isExpanded}
           index={2}
           iconName={'feather'}
-          onPress={() => setModalVisible(true)}
+          onPress={() => navigation.navigate('CreatePost')} // Navigate to CreatePost screen
         />
       </View>
-      {/* Modal for creating a new post */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => {
-          setModalVisible(false);
-          // Reset the state when closing the modal
-          setNewPostContent('');
-          setCapturedImageUri(null);
-        }}>
-        <KeyboardAvoidingView
-          style={styles.modalContainer}
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          keyboardVerticalOffset={Platform.OS === 'ios' ? 86 : 0} // Adjust as needed
-        >
-          <View style={styles.modalContent}>
-            <TouchableOpacity
-              style={styles.buttonCancel}
-              onPress={() => {
-                setModalVisible(false);
-                // Reset the state when pressing Cancel
-                setNewPostContent('');
-                setCapturedImageUri(null);
-              }}>
-              <Text style={styles.buttonTextCancel}>Cancel</Text>
-            </TouchableOpacity>
-            <View style={styles.inputContainer}>
-              <Image
-                source={require('../../assets/avatar.png')}
-                style={styles.profileImage}
-              />
-              <TextInput
-                style={[styles.textInput]}
-                placeholder="What's on your mind?"
-                multiline
-                numberOfLines={4}
-                value={newPostContent}
-                onChangeText={setNewPostContent}
-                maxLength={400}
-              />
-            </View>
-            {capturedImageUri && ( // Conditionally render the image if available
-              <Image
-                source={{uri: capturedImageUri}}
-                style={styles.capturedImage}
-              />
-            )}
-            <TouchableOpacity
-              style={styles.buttonPost}
-              onPress={handleCreatePost}>
-              <Text style={styles.buttonTextPost}>Post</Text>
-            </TouchableOpacity>
-          </View>
-        </KeyboardAvoidingView>
-      </Modal>
     </SafeAreaView>
   );
 };
@@ -332,68 +259,6 @@ const styles = StyleSheet.create({
   },
   icon: {
     color: '#000',
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalContent: {
-    width: '100%',
-    height: '100%',
-    backgroundColor: '#fff',
-    padding: 25,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    justifyContent: 'space-between',
-  },
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginTop: 20,
-  },
-  profileImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    marginRight: 10,
-    marginTop: 40,
-  },
-  textInput: {
-    flex: 1,
-    fontFamily: 'Inter',
-    fontSize: 16,
-    padding: 10,
-    borderColor: '#000',
-    borderWidth: 1,
-    borderRadius: 10,
-    marginTop: 20,
-  },
-  buttonCancel: {
-    position: 'absolute',
-    top: 20,
-    left: 20,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 5,
-  },
-  buttonPost: {
-    position: 'absolute',
-    top: 20,
-    right: 20,
-    backgroundColor: '#001374',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 50,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  buttonTextCancel: {
-    color: '#000',
-  },
-  buttonTextPost: {
-    color: '#fff',
   },
   noTweetsText: {
     textAlign: 'left',

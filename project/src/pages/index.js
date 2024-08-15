@@ -3,6 +3,7 @@ import Authscreen from './Auth/Authscreen';
 import Signinscreen from './Auth/Signinscreen';
 import Registerscreen from './Auth/Registerscreen';
 import Homescreen from './Home/Homescreen';
+import CreatePost from './Home/CreatePost';
 import Forgotpassword from './Auth/Forgotpassword';
 import OTPScreen from './Auth/OTPScreen';
 import CreatePassword from './Auth/CreatePassword';
@@ -24,6 +25,7 @@ export {
   Signinscreen,
   Registerscreen,
   Homescreen,
+  CreatePost,
   Forgotpassword,
   OTPScreen,
   CreatePassword,

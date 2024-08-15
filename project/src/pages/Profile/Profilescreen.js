@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   SafeAreaView,
   View,
@@ -10,7 +10,7 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import {useNavigation, useFocusEffect} from '@react-navigation/native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import config from '../../config';
@@ -21,24 +21,22 @@ export default function Profilescreen() {
   const [modalImageSource, setModalImageSource] = useState(null);
   const navigation = useNavigation();
 
-  const [userData, setUserData] = useState("")
+  const [userData, setUserData] = useState('');
   async function getData() {
-    const token = await AsyncStorage.getItem("token")
-    console.log(token)
-    axios
-      .post(`${serverUrl}/userdata`, { token: token })
-      .then(res => {
-        console.log(res.data)
-        setUserData(res.data.data)
-        // UNTUK CONTOH PENGAPLIKASIAN DATANYA = {userData.name}
-      })
+    const token = await AsyncStorage.getItem('token');
+    console.log(token);
+    axios.post(`${serverUrl}/userdata`, {token: token}).then(res => {
+      console.log(res.data);
+      setUserData(res.data.data);
+      // UNTUK CONTOH PENGAPLIKASIAN DATANYA = {userData.name}
+    });
   }
 
   useFocusEffect(
     React.useCallback(() => {
       getData();
-      console.log("refresh")
-    }, [])
+      console.log('refresh');
+    }, []),
   );
 
   // Define the source for the profile image
@@ -61,7 +59,7 @@ export default function Profilescreen() {
           source={require('../../assets/bannerhitam.png')}
           style={styles.banner}
         />
-        <TouchableOpacity style={styles.settingsButton} onPress={() => { }}>
+        <TouchableOpacity style={styles.settingsButton} onPress={() => {}}>
           <MaterialCommunityIcons name="dots-vertical" size={30} color="#000" />
         </TouchableOpacity>
       </View>
@@ -72,13 +70,10 @@ export default function Profilescreen() {
         <View style={styles.profileText}>
           <Text style={styles.name}>{userData?.name}</Text>
           <Text style={styles.username}>@{userData?.username}</Text>
-          <Text style={styles.description}>
-          {userData?.bio || "no bio"}
-          </Text>
+          <Text style={styles.description}>{userData?.bio || 'No Description'}</Text>
           <TouchableOpacity
             style={styles.editButton}
-            onPress={() => navigation.navigate('EditProfile')}
-          >
+            onPress={() => navigation.navigate('EditProfile')}>
             <Text style={styles.editButtonText}>Edit Profile</Text>
           </TouchableOpacity>
         </View>
@@ -88,8 +83,7 @@ export default function Profilescreen() {
         visible={modalVisible}
         transparent
         onRequestClose={closeModal}
-        animationType="fade"
-      >
+        animationType="fade">
         <TouchableWithoutFeedback onPress={closeModal}>
           <View style={styles.modalBackground}>
             <View style={styles.modalContainer}>
@@ -161,7 +155,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 30,
     borderRadius: 50,
-    marginTop: 20,
+    marginTop: 10,
   },
   editButtonText: {
     fontSize: 11,
