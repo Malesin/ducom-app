@@ -151,7 +151,7 @@ export default function EditProfilePage() {
         <View style={styles.bannerContainer}>
           <TouchableOpacity onPress={() => selectImage(setBanner, 'banner')}>
             <ImageBackground
-              source={banner || require('../../assets/banner.jpeg')}
+              source={banner || require('../../assets/bannerhitam.png')}
               style={styles.banner}
               resizeMode="cover"
             >
@@ -194,18 +194,18 @@ export default function EditProfilePage() {
           </View>
           <TextInput
             style={styles.input}
-            placeholder="Name"
+            placeholder={userData?.name}
             value={name}
             onChangeText={setName}
           />
           <TextInput
             style={styles.input}
-            placeholder="Bio"
+            placeholder={userData?.bio || "-"}
             value={bio}
             onChangeText={setBio}
             multiline
           />
-          <TextInput style={styles.input} placeholder="Email" />
+          <TextInput style={styles.input} placeholder={userData?.email} />
         </View>
       </ScrollView>
     </SafeAreaView>

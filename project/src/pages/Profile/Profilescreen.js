@@ -58,7 +58,7 @@ export default function Profilescreen() {
     <SafeAreaView style={styles.container}>
       <View style={styles.bannerContainer}>
         <Image
-          source={require('../../assets/banner.jpeg')}
+          source={require('../../assets/bannerhitam.png')}
           style={styles.banner}
         />
         <TouchableOpacity style={styles.settingsButton} onPress={() => { }}>
