@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   SafeAreaView,
   View,
@@ -11,12 +11,35 @@ import {
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useNavigation } from '@react-navigation/native';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import config from '../../config';
+const serverUrl = config.SERVER_URL;
 
 export default function Profilescreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalImageSource, setModalImageSource] = useState(null);
   const navigation = useNavigation();
 
+  const [userData, setUserData] = useState("")
+  async function getData() {
+    const token = await AsyncStorage.getItem("token")
+    console.log(token)
+    axios
+      .post(`${serverUrl}/userdata`, { token: token })
+      .then(res => {
+        console.log(res.data)
+        setUserData(res.data.data)
+        // UNTUK CONTOH PENGAPLIKASIAN DATANYA = {userData.name}
+      })
+  }
+
+  useEffect(() => {
+
+    getData()
+
+  }, []);
+  
   // Define the source for the profile image
   const profileImageSource = require('../../assets/profile.png');
 
@@ -37,7 +60,7 @@ export default function Profilescreen() {
           source={require('../../assets/banner.jpeg')}
           style={styles.banner}
         />
-        <TouchableOpacity style={styles.settingsButton} onPress={() => {}}>
+        <TouchableOpacity style={styles.settingsButton} onPress={() => { }}>
           <MaterialCommunityIcons name="dots-vertical" size={30} color="#000" />
         </TouchableOpacity>
       </View>
@@ -46,13 +69,10 @@ export default function Profilescreen() {
           <Image source={profileImageSource} style={styles.profile} />
         </TouchableOpacity>
         <View style={styles.profileText}>
-          <Text style={styles.name}>SMKN 2 Jakarta</Text>
-          <Text style={styles.username}>@dugamofficial_</Text>
+          <Text style={styles.name}>{userData?.name}</Text>
+          <Text style={styles.username}>@{userData?.username}</Text>
           <Text style={styles.description}>
-            Lorem Ipsum is simply dummy text of the printing and typesetting
-            industry. Lorem Ipsum has been the industry's standard dummy text
-            ever since the 1500s, when an unknown printer took a galley of type
-            and scrambled it to make a type specimen book.
+          {userData?.bio || "no bio"}
           </Text>
           <TouchableOpacity
             style={styles.editButton}
