@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -15,19 +15,44 @@ import { SafeAreaView } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { launchImageLibrary } from 'react-native-image-picker'; // Import image picker
 import axios from 'axios'; // Import axios untuk melakukan permintaan HTTP
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import config from '../../config';
+const serverUrl = config.SERVER_URL;
 
 // Komponen EditProfilePage digunakan untuk mengedit profil pengguna
 export default function EditProfilePage() {
   const navigation = useNavigation();
-  const [username, setUsername] = React.useState('@username');
   const [name, setName] = React.useState('');
   const [bio, setBio] = React.useState('');
   const [banner, setBanner] = React.useState(null); // State untuk banner
   const [profilePicture, setProfilePicture] = React.useState(null); // State untuk gambar profil
   const [isEditing, setIsEditing] = React.useState(false);
 
+  const [userData, setUserData] = useState("")
+  async function getData() {
+    const token = await AsyncStorage.getItem("token")
+    console.log(token)
+    axios
+      .post(`${serverUrl}/userdata`, { token: token })
+      .then(res => {
+        console.log(res.data)
+        setUserData(res.data.data)
+        // UNTUK CONTOH PENGAPLIKASIAN DATANYA = {userData.name}
+      })
+  }
+
+  useEffect(() => {
+
+    getData()
+
+  }, []);
+
+  const user = userData?.username
+  const dataUser = user
+  const [username, setUsername] = React.useState(`@` + dataUser);
+
   const initialData = {
-    username: '@username',
+    username: ``,
     name: '',
     bio: '',
   };
@@ -45,7 +70,7 @@ export default function EditProfilePage() {
       return;
     }
     Alert.alert('Konfirmasi', 'Apakah anda ingin menyimpan perubahan?', [
-      { text: 'Tidak', style: 'cancel', onPress: () => {} },
+      { text: 'Tidak', style: 'cancel', onPress: () => { } },
       {
         text: 'Ya',
         style: 'default',
@@ -113,7 +138,7 @@ export default function EditProfilePage() {
     const beforeRemoveListener = navigation.addListener('beforeRemove', (e) => {
       e.preventDefault(); // Mencegah navigasi default
       Alert.alert('Konfirmasi', 'Apakah anda ingin membatalkan perubahan?', [
-        { text: 'Tidak', style: 'cancel', onPress: () => {} }, // Opsi "Tidak" untuk membatalkan navigasi
+        { text: 'Tidak', style: 'cancel', onPress: () => { } }, // Opsi "Tidak" untuk membatalkan navigasi
         {
           text: 'Ya', // Opsi "Ya" untuk mengonfirmasi pembatalan perubahan
           style: 'destructive',
@@ -129,6 +154,9 @@ export default function EditProfilePage() {
 
     return beforeRemoveListener;
   }, [navigation]);
+
+
+  console.log(userData?.username)
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -164,7 +192,7 @@ export default function EditProfilePage() {
                 <Text style={styles.usernameStatic}>@</Text>
                 <TextInput
                   style={styles.usernameInput}
-                  value={username.replace('@', '')}
+                  value={username.replace('@', '') || userData?.username}
                   onChangeText={(text) => setUsername('@' + text.replace('@', ''))}
                   onBlur={() => setIsEditing(false)}
                   autoFocus
@@ -180,18 +208,18 @@ export default function EditProfilePage() {
           </View>
           <TextInput
             style={styles.input}
-            placeholder="Name"
+            placeholder={userData?.name}
             value={name}
             onChangeText={setName}
           />
           <TextInput
             style={styles.input}
-            placeholder="Bio"
+            placeholder={userData?.bio || "-"}
             value={bio}
             onChangeText={setBio}
             multiline
           />
-          <TextInput style={styles.input} placeholder="Email" />
+          <TextInput style={styles.input} placeholder={userData?.email} />
         </View>
       </ScrollView>
     </SafeAreaView>
