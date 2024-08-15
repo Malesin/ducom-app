@@ -57,7 +57,20 @@ const HomeScreen = ({navigation}) => {
     }
   }
 
-  const handleBackPress = () => {};
+  const handleBackPress = () => {
+    Alert.alert('Exit App', 'Are you sure want to exit', [
+      {
+        text: 'cancel',
+        onPress: () => null,
+        style: 'cancel',
+      },
+      {
+        text: 'Exit',
+        onPress: () => BackHandler.exitApp(),
+      },
+    ]);
+    return true;
+  };
 
   useFocusEffect(
     useCallback(() => {

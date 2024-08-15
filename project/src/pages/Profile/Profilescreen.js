@@ -10,7 +10,7 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import config from '../../config';
@@ -34,12 +34,13 @@ export default function Profilescreen() {
       })
   }
 
-  useEffect(() => {
+  useFocusEffect(
+    React.useCallback(() => {
+      getData();
+      console.log("refresh")
+    }, [])
+  );
 
-    getData()
-
-  }, []);
-  
   // Define the source for the profile image
   const profileImageSource = require('../../assets/profile.png');
 
