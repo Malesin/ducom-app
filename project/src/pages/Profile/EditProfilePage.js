@@ -286,6 +286,6 @@ const styles = StyleSheet.create({
   },
   saveButtonText: {
     color: '#fff', // Mengatur warna teks menjadi putih
-    fontWeight: 'bold', // Mengatur font menjadi tebal
+    fontWeight: 'bold', // Mengatur font menjadi tebal 
   },
 });
