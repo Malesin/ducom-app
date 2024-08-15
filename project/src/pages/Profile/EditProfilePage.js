@@ -22,7 +22,6 @@ const serverUrl = config.SERVER_URL;
 // Komponen EditProfilePage digunakan untuk mengedit profil pengguna
 export default function EditProfilePage() {
   const navigation = useNavigation();
-  const [username, setUsername] = React.useState('@username');
   const [name, setName] = React.useState('');
   const [bio, setBio] = React.useState('');
   const [banner, setBanner] = React.useState(null); // State untuk banner
@@ -48,8 +47,12 @@ export default function EditProfilePage() {
 
   }, []);
 
+  const user = userData?.username
+  const dataUser = user
+  const [username, setUsername] = React.useState(`@` + dataUser);
+
   const initialData = {
-    username: `@username`,
+    username: ``,
     name: '',
     bio: '',
   };
@@ -152,6 +155,9 @@ export default function EditProfilePage() {
     return beforeRemoveListener;
   }, [navigation]);
 
+
+  console.log(userData?.username)
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -186,7 +192,7 @@ export default function EditProfilePage() {
                 <Text style={styles.usernameStatic}>@</Text>
                 <TextInput
                   style={styles.usernameInput}
-                  value={username.replace('@', '')}
+                  value={username.replace('@', '') || userData?.username}
                   onChangeText={(text) => setUsername('@' + text.replace('@', ''))}
                   onBlur={() => setIsEditing(false)}
                   autoFocus
