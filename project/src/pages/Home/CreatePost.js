@@ -7,6 +7,8 @@ import {
   Keyboard,
   Image,
   ScrollView,
+  Modal,
+  TouchableOpacity,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {Button} from 'react-native-elements';
@@ -17,6 +19,8 @@ const CreatePost = ({route, navigation}) => {
   const [newPostText, setNewPostText] = useState('');
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState([]);
+  const [previewVisible, setPreviewVisible] = useState(false);
+  const [previewMedia, setPreviewMedia] = useState(null);
 
   useEffect(() => {
     if (route.params?.mediaUri) {
@@ -25,23 +29,17 @@ const CreatePost = ({route, navigation}) => {
   }, [route.params?.mediaUri]);
 
   const handlePostSubmit = () => {
-    // 1. Send post data to your backend (e.g., using a fetch request)
-    // 2. Update the state or navigate to the feed screen after success
     navigation.navigate('Home');
   };
 
   const handleOpenCamera = () => {
     const options = {
-      mediaType: 'mixed', // Allows both photos and videos
+      mediaType: 'mixed',
       saveToPhotos: true,
     };
 
     ImagePicker.launchCamera(options, response => {
-      if (response.didCancel) {
-        console.log('User cancelled photo or video');
-      } else if (response.error) {
-        console.log('ImagePicker Error: ', response.error);
-      } else {
+      if (!response.didCancel && !response.error) {
         const uri = response.assets[0].uri;
         setSelectedMedia(prevMedia => [...prevMedia, uri]);
       }
@@ -50,24 +48,39 @@ const CreatePost = ({route, navigation}) => {
 
   const handleOpenGallery = () => {
     const options = {
-      mediaType: 'mixed', // Allows both photos and videos
-      selectionLimit: 4, // Allow multiple selections
+      mediaType: 'mixed',
+      selectionLimit: 4,
     };
 
     ImagePicker.launchImageLibrary(options, response => {
-      if (response.didCancel) {
-        console.log('User cancelled image picker');
-      } else if (response.error) {
-        console.log('ImagePicker Error: ', response.error);
-      } else {
+      if (!response.didCancel && !response.error) {
         const uris = response.assets.map(asset => asset.uri);
-        setSelectedMedia(prevMedia => [...prevMedia, ...uris]); // Append multiple media URIs
+        setSelectedMedia(prevMedia => [...prevMedia, ...uris]);
       }
     });
   };
 
   const handleTextChange = text => {
     setNewPostText(text);
+  };
+
+  const handleMediaPress = uri => {
+    setPreviewMedia(uri);
+    setPreviewVisible(true);
+  };
+
+  const renderMedia = (uri, index) => {
+    const isVideo = uri.endsWith('.mp4');
+
+    return (
+      <TouchableOpacity key={index} onPress={() => handleMediaPress(uri)}>
+        {isVideo ? (
+          <Image source={{uri}} style={styles.media} /> // Tampilkan thumbnail video
+        ) : (
+          <Image source={{uri}} style={styles.media} />
+        )}
+      </TouchableOpacity>
+    );
   };
 
   useEffect(() => {
@@ -90,16 +103,6 @@ const CreatePost = ({route, navigation}) => {
     };
   }, []);
 
-  const renderMedia = (uri, index) => {
-    const isVideo = uri.endsWith('.mp4'); // Basic check for video file
-
-    return isVideo ? (
-      <Video key={index} source={{uri}} style={styles.media} controls />
-    ) : (
-      <Image key={index} source={{uri}} style={styles.media} />
-    );
-  };
-
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.contentContainer}>
@@ -117,12 +120,12 @@ const CreatePost = ({route, navigation}) => {
           <Button
             icon={<Icon name="camera" size={24} color="#000" />}
             buttonStyle={styles.button}
-            onPress={handleOpenCamera} // Open camera when button is pressed
+            onPress={handleOpenCamera}
           />
           <Button
             icon={<Icon name="image-outline" size={24} color="#000" />}
             buttonStyle={styles.button}
-            onPress={handleOpenGallery} // Open gallery when button is pressed
+            onPress={handleOpenGallery}
           />
           {keyboardVisible && newPostText.length > 0 && (
             <Button
@@ -133,6 +136,33 @@ const CreatePost = ({route, navigation}) => {
           )}
         </View>
       </View>
+
+      {previewMedia && (
+        <Modal
+          visible={previewVisible}
+          transparent={true}
+          onRequestClose={() => setPreviewVisible(false)}>
+          <View style={styles.modalContainer}>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setPreviewVisible(false)}>
+              <Icon name="close" size={24} color="#fff" />
+            </TouchableOpacity>
+            {previewMedia.endsWith('.mp4') ? (
+              <Video
+                source={{uri: previewMedia}}
+                style={styles.fullScreenMedia}
+                controls
+              />
+            ) : (
+              <Image
+                source={{uri: previewMedia}}
+                style={styles.fullScreenMedia}
+              />
+            )}
+          </View>
+        </Modal>
+      )}
     </SafeAreaView>
   );
 };
@@ -179,6 +209,23 @@ const styles = StyleSheet.create({
     width: 75,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 40,
+    right: 20,
+    zIndex: 1,
+  },
+  fullScreenMedia: {
+    width: '100%',
+    height: '80%',
+    resizeMode: 'contain',
   },
 });
 
