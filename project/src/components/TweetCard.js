@@ -7,11 +7,12 @@ import {
   TouchableOpacity,
   Modal,
   TouchableWithoutFeedback,
-  Share, // Import Share module
+  Share,
+  ActivityIndicator,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Video from 'react-native-video';
-import DefaultAvatar from '../assets/avatar.png'; // Update path if needed
+import DefaultAvatar from '../assets/avatar.png';
 
 const TweetCard = ({tweet}) => {
   const [liked, setLiked] = useState(false);
@@ -21,6 +22,7 @@ const TweetCard = ({tweet}) => {
   const [commentsCount, setCommentsCount] = useState(tweet.commentsCount);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalMediaUri, setModalMediaUri] = useState('');
+  const [isVideoLoaded, setIsVideoLoaded] = useState(false); // State for video loading
 
   const handleLike = () => {
     setLiked(prev => !prev);
@@ -44,13 +46,12 @@ const TweetCard = ({tweet}) => {
     setModalMediaUri('');
   };
 
-  // Function to handle sharing
   const handleShare = async () => {
     try {
       await Share.share({
         message: tweet.content,
-        url: tweet.image || tweet.video, // Include media URL if available
-        title: tweet.userName, // Optional: Set title for the share
+        url: tweet.image || tweet.video,
+        title: tweet.userName,
       });
     } catch (error) {
       console.error('Error sharing:', error.message);
@@ -69,6 +70,19 @@ const TweetCard = ({tweet}) => {
           <Text style={styles.userName}>{tweet.userName}</Text>
           <Text style={styles.userHandle}>@{tweet.userHandle}</Text>
         </View>
+
+        {/* Options Button */}
+        <View style={styles.optionsContainer}>
+          <TouchableOpacity
+            style={styles.optionsButton}
+            onPress={() => console.log('More options pressed')}>
+            <MaterialCommunityIcons
+              name="dots-horizontal"
+              size={24}
+              color="#657786"
+            />
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* Tweet Content */}
@@ -77,16 +91,28 @@ const TweetCard = ({tweet}) => {
       {/* Tweet Media */}
       {tweet.image || tweet.video ? (
         <TouchableOpacity
-          onPress={() => openMediaPreview(tweet.image || tweet.video)}>
+          onPress={() => openMediaPreview(tweet.image || tweet.video)}
+          style={styles.mediaContainer}>
           {tweet.image ? (
             <Image source={{uri: tweet.image}} style={styles.tweetImage} />
           ) : (
-            <Video
-              source={{uri: tweet.video}}
-              style={styles.tweetImage}
-              controls
-              resizeMode="contain"
-            />
+            <View style={styles.videoContainer}>
+              {!isVideoLoaded && (
+                <ActivityIndicator
+                  size="large"
+                  color="#000"
+                  style={styles.videoLoader}
+                />
+              )}
+              <Video
+                source={{uri: tweet.video}}
+                style={styles.video}
+                controls
+                resizeMode="contain"
+                onLoad={() => setIsVideoLoaded(true)} // Set video loaded state
+                onError={() => setIsVideoLoaded(true)} // Ensure loader hides on error
+              />
+            </View>
           )}
         </TouchableOpacity>
       ) : null}
@@ -111,7 +137,6 @@ const TweetCard = ({tweet}) => {
           count={bookMarksCount}
           onPress={handleBookmark}
         />
-
         <TouchableOpacity style={styles.actionButton} onPress={handleShare}>
           <MaterialCommunityIcons
             name="export-variant"
@@ -176,6 +201,7 @@ const styles = StyleSheet.create({
   userInfo: {
     flexDirection: 'row',
     alignItems: 'center',
+    position: 'relative',
   },
   avatar: {
     width: 48,
@@ -193,6 +219,15 @@ const styles = StyleSheet.create({
   userHandle: {
     color: '#00c5ff',
   },
+  optionsContainer: {
+    position: 'absolute',
+    right: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  optionsButton: {
+    marginLeft: 10,
+  },
   tweetText: {
     fontSize: 15,
     marginVertical: 8,
@@ -203,6 +238,24 @@ const styles = StyleSheet.create({
     height: 200,
     borderRadius: 8,
     marginVertical: 8,
+  },
+  videoContainer: {
+    width: '100%',
+    height: 200,
+    borderRadius: 8,
+    overflow: 'hidden',
+    marginVertical: 8,
+    position: 'relative', // Ensure ActivityIndicator is positioned correctly
+  },
+  video: {
+    width: '100%',
+    height: '100%',
+  },
+  videoLoader: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: [{translateX: -25}, {translateY: -25}],
   },
   actions: {
     flexDirection: 'row',

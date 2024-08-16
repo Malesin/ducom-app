@@ -28,7 +28,7 @@ const Forgotpassword = ({navigation}) => {
     // Validation for email or username
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email) {
-      setError('Username or Email is required.');
+      setError('Email is required.');
       setIsButtonDisabled(false); // Re-enable the button if validation fails
     } else if (!emailRegex.test(email) && email.length < 4) {
       setError('Please enter a valid email address or username.');
@@ -71,7 +71,7 @@ const Forgotpassword = ({navigation}) => {
               Dialog.hide(); // Hide the dialog
             }, 1000); // Delay 1 second before hiding the dialog
           },
-        }); 
+        });
         setTimeout(() => {
           Dialog.hide(); // Hide the dialog if it doesn't already
         }, 2000); // Duration to show the dialog

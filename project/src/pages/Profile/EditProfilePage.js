@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -10,10 +10,10 @@ import {
   Alert,
   ImageBackground,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { SafeAreaView } from 'react-native';
+import {useNavigation} from '@react-navigation/native';
+import {SafeAreaView} from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { launchImageLibrary } from 'react-native-image-picker';
+import {launchImageLibrary} from 'react-native-image-picker';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import config from '../../config';
@@ -28,6 +28,7 @@ export default function EditProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
   const [userData, setUserData] = useState(null);
   const [username, setUsername] = useState('');
+  const [hasChanges, setHasChanges] = useState(false); // Track if there are changes
 
   const initialData = {
     username: '',
@@ -36,17 +37,15 @@ export default function EditProfilePage() {
   };
 
   async function getData() {
-    const token = await AsyncStorage.getItem("token");
+    const token = await AsyncStorage.getItem('token');
     console.log(token);
-    axios
-      .post(`${serverUrl}/userdata`, { token: token })
-      .then(res => {
-        console.log(res.data);
-        setUserData(res.data.data);
-        setUsername(`@${res.data.data.username}`);
-        setName(res.data.data.name);
-        setBio(res.data.data.bio);
-      });
+    axios.post(`${serverUrl}/userdata`, {token: token}).then(res => {
+      console.log(res.data);
+      setUserData(res.data.data);
+      setUsername(`@${res.data.data.username}`);
+      setName(res.data.data.name);
+      setBio(res.data.data.bio);
+    });
   }
 
   useEffect(() => {
@@ -54,28 +53,30 @@ export default function EditProfilePage() {
   }, []);
 
   useEffect(() => {
-    const beforeRemoveListener = navigation.addListener('beforeRemove', (e) => {
+    const beforeRemoveListener = navigation.addListener('beforeRemove', e => {
+      if (!hasChanges) {
+        return; // No need to show alert if no changes
+      }
       e.preventDefault();
-      Alert.alert(
-        'Konfirmasi',
-        'Apakah anda ingin membatalkan perubahan?',
-        [
-          { text: 'Tidak', style: 'cancel', onPress: () => {} },
-          { text: 'Ya', style: 'destructive', onPress: () => {
-              setUsername(`@${userData.username}`);
-              setName(userData.name);
-              setBio(userData.bio);
-              navigation.dispatch(e.data.action);
-            }
+      Alert.alert('Konfirmasi', 'Apakah anda ingin membatalkan perubahan?', [
+        {text: 'Tidak', style: 'cancel', onPress: () => {}},
+        {
+          text: 'Ya',
+          style: 'destructive',
+          onPress: () => {
+            setUsername(`@${userData.username}`);
+            setName(userData.name);
+            setBio(userData.bio);
+            navigation.dispatch(e.data.action);
           },
-        ]
-      );
+        },
+      ]);
     });
 
     return beforeRemoveListener;
-  }, [navigation, userData]);
+  }, [navigation, userData, hasChanges]);
 
-  const validateUsername = (username) => {
+  const validateUsername = username => {
     const usernameRegex = /^[a-z0-9]{4,15}$/;
     return usernameRegex.test(username) && !username.includes(' ');
   };
@@ -86,11 +87,14 @@ export default function EditProfilePage() {
       return;
     }
     Alert.alert('Konfirmasi', 'Apakah anda ingin menyimpan perubahan?', [
-      { text: 'Tidak', style: 'cancel', onPress: () => {} },
+      {text: 'Tidak', style: 'cancel', onPress: () => {}},
       {
         text: 'Ya',
         style: 'default',
-        onPress: () => alert('Perubahan disimpan'),
+        onPress: () => {
+          setHasChanges(false); // Reset the change tracker after saving
+          alert('Perubahan disimpan');
+        },
       },
     ]);
   };
@@ -110,11 +114,12 @@ export default function EditProfilePage() {
         },
       });
       if (type === 'banner') {
-        setBanner({ uri: response.data.imageUrl });
+        setBanner({uri: response.data.imageUrl});
       } else {
-        setProfilePicture({ uri: response.data.imageUrl });
+        setProfilePicture({uri: response.data.imageUrl});
       }
       Alert.alert('Success', 'Image uploaded successfully');
+      setHasChanges(true); // Set change tracker when an image is uploaded
     } catch (error) {
       console.log('Upload error: ', error);
       Alert.alert('Error', 'Failed to upload image');
@@ -122,13 +127,13 @@ export default function EditProfilePage() {
   };
 
   const selectImage = (setImage, type) => {
-    launchImageLibrary({ mediaType: 'photo' }, (response) => {
+    launchImageLibrary({mediaType: 'photo'}, response => {
       if (response.didCancel) {
         console.log('User cancelled image picker');
       } else if (response.error) {
         console.log('ImagePicker Error: ', response.error);
       } else {
-        const source = { uri: response.assets[0].uri };
+        const source = {uri: response.assets[0].uri};
         setImage(source);
         uploadImage(source, type);
       }
@@ -146,15 +151,14 @@ export default function EditProfilePage() {
   }, [navigation]);
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{flex: 1}}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.bannerContainer}>
           <TouchableOpacity onPress={() => selectImage(setBanner, 'banner')}>
             <ImageBackground
-              source={banner || require('../../assets/bannerhitam.png')}
+              source={banner || require('../../assets/banner.png')}
               style={styles.banner}
-              resizeMode="cover"
-            >
+              resizeMode="cover">
               <View style={styles.overlay}>
                 <MaterialCommunityIcons name="camera" size={50} color="#fff" />
               </View>
@@ -162,12 +166,12 @@ export default function EditProfilePage() {
           </TouchableOpacity>
         </View>
         <View style={styles.contentContainer}>
-          <TouchableOpacity onPress={() => selectImage(setProfilePicture, 'profile')}>
+          <TouchableOpacity
+            onPress={() => selectImage(setProfilePicture, 'profile')}>
             <ImageBackground
-              source={profilePicture || require('../../assets/avatar.png')}
+              source={profilePicture || require('../../assets/profile.png')}
               style={styles.profilePicture}
-              imageStyle={styles.profilePictureImage}
-            >
+              imageStyle={styles.profilePictureImage}>
               <View style={styles.overlay}>
                 <MaterialCommunityIcons name="camera" size={30} color="#fff" />
               </View>
@@ -180,7 +184,12 @@ export default function EditProfilePage() {
                 <TextInput
                   style={styles.usernameInput}
                   value={username.replace('@', '')}
-                  onChangeText={(text) => setUsername('@' + text.replace('@', '').slice(0, 15))}
+                  onChangeText={text => {
+                    const newUsername =
+                      '@' + text.replace('@', '').slice(0, 15);
+                    setUsername(newUsername);
+                    setHasChanges(true); // Mark as changed
+                  }}
                   onBlur={() => setIsEditing(false)}
                   autoFocus
                 />
@@ -196,13 +205,19 @@ export default function EditProfilePage() {
             style={styles.input}
             placeholder={userData?.name}
             value={name}
-            onChangeText={setName}
+            onChangeText={text => {
+              setName(text);
+              setHasChanges(true); // Mark as changed
+            }}
           />
           <TextInput
             style={styles.input}
-            placeholder={userData?.bio || "-"}
+            placeholder={userData?.bio || '-'}
             value={bio}
-            onChangeText={setBio}
+            onChangeText={text => {
+              setBio(text);
+              setHasChanges(true); // Mark as changed
+            }}
             multiline
           />
           <TextInput style={styles.input} placeholder={userData?.email} />

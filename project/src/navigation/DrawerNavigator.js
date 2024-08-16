@@ -1,7 +1,7 @@
 import React from 'react';
 import {createDrawerNavigator} from '@react-navigation/drawer';
 import {Image, StyleSheet, View, SafeAreaView} from 'react-native';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons'; // Import MaterialIcons
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons'; 
 import {Homescreen, FAQscreen, Marksscreen, Settingsscreen} from '../pages';
 
 // Import the logo image
@@ -20,22 +20,22 @@ const DrawerNavigator = () => {
             </View>
           ),
           headerStyle: {
-            backgroundColor: '#fff', // Background color for the header
-            borderBottomWidth: 1, // Border width
-            borderBottomColor: '#e1e8ed', // Border color
+            backgroundColor: '#fff', 
+            borderBottomWidth: 1, 
+            borderBottomColor: '#e1e8ed', 
           },
-          headerTintColor: '#000', // Color for any text or icons
-          headerTitleAlign: 'center', // Center align the header title (logo in this case)
+          headerTintColor: '#000', 
+          headerTitleAlign: 'center', 
           drawerStyle: {
-            backgroundColor: '#fff', // Background color for the drawer
+            backgroundColor: '#fff', 
           },
-          drawerActiveTintColor: 'black', // Active color for drawer items
-          drawerInactiveTintColor: 'gray', // Inactive color for drawer items
+          drawerActiveTintColor: 'black', 
+          drawerInactiveTintColor: 'gray', 
           drawerItemStyle: {
-            color: 'black', // Color for drawer item text
+            color: 'black', 
           },
           drawerIcon: ({color, size, focused}) => ({
-            color: 'black', // Set color for drawer icons
+            color: 'black', 
           }),
         }}>
         <Drawer.Screen
