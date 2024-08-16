@@ -34,6 +34,11 @@ const RegisterScreen = ({ navigation }) => {
     return usernameRegex.test(username) && !username.includes(' ');
   };
 
+  const validateEmail = email => {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+    return emailRegex.test(email);
+  };
+
   const validatePassword = password => {
     const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,15}$/;
     return passwordRegex.test(password);
@@ -71,8 +76,8 @@ const RegisterScreen = ({ navigation }) => {
     if (!email) {
       newErrors.email = 'Email cannot be empty';
       valid = false;
-    } else if (!email.includes('@')) {
-      newErrors.email = 'Invalid email address';
+    } else if (!validateEmail(email)) {
+      newErrors.email = 'Invalid email address. Must be a Gmail address.';
       valid = false;
     }
 
@@ -159,7 +164,6 @@ const RegisterScreen = ({ navigation }) => {
       }, 1000); // Delay 1 second
     }
   };
-
   const showToast = () => {
     Toast.show({
       type: 'info',
@@ -193,6 +197,7 @@ const RegisterScreen = ({ navigation }) => {
         <TextInput
           style={[styles.input, errors.email ? styles.errorInput : null]}
           onChangeText={text => setEmail(text)}
+          onFocus={showEmailWarning} // Show warning when input is focused
           value={email}
           placeholder="Email"
           keyboardType="email-address"

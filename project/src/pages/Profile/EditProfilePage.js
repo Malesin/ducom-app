@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -10,8 +10,8 @@ import {
   Alert,
   ImageBackground,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { SafeAreaView } from 'react-native';
+import {useNavigation} from '@react-navigation/native';
+import {SafeAreaView} from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { launchImageLibrary } from 'react-native-image-picker';
 import Toast from 'react-native-toast-message';
@@ -33,7 +33,7 @@ export default function EditProfilePage() {
 
   // UNTUK REFRESH DATA
   async function getData() {
-    const token = await AsyncStorage.getItem("token");
+    const token = await AsyncStorage.getItem('token');
     console.log(token);
     axios
       .post(`${serverUrl}/userdata`, { token: token })
@@ -75,14 +75,12 @@ export default function EditProfilePage() {
               navigation.dispatch(e.data.action);
             }
           },
-        ]
-      );
+        },
+      ]);
     });
 
     return beforeRemoveListener;
   }, [navigation, userData, isSaving]);
-
-
   const handleSave = () => {
     setIsSaving(true); // Set isSaving to true while saving
     Alert.alert('Confirmation', 'Do you want to save the changes?', [
@@ -112,7 +110,6 @@ export default function EditProfilePage() {
             const updatedUserData = {
               token: token,
             };
-
             if (name && name !== userData.name) {
               updatedUserData.name = name;
             }
@@ -175,15 +172,14 @@ export default function EditProfilePage() {
   });
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{flex: 1}}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.bannerContainer}>
           <TouchableOpacity onPress={() => selectImage(setBanner, 'banner')}>
             <ImageBackground
-              source={banner || require('../../assets/bannerhitam.png')}
+              source={banner || require('../../assets/banner.png')}
               style={styles.banner}
-              resizeMode="cover"
-            >
+              resizeMode="cover">
               <View style={styles.overlay}>
                 <MaterialCommunityIcons name="camera" size={50} color="#fff" />
               </View>
@@ -191,12 +187,12 @@ export default function EditProfilePage() {
           </TouchableOpacity>
         </View>
         <View style={styles.contentContainer}>
-          <TouchableOpacity onPress={() => selectImage(setProfilePicture, 'profile')}>
+          <TouchableOpacity
+            onPress={() => selectImage(setProfilePicture, 'profile')}>
             <ImageBackground
-              source={profilePicture || require('../../assets/avatar.png')}
+              source={profilePicture || require('../../assets/profile.png')}
               style={styles.profilePicture}
-              imageStyle={styles.profilePictureImage}
-            >
+              imageStyle={styles.profilePictureImage}>
               <View style={styles.overlay}>
                 <MaterialCommunityIcons name="camera" size={30} color="#fff" />
               </View>
@@ -227,13 +223,19 @@ export default function EditProfilePage() {
             style={styles.input}
             placeholder={userData?.name}
             value={name}
-            onChangeText={setName}
+            onChangeText={text => {
+              setName(text);
+              setHasChanges(true); // Mark as changed
+            }}
           />
           <TextInput
             style={styles.input}
             placeholder={userData?.bio || "Bio"}
             value={bio}
-            onChangeText={setBio}
+            onChangeText={text => {
+              setBio(text);
+              setHasChanges(true); // Mark as changed
+            }}
             multiline
           />
           <TextInput style={styles.input} placeholder={userData?.email} />

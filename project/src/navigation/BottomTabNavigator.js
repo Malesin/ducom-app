@@ -9,10 +9,10 @@ import {useFocusEffect} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import config from '../config';
 const serverUrl = config.SERVER_URL;
+import TopTabNavigator from './TopTabNavigator';
 
 // Import the profile image
 import profileImage from './../assets/profile.png';
-import TopTabNavigator from './TopTabNavigator';
 
 const Tab = createBottomTabNavigator();
 
