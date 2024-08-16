@@ -138,17 +138,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   name: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#000',
   },
   username: {
-    fontSize: 11,
+    fontSize: 14,
     color: '#00c5ff',
     marginBottom: 5,
   },
   description: {
-    fontSize: 11,
+    fontSize: 13,
     color: '#000',
   },
   editButton: {
@@ -160,7 +160,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   editButtonText: {
-    fontSize: 11,
+    fontSize: 13,
     color: '#000',
     fontWeight: 'bold',
   },
