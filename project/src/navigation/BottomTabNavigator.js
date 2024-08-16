@@ -17,22 +17,7 @@ import TopTabNavigator from './TopTabNavigator';
 const Tab = createBottomTabNavigator();
 
 function BottomTabNavigator() {
-  const [userData, setUserData] = useState('');
-  async function getData() {
-    const token = await AsyncStorage.getItem('token');
-    console.log(token);
-    axios.post(`${serverUrl}/userdata`, {token: token}).then(res => {
-      console.log(res.data);
-      setUserData(res.data.data);
-      // UNTUK CONTOH PENGAPLIKASIAN DATANYA = {userData.name}
-    });
-  }
-  useFocusEffect(
-    React.useCallback(() => {
-      getData();
-      console.log('refresh');
-    }, []),
-  );
+
   return (
     <GestureHandlerRootView style={{flex: 1}}>
       <Tab.Navigator
