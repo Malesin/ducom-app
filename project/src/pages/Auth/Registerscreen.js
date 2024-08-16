@@ -6,15 +6,14 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Toast from 'react-native-toast-message';
 import axios from 'axios';
 import config from '../../config';
-
 const serverUrl = config.SERVER_URL;
 
-const RegisterScreen = ({navigation}) => {
+const RegisterScreen = ({ navigation }) => {
   const [name, setName] = useState('');
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
@@ -112,13 +111,13 @@ const RegisterScreen = ({navigation}) => {
     setErrors(newErrors);
 
     if (valid) {
-      const userData = {name, username, email, password};
+      const userData = { name, username, email, password };
 
       setTimeout(() => {
         axios
           .post(`${serverUrl}/register`, userData)
           .then(res => {
-            const {status} = res.data;
+            const { status } = res.data;
             switch (status) {
               case 'ok':
                 Toast.show({
@@ -165,12 +164,11 @@ const RegisterScreen = ({navigation}) => {
       }, 1000); // Delay 1 second
     }
   };
-
-  const showEmailWarning = () => {
+  const showToast = () => {
     Toast.show({
       type: 'info',
       text1: 'Warning',
-      text2: 'Email wajib terhubung dengan google!',
+      text2: 'Akun wajib terhubung dengan Google',
     });
   };
 
@@ -204,6 +202,7 @@ const RegisterScreen = ({navigation}) => {
           placeholder="Email"
           keyboardType="email-address"
           autoCapitalize="none"
+          onFocus={showToast} // Menampilkan toast saat TextInput diklik
         />
         {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
         <View

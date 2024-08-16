@@ -13,7 +13,8 @@ import {
 import {useNavigation} from '@react-navigation/native';
 import {SafeAreaView} from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {launchImageLibrary} from 'react-native-image-picker';
+import { launchImageLibrary } from 'react-native-image-picker';
+import Toast from 'react-native-toast-message';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import config from '../../config';
@@ -28,127 +29,147 @@ export default function EditProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
   const [userData, setUserData] = useState(null);
   const [username, setUsername] = useState('');
-  const [hasChanges, setHasChanges] = useState(false); // Track if there are changes
+  const [isSaving, setIsSaving] = useState('');
 
-  const initialData = {
-    username: '',
-    name: '',
-    bio: '',
-  };
-
+  // UNTUK REFRESH DATA
   async function getData() {
     const token = await AsyncStorage.getItem('token');
     console.log(token);
-    axios.post(`${serverUrl}/userdata`, {token: token}).then(res => {
-      console.log(res.data);
-      setUserData(res.data.data);
-      setUsername(`@${res.data.data.username}`);
-      setName(res.data.data.name);
-      setBio(res.data.data.bio);
-    });
+    axios
+      .post(`${serverUrl}/userdata`, { token: token })
+      .then(res => {
+        console.log(res.data);
+        setUserData(res.data.data);
+        setUsername(res.data.data.username);
+      });
   }
 
   useEffect(() => {
     getData();
   }, []);
-
+  // UNTUK REFRESH DATA
+  const validateUsername = (username) => {
+    const usernameRegex = /^[a-z0-9]{4,15}$/;
+    return usernameRegex.test(username) && !username.includes(' ');
+  };
   useEffect(() => {
-    const beforeRemoveListener = navigation.addListener('beforeRemove', e => {
-      if (!hasChanges) {
-        return; // No need to show alert if no changes
+    const beforeRemoveListener = navigation.addListener('beforeRemove', (e) => {
+      if (isSaving) {
+        return; // Jika sedang menyimpan, jangan tampilkan alert
       }
+
       e.preventDefault();
-      Alert.alert('Konfirmasi', 'Apakah anda ingin membatalkan perubahan?', [
-        {text: 'Tidak', style: 'cancel', onPress: () => {}},
-        {
-          text: 'Ya',
-          style: 'destructive',
-          onPress: () => {
-            setUsername(`@${userData.username}`);
-            setName(userData.name);
-            setBio(userData.bio);
-            navigation.dispatch(e.data.action);
+      Alert.alert(
+        'Konfirmasi',
+        'Apakah anda ingin membatalkan perubahan?',
+        [
+          {
+            text: 'Tidak', style: 'cancel', onPress: () => {
+            }
+          },
+          {
+            text: 'Ya', onPress: () => {
+              setUsername(userData.username);
+              setName(userData.name);
+              setBio(userData.bio);
+              navigation.dispatch(e.data.action);
+            }
           },
         },
       ]);
     });
 
     return beforeRemoveListener;
-  }, [navigation, userData, hasChanges]);
-
-  const validateUsername = username => {
-    const usernameRegex = /^[a-z0-9]{4,15}$/;
-    return usernameRegex.test(username) && !username.includes(' ');
-  };
-
+  }, [navigation, userData, isSaving]);
   const handleSave = () => {
-    if (!validateUsername(username)) {
-      Alert.alert('Error', 'Username tidak valid.');
-      return;
-    }
-    Alert.alert('Konfirmasi', 'Apakah anda ingin menyimpan perubahan?', [
-      {text: 'Tidak', style: 'cancel', onPress: () => {}},
+    setIsSaving(true); // Set isSaving to true while saving
+    Alert.alert('Confirmation', 'Do you want to save the changes?', [
+      { text: 'No', style: 'cancel', onPress: () => setIsSaving(false) }, // Reset isSaving if canceled
       {
-        text: 'Ya',
+        text: 'Yes',
         style: 'default',
-        onPress: () => {
-          setHasChanges(false); // Reset the change tracker after saving
-          alert('Perubahan disimpan');
+        onPress: async () => {
+          try {
+            if (!username) {
+              Toast.show({
+                type: 'error',
+                text1: 'Invalid username',
+                text2: 'Username cannot be empty!.',
+              });
+              return;
+            } else if (!validateUsername(username)) {
+              Toast.show({
+                type: 'error',
+                text1: 'Invalid username',
+                text2: '4-15 char, lowercase letters & numbers only with no spaces.',
+              });
+              return;
+            }
+
+            const token = await AsyncStorage.getItem("token");
+            const updatedUserData = {
+              token: token,
+            };
+            if (name && name !== userData.name) {
+              updatedUserData.name = name;
+            }
+            if (username && username !== userData.username) {
+              // Check if the username already exists
+              const checkUsernameResponse = await axios.post(`${serverUrl}/check-username`, { username });
+              if (checkUsernameResponse.data.status === 'error') {
+                setIsSaving(true);
+                Toast.show({
+                  type: 'error',
+                  text1: 'Error',
+                  text2: 'Username already exists!',
+                });
+                return; // Stop further execution if username is already taken
+              }
+              updatedUserData.username = username;
+            }
+            if (bio && bio !== userData.bio) {
+              updatedUserData.bio = bio;
+            }
+
+            const response = await axios.post(`${serverUrl}/update-profile`, updatedUserData);
+
+            if (response.data.status === 'ok') {
+              setIsSaving(true);
+              Toast.show({
+                type: 'success',
+                text1: 'Success',
+                text2: 'Updated Successfully!!',
+                onHide: () => {
+                  setTimeout(() => {
+                    navigation.goBack();
+                  }, 1000);
+                },
+              });
+            } else {
+              setIsSaving(true);
+              Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: 'An error occurred. Please try again later.',
+              });
+            }
+          } catch (error) {
+            setIsSaving(true);
+            console.log('Error updating profile: ', error);
+            Alert.alert('Error', 'Failed to update profile');
+          }
         },
       },
     ]);
   };
 
-  const uploadImage = async (image, type) => {
-    const formData = new FormData();
-    formData.append('image', {
-      uri: image.uri,
-      type: 'image/jpeg',
-      name: 'upload.jpg',
-    });
-
-    try {
-      const response = await axios.post('URL_TO_UPLOAD_IMAGE', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      if (type === 'banner') {
-        setBanner({uri: response.data.imageUrl});
-      } else {
-        setProfilePicture({uri: response.data.imageUrl});
-      }
-      Alert.alert('Success', 'Image uploaded successfully');
-      setHasChanges(true); // Set change tracker when an image is uploaded
-    } catch (error) {
-      console.log('Upload error: ', error);
-      Alert.alert('Error', 'Failed to upload image');
-    }
-  };
-
-  const selectImage = (setImage, type) => {
-    launchImageLibrary({mediaType: 'photo'}, response => {
-      if (response.didCancel) {
-        console.log('User cancelled image picker');
-      } else if (response.error) {
-        console.log('ImagePicker Error: ', response.error);
-      } else {
-        const source = {uri: response.assets[0].uri};
-        setImage(source);
-        uploadImage(source, type);
-      }
-    });
-  };
-
-  React.useLayoutEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-          <Text style={styles.saveButtonText}>Save</Text>
-        </TouchableOpacity>
-      ),
-    });
-  }, [navigation]);
+  navigation.setOptions({
+    headerRight: () => (
+      <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+        <Text style={styles.saveButtonText}>Save</Text>
+      </TouchableOpacity>
+    ),
+  });
 
   return (
     <SafeAreaView style={{flex: 1}}>
@@ -178,29 +199,26 @@ export default function EditProfilePage() {
             </ImageBackground>
           </TouchableOpacity>
           <View style={styles.usernameContainer}>
-            {isEditing ? (
-              <View style={styles.usernameInputContainer}>
-                <Text style={styles.usernameStatic}>@</Text>
+            <View style={styles.usernameInputContainer}>
+              <Text style={styles.usernameStatic}>@</Text>
+              {isEditing ? (
                 <TextInput
                   style={styles.usernameInput}
-                  value={username.replace('@', '')}
-                  onChangeText={text => {
-                    const newUsername =
-                      '@' + text.replace('@', '').slice(0, 15);
-                    setUsername(newUsername);
-                    setHasChanges(true); // Mark as changed
-                  }}
+                  value={username} // Username tanpa '@'
+                  onChangeText={(text) => setUsername(text)} // Set langsung tanpa replace
                   onBlur={() => setIsEditing(false)}
                   autoFocus
                 />
-              </View>
-            ) : (
-              <Text style={styles.username}>{username}</Text>
-            )}
+              ) : (
+                <Text style={styles.username}>{username}</Text>
+              )}
+            </View>
             <TouchableOpacity onPress={() => setIsEditing(true)}>
               <MaterialCommunityIcons name="pencil" size={20} color="#000" />
             </TouchableOpacity>
           </View>
+
+
           <TextInput
             style={styles.input}
             placeholder={userData?.name}
@@ -212,7 +230,7 @@ export default function EditProfilePage() {
           />
           <TextInput
             style={styles.input}
-            placeholder={userData?.bio || '-'}
+            placeholder={userData?.bio || "Bio"}
             value={bio}
             onChangeText={text => {
               setBio(text);
@@ -223,6 +241,7 @@ export default function EditProfilePage() {
           <TextInput style={styles.input} placeholder={userData?.email} />
         </View>
       </ScrollView>
+      <Toast />
     </SafeAreaView>
   );
 }
@@ -274,12 +293,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 25,
   },
-  username: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginRight: 10,
-    marginLeft: 20,
-  },
   usernameInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -287,14 +300,18 @@ const styles = StyleSheet.create({
   usernameStatic: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginLeft: 20,
   },
   usernameInput: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginRight: 10,
+    marginLeft: 5, // Memberikan jarak antara @ dan input
     borderBottomWidth: 1,
     borderColor: '#ccc',
+  },
+  username: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginLeft: 5,
   },
   input: {
     width: '100%',
