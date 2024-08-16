@@ -13,7 +13,7 @@ import {
 import {useNavigation} from '@react-navigation/native';
 import {SafeAreaView} from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { launchImageLibrary } from 'react-native-image-picker';
+import {launchImageLibrary} from 'react-native-image-picker';
 import Toast from 'react-native-toast-message';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -35,45 +35,41 @@ export default function EditProfilePage() {
   async function getData() {
     const token = await AsyncStorage.getItem('token');
     console.log(token);
-    axios
-      .post(`${serverUrl}/userdata`, { token: token })
-      .then(res => {
-        console.log(res.data);
-        setUserData(res.data.data);
-        setUsername(res.data.data.username);
-      });
+    axios.post(`${serverUrl}/userdata`, {token: token}).then(res => {
+      console.log(res.data);
+      setUserData(res.data.data);
+      setUsername(res.data.data.username);
+    });
   }
 
   useEffect(() => {
     getData();
   }, []);
   // UNTUK REFRESH DATA
-  const validateUsername = (username) => {
+  const validateUsername = username => {
     const usernameRegex = /^[a-z0-9]{4,15}$/;
     return usernameRegex.test(username) && !username.includes(' ');
   };
   useEffect(() => {
-    const beforeRemoveListener = navigation.addListener('beforeRemove', (e) => {
+    const beforeRemoveListener = navigation.addListener('beforeRemove', e => {
       if (isSaving) {
         return; // Jika sedang menyimpan, jangan tampilkan alert
       }
 
       e.preventDefault();
-      Alert.alert(
-        'Konfirmasi',
-        'Apakah anda ingin membatalkan perubahan?',
-        [
-          {
-            text: 'Tidak', style: 'cancel', onPress: () => {
-            }
-          },
-          {
-            text: 'Ya', onPress: () => {
-              setUsername(userData.username);
-              setName(userData.name);
-              setBio(userData.bio);
-              navigation.dispatch(e.data.action);
-            }
+      Alert.alert('Konfirmasi', 'Apakah anda ingin membatalkan perubahan?', [
+        {
+          text: 'Tidak',
+          style: 'cancel',
+          onPress: () => {},
+        },
+        {
+          text: 'Ya',
+          onPress: () => {
+            setUsername(userData.username);
+            setName(userData.name);
+            setBio(userData.bio);
+            navigation.dispatch(e.data.action);
           },
         },
       ]);
@@ -84,7 +80,7 @@ export default function EditProfilePage() {
   const handleSave = () => {
     setIsSaving(true); // Set isSaving to true while saving
     Alert.alert('Confirmation', 'Do you want to save the changes?', [
-      { text: 'No', style: 'cancel', onPress: () => setIsSaving(false) }, // Reset isSaving if canceled
+      {text: 'No', style: 'cancel', onPress: () => setIsSaving(false)}, // Reset isSaving if canceled
       {
         text: 'Yes',
         style: 'default',
@@ -101,12 +97,13 @@ export default function EditProfilePage() {
               Toast.show({
                 type: 'error',
                 text1: 'Invalid username',
-                text2: '4-15 char, lowercase letters & numbers only with no spaces.',
+                text2:
+                  '4-15 char, lowercase letters & numbers only with no spaces.',
               });
               return;
             }
 
-            const token = await AsyncStorage.getItem("token");
+            const token = await AsyncStorage.getItem('token');
             const updatedUserData = {
               token: token,
             };
@@ -115,7 +112,10 @@ export default function EditProfilePage() {
             }
             if (username && username !== userData.username) {
               // Check if the username already exists
-              const checkUsernameResponse = await axios.post(`${serverUrl}/check-username`, { username });
+              const checkUsernameResponse = await axios.post(
+                `${serverUrl}/check-username`,
+                {username},
+              );
               if (checkUsernameResponse.data.status === 'error') {
                 setIsSaving(true);
                 Toast.show({
@@ -131,7 +131,10 @@ export default function EditProfilePage() {
               updatedUserData.bio = bio;
             }
 
-            const response = await axios.post(`${serverUrl}/update-profile`, updatedUserData);
+            const response = await axios.post(
+              `${serverUrl}/update-profile`,
+              updatedUserData,
+            );
 
             if (response.data.status === 'ok') {
               setIsSaving(true);
@@ -205,7 +208,7 @@ export default function EditProfilePage() {
                 <TextInput
                   style={styles.usernameInput}
                   value={username} // Username tanpa '@'
-                  onChangeText={(text) => setUsername(text)} // Set langsung tanpa replace
+                  onChangeText={text => setUsername(text)} // Set langsung tanpa replace
                   onBlur={() => setIsEditing(false)}
                   autoFocus
                 />
@@ -218,23 +221,20 @@ export default function EditProfilePage() {
             </TouchableOpacity>
           </View>
 
-
           <TextInput
             style={styles.input}
             placeholder={userData?.name}
             value={name}
             onChangeText={text => {
               setName(text);
-              setHasChanges(true); // Mark as changed
             }}
           />
           <TextInput
             style={styles.input}
-            placeholder={userData?.bio || "Bio"}
+            placeholder={userData?.bio || 'Bio'}
             value={bio}
             onChangeText={text => {
               setBio(text);
-              setHasChanges(true); // Mark as changed
             }}
             multiline
           />
