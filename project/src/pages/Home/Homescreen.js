@@ -46,7 +46,7 @@ const HomeScreen = ({navigation}) => {
         'https://i.pinimg.com/474x/21/dc/e9/21dce97c3191b81ed92b56a9492ceac7.jpg',
       userName: 'frontendgariskeras',
       userHandle: 'frontend',
-      content: 'nyore',
+      content: 'nyoride',
       image:
         'https://i.pinimg.com/474x/97/02/f6/9702f6e58679186bd95c4eb454899032.jpg', // Example image URL
       likesCount: 30,
