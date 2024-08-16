@@ -22,14 +22,22 @@ const CreatePost = ({route, navigation}) => {
   const [previewVisible, setPreviewVisible] = useState(false);
   const [previewMedia, setPreviewMedia] = useState(null);
 
+  // Load profile picture from assets
+  const profilePictureUri = require('../../assets/profile.png');
+
   useEffect(() => {
     if (route.params?.mediaUri) {
-      setSelectedMedia([route.params.mediaUri]); // Initialize with the mediaUri from route params
+      setSelectedMedia([route.params.mediaUri]);
     }
   }, [route.params?.mediaUri]);
 
   const handlePostSubmit = () => {
-    navigation.navigate('Home');
+    // Navigate to Home and pass the post data
+    navigation.navigate('Home', {
+      postText: newPostText,
+      media: selectedMedia,
+      profilePicture: profilePictureUri,
+    });
   };
 
   const handleOpenCamera = () => {
@@ -70,15 +78,9 @@ const CreatePost = ({route, navigation}) => {
   };
 
   const renderMedia = (uri, index) => {
-    const isVideo = uri.endsWith('.mp4');
-
     return (
       <TouchableOpacity key={index} onPress={() => handleMediaPress(uri)}>
-        {isVideo ? (
-          <Image source={{uri}} style={styles.media} /> // Tampilkan thumbnail video
-        ) : (
-          <Image source={{uri}} style={styles.media} />
-        )}
+        <Image source={{uri}} style={styles.media} />
       </TouchableOpacity>
     );
   };
@@ -106,13 +108,17 @@ const CreatePost = ({route, navigation}) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.contentContainer}>
-        <TextInput
-          style={styles.textInput}
-          placeholder="What’s going on..... ?"
-          multiline
-          value={newPostText}
-          onChangeText={handleTextChange}
-        />
+        <View style={styles.inputContainer}>
+          <Image source={profilePictureUri} style={styles.profilePicture} />
+          <TextInput
+            style={styles.textInput}
+            placeholder="What’s going on..... ?"
+            multiline
+            value={newPostText}
+            onChangeText={handleTextChange}
+            maxLength={500}
+          />
+        </View>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           {selectedMedia.map(renderMedia)}
         </ScrollView>
@@ -175,12 +181,23 @@ const styles = StyleSheet.create({
   contentContainer: {
     flex: 1,
   },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  profilePicture: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginRight: 10,
+  },
   textInput: {
+    flex: 1,
     borderWidth: 1,
     borderColor: 'transparent',
     padding: 12,
     borderRadius: 8,
-    marginBottom: 16,
   },
   media: {
     width: 100,
