@@ -92,7 +92,6 @@ export default function EditProfilePage() {
         text: 'Ya',
         style: 'default',
         onPress: () => {
-          // Perform save operation here
           setHasChanges(false); // Reset the change tracker after saving
           alert('Perubahan disimpan');
         },
@@ -157,7 +156,7 @@ export default function EditProfilePage() {
         <View style={styles.bannerContainer}>
           <TouchableOpacity onPress={() => selectImage(setBanner, 'banner')}>
             <ImageBackground
-              source={banner || require('../../assets/bannerhitam.png')}
+              source={banner || require('../../assets/banner.png')}
               style={styles.banner}
               resizeMode="cover">
               <View style={styles.overlay}>

@@ -10,9 +10,9 @@ import {
   TermsandConditionscreen,
   Profilescreen,
   EditProfilePage,
-  CreatePost, // Pastikan ini diimpor dengan benar
-} from './../pages';
-import {NavigationContainer} from '@react-navigation/native';
+  CreatePost, 
+} from '../pages';
+import {NavigationContainer, useTheme} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import BottomTabNavigator from './BottomTabNavigator';
 

@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import {
   SafeAreaView,
   View,
@@ -56,7 +56,7 @@ export default function Profilescreen() {
     <SafeAreaView style={styles.container}>
       <View style={styles.bannerContainer}>
         <Image
-          source={require('../../assets/bannerhitam.png')}
+          source={require('../../assets/banner.png')}
           style={styles.banner}
         />
         <TouchableOpacity style={styles.settingsButton} onPress={() => {}}>
@@ -70,7 +70,9 @@ export default function Profilescreen() {
         <View style={styles.profileText}>
           <Text style={styles.name}>{userData?.name}</Text>
           <Text style={styles.username}>@{userData?.username}</Text>
-          <Text style={styles.description}>{userData?.bio || 'No Description'}</Text>
+          <Text style={styles.description}>
+            {userData?.bio || 'No Description'}
+          </Text>
           <TouchableOpacity
             style={styles.editButton}
             onPress={() => navigation.navigate('EditProfile')}>

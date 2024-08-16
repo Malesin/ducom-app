@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useCallback} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   StyleSheet,
   TextInput,
@@ -11,17 +11,18 @@ import {
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {Button} from 'react-native-elements';
 import * as ImagePicker from 'react-native-image-picker';
+import Video from 'react-native-video';
 
 const CreatePost = ({route, navigation}) => {
   const [newPostText, setNewPostText] = useState('');
   const [keyboardVisible, setKeyboardVisible] = useState(false);
-  const [selectedImages, setSelectedImages] = useState([]);
+  const [selectedMedia, setSelectedMedia] = useState([]);
 
   useEffect(() => {
-    if (route.params?.imageUri) {
-      setSelectedImages([route.params.imageUri]); // Initialize with the imageUri from route params
+    if (route.params?.mediaUri) {
+      setSelectedMedia([route.params.mediaUri]); // Initialize with the mediaUri from route params
     }
-  }, [route.params?.imageUri]);
+  }, [route.params?.mediaUri]);
 
   const handlePostSubmit = () => {
     // 1. Send post data to your backend (e.g., using a fetch request)
@@ -31,26 +32,26 @@ const CreatePost = ({route, navigation}) => {
 
   const handleOpenCamera = () => {
     const options = {
-      mediaType: 'photo',
+      mediaType: 'mixed', // Allows both photos and videos
       saveToPhotos: true,
     };
 
     ImagePicker.launchCamera(options, response => {
       if (response.didCancel) {
-        console.log('User cancelled photo');
+        console.log('User cancelled photo or video');
       } else if (response.error) {
         console.log('ImagePicker Error: ', response.error);
       } else {
         const uri = response.assets[0].uri;
-        setSelectedImages(prevImages => [...prevImages, uri]); // Append new image URI
+        setSelectedMedia(prevMedia => [...prevMedia, uri]);
       }
     });
   };
 
   const handleOpenGallery = () => {
     const options = {
-      mediaType: 'photo',
-      selectionLimit: 4, // Allow multiple image selections
+      mediaType: 'mixed', // Allows both photos and videos
+      selectionLimit: 4, // Allow multiple selections
     };
 
     ImagePicker.launchImageLibrary(options, response => {
@@ -60,7 +61,7 @@ const CreatePost = ({route, navigation}) => {
         console.log('ImagePicker Error: ', response.error);
       } else {
         const uris = response.assets.map(asset => asset.uri);
-        setSelectedImages(prevImages => [...prevImages, ...uris]); // Append multiple image URIs
+        setSelectedMedia(prevMedia => [...prevMedia, ...uris]); // Append multiple media URIs
       }
     });
   };
@@ -89,20 +90,28 @@ const CreatePost = ({route, navigation}) => {
     };
   }, []);
 
+  const renderMedia = (uri, index) => {
+    const isVideo = uri.endsWith('.mp4'); // Basic check for video file
+
+    return isVideo ? (
+      <Video key={index} source={{uri}} style={styles.media} controls />
+    ) : (
+      <Image key={index} source={{uri}} style={styles.media} />
+    );
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.contentContainer}>
         <TextInput
           style={styles.textInput}
-          placeholder="What's new?"
+          placeholder="What’s going on..... ?"
           multiline
           value={newPostText}
           onChangeText={handleTextChange}
         />
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {selectedImages.map((uri, index) => (
-            <Image key={index} source={{uri}} style={styles.image} />
-          ))}
+          {selectedMedia.map(renderMedia)}
         </ScrollView>
         <View style={styles.buttonContainer}>
           <Button
@@ -143,7 +152,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 16,
   },
-  image: {
+  media: {
     width: 100,
     height: 100,
     resizeMode: 'cover',

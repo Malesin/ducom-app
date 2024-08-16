@@ -1,14 +1,23 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity, Animated, Alert, BackHandler, ScrollView } from 'react-native';
-import React, { useState } from 'react';
-import { useFocusEffect } from '@react-navigation/native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  TouchableOpacity,
+  Animated,
+  Alert,
+  BackHandler,
+} from 'react-native';
+import React, {useState} from 'react';
+import {useFocusEffect} from '@react-navigation/native';
 import CheckInternet from '../../components/CheckInternet';
 
-const Authscreen = ({ navigation }) => {
+const Authscreen = ({navigation}) => {
   const [selectedButton, setSelectedButton] = useState('login');
-  const [slideAnim, setSlideAnim] = useState(new Animated.Value(0));
-  const [isConnected, setIsConnected] = useState(false)
+  const [slideAnim] = useState(new Animated.Value(0));
+  const [isConnected, setIsConnected] = useState(false);
 
-  const handlePress = (button) => {
+  const handlePress = button => {
     setSelectedButton(button);
     Animated.timing(slideAnim, {
       toValue: button === 'login' ? 0 : 1,
@@ -23,47 +32,42 @@ const Authscreen = ({ navigation }) => {
   };
 
   const handleBackPress = () => {
-    Alert.alert(
-      'Exit App',
-      'Are you sure want to exit',
-      [{
+    Alert.alert('Exit App', 'Are you sure want to exit', [
+      {
         text: 'cancel',
         onPress: () => null,
-        style: 'cancel'
-      }, {
-        text: 'Exit',
-        onPress: () => BackHandler.exitApp()
+        style: 'cancel',
       },
-      ])
-    return true
-  }
+      {
+        text: 'Exit',
+        onPress: () => BackHandler.exitApp(),
+      },
+    ]);
+    return true;
+  };
 
   useFocusEffect(
     React.useCallback(() => {
-      BackHandler.addEventListener("hardwareBackPress", handleBackPress)
+      BackHandler.addEventListener('hardwareBackPress', handleBackPress);
 
       return () => {
-        BackHandler.removeEventListener("hardwareBackPress", handleBackPress)
-
-      }
-    })
-  )
+        BackHandler.removeEventListener('hardwareBackPress', handleBackPress);
+      };
+    }),
+  );
 
   const slideInterpolation = slideAnim.interpolate({
     inputRange: [0, 1],
-    outputRange: [0, 155], // Bisa di adjust sesuai dengan lebar button
+    outputRange: [0, 150], // Bisa di adjust sesuai dengan lebar button
   });
 
   const slideStyle = {
-    transform: [{ translateX: slideInterpolation }],
+    transform: [{translateX: slideInterpolation}],
   };
 
   return (
     <View style={styles.container}>
-      <Image
-        source={require('../../assets/logo1.png')}
-        style={styles.logo}
-      />
+      <Image source={require('../../assets/logo1.png')} style={styles.logo} />
       <Text style={styles.title}>Welcome Dugam Community</Text>
 
       <Text style={styles.subtitle}>
@@ -74,15 +78,32 @@ const Authscreen = ({ navigation }) => {
 
       <View style={styles.buttonContainer}>
         <Animated.View style={[styles.buttonBackground, slideStyle]} />
-        <TouchableOpacity style={styles.buttonLogin} onPress={() => handlePress('login')}>
-          <Text style={selectedButton === 'login' ? styles.buttonTextLogin : styles.buttonTextInactive}>Log In</Text>
+        <TouchableOpacity
+          style={styles.buttonLogin}
+          onPress={() => handlePress('login')}>
+          <Text
+            style={
+              selectedButton === 'login'
+                ? styles.buttonTextLogin
+                : styles.buttonTextInactive
+            }>
+            Log In
+          </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.buttonSignUp} onPress={() => handlePress('register')}>
-          <Text style={selectedButton === 'register' ? styles.buttonTextSignUp : styles.buttonTextInactive}>Sign Up</Text>
+        <TouchableOpacity
+          style={styles.buttonSignUp}
+          onPress={() => handlePress('register')}>
+          <Text
+            style={
+              selectedButton === 'register'
+                ? styles.buttonTextSignUp
+                : styles.buttonTextInactive
+            }>
+            Sign Up
+          </Text>
         </TouchableOpacity>
       </View>
-
     </View>
   );
 };

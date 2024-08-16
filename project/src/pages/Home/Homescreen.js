@@ -91,6 +91,8 @@ const HomeScreen = ({navigation}) => {
     ImagePicker.launchCamera(options, response => {
       if (response.didCancel) {
         console.log('User cancelled photo');
+        // Reset isExpanded value to ensure FAB does not disappear
+        isExpanded.value = false;
       } else if (response.error) {
         console.log('ImagePicker Error: ', response.error);
       } else {
