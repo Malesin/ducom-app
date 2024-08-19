@@ -24,7 +24,7 @@ const CreatePost = ({route, navigation}) => {
   const [mediaType, setMediaType] = useState(null);
 
   // Load profile picture from assets
-  const profilePictureUri = require('../../assets/profile.png');
+  const profilePictureUri = require('../../assets/profilepic.png');
 
   useEffect(() => {
     if (route.params?.mediaUri) {

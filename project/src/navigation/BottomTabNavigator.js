@@ -12,7 +12,7 @@ const serverUrl = config.SERVER_URL;
 import TopTabNavigator from './TopTabNavigator';
 
 // Import the profile image
-import profileImage from './../assets/profile.png';
+import profileImage from './../assets/profilepic.png';
 
 const Tab = createBottomTabNavigator();
 
