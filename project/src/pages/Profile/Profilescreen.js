@@ -63,7 +63,7 @@ export default function Profilescreen() {
   const profileImageSource = require('../../assets/profilepic.png');
 
   const openModal = () => {
-    setModalImageSource(profileImageSource);
+    setModalImageSource(profilePicture);
     setModalVisible(true);
   };
 
