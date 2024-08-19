@@ -21,6 +21,7 @@ const CreatePost = ({route, navigation}) => {
   const [selectedMedia, setSelectedMedia] = useState([]);
   const [previewVisible, setPreviewVisible] = useState(false);
   const [previewMedia, setPreviewMedia] = useState(null);
+  const [mediaType, setMediaType] = useState(null);
 
   // Load profile picture from assets
   const profilePictureUri = require('../../assets/profilepic.png');
@@ -28,8 +29,9 @@ const CreatePost = ({route, navigation}) => {
   useEffect(() => {
     if (route.params?.mediaUri) {
       setSelectedMedia([route.params.mediaUri]);
+      setMediaType(route.params.mediaType); // Set media type from params
     }
-  }, [route.params?.mediaUri]);
+  }, [route.params?.mediaUri, route.params?.mediaType]);
 
   const handlePostSubmit = () => {
     // Navigate to Home and pass the post data
@@ -42,14 +44,31 @@ const CreatePost = ({route, navigation}) => {
 
   const handleOpenCamera = () => {
     const options = {
-      mediaType: 'mixed',
+      mediaType: 'mixed', // Allow both photo and video
       saveToPhotos: true,
     };
 
     ImagePicker.launchCamera(options, response => {
-      if (!response.didCancel && !response.error) {
-        const uri = response.assets[0].uri;
-        setSelectedMedia(prevMedia => [...prevMedia, uri]);
+      if (response.didCancel) {
+        console.log('User cancelled photo or video capture');
+      } else if (response.errorCode) {
+        console.log('ImagePicker Error: ', response.errorMessage);
+      } else {
+        // Handle the captured media based on its type
+        const {mediaType, assets} = response;
+        if (assets && assets.length > 0) {
+          const uri = assets[0].uri;
+          setSelectedMedia([uri]);
+          setMediaType(mediaType);
+          console.log(
+            `${
+              mediaType === 'mixed' ? 'Captured photo' : 'Captured video'
+            } URI:`,
+            uri,
+          );
+          // Navigate to CreatePost and pass the media URI
+          navigation.navigate('CreatePost', {mediaUri: uri, mediaType});
+        }
       }
     });
   };
@@ -63,7 +82,9 @@ const CreatePost = ({route, navigation}) => {
     ImagePicker.launchImageLibrary(options, response => {
       if (!response.didCancel && !response.error) {
         const uris = response.assets.map(asset => asset.uri);
+        const types = response.assets.map(asset => asset.type);
         setSelectedMedia(prevMedia => [...prevMedia, ...uris]);
+        setMediaType(types[0] || 'photo'); 
       }
     });
   };
@@ -120,7 +141,7 @@ const CreatePost = ({route, navigation}) => {
           />
         </View>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {selectedMedia.map(renderMedia)}
+          {selectedMedia.map((uri, index) => renderMedia(uri, index))}
         </ScrollView>
         <View style={styles.buttonContainer}>
           <Button

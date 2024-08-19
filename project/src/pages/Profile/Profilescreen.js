@@ -14,6 +14,8 @@ import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import config from '../../config';
+import {Skeleton} from 'react-native-elements';
+
 const serverUrl = config.SERVER_URL;
 
 export default function Profilescreen() {
@@ -55,10 +57,8 @@ export default function Profilescreen() {
   useFocusEffect(
     React.useCallback(() => {
       getData();
-      console.log('refresh');
     }, []),
   );
-
   // Define the source for the profile image
   const profileImageSource = require('../../assets/profilepic.png');
 
@@ -88,16 +88,48 @@ export default function Profilescreen() {
           <Image source={profilePicture || profileImageSource} style={styles.profile} />
         </TouchableOpacity>
         <View style={styles.profileText}>
-          <Text style={styles.name}>{userData?.name}</Text>
-          <Text style={styles.username}>@{userData?.username}</Text>
-          <Text style={styles.description}>
-            {userData?.bio || 'No Description'}
-          </Text>
-          <TouchableOpacity
-            style={styles.editButton}
-            onPress={() => navigation.navigate('EditProfile')}>
-            <Text style={styles.editButtonText}>Edit Profile</Text>
-          </TouchableOpacity>
+          {/* Show skeleton while userData is null */}
+          {!userData ? (
+            <>
+              <Skeleton
+                animation="pulse"
+                height={20}
+                width={150}
+                style={styles.skeleton}
+              />
+              <Skeleton
+                animation="pulse"
+                height={14}
+                width={100}
+                style={styles.skeleton}
+              />
+              <Skeleton
+                animation="pulse"
+                height={13}
+                width={200}
+                style={styles.skeleton}
+              />
+              <Skeleton
+                animation="pulse"
+                height={30}
+                width={120}
+                style={styles.skeleton}
+              />
+            </>
+          ) : (
+            <>
+              <Text style={styles.name}>{userData?.name}</Text>
+              <Text style={styles.username}>@{userData?.username}</Text>
+              <Text style={styles.description}>
+                {userData?.bio || 'No Description'}
+              </Text>
+              <TouchableOpacity
+                style={styles.editButton}
+                onPress={() => navigation.navigate('EditProfile')}>
+                <Text style={styles.editButtonText}>Edit Profile</Text>
+              </TouchableOpacity>
+            </>
+          )}
         </View>
       </View>
 
@@ -159,17 +191,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   name: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#000',
   },
   username: {
-    fontSize: 11,
+    fontSize: 14,
     color: '#00c5ff',
     marginBottom: 5,
   },
   description: {
-    fontSize: 11,
+    fontSize: 13,
     color: '#000',
   },
   editButton: {
@@ -181,7 +213,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   editButtonText: {
-    fontSize: 11,
+    fontSize: 13,
     color: '#000',
     fontWeight: 'bold',
   },
@@ -201,5 +233,8 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     resizeMode: 'contain',
+  },
+  skeleton: {
+    marginBottom: 10,
   },
 });

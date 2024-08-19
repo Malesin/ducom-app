@@ -4,20 +4,20 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Image,
+  ImageBackground,
   TextInput,
   ScrollView,
   Alert,
-  ImageBackground,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { SafeAreaView } from 'react-native';
+import {useNavigation} from '@react-navigation/native';
+import {SafeAreaView} from 'react-native';
+import {Skeleton} from 'react-native-elements';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { launchImageLibrary } from 'react-native-image-picker';
 import Toast from 'react-native-toast-message';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../../config';
+
 const serverUrl = config.SERVER_URL;
 
 export default function EditProfilePage() {
@@ -34,7 +34,6 @@ export default function EditProfilePage() {
   const [newBannerImage, setNewBannerImage] = useState('');
   const [uploadedFileName, setUploadedFileName] = useState(null);
 
-  // UNTUK REFRESH DATA
   async function getData() {
     try {
       const token = await AsyncStorage.getItem('token');
@@ -74,27 +73,25 @@ export default function EditProfilePage() {
     return usernameRegex.test(username) && !username.includes(' ');
   };
   useEffect(() => {
-    const beforeRemoveListener = navigation.addListener('beforeRemove', (e) => {
-      if (isSaving) {
-        return; // Jika sedang menyimpan, jangan tampilkan alert
+    const beforeRemoveListener = navigation.addListener('beforeRemove', e => {
+      if (isSaving || !hasChanges) {
+        return;
       }
 
       e.preventDefault();
-      Alert.alert(
-        'Konfirmasi',
-        'Apakah anda ingin membatalkan perubahan?',
-        [
-          {
-            text: 'Tidak', style: 'cancel', onPress: () => {
-            }
-          },
-          {
-            text: 'Ya', onPress: () => {
-              setUsername(userData.username);
-              setName(userData.name);
-              setBio(userData.bio);
-              navigation.dispatch(e.data.action);
-            }
+      Alert.alert('Konfirmasi', 'Apakah anda ingin membatalkan perubahan?', [
+        {
+          text: 'Tidak',
+          style: 'cancel',
+          onPress: () => {},
+        },
+        {
+          text: 'Ya',
+          onPress: () => {
+            setUsername(userData.username);
+            setName(userData.name);
+            setBio(userData.bio);
+            navigation.dispatch(e.data.action);
           },
         ]
       );
@@ -117,7 +114,7 @@ export default function EditProfilePage() {
     Alert.alert('Confirmation', 'Do you want to save the changes?', [
       { text: 'No', style: 'cancel', onPress: () => setIsSaving(false) },
       {
-        text: 'Yes',
+        text: 'Ya',
         style: 'default',
         onPress: async () => {
           try {
@@ -131,8 +128,9 @@ export default function EditProfilePage() {
             } else if (!validateUsername(username)) {
               Toast.show({
                 type: 'error',
-                text1: 'Invalid username',
-                text2: '4-15 char, lowercase letters & numbers only with no spaces.',
+                text1: 'Username tidak valid',
+                text2:
+                  '4-15 karakter, hanya huruf kecil dan angka tanpa spasi.',
               });
               return;
             }
@@ -151,7 +149,7 @@ export default function EditProfilePage() {
                 Toast.show({
                   type: 'error',
                   text1: 'Error',
-                  text2: 'Username already exists!',
+                  text2: 'Username sudah ada!',
                 });
                 return;
               }
@@ -214,7 +212,7 @@ export default function EditProfilePage() {
               Toast.show({
                 type: 'error',
                 text1: 'Error',
-                text2: 'An error occurred. Please try again later.',
+                text2: 'Terjadi kesalahan. Silakan coba lagi nanti.',
               });
             }
           } catch (error) {
@@ -253,73 +251,115 @@ export default function EditProfilePage() {
     });
   };
 
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.bannerContainer}>
+          {banner || userData ? (
           <TouchableOpacity onPress={() => selectImageBanner()}>
-            <ImageBackground
-              source={banner}
-              style={styles.banner}
-              resizeMode="cover">
-              <View style={styles.overlay}>
-                <MaterialCommunityIcons name="camera" size={50} color="#fff" />
-              </View>
-            </ImageBackground>
-          </TouchableOpacity>
+              <ImageBackground
+                source={banner || require('../../assets/banner.png')}
+                style={styles.banner}
+                resizeMode="cover">
+                <View style={styles.overlay}>
+                  <MaterialCommunityIcons
+                    name="camera"
+                    size={50}
+                    color="#fff"
+                  />
+                </View>
+              </ImageBackground>
+            </TouchableOpacity>
+          ) : (
+            <Skeleton containerStyle={styles.banner} animation="wave" />
+          )}
         </View>
         <View style={styles.contentContainer}>
+          {profilePicture || userData ? (
           <TouchableOpacity
             onPress={() => selectImageProfile()}>
-            <ImageBackground
-              source={profilePicture || require('../../assets/profilepic.png')}
-              style={styles.profilePicture}
-              imageStyle={styles.profilePictureImage}>
-              <View style={styles.overlay}>
-                <MaterialCommunityIcons name="camera" size={30} color="#fff" />
-              </View>
-            </ImageBackground>
-          </TouchableOpacity>
+              <ImageBackground
+                source={profilePicture || require('../../assets/profile.png')}
+                style={styles.profilePicture}
+                imageStyle={styles.profilePictureImage}>
+                <View style={styles.overlay}>
+                  <MaterialCommunityIcons
+                    name="camera"
+                    size={30}
+                    color="#fff"
+                  />
+                </View>
+              </ImageBackground>
+            </TouchableOpacity>
+          ) : (
+            <Skeleton containerStyle={styles.profilePicture} animation="wave" />
+          )}
           <View style={styles.usernameContainer}>
             <View style={styles.usernameInputContainer}>
               <Text style={styles.usernameStatic}>@</Text>
               {isEditing ? (
                 <TextInput
                   style={styles.usernameInput}
-                  value={username} // Username tanpa '@'
-                  onChangeText={(text) => setUsername(text)} // Set langsung tanpa replace
+                  value={username}
+                  onChangeText={text => handleInputChange(setUsername, text)}
                   onBlur={() => setIsEditing(false)}
                   autoFocus
                 />
-              ) : (
+              ) : userData ? (
                 <Text style={styles.username}>{username}</Text>
+              ) : (
+                <Skeleton height={20} width={100} animation="wave" />
               )}
             </View>
             <TouchableOpacity onPress={() => setIsEditing(true)}>
               <MaterialCommunityIcons name="pencil" size={20} color="#000" />
             </TouchableOpacity>
           </View>
-
-
-          <TextInput
-            style={styles.input}
-            placeholder={userData?.name}
-            value={name}
-            onChangeText={text => {
-              setName(text);
-            }}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder={userData?.bio || "Bio"}
-            value={bio}
-            onChangeText={text => {
-              setBio(text);
-            }}
-            multiline
-            maxLength={150}
-          />
-          <TextInput style={styles.input} placeholder={userData?.email} editable={false} />
+          {userData ? (
+            <>
+              <TextInput
+                style={styles.input}
+                placeholder={userData.name}
+                value={name}
+                onChangeText={text => handleInputChange(setName, text)}
+              />
+              <TextInput
+                style={styles.input}
+                placeholder={userData.bio || 'Bio'}
+                value={bio}
+                onChangeText={text => handleInputChange(setBio, text)}
+                multiline
+                maxLength={150}
+              />
+              <TextInput
+                style={styles.input}
+                placeholder={userData.email}
+                editable={false}
+              />
+            </>
+          ) : (
+            <>
+              <Skeleton
+                height={40}
+                width="100%"
+                animation="wave"
+                containerStyle={styles.input}
+              />
+              <Skeleton
+                height={40}
+                width="100%"
+                animation="wave"
+                containerStyle={styles.input}
+              />
+              <Skeleton
+                height={40}
+                width="100%"
+                animation="wave"
+                containerStyle={styles.input}
+              />
+            </>
+          )}
         </View>
       </ScrollView>
       <Toast />
@@ -328,10 +368,6 @@ export default function EditProfilePage() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
   scrollContainer: {
     flexGrow: 1,
     alignItems: 'center',
@@ -385,7 +421,7 @@ const styles = StyleSheet.create({
   usernameInput: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginLeft: 5, // Memberikan jarak antara @ dan input
+    marginLeft: 5,
     borderBottomWidth: 1,
     borderColor: '#ccc',
   },

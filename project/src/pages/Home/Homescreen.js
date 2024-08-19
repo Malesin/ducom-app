@@ -53,19 +53,6 @@ const HomeScreen = ({navigation}) => {
       commentsCount: 10,
       bookMarksCount: 8,
     },
-    {
-      id: '3',
-      userAvatar: 'https://randomuser.me/api/portraits/men/3.jpg',
-      userName: 'Mike Johnson',
-      userHandle: 'mikejohnson',
-      content:
-        'Check out my latest blog post on web development trends in 2024!',
-      video:
-        'file:///C:/Users/ACER/Videos/Ready%20Or%20Not/Ready%20Or%20Not%202024.07.05%20-%2019.29.21.01.mp4', // Example video URL
-      likesCount: 50,
-      commentsCount: 20,
-      bookMarksCount: 10,
-    },
   ]);
 
   const isExpanded = useSharedValue(false);
@@ -116,6 +103,7 @@ const HomeScreen = ({navigation}) => {
   useFocusEffect(
     useCallback(() => {
       getData();
+      isExpanded.value = false; // Reset FAB state when screen gains focus
     }, []),
   );
 
@@ -128,13 +116,11 @@ const HomeScreen = ({navigation}) => {
     ImagePicker.launchCamera(options, response => {
       if (response.didCancel) {
         console.log('User cancelled photo');
-        // Reset isExpanded value to ensure FAB does not disappear
-        isExpanded.value = false;
+        isExpanded.value = false; // Reset FAB state if user cancels
       } else if (response.error) {
         console.log('ImagePicker Error: ', response.error);
       } else {
         const uri = response.assets[0].uri;
-        setCapturedImageUri(uri);
         console.log('Captured image URI:', uri);
         // Navigate to CreatePost and pass the image URI
         navigation.navigate('CreatePost', {imageUri: uri});
