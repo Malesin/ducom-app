@@ -9,11 +9,13 @@ import {
   ScrollView,
   Modal,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {Button} from 'react-native-elements';
 import * as ImagePicker from 'react-native-image-picker';
 import Video from 'react-native-video';
+import {createThumbnail} from 'react-native-create-thumbnail';
 
 const CreatePost = ({route, navigation}) => {
   const [newPostText, setNewPostText] = useState('');
@@ -23,18 +25,18 @@ const CreatePost = ({route, navigation}) => {
   const [previewMedia, setPreviewMedia] = useState(null);
   const [mediaType, setMediaType] = useState(null);
 
-  // Load profile picture from assets
   const profilePictureUri = require('../../assets/profilepic.png');
 
   useEffect(() => {
     if (route.params?.mediaUri) {
-      setSelectedMedia([route.params.mediaUri]);
-      setMediaType(route.params.mediaType); // Set media type from params
+      setSelectedMedia([
+        {uri: route.params.mediaUri, thumbnailUri: route.params.thumbnailUri},
+      ]);
+      setMediaType(route.params.mediaType);
     }
   }, [route.params?.mediaUri, route.params?.mediaType]);
 
   const handlePostSubmit = () => {
-    // Navigate to Home and pass the post data
     navigation.navigate('Home', {
       postText: newPostText,
       media: selectedMedia,
@@ -42,32 +44,64 @@ const CreatePost = ({route, navigation}) => {
     });
   };
 
+  const checkVideoDuration = uri => {
+    return new Promise((resolve, reject) => {
+      Video.getDuration(uri, duration => {
+        if (duration > 60) {
+          reject(new Error('Video exceeds 1 minute duration'));
+        } else {
+          resolve();
+        }
+      });
+    });
+  };
+
+  const generateThumbnail = async uri => {
+    try {
+      const {uri: thumbnailUri} = await createThumbnail({source: uri});
+      return thumbnailUri;
+    } catch (error) {
+      console.error('Error generating thumbnail:', error);
+      return null;
+    }
+  };
+
   const handleOpenCamera = () => {
     const options = {
-      mediaType: 'mixed', // Allow both photo and video
+      mediaType: 'mixed',
       saveToPhotos: true,
     };
 
-    ImagePicker.launchCamera(options, response => {
+    ImagePicker.launchCamera(options, async response => {
       if (response.didCancel) {
         console.log('User cancelled photo or video capture');
       } else if (response.errorCode) {
         console.log('ImagePicker Error: ', response.errorMessage);
       } else {
-        // Handle the captured media based on its type
         const {mediaType, assets} = response;
         if (assets && assets.length > 0) {
           const uri = assets[0].uri;
-          setSelectedMedia([uri]);
-          setMediaType(mediaType);
-          console.log(
-            `${
-              mediaType === 'mixed' ? 'Captured photo' : 'Captured video'
-            } URI:`,
-            uri,
-          );
-          // Navigate to CreatePost and pass the media URI
-          navigation.navigate('CreatePost', {mediaUri: uri, mediaType});
+          if (mediaType === 'video') {
+            try {
+              await checkVideoDuration(uri);
+              const thumbnailUri = await generateThumbnail(uri);
+              setSelectedMedia([{uri, thumbnailUri}]);
+              setMediaType(mediaType);
+              console.log('Captured video URI:', uri);
+              navigation.navigate('CreatePost', {
+                mediaUri: uri,
+                mediaType,
+                thumbnailUri,
+              });
+            } catch (error) {
+              Alert.alert('Video Upload Error', error.message);
+            }
+          } else {
+            setSelectedMedia([{uri}]);
+            setMediaType(mediaType);
+            console.log('Captured photo URI:', uri);
+            navigation.navigate('CreatePost', {mediaUri: uri, mediaType});
+          }
         }
       }
     });
@@ -79,12 +113,30 @@ const CreatePost = ({route, navigation}) => {
       selectionLimit: 4,
     };
 
-    ImagePicker.launchImageLibrary(options, response => {
+    ImagePicker.launchImageLibrary(options, async response => {
       if (!response.didCancel && !response.error) {
         const uris = response.assets.map(asset => asset.uri);
         const types = response.assets.map(asset => asset.type);
-        setSelectedMedia(prevMedia => [...prevMedia, ...uris]);
-        setMediaType(types[0] || 'photo');
+        if (types[0] === 'video') {
+          try {
+            await checkVideoDuration(uris[0]);
+            const thumbnailUris = await Promise.all(
+              uris.map(uri => generateThumbnail(uri)),
+            );
+            setSelectedMedia(
+              uris.map((uri, index) => ({
+                uri,
+                thumbnailUri: thumbnailUris[index],
+              })),
+            );
+            setMediaType(types[0] || 'photo');
+          } catch (error) {
+            Alert.alert('Video Upload Error', error.message);
+          }
+        } else {
+          setSelectedMedia(uris.map(uri => ({uri})));
+          setMediaType(types[0] || 'photo');
+        }
       }
     });
   };
@@ -98,11 +150,28 @@ const CreatePost = ({route, navigation}) => {
     setPreviewVisible(true);
   };
 
-  const renderMedia = (uri, index) => {
+  const removeMedia = uri => {
+    setSelectedMedia(prevMedia => prevMedia.filter(item => item.uri !== uri));
+  };
+
+  const renderMedia = (media, index) => {
     return (
-      <TouchableOpacity key={index} onPress={() => handleMediaPress(uri)}>
-        <Image source={{uri}} style={styles.media} />
-      </TouchableOpacity>
+      <View key={index} style={styles.mediaContainer}>
+        <TouchableOpacity onPress={() => handleMediaPress(media.uri)}>
+          {media.uri.endsWith('.mp4') && media.thumbnailUri ? (
+            <Image source={{uri: media.thumbnailUri}} style={styles.media} />
+          ) : (
+            <Image source={{uri: media.uri}} style={styles.media} />
+          )}
+        </TouchableOpacity>
+        {media.uri.endsWith('.mp4') && (
+          <TouchableOpacity
+            style={styles.removeButton}
+            onPress={() => removeMedia(media.uri)}>
+            <Icon name="close" size={24} color="#fff" />
+          </TouchableOpacity>
+        )}
+      </View>
     );
   };
 
@@ -141,7 +210,7 @@ const CreatePost = ({route, navigation}) => {
           />
         </View>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {selectedMedia.map((uri, index) => renderMedia(uri, index))}
+          {selectedMedia.map((media, index) => renderMedia(media, index))}
         </ScrollView>
         <View style={styles.buttonContainer}>
           <Button
@@ -220,12 +289,15 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 8,
   },
+  mediaContainer: {
+    position: 'relative',
+    marginRight: 10,
+  },
   media: {
     width: 100,
     height: 100,
     resizeMode: 'cover',
     borderRadius: 8,
-    marginRight: 10,
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -264,6 +336,14 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '80%',
     resizeMode: 'contain',
+  },
+  removeButton: {
+    position: 'absolute',
+    top: 5,
+    right: 5,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    borderRadius: 50,
+    padding: 5,
   },
 });
 
