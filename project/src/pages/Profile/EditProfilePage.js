@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,13 +9,13 @@ import {
   ScrollView,
   Alert,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import {SafeAreaView} from 'react-native';
-import {Skeleton} from 'react-native-elements';
+import { useNavigation } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native';
+import { Skeleton } from 'react-native-elements';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Toast from 'react-native-toast-message';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {launchImageLibrary} from 'react-native-image-picker';
+import { launchImageLibrary } from 'react-native-image-picker';
 import axios from 'axios';
 import config from '../../config';
 
@@ -94,7 +94,7 @@ export default function EditProfilePage() {
         {
           text: 'Tidak',
           style: 'cancel',
-          onPress: () => {},
+          onPress: () => { },
         },
         {
           text: 'Ya',
@@ -123,7 +123,7 @@ export default function EditProfilePage() {
     setIsSaving(true);
 
     Alert.alert('Confirmation', 'Do you want to save the changes?', [
-      {text: 'No', style: 'cancel', onPress: () => setIsSaving(false)},
+      { text: 'No', style: 'cancel', onPress: () => setIsSaving(false) },
       {
         text: 'Ya',
         style: 'default',
@@ -147,7 +147,7 @@ export default function EditProfilePage() {
             }
 
             const token = await AsyncStorage.getItem('token');
-            const updatedUserData = {token: token};
+            const updatedUserData = { token: token };
 
             if (name && name !== userData.name) {
               updatedUserData.name = name;
@@ -156,7 +156,7 @@ export default function EditProfilePage() {
             if (username && username !== userData.username) {
               const checkUsernameResponse = await axios.post(
                 `${serverUrl}/check-username`,
-                {username},
+                { username },
               );
               if (checkUsernameResponse.data.status === 'error') {
                 setIsSaving(false);
@@ -221,7 +221,7 @@ export default function EditProfilePage() {
               updatedUserData,
             );
 
-            if (response.data.status === 'ok') {
+            if (response.data.status === 'update') {
               Toast.show({
                 type: 'success',
                 text1: 'Success',
@@ -251,33 +251,33 @@ export default function EditProfilePage() {
   };
 
   const selectImageProfile = () => {
-    launchImageLibrary({mediaType: 'photo'}, response => {
+    launchImageLibrary({ mediaType: 'photo' }, response => {
       if (response.didCancel) {
         console.log('User cancelled image picker');
       } else if (response.error) {
         console.log('ImagePicker Error: ', response.error);
       } else {
         setNewProfileImage(response.assets[0]); // Store the image temporarily
-        setProfilePicture({uri: response.assets[0].uri});
+        setProfilePicture({ uri: response.assets[0].uri });
       }
     });
   };
 
   const selectImageBanner = () => {
-    launchImageLibrary({mediaType: 'photo'}, response => {
+    launchImageLibrary({ mediaType: 'photo' }, response => {
       if (response.didCancel) {
         console.log('User cancelled image picker');
       } else if (response.error) {
         console.log('ImagePicker Error: ', response.error);
       } else {
         setNewBannerImage(response.assets[0]); // Store the image temporarily
-        setBanner({uri: response.assets[0].uri});
+        setBanner({ uri: response.assets[0].uri });
       }
     });
   };
 
   return (
-    <SafeAreaView style={{flex: 1}}>
+    <SafeAreaView style={{ flex: 1 }}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.bannerContainer}>
           {banner || userData ? (
@@ -327,7 +327,7 @@ export default function EditProfilePage() {
                 <TextInput
                   style={styles.usernameInput}
                   value={username}
-                  onChangeText={text => handleInputChange(setUsername, text)}
+                  onChangeText={text => setUsername(text)}
                   onBlur={() => setIsEditing(false)}
                   autoFocus
                 />
@@ -347,13 +347,13 @@ export default function EditProfilePage() {
                 style={styles.input}
                 placeholder={userData.name}
                 value={name}
-                onChangeText={text => handleInputChange(setName, text)}
+                onChangeText={text => setName(text)}
               />
               <TextInput
                 style={styles.input}
                 placeholder={userData.bio || 'Bio'}
                 value={bio}
-                onChangeText={text => handleInputChange(setBio, text)}
+                onChangeText={text => setBio(text)}
                 multiline
                 maxLength={150}
               />
