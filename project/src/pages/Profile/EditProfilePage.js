@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -10,13 +10,13 @@ import {
   Alert,
   ImageBackground,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import {SafeAreaView} from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { launchImageLibrary } from 'react-native-image-picker';
 import Toast from 'react-native-toast-message';
-import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 import config from '../../config';
 const serverUrl = config.SERVER_URL;
 
@@ -24,30 +24,51 @@ export default function EditProfilePage() {
   const navigation = useNavigation();
   const [name, setName] = useState('');
   const [bio, setBio] = useState('');
-  const [banner, setBanner] = useState(null);
-  const [profilePicture, setProfilePicture] = useState(null);
+  const [banner, setBanner] = useState('');
+  const [profilePicture, setProfilePicture] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [userData, setUserData] = useState(null);
   const [username, setUsername] = useState('');
   const [isSaving, setIsSaving] = useState('');
+  const [newProfileImage, setNewProfileImage] = useState('');
+  const [newBannerImage, setNewBannerImage] = useState('');
+  const [uploadedFileName, setUploadedFileName] = useState(null);
 
   // UNTUK REFRESH DATA
   async function getData() {
-    const token = await AsyncStorage.getItem('token');
-    console.log(token);
-    axios
-      .post(`${serverUrl}/userdata`, { token: token })
-      .then(res => {
-        console.log(res.data);
-        setUserData(res.data.data);
-        setUsername(res.data.data.username);
-      });
+    try {
+      const token = await AsyncStorage.getItem('token');
+      console.log("Token Retrieved Successfully");
+
+      // Ambil data pengguna
+      const userResponse = await axios.post(`${serverUrl}/userdata`, { token: token });
+      console.log("Data Retrieved Successfully");
+
+      const user = userResponse.data.data;
+      setUserData(user);
+      setUsername(user.username);
+
+      if (user.bannerPicture) {
+        const bannerResponse = await axios.post(`${serverUrl}/get-image-banner/${user.bannerPicture}`);
+        console.log("Image Banner Retrieved Successfully");
+        setBanner({ uri: `data:image/jpeg;base64,${bannerResponse.data.data.imageBase64}` });
+      }
+
+      if (user.profilePicture) {
+        const profileResponse = await axios.post(`${serverUrl}/get-image-profile/${user.profilePicture}`);
+        console.log("Image Profile Retrieved Successfully");
+        setProfilePicture({ uri: `data:image/jpeg;base64,${profileResponse.data.data.imageBase64}` });
+      }
+    } catch (error) {
+      console.error("Error occurred:", error);
+    }
   }
 
   useEffect(() => {
     getData();
   }, []);
   // UNTUK REFRESH DATA
+
   const validateUsername = (username) => {
     const usernameRegex = /^[a-z0-9]{4,15}$/;
     return usernameRegex.test(username) && !username.includes(' ');
@@ -75,16 +96,26 @@ export default function EditProfilePage() {
               navigation.dispatch(e.data.action);
             }
           },
-        },
-      ]);
+        ]
+      );
     });
 
     return beforeRemoveListener;
   }, [navigation, userData, isSaving]);
-  const handleSave = () => {
-    setIsSaving(true); // Set isSaving to true while saving
+
+  navigation.setOptions({
+    headerRight: () => (
+      <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+        <Text style={styles.saveButtonText}>Save</Text>
+      </TouchableOpacity>
+    ),
+  });
+
+  const handleSave = async () => {
+    setIsSaving(true);
+
     Alert.alert('Confirmation', 'Do you want to save the changes?', [
-      { text: 'No', style: 'cancel', onPress: () => setIsSaving(false) }, // Reset isSaving if canceled
+      { text: 'No', style: 'cancel', onPress: () => setIsSaving(false) },
       {
         text: 'Yes',
         style: 'default',
@@ -94,7 +125,7 @@ export default function EditProfilePage() {
               Toast.show({
                 type: 'error',
                 text1: 'Invalid username',
-                text2: 'Username cannot be empty!.',
+                text2: 'Username cannot be empty!',
               });
               return;
             } else if (!validateUsername(username)) {
@@ -107,38 +138,71 @@ export default function EditProfilePage() {
             }
 
             const token = await AsyncStorage.getItem("token");
-            const updatedUserData = {
-              token: token,
-            };
+            const updatedUserData = { token: token };
+
             if (name && name !== userData.name) {
               updatedUserData.name = name;
             }
+
             if (username && username !== userData.username) {
-              // Check if the username already exists
               const checkUsernameResponse = await axios.post(`${serverUrl}/check-username`, { username });
               if (checkUsernameResponse.data.status === 'error') {
-                setIsSaving(true);
+                setIsSaving(false);
                 Toast.show({
                   type: 'error',
                   text1: 'Error',
                   text2: 'Username already exists!',
                 });
-                return; // Stop further execution if username is already taken
+                return;
               }
               updatedUserData.username = username;
             }
+
             if (bio && bio !== userData.bio) {
               updatedUserData.bio = bio;
+            }
+
+            // Upload the new profile image if exists
+            if (newProfileImage) {
+              const profileFormData = new FormData();
+              profileFormData.append('image', {
+                uri: newProfileImage.uri,
+                name: newProfileImage.fileName,
+                type: newProfileImage.type,
+              });
+              profileFormData.append('token', token);
+
+              await axios.post(`${serverUrl}/upload-image-profile`, profileFormData, {
+                headers: {
+                  'Content-Type': 'multipart/form-data',
+                },
+              });
+            }
+
+            // Upload the new banner image if exists
+            if (newBannerImage) {
+              const bannerFormData = new FormData();
+              bannerFormData.append('image', {
+                uri: newBannerImage.uri,
+                name: newBannerImage.fileName,
+                type: newBannerImage.type,
+              });
+              bannerFormData.append('token', token);
+
+              await axios.post(`${serverUrl}/upload-image-banner`, bannerFormData, {
+                headers: {
+                  'Content-Type': 'multipart/form-data',
+                },
+              });
             }
 
             const response = await axios.post(`${serverUrl}/update-profile`, updatedUserData);
 
             if (response.data.status === 'ok') {
-              setIsSaving(true);
               Toast.show({
                 type: 'success',
                 text1: 'Success',
-                text2: 'Updated Successfully!!',
+                text2: 'Updated Successfully!',
                 onHide: () => {
                   setTimeout(() => {
                     navigation.goBack();
@@ -146,7 +210,7 @@ export default function EditProfilePage() {
                 },
               });
             } else {
-              setIsSaving(true);
+              setIsSaving(false);
               Toast.show({
                 type: 'error',
                 text1: 'Error',
@@ -154,8 +218,8 @@ export default function EditProfilePage() {
               });
             }
           } catch (error) {
-            setIsSaving(true);
-            console.log('Error updating profile: ', error);
+            setIsSaving(false);
+            console.error('Error updating profile:', error);
             Alert.alert('Error', 'Failed to update profile');
           }
         },
@@ -163,21 +227,39 @@ export default function EditProfilePage() {
     ]);
   };
 
-  navigation.setOptions({
-    headerRight: () => (
-      <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-        <Text style={styles.saveButtonText}>Save</Text>
-      </TouchableOpacity>
-    ),
-  });
+  const selectImageProfile = () => {
+    launchImageLibrary({ mediaType: 'photo' }, (response) => {
+      if (response.didCancel) {
+        console.log('User cancelled image picker');
+      } else if (response.error) {
+        console.log('ImagePicker Error: ', response.error);
+      } else {
+        setNewProfileImage(response.assets[0]); // Store the image temporarily
+        setProfilePicture({ uri: response.assets[0].uri });
+      }
+    });
+  };
+
+  const selectImageBanner = () => {
+    launchImageLibrary({ mediaType: 'photo' }, (response) => {
+      if (response.didCancel) {
+        console.log('User cancelled image picker');
+      } else if (response.error) {
+        console.log('ImagePicker Error: ', response.error);
+      } else {
+        setNewBannerImage(response.assets[0]); // Store the image temporarily
+        setBanner({ uri: response.assets[0].uri });
+      }
+    });
+  };
 
   return (
-    <SafeAreaView style={{flex: 1}}>
+    <SafeAreaView style={{ flex: 1 }}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.bannerContainer}>
-          <TouchableOpacity onPress={() => selectImage(setBanner, 'banner')}>
+          <TouchableOpacity onPress={() => selectImageBanner()}>
             <ImageBackground
-              source={banner || require('../../assets/banner.png')}
+              source={banner}
               style={styles.banner}
               resizeMode="cover">
               <View style={styles.overlay}>
@@ -188,9 +270,9 @@ export default function EditProfilePage() {
         </View>
         <View style={styles.contentContainer}>
           <TouchableOpacity
-            onPress={() => selectImage(setProfilePicture, 'profile')}>
+            onPress={() => selectImageProfile()}>
             <ImageBackground
-              source={profilePicture || require('../../assets/profile.png')}
+              source={profilePicture || require('../../assets/profilepic.png')}
               style={styles.profilePicture}
               imageStyle={styles.profilePictureImage}>
               <View style={styles.overlay}>
@@ -225,7 +307,6 @@ export default function EditProfilePage() {
             value={name}
             onChangeText={text => {
               setName(text);
-              setHasChanges(true); // Mark as changed
             }}
           />
           <TextInput
@@ -234,11 +315,11 @@ export default function EditProfilePage() {
             value={bio}
             onChangeText={text => {
               setBio(text);
-              setHasChanges(true); // Mark as changed
             }}
             multiline
+            maxLength={150}
           />
-          <TextInput style={styles.input} placeholder={userData?.email} />
+          <TextInput style={styles.input} placeholder={userData?.email} editable={false} />
         </View>
       </ScrollView>
       <Toast />
