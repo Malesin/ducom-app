@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   SafeAreaView,
   View,
@@ -10,7 +10,7 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useNavigation, useFocusEffect} from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import config from '../../config';
@@ -20,29 +20,47 @@ const serverUrl = config.SERVER_URL;
 
 export default function Profilescreen() {
   const [modalVisible, setModalVisible] = useState(false);
+  const [banner, setBanner] = useState(false);
+  const [profilePicture, setProfilePicture] = useState(false);
   const [modalImageSource, setModalImageSource] = useState(null);
-  const [userData, setUserData] = useState(null); // Initialize as null to handle loading state
+  const [userData, setUserData] = useState('');
   const navigation = useNavigation();
 
   async function getData() {
-    const token = await AsyncStorage.getItem('token');
-    axios
-      .post(`${serverUrl}/userdata`, {token: token})
-      .then(res => {
-        setUserData(res.data.data);
-      })
-      .catch(error => {
-        console.error('Error fetching user data:', error);
-      });
-  }
+    try {
+      const token = await AsyncStorage.getItem('token');
+      console.log("Token Retrieved Successfully");
 
+      // Ambil data pengguna
+      const userResponse = await axios.post(`${serverUrl}/userdata`, { token: token });
+      console.log("Data Retrieved Successfully");
+
+      const user = userResponse.data.data;
+      setUserData(user);
+
+      // Ambil gambar banner hanya jika ada data bannerPicture
+      if (user.bannerPicture) {
+        const bannerResponse = await axios.post(`${serverUrl}/get-image-banner/${user.bannerPicture}`);
+        console.log("Image Banner Retrieved Successfully");
+        setBanner({ uri: `data:image/jpeg;base64,${bannerResponse.data.data.imageBase64}` });
+      }
+
+      if (user.profilePicture) {
+        const profileResponse = await axios.post(`${serverUrl}/get-image-profile/${user.profilePicture}`);
+        console.log("Image Profile Retrieved Successfully");
+        setProfilePicture({ uri: `data:image/jpeg;base64,${profileResponse.data.data.imageBase64}` });
+      }
+    } catch (error) {
+      console.error("Error occurred:", error);
+    }
+  }
   useFocusEffect(
     React.useCallback(() => {
       getData();
     }, []),
   );
-
-  const profileImageSource = require('../../assets/profile.png');
+  // Define the source for the profile image
+  const profileImageSource = require('../../assets/profilepic.png');
 
   const openModal = () => {
     setModalImageSource(profileImageSource);
@@ -58,16 +76,16 @@ export default function Profilescreen() {
     <SafeAreaView style={styles.container}>
       <View style={styles.bannerContainer}>
         <Image
-          source={require('../../assets/banner.png')}
+          source={banner || require('../../assets/banner.png')}
           style={styles.banner}
         />
-        <TouchableOpacity style={styles.settingsButton} onPress={() => {}}>
+        <TouchableOpacity style={styles.settingsButton} onPress={() => { }}>
           <MaterialCommunityIcons name="dots-vertical" size={30} color="#000" />
         </TouchableOpacity>
       </View>
       <View style={styles.profileContainer}>
         <TouchableOpacity onPress={openModal}>
-          <Image source={profileImageSource} style={styles.profile} />
+          <Image source={profilePicture || profileImageSource} style={styles.profile} />
         </TouchableOpacity>
         <View style={styles.profileText}>
           {/* Show skeleton while userData is null */}
@@ -114,6 +132,8 @@ export default function Profilescreen() {
           )}
         </View>
       </View>
+
+      {/* Modal for image preview */}
       <Modal
         visible={modalVisible}
         transparent
