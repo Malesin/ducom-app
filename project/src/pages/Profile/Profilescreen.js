@@ -14,32 +14,34 @@ import {useNavigation, useFocusEffect} from '@react-navigation/native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import config from '../../config';
+import {Skeleton} from 'react-native-elements';
+
 const serverUrl = config.SERVER_URL;
 
 export default function Profilescreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalImageSource, setModalImageSource] = useState(null);
+  const [userData, setUserData] = useState(null); // Initialize as null to handle loading state
   const navigation = useNavigation();
 
-  const [userData, setUserData] = useState('');
   async function getData() {
     const token = await AsyncStorage.getItem('token');
-    console.log(token);
-    axios.post(`${serverUrl}/userdata`, {token: token}).then(res => {
-      console.log(res.data);
-      setUserData(res.data.data);
-      // UNTUK CONTOH PENGAPLIKASIAN DATANYA = {userData.name}
-    });
+    axios
+      .post(`${serverUrl}/userdata`, {token: token})
+      .then(res => {
+        setUserData(res.data.data);
+      })
+      .catch(error => {
+        console.error('Error fetching user data:', error);
+      });
   }
 
   useFocusEffect(
     React.useCallback(() => {
       getData();
-      console.log('refresh');
     }, []),
   );
 
-  // Define the source for the profile image
   const profileImageSource = require('../../assets/profile.png');
 
   const openModal = () => {
@@ -68,19 +70,50 @@ export default function Profilescreen() {
           <Image source={profileImageSource} style={styles.profile} />
         </TouchableOpacity>
         <View style={styles.profileText}>
-          <Text style={styles.name}>{userData?.name}</Text>
-          <Text style={styles.username}>@{userData?.username}</Text>
-          <Text style={styles.description}>
-            {userData?.bio || 'No Description'}
-          </Text>
-          <TouchableOpacity
-            style={styles.editButton}
-            onPress={() => navigation.navigate('EditProfile')}>
-            <Text style={styles.editButtonText}>Edit Profile</Text>
-          </TouchableOpacity>
+          {/* Show skeleton while userData is null */}
+          {!userData ? (
+            <>
+              <Skeleton
+                animation="pulse"
+                height={20}
+                width={150}
+                style={styles.skeleton}
+              />
+              <Skeleton
+                animation="pulse"
+                height={14}
+                width={100}
+                style={styles.skeleton}
+              />
+              <Skeleton
+                animation="pulse"
+                height={13}
+                width={200}
+                style={styles.skeleton}
+              />
+              <Skeleton
+                animation="pulse"
+                height={30}
+                width={120}
+                style={styles.skeleton}
+              />
+            </>
+          ) : (
+            <>
+              <Text style={styles.name}>{userData?.name}</Text>
+              <Text style={styles.username}>@{userData?.username}</Text>
+              <Text style={styles.description}>
+                {userData?.bio || 'No Description'}
+              </Text>
+              <TouchableOpacity
+                style={styles.editButton}
+                onPress={() => navigation.navigate('EditProfile')}>
+                <Text style={styles.editButtonText}>Edit Profile</Text>
+              </TouchableOpacity>
+            </>
+          )}
         </View>
       </View>
-      {/* Modal for image preview */}
       <Modal
         visible={modalVisible}
         transparent
@@ -180,5 +213,8 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     resizeMode: 'contain',
+  },
+  skeleton: {
+    marginBottom: 10,
   },
 });

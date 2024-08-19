@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {SafeAreaView} from 'react-native';
+import {Skeleton} from 'react-native-elements';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Toast from 'react-native-toast-message';
 import axios from 'axios';
@@ -32,12 +33,18 @@ export default function EditProfilePage() {
   const [hasChanges, setHasChanges] = useState(false); // Track if there are any changes
 
   async function getData() {
-    const token = await AsyncStorage.getItem('token');
-    const response = await axios.post(`${serverUrl}/userdata`, {token: token});
-    setUserData(response.data.data);
-    setUsername(response.data.data.username);
-    setName(response.data.data.name);
-    setBio(response.data.data.bio);
+    try {
+      const token = await AsyncStorage.getItem('token');
+      const response = await axios.post(`${serverUrl}/userdata`, {
+        token: token,
+      });
+      setUserData(response.data.data);
+      setUsername(response.data.data.username);
+      setName(response.data.data.name);
+      setBio(response.data.data.bio);
+    } catch (error) {
+      console.error('Error fetching user data: ', error);
+    }
   }
 
   useEffect(() => {
@@ -178,29 +185,45 @@ export default function EditProfilePage() {
     <SafeAreaView style={{flex: 1}}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.bannerContainer}>
-          <TouchableOpacity onPress={() => selectImage(setBanner, 'banner')}>
-            <ImageBackground
-              source={banner || require('../../assets/banner.png')}
-              style={styles.banner}
-              resizeMode="cover">
-              <View style={styles.overlay}>
-                <MaterialCommunityIcons name="camera" size={50} color="#fff" />
-              </View>
-            </ImageBackground>
-          </TouchableOpacity>
+          {banner || userData ? (
+            <TouchableOpacity onPress={() => selectImage(setBanner, 'banner')}>
+              <ImageBackground
+                source={banner || require('../../assets/banner.png')}
+                style={styles.banner}
+                resizeMode="cover">
+                <View style={styles.overlay}>
+                  <MaterialCommunityIcons
+                    name="camera"
+                    size={50}
+                    color="#fff"
+                  />
+                </View>
+              </ImageBackground>
+            </TouchableOpacity>
+          ) : (
+            <Skeleton containerStyle={styles.banner} animation="wave" />
+          )}
         </View>
         <View style={styles.contentContainer}>
-          <TouchableOpacity
-            onPress={() => selectImage(setProfilePicture, 'profile')}>
-            <ImageBackground
-              source={profilePicture || require('../../assets/profile.png')}
-              style={styles.profilePicture}
-              imageStyle={styles.profilePictureImage}>
-              <View style={styles.overlay}>
-                <MaterialCommunityIcons name="camera" size={30} color="#fff" />
-              </View>
-            </ImageBackground>
-          </TouchableOpacity>
+          {profilePicture || userData ? (
+            <TouchableOpacity
+              onPress={() => selectImage(setProfilePicture, 'profile')}>
+              <ImageBackground
+                source={profilePicture || require('../../assets/profile.png')}
+                style={styles.profilePicture}
+                imageStyle={styles.profilePictureImage}>
+                <View style={styles.overlay}>
+                  <MaterialCommunityIcons
+                    name="camera"
+                    size={30}
+                    color="#fff"
+                  />
+                </View>
+              </ImageBackground>
+            </TouchableOpacity>
+          ) : (
+            <Skeleton containerStyle={styles.profilePicture} animation="wave" />
+          )}
           <View style={styles.usernameContainer}>
             <View style={styles.usernameInputContainer}>
               <Text style={styles.usernameStatic}>@</Text>
@@ -212,8 +235,10 @@ export default function EditProfilePage() {
                   onBlur={() => setIsEditing(false)}
                   autoFocus
                 />
-              ) : (
+              ) : userData ? (
                 <Text style={styles.username}>{username}</Text>
+              ) : (
+                <Skeleton height={20} width={100} animation="wave" />
               )}
             </View>
             <TouchableOpacity onPress={() => setIsEditing(true)}>
@@ -221,25 +246,50 @@ export default function EditProfilePage() {
             </TouchableOpacity>
           </View>
 
-          <TextInput
-            style={styles.input}
-            placeholder={userData?.name}
-            value={name}
-            onChangeText={text => handleInputChange(setName, text)}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder={userData?.bio || 'Bio'}
-            value={bio}
-            onChangeText={text => handleInputChange(setBio, text)}
-            multiline
-            maxLength={150}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder={userData?.email}
-            editable={false}
-          />
+          {userData ? (
+            <>
+              <TextInput
+                style={styles.input}
+                placeholder={userData.name}
+                value={name}
+                onChangeText={text => handleInputChange(setName, text)}
+              />
+              <TextInput
+                style={styles.input}
+                placeholder={userData.bio || 'Bio'}
+                value={bio}
+                onChangeText={text => handleInputChange(setBio, text)}
+                multiline
+                maxLength={150}
+              />
+              <TextInput
+                style={styles.input}
+                placeholder={userData.email}
+                editable={false}
+              />
+            </>
+          ) : (
+            <>
+              <Skeleton
+                height={40}
+                width="100%"
+                animation="wave"
+                containerStyle={styles.input}
+              />
+              <Skeleton
+                height={40}
+                width="100%"
+                animation="wave"
+                containerStyle={styles.input}
+              />
+              <Skeleton
+                height={40}
+                width="100%"
+                animation="wave"
+                containerStyle={styles.input}
+              />
+            </>
+          )}
         </View>
       </ScrollView>
       <Toast />

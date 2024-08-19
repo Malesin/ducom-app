@@ -28,7 +28,7 @@
     "react-native-config": "^1.5.3",
     "react-native-drawer-layout": "^3.3.2",
     "react-native-element-dropdown": "^2.12.1",
-    "react-native-elements": "^3.4.3",
+    "react-native-elements": "^4.0.0-rc.2",
     "react-native-gesture-handler": "^2.17.1",
     "react-native-image-crop-picker": "^0.41.2",
     "react-native-image-picker": "^7.1.2",
