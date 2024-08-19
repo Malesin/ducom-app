@@ -1,22 +1,54 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {Image, StyleSheet, View, Text} from 'react-native';
 import {Profilescreen, Notificationscreen} from '../pages';
 import DrawerNavigator from './DrawerNavigator';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
-import {useFocusEffect} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 import config from '../config';
 const serverUrl = config.SERVER_URL;
+
 import TopTabNavigator from './TopTabNavigator';
 
-// Import the profile image
 import profileImage from './../assets/profilepic.png';
 
 const Tab = createBottomTabNavigator();
 
 function BottomTabNavigator() {
+  const [profilePicture, setProfilePicture] = useState('');
+
+  async function getData() {
+    try {
+      const token = await AsyncStorage.getItem('token');
+      console.log('Token Retrieved Successfully');
+
+      // Ambil data pengguna
+      const userResponse = await axios.post(`${serverUrl}/userdata`, {
+        token: token,
+      });
+      console.log('Data Retrieved Successfully');
+
+      const user = userResponse.data.data;
+
+      if (user.profilePicture) {
+        const profileResponse = await axios.post(
+          `${serverUrl}/get-image-profile/${user.profilePicture}`,
+        );
+        console.log('Image Profile Retrieved Successfully');
+        setProfilePicture({
+          uri: `data:image/jpeg;base64,${profileResponse.data.data.imageBase64}`,
+        });
+      }
+    } catch (error) {
+      console.error('Error occurred:', error);
+    }
+  }
+
+  useEffect(() => {
+    getData();
+  }, []);
 
   return (
     <GestureHandlerRootView style={{flex: 1}}>
@@ -39,7 +71,7 @@ function BottomTabNavigator() {
             } else if (route.name === 'Profile') {
               return (
                 <Image
-                  source={profileImage}
+                  source={profilePicture || profileImage}
                   style={[styles.icon, {tintColor: undefined}]}
                 />
               );

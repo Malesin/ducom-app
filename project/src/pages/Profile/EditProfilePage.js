@@ -15,7 +15,7 @@ import {Skeleton} from 'react-native-elements';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Toast from 'react-native-toast-message';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {launchImageLibrary} from 'react-native-image-picker';
+import ImagePicker from 'react-native-image-crop-picker';
 import axios from 'axios';
 import config from '../../config';
 
@@ -30,20 +30,17 @@ export default function EditProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
   const [userData, setUserData] = useState(null);
   const [username, setUsername] = useState('');
-  const [isSaving, setIsSaving] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
   const [newProfileImage, setNewProfileImage] = useState('');
   const [newBannerImage, setNewBannerImage] = useState('');
-  const [uploadedFileName, setUploadedFileName] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   async function getData() {
     try {
       const token = await AsyncStorage.getItem('token');
       console.log('Token Retrieved Successfully');
 
-      // Ambil data pengguna
-      const userResponse = await axios.post(`${serverUrl}/userdata`, {
-        token: token,
-      });
+      const userResponse = await axios.post(`${serverUrl}/userdata`, {token});
       console.log('Data Retrieved Successfully');
 
       const user = userResponse.data.data;
@@ -71,18 +68,20 @@ export default function EditProfilePage() {
       }
     } catch (error) {
       console.error('Error occurred:', error);
+    } finally {
+      setIsLoading(false);
     }
   }
 
   useEffect(() => {
     getData();
   }, []);
-  // UNTUK REFRESH DATA
 
   const validateUsername = username => {
     const usernameRegex = /^[a-z0-9]{4,15}$/;
     return usernameRegex.test(username) && !username.includes(' ');
   };
+
   useEffect(() => {
     const beforeRemoveListener = navigation.addListener('beforeRemove', e => {
       if (isSaving) {
@@ -99,9 +98,9 @@ export default function EditProfilePage() {
         {
           text: 'Ya',
           onPress: () => {
-            setUsername(userData.username);
-            setName(userData.name);
-            setBio(userData.bio);
+            setUsername(userData?.username);
+            setName(userData?.name);
+            setBio(userData?.bio);
             navigation.dispatch(e.data.action);
           },
         },
@@ -149,11 +148,11 @@ export default function EditProfilePage() {
             const token = await AsyncStorage.getItem('token');
             const updatedUserData = {token: token};
 
-            if (name && name !== userData.name) {
+            if (name && name !== userData?.name) {
               updatedUserData.name = name;
             }
 
-            if (username && username !== userData.username) {
+            if (username && username !== userData?.username) {
               const checkUsernameResponse = await axios.post(
                 `${serverUrl}/check-username`,
                 {username},
@@ -170,7 +169,7 @@ export default function EditProfilePage() {
               updatedUserData.username = username;
             }
 
-            if (bio && bio !== userData.bio) {
+            if (bio && bio !== userData?.bio) {
               updatedUserData.bio = bio;
             }
 
@@ -178,9 +177,9 @@ export default function EditProfilePage() {
             if (newProfileImage) {
               const profileFormData = new FormData();
               profileFormData.append('image', {
-                uri: newProfileImage.uri,
-                name: newProfileImage.fileName,
-                type: newProfileImage.type,
+                uri: newProfileImage.path,
+                name: newProfileImage.filename || 'profile.jpg',
+                type: newProfileImage.mime,
               });
               profileFormData.append('token', token);
 
@@ -199,9 +198,9 @@ export default function EditProfilePage() {
             if (newBannerImage) {
               const bannerFormData = new FormData();
               bannerFormData.append('image', {
-                uri: newBannerImage.uri,
-                name: newBannerImage.fileName,
-                type: newBannerImage.type,
+                uri: newBannerImage.path,
+                name: newBannerImage.filename || 'banner.jpg',
+                type: newBannerImage.mime,
               });
               bannerFormData.append('token', token);
 
@@ -221,7 +220,7 @@ export default function EditProfilePage() {
               updatedUserData,
             );
 
-            if (response.data.status === 'ok') {
+            if (response.data.status === 'update') {
               Toast.show({
                 type: 'success',
                 text1: 'Success',
@@ -251,37 +250,41 @@ export default function EditProfilePage() {
   };
 
   const selectImageProfile = () => {
-    launchImageLibrary({mediaType: 'photo'}, response => {
-      if (response.didCancel) {
-        console.log('User cancelled image picker');
-      } else if (response.error) {
-        console.log('ImagePicker Error: ', response.error);
-      } else {
-        setNewProfileImage(response.assets[0]); // Store the image temporarily
-        setProfilePicture({uri: response.assets[0].uri});
-      }
-    });
+    ImagePicker.openPicker({
+      cropping: true,
+      mediaType: 'photo',
+    })
+      .then(image => {
+        setNewProfileImage(image); // Store the image temporarily
+        setProfilePicture({uri: image.path});
+      })
+      .catch(error => {
+        console.error('Error selecting image:', error);
+      });
   };
 
   const selectImageBanner = () => {
-    launchImageLibrary({mediaType: 'photo'}, response => {
-      if (response.didCancel) {
-        console.log('User cancelled image picker');
-      } else if (response.error) {
-        console.log('ImagePicker Error: ', response.error);
-      } else {
-        setNewBannerImage(response.assets[0]); // Store the image temporarily
-        setBanner({uri: response.assets[0].uri});
-      }
-    });
+    ImagePicker.openPicker({
+      cropping: true,
+      mediaType: 'photo',
+    })
+      .then(image => {
+        setNewBannerImage(image); // Store the image temporarily
+        setBanner({uri: image.path});
+      })
+      .catch(error => {
+        console.error('Error selecting image:', error);
+      });
   };
 
   return (
     <SafeAreaView style={{flex: 1}}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.bannerContainer}>
-          {banner || userData ? (
-            <TouchableOpacity onPress={() => selectImageBanner()}>
+          {isLoading ? (
+            <Skeleton containerStyle={styles.banner} animation="wave" />
+          ) : (
+            <TouchableOpacity onPress={selectImageBanner}>
               <ImageBackground
                 source={banner || require('../../assets/banner.png')}
                 style={styles.banner}
@@ -295,20 +298,22 @@ export default function EditProfilePage() {
                 </View>
               </ImageBackground>
             </TouchableOpacity>
-          ) : (
-            <Skeleton containerStyle={styles.banner} animation="wave" />
           )}
         </View>
+
         <View style={styles.contentContainer}>
-          {profilePicture || userData ? (
-            <TouchableOpacity onPress={() => selectImageProfile()}>
+          {isLoading ? (
+            <Skeleton containerStyle={styles.profilePicture} animation="wave" />
+          ) : (
+            <TouchableOpacity onPress={selectImageProfile}>
               <ImageBackground
                 source={
                   profilePicture || require('../../assets/profilepic.png')
                 }
                 style={styles.profilePicture}
-                imageStyle={styles.profilePictureImage}>
-                <View style={styles.overlay}>
+                imageStyle={styles.profileImage}
+                resizeMode="cover">
+                <View style={styles.profileOverlay}>
                   <MaterialCommunityIcons
                     name="camera"
                     size={30}
@@ -317,77 +322,61 @@ export default function EditProfilePage() {
                 </View>
               </ImageBackground>
             </TouchableOpacity>
-          ) : (
-            <Skeleton containerStyle={styles.profilePicture} animation="wave" />
           )}
+
           <View style={styles.usernameContainer}>
             <View style={styles.usernameInputContainer}>
               <Text style={styles.usernameStatic}>@</Text>
-              {isEditing ? (
+              {isLoading ? (
+                <Skeleton height={20} width={100} animation="wave" />
+              ) : isEditing ? (
                 <TextInput
                   style={styles.usernameInput}
                   value={username}
-                  onChangeText={text => handleInputChange(setUsername, text)}
+                  onChangeText={text => setUsername(text)}
                   onBlur={() => setIsEditing(false)}
                   autoFocus
                 />
-              ) : userData ? (
-                <Text style={styles.username}>{username}</Text>
               ) : (
-                <Skeleton height={20} width={100} animation="wave" />
+                <Text style={styles.username}>{username}</Text>
               )}
             </View>
-            <TouchableOpacity onPress={() => setIsEditing(true)}>
-              <MaterialCommunityIcons name="pencil" size={20} color="#000" />
-            </TouchableOpacity>
+            {!isLoading && (
+              <TouchableOpacity onPress={() => setIsEditing(true)}>
+                <MaterialCommunityIcons name="pencil" size={17} color="#000" />
+              </TouchableOpacity>
+            )}
           </View>
-          {userData ? (
-            <>
-              <TextInput
-                style={styles.input}
-                placeholder={userData.name}
-                value={name}
-                onChangeText={text => handleInputChange(setName, text)}
-              />
-              <TextInput
-                style={styles.input}
-                placeholder={userData.bio || 'Bio'}
-                value={bio}
-                onChangeText={text => handleInputChange(setBio, text)}
-                multiline
-                maxLength={150}
-              />
-              <TextInput
-                style={styles.input}
-                placeholder={userData.email}
-                editable={false}
-              />
-            </>
-          ) : (
-            <>
-              <Skeleton
-                height={40}
-                width="100%"
-                animation="wave"
-                containerStyle={styles.input}
-              />
-              <Skeleton
-                height={40}
-                width="100%"
-                animation="wave"
-                containerStyle={styles.input}
-              />
-              <Skeleton
-                height={40}
-                width="100%"
-                animation="wave"
-                containerStyle={styles.input}
-              />
-            </>
-          )}
+
+          <View style={styles.inputContainer}>
+            <TextInput
+              value={name}
+              onChangeText={setName}
+              style={styles.textInput}
+              placeholder={userData?.name}
+            />
+          </View>
+
+          <View style={styles.inputContainer}>
+            <TextInput
+              value={bio}
+              onChangeText={setBio}
+              style={styles.textInput}
+              placeholder={userData?.bio || 'Bio'}
+              multiline
+              maxLength={150}
+            />
+          </View>
+
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.textInput}
+              placeholder={userData?.email}
+              editable={false}
+            />
+          </View>
         </View>
       </ScrollView>
-      <Toast />
     </SafeAreaView>
   );
 }
@@ -396,39 +385,48 @@ const styles = StyleSheet.create({
   scrollContainer: {
     flexGrow: 1,
     alignItems: 'center',
+    backgroundColor: '#fff',
   },
   bannerContainer: {
     width: '100%',
-    height: 150,
+    height: 200,
     marginBottom: 20,
   },
   banner: {
     width: '100%',
     height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
+  },
+  profilePicture: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    overflow: 'hidden',
+    marginBottom: 20,
+  },
+  profileImage: {
+    borderRadius: 60, // Ensures the image is circular
   },
   overlay: {
-    backgroundColor: 'rgba(128, 128, 128, 0.5)',
-    width: '100%',
-    height: '100%',
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  profileOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    borderRadius: 60, // Circular overlay
   },
   contentContainer: {
     width: '100%',
-    alignItems: 'center',
     paddingHorizontal: 20,
-  },
-  profilePicture: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    marginBottom: 10,
-    overflow: 'hidden',
-  },
-  profilePictureImage: {
-    borderRadius: 50,
+    alignItems: 'center',
   },
   usernameContainer: {
     flexDirection: 'row',
@@ -455,23 +453,27 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginLeft: 5,
   },
-  input: {
+  inputContainer: {
     width: '100%',
-    padding: 10,
-    paddingLeft: 15,
+    marginBottom: 20,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 5,
+  },
+  textInput: {
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 10,
-    marginBottom: 20,
+    padding: 10,
+    width: '100%',
   },
   saveButton: {
-    backgroundColor: '#00137F',
-    paddingVertical: 7,
-    paddingHorizontal: 18,
-    borderRadius: 50,
+    marginRight: 10,
   },
   saveButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
+    color: '#007BFF',
+    fontSize: 16,
   },
 });

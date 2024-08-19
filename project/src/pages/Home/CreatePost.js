@@ -84,7 +84,7 @@ const CreatePost = ({route, navigation}) => {
         const uris = response.assets.map(asset => asset.uri);
         const types = response.assets.map(asset => asset.type);
         setSelectedMedia(prevMedia => [...prevMedia, ...uris]);
-        setMediaType(types[0] || 'photo'); 
+        setMediaType(types[0] || 'photo');
       }
     });
   };
