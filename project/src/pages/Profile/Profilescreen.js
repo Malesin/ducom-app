@@ -58,11 +58,13 @@ export default function Profilescreen() {
     }
   }
   
-  useFocusEffect(
-    React.useCallback(() => {
+  useEffect(() => {
+    const intervalId = setInterval(() => {
       getData();
-    }, [])
-  );
+    }, 10000);
+    return () => clearInterval(intervalId);
+  }, []);
+  
 
   // Define the source for the profile image
   const profileImageSource = require('../../assets/profilepic.png');
