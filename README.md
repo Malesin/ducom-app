@@ -30,3 +30,5 @@ This is a React Native project built using [React Native](https://reactnative.de
    ```bash
    git clone https://github.com/your-username/your-repo.git
    cd your-repo
+   npm uninstall react-native-pager-view
+   npm install react-native-pager-view@6.3.0 --save 
