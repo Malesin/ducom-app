@@ -201,32 +201,31 @@ const styles = StyleSheet.create({
   userInfo: {
     flexDirection: 'row',
     alignItems: 'center',
-    position: 'relative',
   },
   avatar: {
-    width: 48,
-    height: 48,
+    width: 52,
+    height: 49,
     borderRadius: 24,
     marginRight: 12,
   },
   userDetails: {
-    flex: 1,
-  },
-  userName: {
-    fontWeight: 'bold',
-    color: '#040608',
-  },
-  userHandle: {
-    color: '#00c5ff',
-  },
-  optionsContainer: {
-    position: 'absolute',
-    right: 0,
     flexDirection: 'row',
     alignItems: 'center',
   },
-  optionsButton: {
-    marginLeft: 10,
+  userName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#040608',
+    marginRight: 4,
+  },
+  userHandle: {
+    color: '#718096',
+    fontWeight: '700',
+    marginRight: 8,
+  },
+  postDate: {
+    color: '#718096',
+    fontSize: 12,
   },
   tweetText: {
     fontSize: 15,
@@ -239,24 +238,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginVertical: 8,
   },
-  videoContainer: {
-    width: '100%',
-    height: 200,
-    borderRadius: 8,
-    overflow: 'hidden',
-    marginVertical: 8,
-    position: 'relative', // Ensure ActivityIndicator is positioned correctly
-  },
-  video: {
-    width: '100%',
-    height: '100%',
-  },
-  videoLoader: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: [{translateX: -25}, {translateY: -25}],
-  },
   actions: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -268,6 +249,15 @@ const styles = StyleSheet.create({
   actionText: {
     marginLeft: 4,
     color: '#040608',
+  },
+  optionsContainer: {
+    position: 'absolute',
+    right: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  optionsButton: {
+    marginLeft: 10,
   },
   modalBackground: {
     flex: 1,
@@ -285,6 +275,24 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     resizeMode: 'contain',
+  },
+  videoContainer: {
+    width: '100%',
+    height: 200,
+    borderRadius: 8,
+    overflow: 'hidden',
+    marginVertical: 8,
+    position: 'relative',
+  },
+  video: {
+    width: '100%',
+    height: '100%',
+  },
+  videoLoader: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: [{translateX: -25}, {translateY: -25}],
   },
 });
 

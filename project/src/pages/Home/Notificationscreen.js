@@ -11,7 +11,8 @@ const Notificationscreen = () => {
       userName: 'John Doe',
       userHandle: 'johndoe',
       content: 'This is a sample mention content. #example',
-      image: 'https://i.pinimg.com/564x/12/ee/2c/12ee2c54d0ff28cf57df7890c447abf8.jpg',
+      image:
+        'https://i.pinimg.com/564x/12/ee/2c/12ee2c54d0ff28cf57df7890c447abf8.jpg',
       video: '',
       likesCount: 10,
       bookMarksCount: 5,

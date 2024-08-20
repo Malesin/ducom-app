@@ -10,6 +10,7 @@ import {
   Modal,
   TouchableOpacity,
   Alert,
+  Animated, // Import Animated from react-native
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {Button} from 'react-native-elements';
@@ -24,6 +25,7 @@ const CreatePost = ({route, navigation}) => {
   const [previewVisible, setPreviewVisible] = useState(false);
   const [previewMedia, setPreviewMedia] = useState(null);
   const [mediaType, setMediaType] = useState(null);
+  const [translateY] = useState(new Animated.Value(500)); // Initial position
 
   const profilePictureUri = require('../../assets/profilepic.png');
 
@@ -36,6 +38,15 @@ const CreatePost = ({route, navigation}) => {
       setMediaType(route.params.mediaType);
     }
   }, [route.params?.mediaUri, route.params?.mediaType]);
+
+  useEffect(() => {
+    Animated.spring(translateY, {
+      toValue: 0,
+      friction: 8, // Adjust friction for the bounciness effect
+      tension: 40, // Adjust tension for the speed of the animation
+      useNativeDriver: true,
+    }).start();
+  }, [translateY]);
 
   const handlePostSubmit = () => {
     navigation.navigate('Home', {
@@ -69,7 +80,7 @@ const CreatePost = ({route, navigation}) => {
 
   const handleOpenCamera = () => {
     const options = {
-      mediaType: 'mixed', // Atau 'video' untuk hanya merekam video
+      mediaType: 'mixed',
       saveToPhotos: true,
     };
 
@@ -108,7 +119,7 @@ const CreatePost = ({route, navigation}) => {
           }
         }
       }
-    }); 
+    });
   };
 
   const handleOpenGallery = () => {
@@ -199,7 +210,8 @@ const CreatePost = ({route, navigation}) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.contentContainer}>
+      <Animated.View
+        style={[styles.contentContainer, {transform: [{translateY}]}]}>
         <View style={styles.inputContainer}>
           <Image source={profilePictureUri} style={styles.profilePicture} />
           <TextInput
@@ -233,7 +245,7 @@ const CreatePost = ({route, navigation}) => {
             />
           )}
         </View>
-      </View>
+      </Animated.View>
 
       {previewMedia && (
         <Modal
