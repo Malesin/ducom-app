@@ -55,13 +55,12 @@ export default function Profilescreen() {
       console.error("Error occurred:", error);
     }
   }
-
-  useEffect(() => {
-    const intervalId = setInterval(() => {
+  
+  useFocusEffect(
+    React.useCallback(() => {
       getData();
-    }, 10000);
-    return () => clearInterval(intervalId);
-  }, []);
+    }, [])
+  );
 
   // Define the source for the profile image
   const profileImageSource = require('../../assets/profilepic.png');
