@@ -13,7 +13,11 @@ import {useNavigation} from '@react-navigation/native';
 import {SafeAreaView} from 'react-native';
 import {Skeleton} from 'react-native-elements';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import Toast from 'react-native-toast-message';
+import {
+  ALERT_TYPE,
+  Dialog,
+  AlertNotificationRoot,
+} from 'react-native-alert-notification';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ImagePicker from 'react-native-image-crop-picker';
 import axios from 'axios';
@@ -48,23 +52,17 @@ export default function EditProfilePage() {
       setUsername(user.username);
 
       if (user.bannerPicture) {
-        const bannerResponse = await axios.post(
-          `${serverUrl}/get-image-banner/${user.bannerPicture}`,
-        );
-        console.log('Image Banner Retrieved Successfully');
         setBanner({
-          uri: `data:image/jpeg;base64,${bannerResponse.data.data.imageBase64}`,
+          uri: `${user.bannerPicture}`,
         });
+        console.log('Image Banner Retrieved Successfully');
       }
 
       if (user.profilePicture) {
-        const profileResponse = await axios.post(
-          `${serverUrl}/get-image-profile/${user.profilePicture}`,
-        );
-        console.log('Image Profile Retrieved Successfully');
         setProfilePicture({
-          uri: `data:image/jpeg;base64,${profileResponse.data.data.imageBase64}`,
+          uri: `${user.profilePicture}`,
         });
+        console.log('Image Profile Retrieved Successfully');
       }
     } catch (error) {
       console.error('Error occurred:', error);
@@ -91,12 +89,12 @@ export default function EditProfilePage() {
       e.preventDefault();
       Alert.alert('Konfirmasi', 'Apakah anda ingin membatalkan perubahan?', [
         {
-          text: 'Tidak',
+          text: 'No',
           style: 'cancel',
           onPress: () => {},
         },
         {
-          text: 'Ya',
+          text: 'Yes',
           onPress: () => {
             setUsername(userData?.username);
             setName(userData?.name);
@@ -113,7 +111,7 @@ export default function EditProfilePage() {
   navigation.setOptions({
     headerRight: () => (
       <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-        <Text style={styles.saveButtonText}>Save</Text>
+        <Text style={styles.saveButtonText}> Save </Text>
       </TouchableOpacity>
     ),
   });
@@ -124,23 +122,23 @@ export default function EditProfilePage() {
     Alert.alert('Confirmation', 'Do you want to save the changes?', [
       {text: 'No', style: 'cancel', onPress: () => setIsSaving(false)},
       {
-        text: 'Ya',
+        text: 'Yes',
         style: 'default',
         onPress: async () => {
           try {
             if (!username) {
-              Toast.show({
-                type: 'error',
-                text1: 'Invalid username',
-                text2: 'Username cannot be empty!',
+              Dialog.show({
+                type: ALERT_TYPE.DANGER,
+                title: 'Invalid username',
+                textBody: 'Username cannot be empty!',
               });
               return;
             } else if (!validateUsername(username)) {
-              Toast.show({
-                type: 'error',
-                text1: 'Username tidak valid',
-                text2:
-                  '4-15 karakter, hanya huruf kecil dan angka tanpa spasi.',
+              Dialog.show({
+                type: ALERT_TYPE.DANGER,
+                title: 'Invalid Username',
+                textBody:
+                  '4-15 characters, only lowercase letters and numbers without spaces.',
               });
               return;
             }
@@ -159,10 +157,10 @@ export default function EditProfilePage() {
               );
               if (checkUsernameResponse.data.status === 'error') {
                 setIsSaving(false);
-                Toast.show({
-                  type: 'error',
-                  text1: 'Error',
-                  text2: 'Username sudah ada!',
+                Dialog.show({
+                  type: ALERT_TYPE.DANGER,
+                  title: 'Error',
+                  textBody: 'Username already exist!',
                 });
                 return;
               }
@@ -221,22 +219,23 @@ export default function EditProfilePage() {
             );
 
             if (response.data.status === 'update') {
-              Toast.show({
-                type: 'success',
-                text1: 'Success',
-                text2: 'Updated Successfully!',
+              Dialog.show({
+                type: ALERT_TYPE.SUCCESS,
+                title: 'Success',
+                textBody: 'Updated Successfully!',
                 onHide: () => {
                   setTimeout(() => {
+                    Dialog.hide();
                     navigation.goBack();
-                  }, 1000);
+                  }, 1000); // Delay 1 second before hiding the dialog and navigating back
                 },
               });
             } else {
               setIsSaving(false);
-              Toast.show({
-                type: 'error',
-                text1: 'Error',
-                text2: 'Terjadi kesalahan. Silakan coba lagi nanti.',
+              Dialog.show({
+                type: ALERT_TYPE.DANGER,
+                title: 'Error',
+                textBody: 'An Error Occured. Please Try Again Later.',
               });
             }
           } catch (error) {
@@ -251,8 +250,12 @@ export default function EditProfilePage() {
 
   const selectImageProfile = () => {
     ImagePicker.openPicker({
+      width: 400,
+      height: 400,
       cropping: true,
       mediaType: 'photo',
+      cropperCircleOverlay: true,
+      avoidEmptySpaceAroundImage: true,
     })
       .then(image => {
         setNewProfileImage(image); // Store the image temporarily
@@ -265,8 +268,11 @@ export default function EditProfilePage() {
 
   const selectImageBanner = () => {
     ImagePicker.openPicker({
+      width: 1600,
+      height: 900,
       cropping: true,
       mediaType: 'photo',
+      avoidEmptySpaceAroundImage: true,
     })
       .then(image => {
         setNewBannerImage(image); // Store the image temporarily
@@ -278,106 +284,115 @@ export default function EditProfilePage() {
   };
 
   return (
-    <SafeAreaView style={{flex: 1}}>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.bannerContainer}>
-          {isLoading ? (
-            <Skeleton containerStyle={styles.banner} animation="wave" />
-          ) : (
-            <TouchableOpacity onPress={selectImageBanner}>
-              <ImageBackground
-                source={banner || require('../../assets/banner.png')}
-                style={styles.banner}
-                resizeMode="cover">
-                <View style={styles.overlay}>
-                  <MaterialCommunityIcons
-                    name="camera"
-                    size={50}
-                    color="#fff"
-                  />
-                </View>
-              </ImageBackground>
-            </TouchableOpacity>
-          )}
-        </View>
-
-        <View style={styles.contentContainer}>
-          {isLoading ? (
-            <Skeleton containerStyle={styles.profilePicture} animation="wave" />
-          ) : (
-            <TouchableOpacity onPress={selectImageProfile}>
-              <ImageBackground
-                source={
-                  profilePicture || require('../../assets/profilepic.png')
-                }
-                style={styles.profilePicture}
-                imageStyle={styles.profileImage}
-                resizeMode="cover">
-                <View style={styles.profileOverlay}>
-                  <MaterialCommunityIcons
-                    name="camera"
-                    size={30}
-                    color="#fff"
-                  />
-                </View>
-              </ImageBackground>
-            </TouchableOpacity>
-          )}
-
-          <View style={styles.usernameContainer}>
-            <View style={styles.usernameInputContainer}>
-              <Text style={styles.usernameStatic}>@</Text>
-              {isLoading ? (
-                <Skeleton height={20} width={100} animation="wave" />
-              ) : isEditing ? (
-                <TextInput
-                  style={styles.usernameInput}
-                  value={username}
-                  onChangeText={text => setUsername(text)}
-                  onBlur={() => setIsEditing(false)}
-                  autoFocus
-                />
-              ) : (
-                <Text style={styles.username}>{username}</Text>
-              )}
-            </View>
-            {!isLoading && (
-              <TouchableOpacity onPress={() => setIsEditing(true)}>
-                <MaterialCommunityIcons name="pencil" size={17} color="#000" />
+    <AlertNotificationRoot>
+      <SafeAreaView style={{flex: 1}}>
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+          <View style={styles.bannerContainer}>
+            {isLoading ? (
+              <Skeleton containerStyle={styles.banner} animation="wave" />
+            ) : (
+              <TouchableOpacity onPress={selectImageBanner}>
+                <ImageBackground
+                  source={banner || require('../../assets/banner.png')}
+                  style={styles.banner}
+                  resizeMode="cover">
+                  <View style={styles.overlay}>
+                    <MaterialCommunityIcons
+                      name="camera"
+                      size={50}
+                      color="#fff"
+                    />
+                  </View>
+                </ImageBackground>
               </TouchableOpacity>
             )}
           </View>
 
-          <View style={styles.inputContainer}>
-            <TextInput
-              value={name}
-              onChangeText={setName}
-              style={styles.textInput}
-              placeholder={userData?.name}
-            />
-          </View>
+          <View style={styles.contentContainer}>
+            {isLoading ? (
+              <Skeleton
+                containerStyle={styles.profilePicture}
+                animation="wave"
+              />
+            ) : (
+              <TouchableOpacity onPress={selectImageProfile}>
+                <ImageBackground
+                  source={
+                    profilePicture || require('../../assets/profilepic.png')
+                  }
+                  style={styles.profilePicture}
+                  imageStyle={styles.profileImage}
+                  resizeMode="cover">
+                  <View style={styles.profileOverlay}>
+                    <MaterialCommunityIcons
+                      name="camera"
+                      size={30}
+                      color="#fff"
+                    />
+                  </View>
+                </ImageBackground>
+              </TouchableOpacity>
+            )}
 
-          <View style={styles.inputContainer}>
-            <TextInput
-              value={bio}
-              onChangeText={setBio}
-              style={styles.textInput}
-              placeholder={userData?.bio || 'Bio'}
-              multiline
-              maxLength={150}
-            />
-          </View>
+            <View style={styles.usernameContainer}>
+              <View style={styles.usernameInputContainer}>
+                <Text style={styles.usernameStatic}> @</Text>
+                {isLoading ? (
+                  <Skeleton height={20} width={100} animation="wave" />
+                ) : isEditing ? (
+                  <TextInput
+                    style={styles.usernameInput}
+                    value={username}
+                    onChangeText={text => setUsername(text)}
+                    onBlur={() => setIsEditing(false)}
+                    autoFocus
+                  />
+                ) : (
+                  <Text style={styles.username}> {username} </Text>
+                )}
+              </View>
+              {!isLoading && (
+                <TouchableOpacity onPress={() => setIsEditing(true)}>
+                  <MaterialCommunityIcons
+                    name="pencil"
+                    size={17}
+                    color="#000"
+                  />
+                </TouchableOpacity>
+              )}
+            </View>
 
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.textInput}
-              placeholder={userData?.email}
-              editable={false}
-            />
+            <View style={styles.inputContainer}>
+              <TextInput
+                value={name}
+                onChangeText={setName}
+                style={styles.textInput}
+                placeholder={userData?.name}
+              />
+            </View>
+
+            <View style={styles.inputContainer}>
+              <TextInput
+                value={bio}
+                onChangeText={setBio}
+                style={styles.textInput}
+                placeholder={userData?.bio || 'Bio'}
+                multiline
+                maxLength={150}
+              />
+            </View>
+
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.textInput}
+                placeholder={userData?.email}
+                editable={false}
+              />
+            </View>
           </View>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+        </ScrollView>
+      </SafeAreaView>
+    </AlertNotificationRoot>
   );
 }
 
@@ -470,10 +485,13 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   saveButton: {
-    marginRight: 10,
+    backgroundColor: '#00137F',
+    paddingVertical: 7,
+    paddingHorizontal: 18,
+    borderRadius: 50,
   },
   saveButtonText: {
-    color: '#007BFF',
-    fontSize: 16,
+    color: '#fff',
+    fontWeight: 'bold',
   },
 });
