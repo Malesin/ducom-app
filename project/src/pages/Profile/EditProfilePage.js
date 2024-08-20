@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -9,9 +9,9 @@ import {
   ScrollView,
   Alert,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { SafeAreaView } from 'react-native';
-import { Skeleton } from 'react-native-elements';
+import {useNavigation} from '@react-navigation/native';
+import {SafeAreaView} from 'react-native';
+import {Skeleton} from 'react-native-elements';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
   ALERT_TYPE,
@@ -91,7 +91,7 @@ export default function EditProfilePage() {
         {
           text: 'No',
           style: 'cancel',
-          onPress: () => { },
+          onPress: () => {},
         },
         {
           text: 'Yes',
@@ -120,7 +120,7 @@ export default function EditProfilePage() {
     setIsSaving(true);
 
     Alert.alert('Confirmation', 'Do you want to save the changes?', [
-      { text: 'No', style: 'cancel', onPress: () => setIsSaving(false) },
+      {text: 'No', style: 'cancel', onPress: () => setIsSaving(false)},
       {
         text: 'Yes',
         style: 'default',
@@ -144,7 +144,7 @@ export default function EditProfilePage() {
             }
 
             const token = await AsyncStorage.getItem('token');
-            const updatedUserData = { token: token };
+            const updatedUserData = {token: token};
 
             if (name && name !== userData?.name) {
               updatedUserData.name = name;
@@ -153,7 +153,7 @@ export default function EditProfilePage() {
             if (username && username !== userData?.username) {
               const checkUsernameResponse = await axios.post(
                 `${serverUrl}/check-username`,
-                { username },
+                {username},
               );
               if (checkUsernameResponse.data.status === 'error') {
                 setIsSaving(false);

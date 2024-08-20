@@ -4,7 +4,8 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { Image, StyleSheet, View, Text } from 'react-native';
 import { Profilescreen, Notificationscreen } from '../pages';
 import DrawerNavigator from './DrawerNavigator';
-import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../config';
@@ -35,23 +36,21 @@ function BottomTabNavigator() {
 
       if (user.profilePicture) {
         setProfilePicture({
-          uri: `${user.profilePicture}`,
+          uri: `${user.profilePicture}
         });
         console.log('Image Profile Retrieved Successfully');
       }
+
     } catch (error) {
       console.error('Error occurred:', error);
     }
   }
 
-  useEffect(() => {
-    const intervalId = setInterval(() => {
+  useFocusEffect(
+    React.useCallback(() => {
       getData();
-    }, 10000);
-
-    return () => clearInterval(intervalId);
-  }, []);
-
+    }, [])
+  );
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
