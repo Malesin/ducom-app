@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import React, {useState, useEffect} from 'react';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { Image, StyleSheet, View, Text } from 'react-native';
 import { Profilescreen, Notificationscreen } from '../pages';
@@ -36,7 +36,7 @@ function BottomTabNavigator() {
 
       if (user.profilePicture) {
         setProfilePicture({
-          uri: `${user.profilePicture}`
+          uri: `${user.profilePicture}
         });
         console.log('Image Profile Retrieved Successfully');
       }
@@ -74,7 +74,7 @@ function BottomTabNavigator() {
               return (
                 <Image
                   source={profilePicture || profileImage}
-                  style={[styles.icon, { tintColor: undefined }]}
+                  style={[styles.icon, {tintColor: undefined}]}
                 />
               );
             }

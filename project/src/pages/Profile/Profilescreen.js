@@ -10,7 +10,7 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import config from '../../config';
@@ -29,11 +29,13 @@ export default function Profilescreen() {
   async function getData() {
     try {
       const token = await AsyncStorage.getItem('token');
-      console.log("Token Retrieved Successfully");
+      console.log('Token Retrieved Successfully');
 
       // Ambil data pengguna
-      const userResponse = await axios.post(`${serverUrl}/userdata`, { token: token });
-      console.log("Data Retrieved Successfully");
+      const userResponse = await axios.post(`${serverUrl}/userdata`, {
+        token: token,
+      });
+      console.log('Data Retrieved Successfully', userResponse.data);
 
       const user = userResponse.data.data;
       setUserData(user);
@@ -52,7 +54,7 @@ export default function Profilescreen() {
         console.log('Image Profile Retrieved Successfully');
       }
     } catch (error) {
-      console.error("Error occurred:", error);
+      console.error('Error occurred:', error);
     }
   }
   
@@ -82,16 +84,18 @@ export default function Profilescreen() {
           source={banner || require('../../assets/banner.png')}
           style={styles.banner}
         />
-        <TouchableOpacity style={styles.settingsButton} onPress={() => { }}>
+        <TouchableOpacity style={styles.settingsButton} onPress={() => {}}>
           <MaterialCommunityIcons name="dots-vertical" size={30} color="#000" />
         </TouchableOpacity>
       </View>
       <View style={styles.profileContainer}>
         <TouchableOpacity onPress={openModal}>
-          <Image source={profilePicture || profileImageSource} style={styles.profile} />
+          <Image
+            source={profilePicture || profileImageSource}
+            style={styles.profile}
+          />
         </TouchableOpacity>
         <View style={styles.profileText}>
-          {/* Show skeleton while userData is null */}
           {!userData ? (
             <>
               <Skeleton
@@ -136,7 +140,6 @@ export default function Profilescreen() {
         </View>
       </View>
 
-      {/* Modal for image preview */}
       <Modal
         visible={modalVisible}
         transparent
