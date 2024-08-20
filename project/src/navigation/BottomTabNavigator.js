@@ -1,8 +1,8 @@
 import React, {useState, useEffect} from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import {Image, StyleSheet, View, Text} from 'react-native';
-import {Profilescreen, Notificationscreen} from '../pages';
+import { Image, StyleSheet, View, Text } from 'react-native';
+import { Profilescreen, Notificationscreen } from '../pages';
 import DrawerNavigator from './DrawerNavigator';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -11,6 +11,7 @@ import config from '../config';
 const serverUrl = config.SERVER_URL;
 
 import TopTabNavigator from './TopTabNavigator';
+
 
 import profileImage from './../assets/profilepic.png';
 
@@ -51,11 +52,12 @@ function BottomTabNavigator() {
     return () => clearInterval(intervalId);
   }, []);
 
+
   return (
-    <GestureHandlerRootView style={{flex: 1}}>
+    <GestureHandlerRootView style={{ flex: 1 }}>
       <Tab.Navigator
-        screenOptions={({route}) => ({
-          tabBarIcon: ({color}) => {
+        screenOptions={({ route }) => ({
+          tabBarIcon: ({ color }) => {
             let iconName;
             const iconSize = 30;
 
