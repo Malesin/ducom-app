@@ -1,7 +1,7 @@
 import React from 'react';
 import {createDrawerNavigator} from '@react-navigation/drawer';
 import {Image, StyleSheet, View, SafeAreaView} from 'react-native';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons'; 
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {Homescreen, FAQscreen, Marksscreen, Settingsscreen} from '../pages';
 
 // Import the logo image
@@ -20,22 +20,22 @@ const DrawerNavigator = () => {
             </View>
           ),
           headerStyle: {
-            backgroundColor: '#fff', 
-            borderBottomWidth: 1, 
-            borderBottomColor: '#e1e8ed', 
+            backgroundColor: '#fff',
+            borderBottomWidth: 1,
+            borderBottomColor: '#e1e8ed',
           },
-          headerTintColor: '#000', 
-          headerTitleAlign: 'center', 
+          headerTintColor: '#000',
+          headerTitleAlign: 'center',
           drawerStyle: {
-            backgroundColor: '#fff', 
+            backgroundColor: '#fff',
           },
-          drawerActiveTintColor: 'black', 
-          drawerInactiveTintColor: 'gray', 
+          drawerActiveTintColor: 'black',
+          drawerInactiveTintColor: 'gray',
           drawerItemStyle: {
-            color: 'black', 
+            color: 'black',
           },
           drawerIcon: ({color, size, focused}) => ({
-            color: 'black', 
+            color: 'black',
           }),
         }}>
         <Drawer.Screen
@@ -87,11 +87,14 @@ const styles = StyleSheet.create({
   headerTitleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%', // Ensure the container takes full width
+    paddingHorizontal: 20, // Add padding if needed
   },
   logo: {
-    width: 160, 
-    height: 60, 
-    resizeMode: 'contain', 
+    width: 150, // Increase the width of the logo to make it larger
+    height: 50, // Increase the height of the logo to maintain aspect ratio
+    resizeMode: 'contain',
   },
 });
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   SafeAreaView,
   View,
@@ -10,7 +10,7 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import config from '../../config';
@@ -29,36 +29,42 @@ export default function Profilescreen() {
   async function getData() {
     try {
       const token = await AsyncStorage.getItem('token');
-      console.log("Token Retrieved Successfully");
+      console.log('Token Retrieved Successfully');
 
       // Ambil data pengguna
-      const userResponse = await axios.post(`${serverUrl}/userdata`, { token: token });
-      console.log("Data Retrieved Successfully");
+      const userResponse = await axios.post(`${serverUrl}/userdata`, {
+        token: token,
+      });
+      console.log('Data Retrieved Successfully', userResponse.data);
 
       const user = userResponse.data.data;
       setUserData(user);
 
-      // Ambil gambar banner hanya jika ada data bannerPicture
       if (user.bannerPicture) {
-        const bannerResponse = await axios.post(`${serverUrl}/get-image-banner/${user.bannerPicture}`);
-        console.log("Image Banner Retrieved Successfully");
-        setBanner({ uri: `data:image/jpeg;base64,${bannerResponse.data.data.imageBase64}` });
+        setBanner({
+          uri: `${user.bannerPicture}`,
+        });
+        console.log('Image Banner Retrieved Successfully');
       }
 
       if (user.profilePicture) {
-        const profileResponse = await axios.post(`${serverUrl}/get-image-profile/${user.profilePicture}`);
-        console.log("Image Profile Retrieved Successfully");
-        setProfilePicture({ uri: `data:image/jpeg;base64,${profileResponse.data.data.imageBase64}` });
+        setProfilePicture({
+          uri: `${user.profilePicture}`,
+        });
+        console.log('Image Profile Retrieved Successfully');
       }
     } catch (error) {
-      console.error("Error occurred:", error);
+      console.error('Error occurred:', error);
     }
   }
-  useFocusEffect(
-    React.useCallback(() => {
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
       getData();
-    }, []),
-  );
+    }, 10000);
+    return () => clearInterval(intervalId);
+  }, []);
+
   // Define the source for the profile image
   const profileImageSource = require('../../assets/profilepic.png');
 
@@ -79,16 +85,18 @@ export default function Profilescreen() {
           source={banner || require('../../assets/banner.png')}
           style={styles.banner}
         />
-        <TouchableOpacity style={styles.settingsButton} onPress={() => { }}>
+        <TouchableOpacity style={styles.settingsButton} onPress={() => {}}>
           <MaterialCommunityIcons name="dots-vertical" size={30} color="#000" />
         </TouchableOpacity>
       </View>
       <View style={styles.profileContainer}>
         <TouchableOpacity onPress={openModal}>
-          <Image source={profilePicture || profileImageSource} style={styles.profile} />
+          <Image
+            source={profilePicture || profileImageSource}
+            style={styles.profile}
+          />
         </TouchableOpacity>
         <View style={styles.profileText}>
-          {/* Show skeleton while userData is null */}
           {!userData ? (
             <>
               <Skeleton
@@ -133,7 +141,6 @@ export default function Profilescreen() {
         </View>
       </View>
 
-      {/* Modal for image preview */}
       <Modal
         visible={modalVisible}
         transparent

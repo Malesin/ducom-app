@@ -197,7 +197,6 @@ const RegisterScreen = ({ navigation }) => {
         <TextInput
           style={[styles.input, errors.email ? styles.errorInput : null]}
           onChangeText={text => setEmail(text)}
-          onFocus={showEmailWarning} // Show warning when input is focused
           value={email}
           placeholder="Email"
           keyboardType="email-address"

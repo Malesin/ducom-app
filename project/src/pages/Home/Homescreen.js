@@ -46,9 +46,9 @@ const HomeScreen = ({navigation}) => {
         'https://i.pinimg.com/474x/21/dc/e9/21dce97c3191b81ed92b56a9492ceac7.jpg',
       userName: 'frontendgariskeras',
       userHandle: 'frontend',
-      content: 'nyoride',
+      content: 'go fast or go home',
       image:
-        'https://i.pinimg.com/474x/97/02/f6/9702f6e58679186bd95c4eb454899032.jpg', // Example image URL
+        'https://i.pinimg.com/564x/8d/ed/4d/8ded4df85951aa1e0a7e68ef78581a35.jpg', // Example image URL
       likesCount: 30,
       commentsCount: 10,
       bookMarksCount: 8,
