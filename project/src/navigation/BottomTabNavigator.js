@@ -36,7 +36,8 @@ function BottomTabNavigator() {
 
       if (user.profilePicture) {
         setProfilePicture({
-          uri: `${user.profilePicture}
+          uri: `${user.profilePicture}`
+        
         });
         console.log('Image Profile Retrieved Successfully');
       }
@@ -46,11 +47,9 @@ function BottomTabNavigator() {
     }
   }
 
-  useFocusEffect(
-    React.useCallback(() => {
-      getData();
-    }, [])
-  );
+  useEffect(() => {
+    getData();
+  }, [])
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>

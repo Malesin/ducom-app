@@ -58,11 +58,10 @@ export default function Profilescreen() {
     }
   }
   
-  useFocusEffect(
-    React.useCallback(() => {
-      getData();
-    }, [])
-  );
+  useEffect(() => {
+    getData();
+  }, [])
+  
 
   // Define the source for the profile image
   const profileImageSource = require('../../assets/profilepic.png');
