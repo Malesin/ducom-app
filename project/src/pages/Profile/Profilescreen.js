@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   SafeAreaView,
   View,
@@ -14,7 +14,7 @@ import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import config from '../../config';
-import {Skeleton} from 'react-native-elements';
+import { Skeleton } from 'react-native-elements';
 
 const serverUrl = config.SERVER_URL;
 
@@ -38,27 +38,31 @@ export default function Profilescreen() {
       const user = userResponse.data.data;
       setUserData(user);
 
-      // Ambil gambar banner hanya jika ada data bannerPicture
       if (user.bannerPicture) {
-        const bannerResponse = await axios.post(`${serverUrl}/get-image-banner/${user.bannerPicture}`);
-        console.log("Image Banner Retrieved Successfully");
-        setBanner({ uri: `data:image/jpeg;base64,${bannerResponse.data.data.imageBase64}` });
+        setBanner({
+          uri: `${user.bannerPicture}`
+        });
+        console.log('Image Banner Retrieved Successfully');
       }
 
       if (user.profilePicture) {
-        const profileResponse = await axios.post(`${serverUrl}/get-image-profile/${user.profilePicture}`);
-        console.log("Image Profile Retrieved Successfully");
-        setProfilePicture({ uri: `data:image/jpeg;base64,${profileResponse.data.data.imageBase64}` });
+        setProfilePicture({
+          uri: `${user.profilePicture}`
+        });
+        console.log('Image Profile Retrieved Successfully');
       }
     } catch (error) {
       console.error("Error occurred:", error);
     }
   }
-  useFocusEffect(
-    React.useCallback(() => {
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
       getData();
-    }, []),
-  );
+    }, 10000);
+    return () => clearInterval(intervalId);
+  }, []);
+
   // Define the source for the profile image
   const profileImageSource = require('../../assets/profilepic.png');
 

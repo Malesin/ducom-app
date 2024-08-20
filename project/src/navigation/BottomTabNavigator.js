@@ -34,23 +34,24 @@ function BottomTabNavigator() {
       const user = userResponse.data.data;
 
       if (user.profilePicture) {
-        const profileResponse = await axios.post(
-          `${serverUrl}/get-image-profile/${user.profilePicture}`,
-        );
-        console.log('Image Profile Retrieved Successfully');
         setProfilePicture({
-          uri: `data:image/jpeg;base64,${profileResponse.data.data.imageBase64}`,
+          uri: `${user.profilePicture}`
         });
+        console.log('Image Profile Retrieved Successfully');
       }
+
     } catch (error) {
       console.error('Error occurred:', error);
     }
   }
 
   useEffect(() => {
-    getData();
-  }, []);
+    const intervalId = setInterval(() => {
+      getData();
+    }, 10000); 
 
+    return () => clearInterval(intervalId);
+  }, []); 
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
