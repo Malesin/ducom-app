@@ -74,7 +74,7 @@ export default function EditProfilePage() {
   useEffect(() => {
     const intervalId = setInterval(() => {
       getData();
-    }, 10000);
+    }, 2000);
     return () => clearInterval(intervalId);
   }, []);
 
@@ -371,6 +371,7 @@ export default function EditProfilePage() {
                 onChangeText={setName}
                 style={styles.textInput}
                 placeholder={userData?.name}
+                autoCapitalize="none"
               />
             </View>
 
@@ -380,6 +381,7 @@ export default function EditProfilePage() {
                 onChangeText={setBio}
                 style={styles.textInput}
                 placeholder={userData?.bio || 'Bio'}
+                autoCapitalize="none"
                 multiline
                 maxLength={150}
               />
