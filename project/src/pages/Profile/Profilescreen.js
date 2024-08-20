@@ -59,8 +59,11 @@ export default function Profilescreen() {
   }
   
   useEffect(() => {
-    getData();
-  }, [])
+    const intervalId = setInterval(() => {
+      getData();
+    }, 10000);
+    return () => clearInterval(intervalId);
+  }, []);
   
 
   // Define the source for the profile image

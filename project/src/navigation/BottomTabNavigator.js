@@ -48,8 +48,11 @@ function BottomTabNavigator() {
   }
 
   useEffect(() => {
-    getData();
-  }, [])
+    const intervalId = setInterval(() => {
+      getData();
+    }, 10000);
+    return () => clearInterval(intervalId);
+  }, []);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>

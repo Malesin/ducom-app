@@ -1,0 +1,3 @@
+ npm uninstall react-native-pager-view
+
+ npm uninstall react-native-pager-view --save 

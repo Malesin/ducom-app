@@ -72,7 +72,10 @@ export default function EditProfilePage() {
   }
 
   useEffect(() => {
-    getData();
+    const intervalId = setInterval(() => {
+      getData();
+    }, 10000);
+    return () => clearInterval(intervalId);
   }, []);
 
   const validateUsername = username => {
