@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import {StyleSheet, View, Dimensions} from 'react-native';
 import {
@@ -14,12 +14,21 @@ const Tab = createMaterialTopTabNavigator();
 const {height} = Dimensions.get('window');
 
 function TopTabNavigator() {
+  const [profileHeight, setProfileHeight] = useState(height * 0.4);
+
+  const handleProfileLayout = event => {
+    const {height: profileWrapperHeight} = event.nativeEvent.layout;
+    setProfileHeight(profileWrapperHeight);
+  };
+
   return (
     <GestureHandlerRootView style={styles.container}>
-      <View style={[styles.profileWrapper, {height: height * 0.45}]}>
+      <View
+        style={[styles.profileWrapper, {height: profileHeight}]}
+        onLayout={handleProfileLayout}>
         <Profilescreen />
       </View>
-      <View style={styles.navigatorWrapper}>
+      <View style={[styles.navigatorWrapper, {height: height - profileHeight}]}>
         <Tab.Navigator
           screenOptions={{
             tabBarLabelStyle: styles.tabBarLabel,
@@ -44,7 +53,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   navigatorWrapper: {
-    flex: 1, 
+    flex: 1,
   },
   tabBar: {
     backgroundColor: '#fff',

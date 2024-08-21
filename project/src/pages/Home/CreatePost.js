@@ -10,6 +10,7 @@ import {
   Modal,
   TouchableOpacity,
   Alert,
+  Animated, // Import Animated from react-native
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {Button} from 'react-native-elements';
@@ -24,17 +25,28 @@ const CreatePost = ({route, navigation}) => {
   const [previewVisible, setPreviewVisible] = useState(false);
   const [previewMedia, setPreviewMedia] = useState(null);
   const [mediaType, setMediaType] = useState(null);
+  const [translateY] = useState(new Animated.Value(500)); // Initial position
 
   const profilePictureUri = require('../../assets/profilepic.png');
 
   useEffect(() => {
     if (route.params?.mediaUri) {
-      setSelectedMedia([
-        {uri: route.params.mediaUri, thumbnailUri: route.params.thumbnailUri},
+      setSelectedMedia(prevMedia => [
+        ...prevMedia,
+        {uri: route.params.mediaUri},
       ]);
       setMediaType(route.params.mediaType);
     }
   }, [route.params?.mediaUri, route.params?.mediaType]);
+
+  useEffect(() => {
+    Animated.spring(translateY, {
+      toValue: 0,
+      friction: 8, // Adjust friction for the bounciness effect
+      tension: 40, // Adjust tension for the speed of the animation
+      useNativeDriver: true,
+    }).start();
+  }, [translateY]);
 
   const handlePostSubmit = () => {
     navigation.navigate('Home', {
@@ -85,7 +97,10 @@ const CreatePost = ({route, navigation}) => {
             try {
               await checkVideoDuration(uri);
               const thumbnailUri = await generateThumbnail(uri);
-              setSelectedMedia([{uri, thumbnailUri}]);
+              setSelectedMedia(prevMedia => [
+                ...prevMedia,
+                {uri, thumbnailUri},
+              ]);
               setMediaType(mediaType);
               console.log('Captured video URI:', uri);
               navigation.navigate('CreatePost', {
@@ -97,7 +112,7 @@ const CreatePost = ({route, navigation}) => {
               Alert.alert('Video Upload Error', error.message);
             }
           } else {
-            setSelectedMedia([{uri}]);
+            setSelectedMedia(prevMedia => [...prevMedia, {uri}]);
             setMediaType(mediaType);
             console.log('Captured photo URI:', uri);
             navigation.navigate('CreatePost', {mediaUri: uri, mediaType});
@@ -123,18 +138,22 @@ const CreatePost = ({route, navigation}) => {
             const thumbnailUris = await Promise.all(
               uris.map(uri => generateThumbnail(uri)),
             );
-            setSelectedMedia(
-              uris.map((uri, index) => ({
+            setSelectedMedia(prevMedia => [
+              ...prevMedia,
+              ...uris.map((uri, index) => ({
                 uri,
                 thumbnailUri: thumbnailUris[index],
               })),
-            );
+            ]);
             setMediaType(types[0] || 'photo');
           } catch (error) {
             Alert.alert('Video Upload Error', error.message);
           }
         } else {
-          setSelectedMedia(uris.map(uri => ({uri})));
+          setSelectedMedia(prevMedia => [
+            ...prevMedia,
+            ...uris.map(uri => ({uri})),
+          ]);
           setMediaType(types[0] || 'photo');
         }
       }
@@ -158,19 +177,13 @@ const CreatePost = ({route, navigation}) => {
     return (
       <View key={index} style={styles.mediaContainer}>
         <TouchableOpacity onPress={() => handleMediaPress(media.uri)}>
-          {media.uri.endsWith('.mp4') && media.thumbnailUri ? (
-            <Image source={{uri: media.thumbnailUri}} style={styles.media} />
-          ) : (
-            <Image source={{uri: media.uri}} style={styles.media} />
-          )}
+          <Image source={{uri: media.uri}} style={styles.media} />
         </TouchableOpacity>
-        {media.uri.endsWith('.mp4') && (
-          <TouchableOpacity
-            style={styles.removeButton}
-            onPress={() => removeMedia(media.uri)}>
-            <Icon name="close" size={24} color="#fff" />
-          </TouchableOpacity>
-        )}
+        <TouchableOpacity
+          style={styles.removeButton}
+          onPress={() => removeMedia(media.uri)}>
+          <Icon name="close" size={24} color="#fff" />
+        </TouchableOpacity>
       </View>
     );
   };
@@ -197,7 +210,8 @@ const CreatePost = ({route, navigation}) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.contentContainer}>
+      <Animated.View
+        style={[styles.contentContainer, {transform: [{translateY}]}]}>
         <View style={styles.inputContainer}>
           <Image source={profilePictureUri} style={styles.profilePicture} />
           <TextInput
@@ -231,7 +245,7 @@ const CreatePost = ({route, navigation}) => {
             />
           )}
         </View>
-      </View>
+      </Animated.View>
 
       {previewMedia && (
         <Modal
@@ -314,36 +328,32 @@ const styles = StyleSheet.create({
   },
   postButton: {
     backgroundColor: '#001374',
-    borderRadius: 50,
-    height: 40,
-    width: 75,
-    justifyContent: 'center',
-    alignItems: 'center',
+    borderRadius: 20,
+    paddingHorizontal: 16,
   },
   modalContainer: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.9)',
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.8)',
   },
   closeButton: {
     position: 'absolute',
     top: 40,
     right: 20,
-    zIndex: 1,
   },
   fullScreenMedia: {
-    width: '100%',
-    height: '80%',
-    resizeMode: 'contain',
+    width: '90%',
+    height: '70%',
+    borderRadius: 8,
   },
   removeButton: {
     position: 'absolute',
-    top: 5,
-    right: 5,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    borderRadius: 50,
-    padding: 5,
+    top: 4,
+    right: 4,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    borderRadius: 20,
+    padding: 4,
   },
 });
 

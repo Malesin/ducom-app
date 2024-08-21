@@ -4,6 +4,7 @@ import {
   View,
   TextInput,
   TouchableOpacity,
+  useColorScheme,
 } from 'react-native';
 import React, {useState, useEffect} from 'react';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -16,10 +17,12 @@ const serverUrl = config.SERVER_URL;
 const Signinscreen = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isChecked, setIsChecked] = useState(false); // State for checkbox
-  const [showPassword, setShowPassword] = useState(false); // State for showing password
+  const [isChecked, setIsChecked] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
+
+  const colorScheme = useColorScheme(); // Detect light or dark mode
 
   useEffect(() => {
     const checkLoginStatus = async () => {
@@ -65,7 +68,7 @@ const Signinscreen = ({navigation}) => {
               onHide: () => {
                 setTimeout(() => {
                   navigation.navigate('Home');
-                }, 1000); // Delay 1 detik sebelum navigasi
+                }, 1000);
               },
             });
 
@@ -78,7 +81,7 @@ const Signinscreen = ({navigation}) => {
               onHide: () => {
                 setTimeout(() => {
                   navigation.navigate('Signin');
-                }, 1000); // Delay 1 detik sebelum navigasi
+                }, 1000);
               },
             });
           } else if (res.data.status === 'errorPass') {
@@ -89,7 +92,7 @@ const Signinscreen = ({navigation}) => {
               onHide: () => {
                 setTimeout(() => {
                   navigation.navigate('Signin');
-                }, 1000); // Delay 1 detik sebelum navigasi
+                }, 1000);
               },
             });
           }
@@ -109,6 +112,8 @@ const Signinscreen = ({navigation}) => {
     setPassword(text.slice(0, 25));
   };
 
+  const styles = getStyles(colorScheme); // Get styles based on color scheme
+
   return (
     <>
       <View style={styles.container}>
@@ -120,6 +125,7 @@ const Signinscreen = ({navigation}) => {
           placeholder="Email or Username"
           keyboardType="email-address"
           autoCapitalize="none"
+          placeholderTextColor={colorScheme === 'dark' ? '#cccccc' : '#888888'} // Adjust placeholder text color based on theme
         />
         {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
         <View
@@ -132,14 +138,17 @@ const Signinscreen = ({navigation}) => {
             onChangeText={handlePasswordChange}
             value={password}
             placeholder="Password"
-            secureTextEntry={!showPassword} // Toggle password visibility based on state
+            secureTextEntry={!showPassword}
             autoCapitalize="none"
+            placeholderTextColor={
+              colorScheme === 'dark' ? '#cccccc' : '#888888'
+            } // Adjust placeholder text color based on theme
           />
           <TouchableOpacity
             style={styles.eyeIcon}
             onPress={() => {
               setIsChecked(!isChecked);
-              setShowPassword(!showPassword); // Update showPassword state
+              setShowPassword(!showPassword);
             }}>
             {isChecked ? (
               <Icon name="visibility" size={18} color="#000000" />
@@ -172,86 +181,89 @@ const Signinscreen = ({navigation}) => {
   );
 };
 
-export default Signinscreen;
+const getStyles = () =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: '#fff', // Tetap putih untuk kedua mode
+      padding: 16,
+    },
+    title: {
+      fontSize: 30,
+      fontWeight: 'bold',
+      textAlign: 'center',
+      marginBottom: 20,
+      color: '#000000', // Tetap hitam untuk kedua mode
+    },
+    input: {
+      width: '80%',
+      height: 50,
+      margin: 12,
+      borderWidth: 1,
+      borderColor: '#dcdcdc', // Tetap abu-abu untuk kedua mode
+      borderRadius: 5,
+      padding: 10,
+      backgroundColor: '#f5f5f5', // Tetap abu-abu terang untuk kedua mode
+      color: '#000000', // Tetap hitam untuk kedua mode
+    },
+    passwordContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      width: '80%',
+      margin: 12,
+      borderWidth: 1,
+      borderColor: '#dcdcdc', // Tetap abu-abu untuk kedua mode
+      borderRadius: 5,
+      backgroundColor: '#f5f5f5', // Tetap abu-abu terang untuk kedua mode
+    },
+    passwordInput: {
+      flex: 1,
+      height: 50,
+      padding: 10,
+      color: '#000000', // Tetap hitam untuk kedua mode
+    },
+    eyeIcon: {
+      marginRight: 10,
+    },
+    buttonLogin: {
+      width: '80%',
+      height: 50,
+      backgroundColor: '#001374', // Tetap biru untuk kedua mode
+      borderRadius: 25,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginTop: 20,
+    },
+    textLogin: {
+      color: '#fff', // Tetap putih untuk kedua mode
+      fontSize: 18,
+      fontWeight: 'bold',
+    },
+    forgotPassLink: {
+      color: '#000000', // Tetap hitam untuk kedua mode
+      marginTop: 20,
+    },
+    signupText: {
+      color: '#000000', // Tetap hitam untuk kedua mode
+      fontSize: 14,
+      marginTop: 20,
+    },
+    signupLink: {
+      color: '#0a3e99', // Tetap biru untuk kedua mode
+      fontWeight: 'bold',
+    },
+    errorText: {
+      color: 'red',
+      fontSize: 14,
+      width: '80%',
+      textAlign: 'left',
+      marginBottom: 10,
+    },
+    errorInput: {
+      borderColor: 'red',
+    },
+  });
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    padding: 16,
-  },
-  title: {
-    fontSize: 30,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 20,
-    color: '#000000',
-  },
-  input: {
-    width: '80%',
-    height: 50,
-    margin: 12,
-    borderWidth: 1,
-    borderColor: '#dcdcdc',
-    borderRadius: 5,
-    padding: 10,
-    backgroundColor: '#f5f5f5',
-  },
-  passwordContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: '80%',
-    margin: 12,
-    borderWidth: 1,
-    borderColor: '#dcdcdc',
-    borderRadius: 5,
-    backgroundColor: '#f5f5f5',
-  },
-  passwordInput: {
-    flex: 1,
-    height: 50,
-    padding: 10,
-  },
-  eyeIcon: {
-    marginRight: 10,
-  },
-  buttonLogin: {
-    width: '80%',
-    height: 50,
-    backgroundColor: '#001374',
-    borderRadius: 25,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  textLogin: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  forgotPassLink: {
-    color: '#000000',
-    marginTop: 20,
-  },
-  signupText: {
-    color: '#000',
-    fontSize: 14,
-    marginTop: 20,
-  },
-  signupLink: {
-    color: '#0a3e99',
-    fontWeight: 'bold',
-  },
-  errorText: {
-    color: 'red',
-    fontSize: 14,
-    width: '80%',
-    textAlign: 'left',
-    marginBottom: 10,
-  },
-  errorInput: {
-    borderColor: 'red',
-  },
-});
+export default Signinscreen;
