@@ -116,14 +116,14 @@ const HomeScreen = ({navigation}) => {
     ImagePicker.launchCamera(options, response => {
       if (response.didCancel) {
         console.log('User cancelled photo');
-        isExpanded.value = false; // Reset FAB state if user cancels
+        isExpanded.value = false;
       } else if (response.error) {
         console.log('ImagePicker Error: ', response.error);
       } else {
         const uri = response.assets[0].uri;
         console.log('Captured image URI:', uri);
         // Navigate to CreatePost and pass the image URI
-        navigation.navigate('CreatePost', {imageUri: uri});
+        navigation.navigate('CreatePost', {mediaUri: uri, mediaType: 'photo'});
       }
     });
   };

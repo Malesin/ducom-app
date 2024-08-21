@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Video from 'react-native-video';
-import DefaultAvatar from '../assets/avatar.png'; 
+import DefaultAvatar from '../assets/avatar.png';
 
 const MentionCard = ({tweet}) => {
   const [liked, setLiked] = useState(false);
@@ -75,6 +75,19 @@ const MentionCard = ({tweet}) => {
           <Text style={styles.userHandle}>@{tweet.userHandle}</Text>
           <Text style={styles.postDate}>{formatDate(tweet.postDate)}</Text>
         </View>
+      </View>
+
+      {/* Options Button */}
+      <View style={styles.optionsContainer}>
+        <TouchableOpacity
+          style={styles.optionsButton}
+          onPress={() => console.log('More options pressed')}>
+          <MaterialCommunityIcons
+            name="dots-horizontal"
+            size={24}
+            color="#657786"
+          />
+        </TouchableOpacity>
       </View>
 
       {/* Tweet Content */}
@@ -229,6 +242,15 @@ const styles = StyleSheet.create({
   actionText: {
     marginLeft: 4,
     color: '#040608',
+  },
+  optionsContainer: {
+    position: 'absolute',
+    right: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  optionsButton: {
+    marginLeft: 10,
   },
   modalBackground: {
     flex: 1,
