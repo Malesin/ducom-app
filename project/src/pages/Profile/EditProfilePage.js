@@ -8,6 +8,7 @@ import {
   TextInput,
   ScrollView,
   Alert,
+  useColorScheme,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {SafeAreaView} from 'react-native';
@@ -38,6 +39,8 @@ export default function EditProfilePage() {
   const [newProfileImage, setNewProfileImage] = useState('');
   const [newBannerImage, setNewBannerImage] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const colorScheme = useColorScheme();
+  const styles = getStyles(colorScheme); // Get styles based on color scheme
 
   async function getData() {
     try {
@@ -72,17 +75,17 @@ export default function EditProfilePage() {
   }
 
   useEffect(() => {
-    const intervalId = setInterval(() => {
-      getData();
-    }, 2000);
-    return () => clearInterval(intervalId);
+    getData();
   }, []);
 
   const validateUsername = username => {
     const usernameRegex = /^[a-z0-9]{4,15}$/;
     return usernameRegex.test(username) && !username.includes(' ');
   };
-
+  const validateName = name => {
+    const nameRegex = /^[a-zA-Z]+( [a-zA-Z]+)*$/;
+    return nameRegex.test(name) && name.length <= 40;
+  };
   useEffect(() => {
     const beforeRemoveListener = navigation.addListener('beforeRemove', e => {
       if (isSaving) {
@@ -142,6 +145,16 @@ export default function EditProfilePage() {
                 title: 'Invalid Username',
                 textBody:
                   '4-15 characters, only lowercase letters and numbers without spaces.',
+              });
+              return;
+            }
+
+            // Only validate name if it's different from the current name
+            if (name && name !== userData?.name && !validateName(name)) {
+              Dialog.show({
+                type: ALERT_TYPE.DANGER,
+                title: 'Invalid Name',
+                textBody: 'Name can only be alphabetical and maximum 40 char.',
               });
               return;
             }
@@ -251,6 +264,8 @@ export default function EditProfilePage() {
     ]);
   };
 
+  const MAX_IMAGE_SIZE_MB = 5; // Maksimal ukuran gambar dalam MB
+
   const selectImageProfile = () => {
     ImagePicker.openPicker({
       width: 400,
@@ -261,7 +276,11 @@ export default function EditProfilePage() {
       avoidEmptySpaceAroundImage: true,
     })
       .then(image => {
-        setNewProfileImage(image); // Store the image temporarily
+        if (image.size / 1024 / 1024 > MAX_IMAGE_SIZE_MB) {
+          Alert.alert('Error', 'Image size exceeds 5 MB.');
+          return;
+        }
+        setNewProfileImage(image);
         setProfilePicture({uri: image.path});
       })
       .catch(error => {
@@ -278,7 +297,11 @@ export default function EditProfilePage() {
       avoidEmptySpaceAroundImage: true,
     })
       .then(image => {
-        setNewBannerImage(image); // Store the image temporarily
+        if (image.size / 1024 / 1024 > MAX_IMAGE_SIZE_MB) {
+          Alert.alert('Error', 'Image size exceeds 5 MB.');
+          return;
+        }
+        setNewBannerImage(image);
         setBanner({uri: image.path});
       })
       .catch(error => {
@@ -371,6 +394,9 @@ export default function EditProfilePage() {
                 onChangeText={setName}
                 style={styles.textInput}
                 placeholder={userData?.name}
+                placeholderTextColor={
+                  colorScheme === 'dark' ? '#cccccc' : '#888888'
+                } // Adjust placeholder text color based on theme
                 autoCapitalize="none"
               />
             </View>
@@ -381,6 +407,9 @@ export default function EditProfilePage() {
                 onChangeText={setBio}
                 style={styles.textInput}
                 placeholder={userData?.bio || 'Bio'}
+                placeholderTextColor={
+                  colorScheme === 'dark' ? '#cccccc' : '#888888'
+                } // Adjust placeholder text color based on theme
                 autoCapitalize="none"
                 multiline
                 maxLength={150}
@@ -391,6 +420,9 @@ export default function EditProfilePage() {
               <TextInput
                 style={styles.textInput}
                 placeholder={userData?.email}
+                placeholderTextColor={
+                  colorScheme === 'dark' ? '#cccccc' : '#888888'
+                } // Adjust placeholder text color based on theme
                 editable={false}
               />
             </View>
@@ -401,102 +433,108 @@ export default function EditProfilePage() {
   );
 }
 
-const styles = StyleSheet.create({
-  scrollContainer: {
-    flexGrow: 1,
-    alignItems: 'center',
-    backgroundColor: '#fff',
-  },
-  bannerContainer: {
-    width: '100%',
-    height: 200,
-    marginBottom: 20,
-  },
-  banner: {
-    width: '100%',
-    height: '100%',
-  },
-  profilePicture: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    overflow: 'hidden',
-    marginBottom: 20,
-  },
-  profileImage: {
-    borderRadius: 60, // Ensures the image is circular
-  },
-  overlay: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  profileOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    borderRadius: 60, // Circular overlay
-  },
-  contentContainer: {
-    width: '100%',
-    paddingHorizontal: 20,
-    alignItems: 'center',
-  },
-  usernameContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 25,
-  },
-  usernameInputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  usernameStatic: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  usernameInput: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginLeft: 5,
-    borderBottomWidth: 1,
-    borderColor: '#ccc',
-  },
-  username: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginLeft: 5,
-  },
-  inputContainer: {
-    width: '100%',
-    marginBottom: 20,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 5,
-  },
-  textInput: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 10,
-    padding: 10,
-    width: '100%',
-  },
-  saveButton: {
-    backgroundColor: '#00137F',
-    paddingVertical: 7,
-    paddingHorizontal: 18,
-    borderRadius: 50,
-  },
-  saveButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-});
+const getStyles = colorScheme => {
+  const currentTextColor = colorScheme === 'dark' ? '#888888' : '#888888';
+  return StyleSheet.create({
+    scrollContainer: {
+      flexGrow: 1,
+      alignItems: 'center',
+      backgroundColor: '#fff',
+    },
+    bannerContainer: {
+      width: '100%',
+      height: 200,
+      marginBottom: 20,
+    },
+    banner: {
+      width: '100%',
+      height: '100%',
+    },
+    profilePicture: {
+      width: 120,
+      height: 120,
+      borderRadius: 60,
+      overflow: 'hidden',
+      marginBottom: 20,
+    },
+    profileImage: {
+      borderRadius: 60, // Ensures the image is circular
+    },
+    overlay: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    profileOverlay: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      borderRadius: 60, // Circular overlay
+    },
+    contentContainer: {
+      width: '100%',
+      paddingHorizontal: 20,
+      alignItems: 'center',
+    },
+    usernameContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 25,
+    },
+    usernameInputContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    usernameStatic: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: currentTextColor,
+    },
+    usernameInput: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      marginLeft: 5,
+      borderBottomWidth: 1,
+      borderColor: '#ccc',
+      color: currentTextColor,
+    },
+    username: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      marginLeft: 5,
+      color: currentTextColor,
+    },
+    inputContainer: {
+      width: '100%',
+      marginBottom: 20,
+    },
+    label: {
+      fontSize: 16,
+      fontWeight: 'bold',
+      marginBottom: 5,
+    },
+    textInput: {
+      borderWidth: 1,
+      borderColor: '#ccc',
+      borderRadius: 10,
+      padding: 10,
+      width: '100%',
+    },
+    saveButton: {
+      backgroundColor: '#00137F',
+      paddingVertical: 7,
+      paddingHorizontal: 18,
+      borderRadius: 50,
+    },
+    saveButtonText: {
+      color: '#fff',
+      fontWeight: 'bold',
+    },
+  });
+};
