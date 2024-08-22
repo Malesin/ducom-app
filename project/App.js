@@ -5,8 +5,8 @@ import Toast from 'react-native-toast-message';
 const App = () => {
   return (
     <>
-      <AuthNavigator />
-      <Toast />
+        <AuthNavigator />
+        <Toast />
     </>
   );
 };

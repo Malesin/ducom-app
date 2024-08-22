@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -8,18 +8,14 @@ import {
   Modal,
   TouchableWithoutFeedback,
   Share,
-  ActivityIndicator,
   FlatList,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Video from 'react-native-video';
+import {createThumbnail} from 'react-native-create-thumbnail';
 import DefaultAvatar from '../assets/avatar.png';
 
-const TweetCard = ({ tweet }) => {
-  if (typeof tweet.content !== 'string') {
-    console.error('Invalid tweet content:', tweet.content);
-    return null;
-  }
+const TweetCard = ({tweet}) => {
   const [liked, setLiked] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
   const [likesCount, setLikesCount] = useState(tweet.likesCount);
@@ -27,7 +23,27 @@ const TweetCard = ({ tweet }) => {
   const [commentsCount, setCommentsCount] = useState(tweet.commentsCount);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalMediaUri, setModalMediaUri] = useState('');
-  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
+  const [thumbnails, setThumbnails] = useState({});
+
+  useEffect(() => {
+    // Generate thumbnails for video media
+    const generateThumbnails = async () => {
+      const newThumbnails = {};
+      for (const media of tweet.media || []) {
+        if (media.type === 'video' && media.uri) {
+          try {
+            const {uri} = await createThumbnail({url: media.uri});
+            newThumbnails[media.uri] = uri;
+          } catch (error) {
+            console.log('Error generating thumbnail:', error);
+          }
+        }
+      }
+      setThumbnails(newThumbnails);
+    };
+
+    generateThumbnails();
+  }, [tweet.media]);
 
   const handleLike = () => {
     setLiked(prev => !prev);
@@ -65,54 +81,88 @@ const TweetCard = ({ tweet }) => {
 
   const formatDate = dateString => {
     const date = new Date(dateString);
-    return `${date.getDate()} -${date.getMonth() + 1} -${date.getFullYear()}`;
+    const now = new Date();
+    const diffInSeconds = Math.floor((now - date) / 1000);
+
+    if (diffInSeconds < 1) {
+      return 'now';
+    }
+
+    if (diffInSeconds < 60) {
+      return `${diffInSeconds}s ago`;
+    }
+
+    const diffInMinutes = Math.floor(diffInSeconds / 60);
+    if (diffInMinutes < 60) {
+      return `${diffInMinutes}m ago`;
+    }
+
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    if (diffInHours < 24) {
+      return `${diffInHours}h ago`;
+    }
+
+    const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays < 7) {
+      return `${diffInDays}d ago`;
+    }
+
+    const diffInWeeks = Math.floor(diffInDays / 7);
+    if (diffInWeeks < 4) {
+      return `${diffInWeeks}w ago`;
+    }
+
+    return `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
   };
 
-  const renderMediaItem = ({ item }) => {
+  const renderMediaItem = ({item}) => {
     if (!item.uri) {
-      console.error('Media URI is not valid:', item.uri);
       return null;
     }
+
+    // Determine the style based on the media type and count
+    const mediaStyle =
+      tweet.media.length === 1
+        ? item.type === 'video'
+          ? styles.singleMediaVideo
+          : styles.singleMediaImage
+        : item.type === 'video'
+        ? styles.tweetVideo
+        : styles.tweetImage;
 
     return (
       <TouchableOpacity
         onPress={() => openMediaPreview(item.uri)}
         style={styles.mediaContainer}>
         {item.type === 'image' ? (
-          <Image source={{ uri: item.uri }} style={styles.tweetImage} onError={() => console.log('Failed to load image')} />
+          <Image
+            source={{uri: item.uri}}
+            style={mediaStyle}
+            onError={() => console.log('Failed to load image')}
+          />
         ) : (
-          <View style={styles.videoContainer}>
-            {!isVideoLoaded && (
-              <ActivityIndicator
-                size="large"
-                color="#000"
-                style={styles.videoLoader}
-              />
-            )}
-            <Video
-              source={{ uri: item.uri }}
-              style={styles.video}
-              controls
-              resizeMode="contain"
-              onLoad={() => setIsVideoLoaded(true)}
-              onError={(error) => {
-                console.log('Failed to load video', error);
-                setIsVideoLoaded(true); // Hide loader
-              }}
+          <TouchableOpacity
+            onPress={() => openMediaPreview(item.uri)}
+            style={styles.videoContainer}>
+            <Image source={{uri: thumbnails[item.uri]}} style={mediaStyle} />
+            <MaterialCommunityIcons
+              name="play-circle-outline"
+              size={40}
+              color="#fff"
+              style={styles.playIcon}
             />
-          </View>
+          </TouchableOpacity>
         )}
       </TouchableOpacity>
     );
   };
-
 
   return (
     <View style={styles.card}>
       {/* User Info */}
       <View style={styles.userInfo}>
         <Image
-          source={tweet.userAvatar ? { uri: tweet.userAvatar } : DefaultAvatar}
+          source={tweet.userAvatar ? {uri: tweet.userAvatar} : DefaultAvatar}
           style={styles.avatar}
         />
         <View style={styles.userDetails}>
@@ -188,19 +238,23 @@ const TweetCard = ({ tweet }) => {
         <TouchableWithoutFeedback onPress={closeMediaPreview}>
           <View style={styles.modalBackground}>
             <View style={styles.modalContainer}>
-              {modalMediaUri && modalMediaUri.endsWith('jpg') ? (
-                <Video
-                  source={{ uri: modalMediaUri }}
-                  style={styles.modalImage}
-                  controls
-                  resizeMode="contain"
-                />
-              ) : (
-                <Image
-                  source={{ uri: modalMediaUri }}
-                  style={styles.modalImage}
-                />
-              )}
+              {modalMediaUri ? (
+                modalMediaUri.endsWith('.jpg') ||
+                modalMediaUri.endsWith('.png') ? (
+                  <Image
+                    source={{uri: modalMediaUri}}
+                    style={styles.modalImage}
+                    onError={() => console.log('Failed to load image')}
+                  />
+                ) : (
+                  <Video
+                    source={{uri: modalMediaUri}}
+                    style={styles.modalImage}
+                    controls
+                    resizeMode="contain"
+                  />
+                )
+              ) : null}
             </View>
           </View>
         </TouchableWithoutFeedback>
@@ -209,7 +263,7 @@ const TweetCard = ({ tweet }) => {
   );
 };
 
-const InteractionButton = ({ icon, color, count, onPress }) => (
+const InteractionButton = ({icon, color, count, onPress}) => (
   <TouchableOpacity style={styles.actionButton} onPress={onPress}>
     <MaterialCommunityIcons name={icon} size={20} color={color} />
     <Text style={styles.actionText}>{count}</Text>
@@ -221,7 +275,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     padding: 10,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 1,
@@ -273,6 +327,17 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginRight: 8,
   },
+  singleMediaImage: {
+    width: 390,
+    height: 200, // Adjust height if needed
+    borderRadius: 8,
+    resizeMode: 'cover',
+  },
+  singleMediaVideo: {
+    width: 390,
+    height: 200, // Adjust height if needed
+    borderRadius: 8,
+  },
   actions: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -312,7 +377,7 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
   videoContainer: {
-    width: 200,
+    width: 390,
     height: 200,
     borderRadius: 8,
     backgroundColor: '#000',
@@ -320,13 +385,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: 8,
   },
-  video: {
-    width: '100%',
-    height: '100%',
-  },
-  videoLoader: {
+  playIcon: {
     position: 'absolute',
-    zIndex: 1,
   },
 });
 
