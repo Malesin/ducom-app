@@ -5,15 +5,16 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
+  useColorScheme,
 } from 'react-native';
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Toast from 'react-native-toast-message';
 import axios from 'axios';
 import config from '../../config';
 const serverUrl = config.SERVER_URL;
 
-const RegisterScreen = ({ navigation }) => {
+const RegisterScreen = ({navigation}) => {
   const [name, setName] = useState('');
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
@@ -23,6 +24,7 @@ const RegisterScreen = ({ navigation }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState({});
+  const colorScheme = useColorScheme(); // Detect light or dark mode
 
   const validateName = name => {
     const nameRegex = /^[a-zA-Z]+( [a-zA-Z]+)*$/;
@@ -111,13 +113,13 @@ const RegisterScreen = ({ navigation }) => {
     setErrors(newErrors);
 
     if (valid) {
-      const userData = { name, username, email, password };
+      const userData = {name, username, email, password};
 
       setTimeout(() => {
         axios
           .post(`${serverUrl}/register`, userData)
           .then(res => {
-            const { status } = res.data;
+            const {status} = res.data;
             switch (status) {
               case 'ok':
                 Toast.show({
@@ -172,6 +174,8 @@ const RegisterScreen = ({ navigation }) => {
     });
   };
 
+  const styles = getStyles(colorScheme); // Get styles based on color scheme
+
   return (
     <>
       <ScrollView contentContainerStyle={styles.container}>
@@ -182,6 +186,7 @@ const RegisterScreen = ({ navigation }) => {
           value={name}
           placeholder="Name"
           autoCapitalize="words"
+          placeholderTextColor={colorScheme === 'dark' ? '#cccccc' : '#888888'} // Adjust placeholder text color based on theme
         />
         {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
         <TextInput
@@ -190,6 +195,7 @@ const RegisterScreen = ({ navigation }) => {
           value={username}
           placeholder="Username"
           autoCapitalize="none"
+          placeholderTextColor={colorScheme === 'dark' ? '#cccccc' : '#888888'} // Adjust placeholder text color based on theme
         />
         {errors.username && (
           <Text style={styles.errorText}>{errors.username}</Text>
@@ -202,6 +208,7 @@ const RegisterScreen = ({ navigation }) => {
           keyboardType="email-address"
           autoCapitalize="none"
           onFocus={showToast} // Menampilkan toast saat TextInput diklik
+          placeholderTextColor={colorScheme === 'dark' ? '#cccccc' : '#888888'} // Adjust placeholder text color based on theme
         />
         {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
         <View
@@ -216,6 +223,9 @@ const RegisterScreen = ({ navigation }) => {
             placeholder="Password"
             secureTextEntry={!showPassword}
             autoCapitalize="none"
+            placeholderTextColor={
+              colorScheme === 'dark' ? '#cccccc' : '#888888'
+            } // Adjust placeholder text color based on theme
           />
           <TouchableOpacity
             style={styles.eyeIcon}
@@ -242,6 +252,9 @@ const RegisterScreen = ({ navigation }) => {
             placeholder="Confirm Password"
             secureTextEntry={!showConfirmPassword}
             autoCapitalize="none"
+            placeholderTextColor={
+              colorScheme === 'dark' ? '#cccccc' : '#888888'
+            } // Adjust placeholder text color based on theme
           />
           <TouchableOpacity
             style={styles.eyeIcon}
@@ -292,99 +305,100 @@ const RegisterScreen = ({ navigation }) => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    padding: 16,
-  },
-  title: {
-    fontSize: 30,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 20,
-    color: '#000',
-  },
-  input: {
-    width: '80%',
-    height: 50,
-    margin: 12,
-    borderWidth: 1,
-    borderColor: '#dcdcdc',
-    borderRadius: 5,
-    padding: 10,
-    backgroundColor: '#f5f5f5',
-  },
-  passwordContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: '80%',
-    margin: 12,
-    borderWidth: 1,
-    borderColor: '#dcdcdc',
-    borderRadius: 5,
-    backgroundColor: '#f5f5f5',
-  },
-  passwordInput: {
-    flex: 1,
-    height: 50,
-    padding: 10,
-  },
-  eyeIcon: {
-    marginRight: 10,
-  },
-  checkboxContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: '80%',
-    margin: 12,
-  },
-  checkbox: {
-    marginRight: 10,
-  },
-  checkboxLabel: {
-    color: '#000',
-    fontSize: 14,
-  },
-  buttonSignup: {
-    width: '80%',
-    height: 50,
-    backgroundColor: '#001374',
-    borderRadius: 25,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  textSignUp: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  termslink: {
-    color: '#0a3e99',
-    fontWeight: 'bold',
-    textDecorationLine: 'underline',
-  },
-  errorText: {
-    color: 'red',
-    width: '80%',
-    textAlign: 'left',
-    marginBottom: 10,
-  },
-  loginLink: {
-    color: '#0a3e99',
-    fontWeight: 'bold',
-  },
-  loginText: {
-    color: '#000',
-    fontSize: 14,
-    marginTop: 20,
-  },
-  errorInput: {
-    borderColor: 'red',
-  },
-});
+const getStyles = () =>
+  StyleSheet.create({
+    container: {
+      flexGrow: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: '#fff',
+      padding: 16,
+    },
+    title: {
+      fontSize: 30,
+      fontWeight: 'bold',
+      textAlign: 'center',
+      marginBottom: 20,
+      color: '#000',
+    },
+    input: {
+      width: '80%',
+      height: 50,
+      margin: 12,
+      borderWidth: 1,
+      borderColor: '#dcdcdc',
+      borderRadius: 5,
+      padding: 10,
+      backgroundColor: '#f5f5f5',
+    },
+    passwordContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      width: '80%',
+      margin: 12,
+      borderWidth: 1,
+      borderColor: '#dcdcdc',
+      borderRadius: 5,
+      backgroundColor: '#f5f5f5',
+    },
+    passwordInput: {
+      flex: 1,
+      height: 50,
+      padding: 10,
+    },
+    eyeIcon: {
+      marginRight: 10,
+    },
+    checkboxContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      width: '80%',
+      margin: 12,
+    },
+    checkbox: {
+      marginRight: 10,
+    },
+    checkboxLabel: {
+      color: '#000',
+      fontSize: 14,
+    },
+    buttonSignup: {
+      width: '80%',
+      height: 50,
+      backgroundColor: '#001374',
+      borderRadius: 25,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginTop: 20,
+    },
+    textSignUp: {
+      color: '#fff',
+      fontSize: 18,
+      fontWeight: 'bold',
+    },
+    termslink: {
+      color: '#0a3e99',
+      fontWeight: 'bold',
+      textDecorationLine: 'underline',
+    },
+    errorText: {
+      color: 'red',
+      width: '80%',
+      textAlign: 'left',
+      marginBottom: 10,
+    },
+    loginLink: {
+      color: '#0a3e99',
+      fontWeight: 'bold',
+    },
+    loginText: {
+      color: '#000',
+      fontSize: 14,
+      marginTop: 20,
+    },
+    errorInput: {
+      borderColor: 'red',
+    },
+  });
 
 export default RegisterScreen;

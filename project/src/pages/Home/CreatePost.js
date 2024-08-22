@@ -35,7 +35,7 @@ const CreatePost = ({ route, navigation }) => {
   const [translateY] = useState(new Animated.Value(500)); // Initial position
   const colorScheme = useColorScheme();
   const styles = getStyles(colorScheme); // Get styles based on color scheme
-
+  
   const profilePictureUri = require('../../assets/profilepic.png');
 
   useEffect(() => {
@@ -116,8 +116,6 @@ const CreatePost = ({ route, navigation }) => {
       console.error('Error submitting post:', error.message);
     }
   };
-
-
 
   const handleOpenCamera = () => {
     const options = {

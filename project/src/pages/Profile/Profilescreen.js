@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   SafeAreaView,
   View,
@@ -14,7 +14,7 @@ import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import config from '../../config';
-import { Skeleton } from 'react-native-elements';
+import {Skeleton} from 'react-native-elements';
 
 const serverUrl = config.SERVER_URL;
 
@@ -62,7 +62,6 @@ export default function Profilescreen() {
     }, 2000);
     return () => clearInterval(intervalId);
   }, []);
-
 
   // Define the source for the profile image
   const profileImageSource = require('../../assets/profilepic.png');
