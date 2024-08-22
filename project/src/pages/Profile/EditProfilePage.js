@@ -121,16 +121,6 @@ export default function EditProfilePage() {
     ),
   });
 
-  const validateUsername = username => {
-    const usernameRegex = /^[a-z0-9]{4,15}$/;
-    return usernameRegex.test(username) && !username.includes(' ');
-  };
-
-  const validateName = name => {
-    const nameRegex = /^[a-zA-Z]+( [a-zA-Z]+)*$/;
-    return nameRegex.test(name) && name.length <= 40;
-  };
-
   const handleSave = async () => {
     setIsSaving(true);
 

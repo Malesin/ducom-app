@@ -70,7 +70,7 @@ const TweetCard = ({ tweet }) => {
 
   const renderMediaItem = ({ item }) => {
     if (!item.uri) {
-      console.error('Media URI is not valid:', item.uri);
+      // console.error('Media URI is not valid:', item.uri);
       return null;
     }
 
@@ -188,19 +188,22 @@ const TweetCard = ({ tweet }) => {
         <TouchableWithoutFeedback onPress={closeMediaPreview}>
           <View style={styles.modalBackground}>
             <View style={styles.modalContainer}>
-              {modalMediaUri && modalMediaUri.endsWith('jpg') ? (
-                <Video
-                  source={{ uri: modalMediaUri }}
-                  style={styles.modalImage}
-                  controls
-                  resizeMode="contain"
-                />
-              ) : (
-                <Image
-                  source={{ uri: modalMediaUri }}
-                  style={styles.modalImage}
-                />
-              )}
+              {modalMediaUri ? (
+                modalMediaUri.endsWith('.jpg') || modalMediaUri.endsWith('.png') ? (
+                  <Image
+                    source={{ uri: modalMediaUri }}
+                    style={styles.modalImage}
+                    onError={() => console.log('Failed to load image')}
+                  />
+                ) : (
+                  <Video
+                    source={{ uri: modalMediaUri }}
+                    style={styles.modalImage}
+                    controls
+                    resizeMode="contain"
+                  />
+                )
+              ) : null}
             </View>
           </View>
         </TouchableWithoutFeedback>
