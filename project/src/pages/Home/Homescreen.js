@@ -8,7 +8,7 @@ import {
   BackHandler,
   TouchableOpacity,
   Text,
-  Image
+  RefreshControl,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
@@ -25,12 +25,14 @@ import * as ImagePicker from 'react-native-image-picker';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import axios from 'axios';
 import config from '../../config';
+import { Skeleton } from 'react-native-elements'; // Import Skeleton
 
 const serverUrl = config.SERVER_URL;
 
 const HomeScreen = ({ navigation }) => {
   const [tweets, setTweets] = useState([]);
-  const [images, setImages] = useState();
+  const [refreshing, setRefreshing] = useState(false); // State untuk refreshing
+  const [loading, setLoading] = useState(true); // State untuk loading
 
   const isExpanded = useSharedValue(false);
 
@@ -68,12 +70,23 @@ const HomeScreen = ({ navigation }) => {
         bookMarksCount: post.bookmarks.length,
       }));
 
-
       setTweets(formattedTweets); // Hanya mengatur data dari API, tidak menambahkan yang lama
+
+      // Menambahkan delay 1 detik sebelum mengubah loading ke false
+      setTimeout(() => {
+        setLoading(false);
+      }, 1000);
     } catch (error) {
       console.error('Error fetching data:', error);
+      setLoading(false); // Set loading ke false jika terjadi error
     }
   }
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await getData(); // Panggil fungsi untuk mendapatkan data terbaru
+    setRefreshing(false);
+  }, []);
 
   const handleBackPress = () => {
     Alert.alert('Exit App', 'Are you sure want to exit', [
@@ -93,6 +106,10 @@ const HomeScreen = ({ navigation }) => {
   useFocusEffect(
     useCallback(() => {
       BackHandler.addEventListener('hardwareBackPress', handleBackPress);
+      
+      // Reset isExpanded to false when HomeScreen is focused
+      isExpanded.value = false;
+
       return () => {
         BackHandler.removeEventListener('hardwareBackPress', handleBackPress);
       };
@@ -102,7 +119,6 @@ const HomeScreen = ({ navigation }) => {
   useEffect(() => {
     getData()
   }, [])
-
 
   const handleOpenCamera = () => {
     const options = {
@@ -175,15 +191,47 @@ const HomeScreen = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.contentContainer}>
-        {Array.isArray(tweets) && tweets.length > 0 ? (
-          tweets.map((tweet, index) => (
-            <View key={index} style={styles.tweetContainer}>
-              <TweetCard tweet={tweet} />
+      <ScrollView
+        contentContainerStyle={styles.contentContainer}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }>
+        {loading ? (
+          // Skeleton loading
+          <>
+            <View style={styles.skeletonContainer}>
+              <View style={styles.skeletonHeader}>
+                <Skeleton animation="pulse" circle height={40} width={40} style={styles.skeletonAvatar} />
+                <View style={styles.skeletonTextContainer}>
+                  <Skeleton animation="pulse" height={20} width={100} style={styles.skeleton} />
+                  <Skeleton animation="pulse" height={14} width={60} style={styles.skeleton} />
+                </View>
+              </View>
+              <Skeleton animation="pulse" height={20} width={200} style={styles.skeleton} />
+              <Skeleton animation="pulse" height={150} width={'100%'} style={styles.skeleton} />
             </View>
-          ))
+            <View style={styles.skeletonContainer}>
+              <View style={styles.skeletonHeader}>
+                <Skeleton animation="pulse" circle height={40} width={40} style={styles.skeletonAvatar} />
+                <View style={styles.skeletonTextContainer}>
+                  <Skeleton animation="pulse" height={20} width={100} style={styles.skeleton} />
+                  <Skeleton animation="pulse" height={14} width={60} style={styles.skeleton} />
+                </View>
+              </View>
+              <Skeleton animation="pulse" height={20} width={200} style={styles.skeleton} />
+              <Skeleton animation="pulse" height={150} width={'100%'} style={styles.skeleton} />
+            </View>
+          </>
         ) : (
-          <Text style={styles.noTweetsText}>No tweets available</Text>
+          Array.isArray(tweets) && tweets.length > 0 ? (
+            tweets.map((tweet, index) => (
+              <View key={index} style={styles.tweetContainer}>
+                <TweetCard tweet={tweet} />
+              </View>
+            ))
+          ) : (
+            <Text style={styles.noTweetsText}>No tweets available</Text>
+          )
         )}
       </ScrollView>
 
@@ -290,6 +338,31 @@ const styles = StyleSheet.create({
     height: 200,
     marginTop: 20,
     borderRadius: 10,
+  },
+  skeletonContainer: {
+    width: '100%',
+    padding: 20,
+    marginBottom: 20,
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    shadowColor: '#171717',
+    shadowOffset: { width: -0.5, height: 3.5 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+  },
+  skeletonHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  skeletonAvatar: {
+    marginRight: 10,
+  },
+  skeletonTextContainer: {
+    flex: 1,
+  },
+  skeleton: {
+    marginBottom: 10,
   },
 });
 

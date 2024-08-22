@@ -45,12 +45,12 @@ function BottomTabNavigator() {
     }
   }
 
-  // useEffect(() => {
-  //   const intervalId = setInterval(() => {
-  //     getData();
-  //   }, 2000);
-  //   return () => clearInterval(intervalId);
-  // }, []);
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      getData();
+    }, 2000);
+    return () => clearInterval(intervalId);
+  }, []);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
