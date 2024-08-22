@@ -1,5 +1,5 @@
-import React, {useState, useEffect} from 'react';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import React, { useState, useEffect } from 'react';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { Image, StyleSheet, View, Text } from 'react-native';
 import { Profilescreen, Notificationscreen } from '../pages';
@@ -35,10 +35,8 @@ function BottomTabNavigator() {
       const user = userResponse.data.data;
 
       if (user.profilePicture) {
-        setProfilePicture({
-          uri: `${user.profilePicture}`
-        
-        });
+        const profile = { uri: user.profilePicture };
+        setProfilePicture(profile);
         console.log('Image Profile Retrieved Successfully');
       }
 
@@ -47,12 +45,12 @@ function BottomTabNavigator() {
     }
   }
 
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      getData();
-    }, 10000);
-    return () => clearInterval(intervalId);
-  }, []);
+  // useEffect(() => {
+  //   const intervalId = setInterval(() => {
+  //     getData();
+  //   }, 2000);
+  //   return () => clearInterval(intervalId);
+  // }, []);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -76,7 +74,7 @@ function BottomTabNavigator() {
               return (
                 <Image
                   source={profilePicture || profileImage}
-                  style={[styles.icon, {tintColor: undefined}]}
+                  style={[styles.icon, { tintColor: undefined }]}
                 />
               );
             }

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -9,12 +9,17 @@ import {
   TouchableWithoutFeedback,
   Share,
   ActivityIndicator,
+  FlatList,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Video from 'react-native-video';
 import DefaultAvatar from '../assets/avatar.png';
 
-const TweetCard = ({tweet}) => {
+const TweetCard = ({ tweet }) => {
+  if (typeof tweet.content !== 'string') {
+    console.error('Invalid tweet content:', tweet.content);
+    return null;
+  }
   const [liked, setLiked] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
   const [likesCount, setLikesCount] = useState(tweet.likesCount);
@@ -22,7 +27,7 @@ const TweetCard = ({tweet}) => {
   const [commentsCount, setCommentsCount] = useState(tweet.commentsCount);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalMediaUri, setModalMediaUri] = useState('');
-  const [isVideoLoaded, setIsVideoLoaded] = useState(false); // State for video loading
+  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
 
   const handleLike = () => {
     setLiked(prev => !prev);
@@ -50,7 +55,7 @@ const TweetCard = ({tweet}) => {
     try {
       await Share.share({
         message: tweet.content,
-        url: tweet.image || tweet.video,
+        url: tweet.media && tweet.media.length > 0 ? tweet.media[0].uri : '',
         title: tweet.userName,
       });
     } catch (error) {
@@ -58,17 +63,62 @@ const TweetCard = ({tweet}) => {
     }
   };
 
+  const formatDate = dateString => {
+    const date = new Date(dateString);
+    return `${date.getDate()} -${date.getMonth() + 1} -${date.getFullYear()}`;
+  };
+
+  const renderMediaItem = ({ item }) => {
+    if (!item.uri) {
+      console.error('Media URI is not valid:', item.uri);
+      return null;
+    }
+
+    return (
+      <TouchableOpacity
+        onPress={() => openMediaPreview(item.uri)}
+        style={styles.mediaContainer}>
+        {item.type === 'image' ? (
+          <Image source={{ uri: item.uri }} style={styles.tweetImage} onError={() => console.log('Failed to load image')} />
+        ) : (
+          <View style={styles.videoContainer}>
+            {!isVideoLoaded && (
+              <ActivityIndicator
+                size="large"
+                color="#000"
+                style={styles.videoLoader}
+              />
+            )}
+            <Video
+              source={{ uri: item.uri }}
+              style={styles.video}
+              controls
+              resizeMode="contain"
+              onLoad={() => setIsVideoLoaded(true)}
+              onError={(error) => {
+                console.log('Failed to load video', error);
+                setIsVideoLoaded(true); // Hide loader
+              }}
+            />
+          </View>
+        )}
+      </TouchableOpacity>
+    );
+  };
+
+
   return (
     <View style={styles.card}>
       {/* User Info */}
       <View style={styles.userInfo}>
         <Image
-          source={tweet.userAvatar ? {uri: tweet.userAvatar} : DefaultAvatar}
+          source={tweet.userAvatar ? { uri: tweet.userAvatar } : DefaultAvatar}
           style={styles.avatar}
         />
         <View style={styles.userDetails}>
           <Text style={styles.userName}>{tweet.userName}</Text>
           <Text style={styles.userHandle}>@{tweet.userHandle}</Text>
+          <Text style={styles.postDate}>{formatDate(tweet.postDate)}</Text>
         </View>
 
         {/* Options Button */}
@@ -88,33 +138,16 @@ const TweetCard = ({tweet}) => {
       {/* Tweet Content */}
       <Text style={styles.tweetText}>{tweet.content}</Text>
 
-      {/* Tweet Media */}
-      {tweet.image || tweet.video ? (
-        <TouchableOpacity
-          onPress={() => openMediaPreview(tweet.image || tweet.video)}
-          style={styles.mediaContainer}>
-          {tweet.image ? (
-            <Image source={{uri: tweet.image}} style={styles.tweetImage} />
-          ) : (
-            <View style={styles.videoContainer}>
-              {!isVideoLoaded && (
-                <ActivityIndicator
-                  size="large"
-                  color="#000"
-                  style={styles.videoLoader}
-                />
-              )}
-              <Video
-                source={{uri: tweet.video}}
-                style={styles.video}
-                controls
-                resizeMode="contain"
-                onLoad={() => setIsVideoLoaded(true)} // Set video loaded state
-                onError={() => setIsVideoLoaded(true)} // Ensure loader hides on error
-              />
-            </View>
-          )}
-        </TouchableOpacity>
+      {/* Tweet Media with Horizontal Scroll */}
+      {tweet.media && tweet.media.length > 0 ? (
+        <FlatList
+          data={tweet.media}
+          renderItem={renderMediaItem}
+          keyExtractor={(item, index) => index.toString()}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.mediaFlatList}
+        />
       ) : null}
 
       {/* Interactions */}
@@ -155,16 +188,16 @@ const TweetCard = ({tweet}) => {
         <TouchableWithoutFeedback onPress={closeMediaPreview}>
           <View style={styles.modalBackground}>
             <View style={styles.modalContainer}>
-              {modalMediaUri.endsWith('.mp4') ? (
+              {modalMediaUri && modalMediaUri.endsWith('jpg') ? (
                 <Video
-                  source={{uri: modalMediaUri}}
+                  source={{ uri: modalMediaUri }}
                   style={styles.modalImage}
                   controls
                   resizeMode="contain"
                 />
               ) : (
                 <Image
-                  source={{uri: modalMediaUri}}
+                  source={{ uri: modalMediaUri }}
                   style={styles.modalImage}
                 />
               )}
@@ -176,7 +209,7 @@ const TweetCard = ({tweet}) => {
   );
 };
 
-const InteractionButton = ({icon, color, count, onPress}) => (
+const InteractionButton = ({ icon, color, count, onPress }) => (
   <TouchableOpacity style={styles.actionButton} onPress={onPress}>
     <MaterialCommunityIcons name={icon} size={20} color={color} />
     <Text style={styles.actionText}>{count}</Text>
@@ -186,10 +219,9 @@ const InteractionButton = ({icon, color, count, onPress}) => (
 const styles = StyleSheet.create({
   card: {
     backgroundColor: '#fff',
-    borderRadius: 7,
     padding: 10,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 1,
@@ -232,11 +264,14 @@ const styles = StyleSheet.create({
     marginVertical: 8,
     color: '#040608',
   },
+  mediaFlatList: {
+    marginVertical: 8,
+  },
   tweetImage: {
-    width: '100%',
+    width: 200,
     height: 200,
     borderRadius: 8,
-    marginVertical: 8,
+    marginRight: 8,
   },
   actions: {
     flexDirection: 'row',
@@ -277,12 +312,13 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
   videoContainer: {
-    width: '100%',
+    width: 200,
     height: 200,
     borderRadius: 8,
-    overflow: 'hidden',
-    marginVertical: 8,
-    position: 'relative',
+    backgroundColor: '#000',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 8,
   },
   video: {
     width: '100%',
@@ -290,9 +326,7 @@ const styles = StyleSheet.create({
   },
   videoLoader: {
     position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: [{translateX: -25}, {translateY: -25}],
+    zIndex: 1,
   },
 });
 

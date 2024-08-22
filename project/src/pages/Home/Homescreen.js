@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useCallback} from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   StyleSheet,
   ScrollView,
@@ -8,9 +8,10 @@ import {
   BackHandler,
   TouchableOpacity,
   Text,
+  Image
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useFocusEffect} from '@react-navigation/native';
+import { useFocusEffect } from '@react-navigation/native';
 import TweetCard from '../../components/TweetCard'; // Import TweetCard
 import Animated, {
   withDelay,
@@ -27,50 +28,48 @@ import config from '../../config';
 
 const serverUrl = config.SERVER_URL;
 
-const HomeScreen = ({navigation}) => {
-  const [tweets, setTweets] = useState([
-    {
-      id: '1',
-      userAvatar:
-        'https://i.pinimg.com/736x/75/5b/f4/755bf4ca4d44e85b43c7c569a8949cfb.jpg',
-      userName: 'peduliamatgua',
-      userHandle: 'frontendkedua',
-      content: 'This is an example tweet. React Native is awesome!',
-      likesCount: 15,
-      commentsCount: 3,
-      bookMarksCount: 5,
-    },
-    {
-      id: '2',
-      userAvatar:
-        'https://i.pinimg.com/474x/21/dc/e9/21dce97c3191b81ed92b56a9492ceac7.jpg',
-      userName: 'frontendgariskeras',
-      userHandle: 'frontend',
-      content: 'go fast or go home',
-      image:
-        'https://i.pinimg.com/564x/8d/ed/4d/8ded4df85951aa1e0a7e68ef78581a35.jpg', // Example image URL
-      likesCount: 30,
-      commentsCount: 10,
-      bookMarksCount: 8,
-    },
-  ]);
+const HomeScreen = ({ navigation }) => {
+  const [tweets, setTweets] = useState([]);
+  const [images, setImages] = useState();
 
   const isExpanded = useSharedValue(false);
 
   async function getData() {
     const token = await AsyncStorage.getItem('token');
     try {
-      const response = await axios.post(`${serverUrl}/userdata`, {token});
-      const {data, status} = response.data;
-      console.log('Data received:', data); // Add this log to check the data
+      const response = await axios.post(`${serverUrl}/userdata`, { token });
+      const { data, status } = response.data;
+      console.log('Data received'); // Add this log to check the data
       if (status === 'error') {
         Alert.alert('Error', 'Anda Telah Keluar dari Akun', [
-          {text: 'OK', onPress: () => navigation.navigate('Auths')},
+          { text: 'OK', onPress: () => navigation.navigate('Auths') },
         ]);
         return;
       }
-      // Fetch Data Tweet
-      setTweets([...data, ...tweets]); // Combine fetched tweets with example tweets
+
+      const responseTweet = await axios.post(`${serverUrl}/posts`);
+
+      const dataDataTweet = responseTweet.data.data[0];
+      const dataTweet = responseTweet.data;
+
+      const formattedTweets = dataTweet.data.map(post => ({
+        id: post._id,
+        userAvatar: post.user.profilePicture,
+        userName: post.user.name,
+        userHandle: post.user.username, 
+        postDate: post.created_at,
+        content: post.description,
+        media: Array.isArray(post.media) ? post.media.map(mediaItem => ({
+          type: mediaItem.type,
+          uri: mediaItem.uri,
+        })) : [],
+        likesCount: post.likes.length,
+        commentsCount: post.comments.length,
+        bookMarksCount: post.bookmarks.length,
+      }));
+
+
+      setTweets(formattedTweets); // Hanya mengatur data dari API, tidak menambahkan yang lama
     } catch (error) {
       console.error('Error fetching data:', error);
     }
@@ -100,12 +99,10 @@ const HomeScreen = ({navigation}) => {
     }, []),
   );
 
-  useFocusEffect(
-    useCallback(() => {
-      getData();
-      isExpanded.value = false; // Reset FAB state when screen gains focus
-    }, []),
-  );
+  useEffect(() => {
+    getData()
+  }, [])
+
 
   const handleOpenCamera = () => {
     const options = {
@@ -123,12 +120,12 @@ const HomeScreen = ({navigation}) => {
         const uri = response.assets[0].uri;
         console.log('Captured image URI:', uri);
         // Navigate to CreatePost and pass the image URI
-        navigation.navigate('CreatePost', {mediaUri: uri, mediaType: 'photo'});
+        navigation.navigate('CreatePost', { mediaUri: uri, mediaType: 'photo' });
       }
     });
   };
 
-  const FloatingActionButton = ({isExpanded, index, iconName, onPress}) => {
+  const FloatingActionButton = ({ isExpanded, index, iconName, onPress }) => {
     const animatedStyles = useAnimatedStyle(() => {
       const moveValue = isExpanded.value ? OFFSET * index : 0;
       const translateValue = withSpring(-moveValue, SPRING_CONFIG);
@@ -137,8 +134,8 @@ const HomeScreen = ({navigation}) => {
 
       return {
         transform: [
-          {translateY: translateValue},
-          {scale: withDelay(delay, withTiming(scaleValue))},
+          { translateY: translateValue },
+          { scale: withDelay(delay, withTiming(scaleValue)) },
         ],
         backgroundColor: isExpanded.value ? '#F3F3F3' : '#F3F3F3',
       };
@@ -170,8 +167,8 @@ const HomeScreen = ({navigation}) => {
 
     return {
       transform: [
-        {translateX: translateValue},
-        {rotate: withTiming(rotateValue)},
+        { translateX: translateValue },
+        { rotate: withTiming(rotateValue) },
       ],
     };
   });
@@ -250,12 +247,10 @@ const styles = StyleSheet.create({
   contentContainer: {
     flexGrow: 1,
     alignItems: 'center',
-    paddingBottom: 20,
+    paddingBottom: 10,
   },
   tweetContainer: {
     width: '100%',
-    paddingHorizontal: 15,
-    paddingVertical: 10,
   },
   fabContainer: {
     position: 'absolute',
@@ -278,7 +273,7 @@ const styles = StyleSheet.create({
   },
   shadow: {
     shadowColor: '#171717',
-    shadowOffset: {width: -0.5, height: 3.5},
+    shadowOffset: { width: -0.5, height: 3.5 },
     shadowOpacity: 0.2,
     shadowRadius: 3,
   },
