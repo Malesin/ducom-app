@@ -10,7 +10,7 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useNavigation} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import config from '../../config';
@@ -35,22 +35,20 @@ export default function Profilescreen() {
       const userResponse = await axios.post(`${serverUrl}/userdata`, {
         token: token,
       });
-      console.log('Data Retrieved Successfully', userResponse.data);
+      console.log('Data Retrieved Successfully');
 
       const user = userResponse.data.data;
       setUserData(user);
 
       if (user.bannerPicture) {
-        setBanner({
-          uri: `${user.bannerPicture}`,
-        });
+        const banner = { uri: user.bannerPicture };
+        setBanner(banner);
         console.log('Image Banner Retrieved Successfully');
       }
 
       if (user.profilePicture) {
-        setProfilePicture({
-          uri: `${user.profilePicture}`,
-        });
+        const profile = { uri: user.profilePicture };
+        setProfilePicture(profile);
         console.log('Image Profile Retrieved Successfully');
       }
     } catch (error) {
@@ -85,7 +83,7 @@ export default function Profilescreen() {
           source={banner || require('../../assets/banner.png')}
           style={styles.banner}
         />
-        <TouchableOpacity style={styles.settingsButton} onPress={() => {}}>
+        <TouchableOpacity style={styles.settingsButton} onPress={() => { }}>
           <MaterialCommunityIcons name="dots-vertical" size={30} color="#000" />
         </TouchableOpacity>
       </View>

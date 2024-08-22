@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -10,9 +10,9 @@ import {
   Alert,
   useColorScheme,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import {SafeAreaView} from 'react-native';
-import {Skeleton} from 'react-native-elements';
+import { useNavigation } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native';
+import { Skeleton } from 'react-native-elements';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
   ALERT_TYPE,
@@ -47,7 +47,7 @@ export default function EditProfilePage() {
       const token = await AsyncStorage.getItem('token');
       console.log('Token Retrieved Successfully');
 
-      const userResponse = await axios.post(`${serverUrl}/userdata`, {token});
+      const userResponse = await axios.post(`${serverUrl}/userdata`, { token });
       console.log('Data Retrieved Successfully');
 
       const user = userResponse.data.data;
@@ -55,16 +55,14 @@ export default function EditProfilePage() {
       setUsername(user.username);
 
       if (user.bannerPicture) {
-        setBanner({
-          uri: `${user.bannerPicture}`,
-        });
+        const banner = { uri: user.bannerPicture };
+        setBanner(banner);
         console.log('Image Banner Retrieved Successfully');
       }
 
       if (user.profilePicture) {
-        setProfilePicture({
-          uri: `${user.profilePicture}`,
-        });
+        const profile = { uri: user.profilePicture };
+        setProfilePicture(profile);
         console.log('Image Profile Retrieved Successfully');
       }
     } catch (error) {
@@ -86,6 +84,7 @@ export default function EditProfilePage() {
     const nameRegex = /^[a-zA-Z]+( [a-zA-Z]+)*$/;
     return nameRegex.test(name) && name.length <= 40;
   };
+
   useEffect(() => {
     const beforeRemoveListener = navigation.addListener('beforeRemove', e => {
       if (isSaving) {
@@ -97,7 +96,7 @@ export default function EditProfilePage() {
         {
           text: 'No',
           style: 'cancel',
-          onPress: () => {},
+          onPress: () => { },
         },
         {
           text: 'Yes',
@@ -122,11 +121,21 @@ export default function EditProfilePage() {
     ),
   });
 
+  const validateUsername = username => {
+    const usernameRegex = /^[a-z0-9]{4,15}$/;
+    return usernameRegex.test(username) && !username.includes(' ');
+  };
+
+  const validateName = name => {
+    const nameRegex = /^[a-zA-Z]+( [a-zA-Z]+)*$/;
+    return nameRegex.test(name) && name.length <= 40;
+  };
+
   const handleSave = async () => {
     setIsSaving(true);
 
     Alert.alert('Confirmation', 'Do you want to save the changes?', [
-      {text: 'No', style: 'cancel', onPress: () => setIsSaving(false)},
+      { text: 'No', style: 'cancel', onPress: () => setIsSaving(false) },
       {
         text: 'Yes',
         style: 'default',
@@ -154,13 +163,14 @@ export default function EditProfilePage() {
               Dialog.show({
                 type: ALERT_TYPE.DANGER,
                 title: 'Invalid Name',
-                textBody: 'Name can only be alphabetical and maximum 40 char.',
+                textBody:
+                  'Name can only be alphabetical and maximum 40 char.',
               });
               return;
             }
 
             const token = await AsyncStorage.getItem('token');
-            const updatedUserData = {token: token};
+            const updatedUserData = { token: token };
 
             if (name && name !== userData?.name) {
               updatedUserData.name = name;
@@ -169,14 +179,14 @@ export default function EditProfilePage() {
             if (username && username !== userData?.username) {
               const checkUsernameResponse = await axios.post(
                 `${serverUrl}/check-username`,
-                {username},
+                { username },
               );
               if (checkUsernameResponse.data.status === 'error') {
                 setIsSaving(false);
                 Dialog.show({
                   type: ALERT_TYPE.DANGER,
                   title: 'Error',
-                  textBody: 'Username already exist!',
+                  textBody: 'Username already exists!',
                 });
                 return;
               }
@@ -251,7 +261,7 @@ export default function EditProfilePage() {
               Dialog.show({
                 type: ALERT_TYPE.DANGER,
                 title: 'Error',
-                textBody: 'An Error Occured. Please Try Again Later.',
+                textBody: 'An Error Occurred. Please Try Again Later.',
               });
             }
           } catch (error) {
@@ -281,7 +291,7 @@ export default function EditProfilePage() {
           return;
         }
         setNewProfileImage(image);
-        setProfilePicture({uri: image.path});
+        setProfilePicture({ uri: image.path });
       })
       .catch(error => {
         console.error('Error selecting image:', error);
@@ -302,16 +312,17 @@ export default function EditProfilePage() {
           return;
         }
         setNewBannerImage(image);
-        setBanner({uri: image.path});
+        setBanner({ uri: image.path });
       })
       .catch(error => {
         console.error('Error selecting image:', error);
       });
   };
 
+
   return (
     <AlertNotificationRoot>
-      <SafeAreaView style={{flex: 1}}>
+      <SafeAreaView style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <View style={styles.bannerContainer}>
             {isLoading ? (
