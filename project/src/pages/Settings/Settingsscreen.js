@@ -2,6 +2,7 @@ import { StyleSheet, Text, View, TouchableOpacity, Alert, Image, Button, TextInp
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import config from '../../config';
 const serverUrl = config.SERVER_URL;
 
@@ -27,9 +28,10 @@ const Settingsscreen = ({ navigation }) => {
   };
 
   return (
-    <View>
+    <View style={styles.container}>
       <TouchableOpacity style={styles.buttonLogout} onPress={handleLogout}>
-        <Text style={styles.contentText}>Logout</Text>
+        <MaterialCommunityIcons name="logout" size={30} color="#000" />
+        <Text style={styles.buttonText}>Log Out</Text>
       </TouchableOpacity>
     </View>
   );
@@ -38,13 +40,24 @@ const Settingsscreen = ({ navigation }) => {
 export default Settingsscreen;
 
 const styles = StyleSheet.create({
-  buttonLogout: {
-    width: 100,
-    height: 60,
-    backgroundColor: 'red',
-    borderRadius: 20,
+  container:{
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  }, 
+  buttonLogout: {
+    width: '100%',
+    height: 60,
+    backgroundColor: 'transparent',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent:'center',
+    paddingHorizontal: 10,
+  },
+  buttonText: {
+    color: 'black',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
   title: {
     fontSize: 24,

@@ -38,6 +38,26 @@ const CreatePost = ({route, navigation}) => {
   const styles = getStyles(colorScheme); // Get styles based on color scheme
 
   const profilePictureUri = require('../../assets/profilepic.png');
+  const [userProfilePicture, setUserProfilePicture] = useState(null);
+
+  useEffect(() => {
+    async function fetchUserProfilePicture() {
+      try {
+        const token = await AsyncStorage.getItem('token');
+        const userResponse = await axios.post(`${serverUrl}/userdata`, {
+          token: token,
+        });
+        const user = userResponse.data.data;
+        if (user.profilePicture) {
+          setUserProfilePicture({ uri: user.profilePicture });
+        }
+      } catch (error) {
+        console.error('Error fetching user profile picture:', error);
+      }
+    }
+
+    fetchUserProfilePicture();
+  }, []);
 
   async function getData() {
     try {
@@ -315,7 +335,7 @@ const CreatePost = ({route, navigation}) => {
           />
           <TextInput
             style={styles.textInput}
-            placeholder="What’s going on..... ?"
+            placeholder="What's going on..... ?"
             multiline
             value={newPostText}
             onChangeText={handleTextChange}

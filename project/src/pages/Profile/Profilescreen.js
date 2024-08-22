@@ -24,6 +24,7 @@ export default function Profilescreen() {
   const [profilePicture, setProfilePicture] = useState(false);
   const [modalImageSource, setModalImageSource] = useState(null);
   const [userData, setUserData] = useState('');
+  const [loading, setLoading] = useState(true); // State untuk loading
   const navigation = useNavigation();
 
   async function getData() {
@@ -51,8 +52,14 @@ export default function Profilescreen() {
         setProfilePicture(profile);
         console.log('Image Profile Retrieved Successfully');
       }
+
+      // Menambahkan delay 1 detik sebelum mengubah loading ke false
+      setTimeout(() => {
+        setLoading(false);
+      }, 1000);
     } catch (error) {
       console.error('Error occurred:', error);
+      setLoading(false); // Set loading ke false jika terjadi error
     }
   }
 
@@ -79,47 +86,55 @@ export default function Profilescreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.bannerContainer}>
-        <Image
-          source={banner || require('../../assets/banner.png')}
-          style={styles.banner}
-        />
+        {loading ? (
+          <Skeleton animation="pulse" height={150} width={'100%'} style={styles.skeletonBanner} />
+        ) : (
+          <Image
+            source={banner || require('../../assets/banner.png')}
+            style={styles.banner}
+          />
+        )}
         <TouchableOpacity style={styles.settingsButton} onPress={() => { }}>
           <MaterialCommunityIcons name="dots-vertical" size={30} color="#000" />
         </TouchableOpacity>
       </View>
       <View style={styles.profileContainer}>
         <TouchableOpacity onPress={openModal}>
-          <Image
-            source={profilePicture || profileImageSource}
-            style={styles.profile}
-          />
+          {loading ? (
+            <Skeleton animation="pulse" circle height={82} width={83} style={styles.skeletonProfile} />
+          ) : (
+            <Image
+              source={profilePicture || profileImageSource}
+              style={styles.profile}
+            />
+          )}
         </TouchableOpacity>
         <View style={styles.profileText}>
-          {!userData ? (
+          {loading ? (
             <>
               <Skeleton
                 animation="pulse"
                 height={20}
                 width={150}
-                style={styles.skeleton}
+                style={[styles.skeleton, styles.skeletonText]}
               />
               <Skeleton
                 animation="pulse"
                 height={14}
                 width={100}
-                style={styles.skeleton}
+                style={[styles.skeleton, styles.skeletonText]}
               />
               <Skeleton
                 animation="pulse"
                 height={13}
                 width={200}
-                style={styles.skeleton}
+                style={[styles.skeleton, styles.skeletonText]}
               />
               <Skeleton
                 animation="pulse"
                 height={30}
                 width={120}
-                style={styles.skeleton}
+                style={[styles.skeleton, styles.skeletonText]}
               />
             </>
           ) : (
@@ -241,5 +256,15 @@ const styles = StyleSheet.create({
   },
   skeleton: {
     marginBottom: 10,
+  },
+  skeletonBanner: {
+    marginBottom: 20,
+  },
+  skeletonProfile: {
+    marginBottom: 30,
+    marginTop: 10, // Menambahkan jeda di atas skeleton profile picture
+  },
+  skeletonText: {
+    marginLeft: 10, // Menambahkan jeda di sebelah profile picture
   },
 });
