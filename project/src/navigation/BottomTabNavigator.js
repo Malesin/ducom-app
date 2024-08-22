@@ -1,18 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import React, {useState, useEffect} from 'react';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import { Image, StyleSheet, View, Text } from 'react-native';
-import { Profilescreen, Notificationscreen } from '../pages';
+import {Image, StyleSheet, View, Text} from 'react-native';
+import {Profilescreen, Notificationscreen} from '../pages';
 import DrawerNavigator from './DrawerNavigator';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { useFocusEffect } from '@react-navigation/native';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import {useFocusEffect} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../config';
 const serverUrl = config.SERVER_URL;
 
 import TopTabNavigator from './TopTabNavigator';
-
 
 import profileImage from './../assets/profilepic.png';
 
@@ -35,11 +34,10 @@ function BottomTabNavigator() {
       const user = userResponse.data.data;
 
       if (user.profilePicture) {
-        const profile = { uri: user.profilePicture };
+        const profile = {uri: user.profilePicture};
         setProfilePicture(profile);
         console.log('Image Profile Retrieved Successfully');
       }
-
     } catch (error) {
       console.error('Error occurred:', error);
     }
@@ -53,10 +51,10 @@ function BottomTabNavigator() {
   }, []);
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <GestureHandlerRootView style={{flex: 1}}>
       <Tab.Navigator
-        screenOptions={({ route }) => ({
-          tabBarIcon: ({ color }) => {
+        screenOptions={({route}) => ({
+          tabBarIcon: ({color}) => {
             let iconName;
             const iconSize = 30;
 
@@ -74,7 +72,7 @@ function BottomTabNavigator() {
               return (
                 <Image
                   source={profilePicture || profileImage}
-                  style={[styles.icon, { tintColor: undefined }]}
+                  style={[styles.icon, {tintColor: undefined}]}
                 />
               );
             }

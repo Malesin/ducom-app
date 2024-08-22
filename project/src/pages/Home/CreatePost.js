@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   StyleSheet,
   TextInput,
@@ -15,27 +15,28 @@ import {
   useColorScheme,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { Button } from 'react-native-elements';
+import {Button} from 'react-native-elements';
 import * as ImagePicker from 'react-native-image-picker';
 import Video from 'react-native-video';
-import { createThumbnail } from 'react-native-create-thumbnail';
+import {createThumbnail} from 'react-native-create-thumbnail';
 import axios from 'axios';
 import config from '../../config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const serverUrl = config.SERVER_URL;
 
-const CreatePost = ({ route, navigation }) => {
+const CreatePost = ({route, navigation}) => {
   const [newPostText, setNewPostText] = useState('');
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState([]);
   const [previewVisible, setPreviewVisible] = useState(false);
   const [previewMedia, setPreviewMedia] = useState(null);
   const [mediaType, setMediaType] = useState(null);
+  const [profilePicture, setProfilePicture] = useState(null);
   const [translateY] = useState(new Animated.Value(500)); // Initial position
   const colorScheme = useColorScheme();
   const styles = getStyles(colorScheme); // Get styles based on color scheme
-  
+
   const profilePictureUri = require('../../assets/profilepic.png');
   const [userProfilePicture, setUserProfilePicture] = useState(null);
 
@@ -58,11 +59,38 @@ const CreatePost = ({ route, navigation }) => {
     fetchUserProfilePicture();
   }, []);
 
+  async function getData() {
+    try {
+      const token = await AsyncStorage.getItem('token');
+      console.log('Token Retrieved Successfully');
+
+      // Ambil data pengguna
+      const userResponse = await axios.post(`${serverUrl}/userdata`, {
+        token: token,
+      });
+      console.log('Data Retrieved Successfully');
+
+      const user = userResponse.data.data;
+
+      if (user.profilePicture) {
+        const profile = {uri: user.profilePicture};
+        setProfilePicture(profile);
+        console.log('Image Profile Retrieved Successfully');
+      }
+    } catch (error) {
+      console.error('Error occurred:', error);
+    }
+  }
+
+  useEffect(() => {
+    getData();
+  }, []);
+
   useEffect(() => {
     if (route.params?.mediaUri) {
       setSelectedMedia(prevMedia => [
         ...prevMedia,
-        { uri: route.params.mediaUri },
+        {uri: route.params.mediaUri},
       ]);
       setMediaType(route.params.mediaType);
     }
@@ -77,32 +105,40 @@ const CreatePost = ({ route, navigation }) => {
     }).start();
   }, [translateY]);
 
+  console.log(selectedMedia, 'woilah');
+
   const handlePostSubmit = async () => {
     const token = await AsyncStorage.getItem('token');
     try {
       if (selectedMedia.length > 0) {
-        // Prepare the form data for media upload
         const formData = new FormData();
         selectedMedia.forEach((media, index) => {
+          const fileType = media.uri.endsWith('.mp4')
+            ? 'video/mp4'
+            : 'image/jpeg';
           formData.append('media', {
             uri: media.uri,
-            type: mediaType === 'video' ? 'video/mp4' : 'image/jpeg',
-            name: `media-${index}.${mediaType === 'video' ? 'mp4' : 'jpg'}`,
+            type: fileType,
+            name: `media-${index}.${
+              media.uri.endsWith('.mp4') ? 'mp4' : 'jpg'
+            }`,
           });
         });
         formData.append('token', token);
 
-        // Upload media
-        const uploadResponse = await axios.post(`${serverUrl}/upload-media`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
+        const uploadResponse = await axios.post(
+          `${serverUrl}/upload-media`,
+          formData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
           },
-        });
+        );
 
         if (uploadResponse.data.status === 'ok') {
           const mediaData = uploadResponse.data.data;
 
-          // Create a new post with the uploaded media URIs
           const postResponse = await axios.post(`${serverUrl}/create-post`, {
             token: token,
             media: mediaData.map(item => `${item.url}|${item.type}`).join(','),
@@ -111,7 +147,7 @@ const CreatePost = ({ route, navigation }) => {
 
           if (postResponse.data.status === 'ok') {
             navigation.navigate('Home');
-            console.log("Post created successfully with media");
+            console.log('Post created successfully with media');
           } else {
             console.error('Failed to create post:', postResponse.data.data);
           }
@@ -119,15 +155,14 @@ const CreatePost = ({ route, navigation }) => {
           console.error('Failed to upload media:', uploadResponse.data.data);
         }
       } else {
-        // No media selected, create post with description only
         const postResponse = await axios.post(`${serverUrl}/create-post`, {
           token: token,
-          description: newPostText, // Replace with your post description variable
+          description: newPostText,
         });
 
         if (postResponse.data.status === 'ok') {
           navigation.navigate('Home');
-          console.log("Post created successfully without media");
+          console.log('Post created successfully without media');
         } else {
           console.error('Failed to create post:', postResponse.data.data);
         }
@@ -149,7 +184,7 @@ const CreatePost = ({ route, navigation }) => {
       } else if (response.errorCode) {
         console.log('ImagePicker Error: ', response.errorMessage);
       } else {
-        const { mediaType, assets } = response;
+        const {mediaType, assets} = response;
         if (assets && assets.length > 0) {
           const uri = assets[0].uri;
           if (mediaType === 'video') {
@@ -158,14 +193,14 @@ const CreatePost = ({ route, navigation }) => {
               const thumbnailUri = await generateThumbnail(uri);
               setSelectedMedia(prevMedia => [
                 ...prevMedia,
-                { uri, thumbnailUri },
+                {uri, thumbnailUri},
               ]);
               setMediaType(mediaType);
             } catch (error) {
               Alert.alert('Video Upload Error', error.message);
             }
           } else {
-            setSelectedMedia(prevMedia => [...prevMedia, { uri }]);
+            setSelectedMedia(prevMedia => [...prevMedia, {uri}]);
             setMediaType(mediaType);
           }
         }
@@ -203,7 +238,7 @@ const CreatePost = ({ route, navigation }) => {
         } else {
           setSelectedMedia(prevMedia => [
             ...prevMedia,
-            ...uris.map(uri => ({ uri })),
+            ...uris.map(uri => ({uri})),
           ]);
           setMediaType(types[0] || 'photo');
         }
@@ -225,16 +260,13 @@ const CreatePost = ({ route, navigation }) => {
 
   const generateThumbnail = async uri => {
     try {
-      const { uri: thumbnailUri } = await createThumbnail({ source: uri });
+      const {uri: thumbnailUri} = await createThumbnail({source: uri});
       return thumbnailUri;
     } catch (error) {
       console.error('Error generating thumbnail:', error);
       return null;
     }
   };
-
-
-
 
   const handleTextChange = text => {
     setNewPostText(text);
@@ -249,11 +281,6 @@ const CreatePost = ({ route, navigation }) => {
     setSelectedMedia(prevMedia => prevMedia.filter(item => item.uri !== uri));
   };
 
-  // const convertMediaToUri = media => {
-  //   const uri = URL.createObjectURL(media);
-  //   return uri;
-  // };
-
   const renderMedia = (media, index) => {
     if (typeof media.uri !== 'string') {
       console.error('Invalid URI Format');
@@ -263,9 +290,9 @@ const CreatePost = ({ route, navigation }) => {
       <View key={index} style={styles.mediaContainer}>
         <TouchableOpacity onPress={() => handleMediaPress(media.uri)}>
           {media.thumbnailUri ? (
-            <Image source={{ uri: media.thumbnailUri }} style={styles.media} />
+            <Image source={{uri: media.thumbnailUri}} style={styles.media} />
           ) : (
-            <Image source={{ uri: media.uri }} style={styles.media} />
+            <Image source={{uri: media.uri}} style={styles.media} />
           )}
         </TouchableOpacity>
         <TouchableOpacity
@@ -276,7 +303,6 @@ const CreatePost = ({ route, navigation }) => {
       </View>
     );
   };
-
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -301,10 +327,10 @@ const CreatePost = ({ route, navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <Animated.View
-        style={[styles.contentContainer, { transform: [{ translateY }] }]}>
+        style={[styles.contentContainer, {transform: [{translateY}]}]}>
         <View style={styles.inputContainer}>
           <Image
-            source={userProfilePicture || profilePictureUri}
+            source={profilePicture || profilePictureUri}
             style={styles.profilePicture}
           />
           <TextInput
@@ -356,13 +382,13 @@ const CreatePost = ({ route, navigation }) => {
             </TouchableOpacity>
             {previewMedia.endsWith('.mp4') ? (
               <Video
-                source={{ uri: previewMedia }}
+                source={{uri: previewMedia}}
                 style={styles.fullScreenMedia}
                 controls
               />
             ) : (
               <Image
-                source={{ uri: previewMedia }}
+                source={{uri: previewMedia}}
                 style={styles.fullScreenMedia}
               />
             )}

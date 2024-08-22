@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {
   StyleSheet,
   ScrollView,
@@ -9,9 +9,10 @@ import {
   TouchableOpacity,
   Text,
   RefreshControl,
+  ActivityIndicator,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useFocusEffect } from '@react-navigation/native';
+import {useFocusEffect} from '@react-navigation/native';
 import TweetCard from '../../components/TweetCard'; // Import TweetCard
 import Animated, {
   withDelay,
@@ -29,58 +30,65 @@ import { Skeleton } from 'react-native-elements'; // Import Skeleton
 
 const serverUrl = config.SERVER_URL;
 
-const HomeScreen = ({ navigation }) => {
+const HomeScreen = ({navigation}) => {
   const [tweets, setTweets] = useState([]);
-  const [refreshing, setRefreshing] = useState(false); // State untuk refreshing
-  const [loading, setLoading] = useState(true); // State untuk loading
+  const [refreshing, setRefreshing] = useState(false);
+  const [page, setPage] = useState(1);
+  const [loadingMore, setLoadingMore] = useState(false);
 
   const isExpanded = useSharedValue(false);
 
-  async function getData() {
+  const fetchTweets = async pageNum => {
     const token = await AsyncStorage.getItem('token');
     try {
-      const response = await axios.post(`${serverUrl}/userdata`, { token });
-      const { data, status } = response.data;
-      console.log('Data received'); // Add this log to check the data
+      const response = await axios.post(`${serverUrl}/userdata`, {token});
+      const {data, status} = response.data;
       if (status === 'error') {
         Alert.alert('Error', 'Anda Telah Keluar dari Akun', [
-          { text: 'OK', onPress: () => navigation.navigate('Auths') },
+          {text: 'OK', onPress: () => navigation.navigate('Auths')},
         ]);
         return;
       }
 
-      const responseTweet = await axios.post(`${serverUrl}/posts`);
-
-      const dataDataTweet = responseTweet.data.data[0];
+      const responseTweet = await axios.post(`${serverUrl}/posts`, {
+        page: pageNum,
+      });
       const dataTweet = responseTweet.data;
 
       const formattedTweets = dataTweet.data.map(post => ({
         id: post._id,
         userAvatar: post.user.profilePicture,
         userName: post.user.name,
-        userHandle: post.user.username, 
+        userHandle: post.user.username,
         postDate: post.created_at,
         content: post.description,
-        media: Array.isArray(post.media) ? post.media.map(mediaItem => ({
-          type: mediaItem.type,
-          uri: mediaItem.uri,
-        })) : [],
+        media: Array.isArray(post.media)
+          ? post.media.map(mediaItem => ({
+              type: mediaItem.type,
+              uri: mediaItem.uri,
+            }))
+          : [],
         likesCount: post.likes.length,
         commentsCount: post.comments.length,
         bookMarksCount: post.bookmarks.length,
       }));
 
-      setTweets(formattedTweets); // Hanya mengatur data dari API, tidak menambahkan yang lama
-
-      // Menambahkan delay 1 detik sebelum mengubah loading ke false
-      setTimeout(() => {
-        setLoading(false);
-      }, 1000);
+      setTweets(prevTweets =>
+        pageNum === 1 ? formattedTweets : [...prevTweets, ...formattedTweets],
+      );
     } catch (error) {
       console.error('Error fetching data:', error);
-      setLoading(false); // Set loading ke false jika terjadi error
+    } finally {
+      setLoadingMore(true);
     }
-  }
+  };
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    setPage(1);
+    await fetchTweets(1);
+    setRefreshing(false);
+  }, []);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -116,10 +124,15 @@ const HomeScreen = ({ navigation }) => {
     }, []),
   );
 
-  useEffect(() => {
-    getData()
-  }, [])
+  useFocusEffect(
+    useCallback(() => {
+      isExpanded.value = false; // Reset FAB state when screen comes into focus
+    }, []),
+  );
 
+  useEffect(() => {
+    fetchTweets(page);
+  }, [page]);
   const handleOpenCamera = () => {
     const options = {
       mediaType: 'photo',
@@ -136,12 +149,12 @@ const HomeScreen = ({ navigation }) => {
         const uri = response.assets[0].uri;
         console.log('Captured image URI:', uri);
         // Navigate to CreatePost and pass the image URI
-        navigation.navigate('CreatePost', { mediaUri: uri, mediaType: 'photo' });
+        navigation.navigate('CreatePost', {mediaUri: uri, mediaType: 'photo'});
       }
     });
   };
 
-  const FloatingActionButton = ({ isExpanded, index, iconName, onPress }) => {
+  const FloatingActionButton = ({isExpanded, index, iconName, onPress}) => {
     const animatedStyles = useAnimatedStyle(() => {
       const moveValue = isExpanded.value ? OFFSET * index : 0;
       const translateValue = withSpring(-moveValue, SPRING_CONFIG);
@@ -150,8 +163,8 @@ const HomeScreen = ({ navigation }) => {
 
       return {
         transform: [
-          { translateY: translateValue },
-          { scale: withDelay(delay, withTiming(scaleValue)) },
+          {translateY: translateValue},
+          {scale: withDelay(delay, withTiming(scaleValue))},
         ],
         backgroundColor: isExpanded.value ? '#F3F3F3' : '#F3F3F3',
       };
@@ -183,11 +196,18 @@ const HomeScreen = ({ navigation }) => {
 
     return {
       transform: [
-        { translateX: translateValue },
-        { rotate: withTiming(rotateValue) },
+        {translateX: translateValue},
+        {rotate: withTiming(rotateValue)},
       ],
     };
   });
+
+  const handleLoadMore = () => {
+    if (!loadingMore) {
+      setLoadingMore(true);
+      setPage(prevPage => prevPage + 1);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -195,31 +215,21 @@ const HomeScreen = ({ navigation }) => {
         contentContainerStyle={styles.contentContainer}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }>
-        {loading ? (
-          // Skeleton loading
-          <>
-            <View style={styles.skeletonContainer}>
-              <View style={styles.skeletonHeader}>
-                <Skeleton animation="pulse" circle height={40} width={40} style={styles.skeletonAvatar} />
-                <View style={styles.skeletonTextContainer}>
-                  <Skeleton animation="pulse" height={20} width={100} style={styles.skeleton} />
-                  <Skeleton animation="pulse" height={14} width={60} style={styles.skeleton} />
-                </View>
-              </View>
-              <Skeleton animation="pulse" height={20} width={200} style={styles.skeleton} />
-              <Skeleton animation="pulse" height={150} width={'100%'} style={styles.skeleton} />
-            </View>
-            <View style={styles.skeletonContainer}>
-              <View style={styles.skeletonHeader}>
-                <Skeleton animation="pulse" circle height={40} width={40} style={styles.skeletonAvatar} />
-                <View style={styles.skeletonTextContainer}>
-                  <Skeleton animation="pulse" height={20} width={100} style={styles.skeleton} />
-                  <Skeleton animation="pulse" height={14} width={60} style={styles.skeleton} />
-                </View>
-              </View>
-              <Skeleton animation="pulse" height={20} width={200} style={styles.skeleton} />
-              <Skeleton animation="pulse" height={150} width={'100%'} style={styles.skeleton} />
+        }
+        onScroll={({nativeEvent}) => {
+          const {contentOffset, layoutMeasurement, contentSize} = nativeEvent;
+          const contentHeight = contentSize.height;
+          const viewportHeight = layoutMeasurement.height;
+          const scrollPosition = contentOffset.y + viewportHeight;
+
+          if (scrollPosition >= contentHeight - 100) {
+            handleLoadMore();
+          }
+        }}>
+        {Array.isArray(tweets) && tweets.length > 0 ? (
+          tweets.map((tweet, index) => (
+            <View key={index} style={styles.tweetContainer}>
+              <TweetCard tweet={tweet} />
             </View>
           </>
         ) : (
@@ -232,6 +242,13 @@ const HomeScreen = ({ navigation }) => {
           ) : (
             <Text style={styles.noTweetsText}>No tweets available</Text>
           )
+        )}
+        {loadingMore && (
+          <ActivityIndicator
+            size="large"
+            color="#001374"
+            style={styles.loadingMore}
+          />
         )}
       </ScrollView>
 
@@ -321,7 +338,7 @@ const styles = StyleSheet.create({
   },
   shadow: {
     shadowColor: '#171717',
-    shadowOffset: { width: -0.5, height: 3.5 },
+    shadowOffset: {width: -0.5, height: 3.5},
     shadowOpacity: 0.2,
     shadowRadius: 3,
   },
@@ -333,11 +350,8 @@ const styles = StyleSheet.create({
     color: '#888',
     marginTop: 20,
   },
-  capturedImage: {
-    width: '100%',
-    height: 200,
-    marginTop: 20,
-    borderRadius: 10,
+  loadingMore: {
+    marginVertical: 20,
   },
   skeletonContainer: {
     width: '100%',
