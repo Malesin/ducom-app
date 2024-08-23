@@ -26,7 +26,6 @@ import * as ImagePicker from 'react-native-image-picker';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import axios from 'axios';
 import config from '../../config';
-import { Skeleton } from 'react-native-elements'; // Import Skeleton
 
 const serverUrl = config.SERVER_URL;
 
@@ -73,13 +72,18 @@ const HomeScreen = ({navigation}) => {
         bookMarksCount: post.bookmarks.length,
       }));
 
-      setTweets(prevTweets =>
-        pageNum === 1 ? formattedTweets : [...prevTweets, ...formattedTweets],
-      );
+      setTweets(prevTweets => {
+        // Filter to avoid duplicate tweets
+        const newTweets = formattedTweets.filter(
+          newTweet => !prevTweets.some(tweet => tweet.id === newTweet.id),
+        );
+
+        return pageNum === 1 ? newTweets : [...prevTweets, ...newTweets];
+      });
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
-      setLoadingMore(true);
+      setLoadingMore(false);
     }
   };
 
@@ -87,12 +91,6 @@ const HomeScreen = ({navigation}) => {
     setRefreshing(true);
     setPage(1);
     await fetchTweets(1);
-    setRefreshing(false);
-  }, []);
-
-  const onRefresh = useCallback(async () => {
-    setRefreshing(true);
-    await getData(); // Panggil fungsi untuk mendapatkan data terbaru
     setRefreshing(false);
   }, []);
 
@@ -114,10 +112,6 @@ const HomeScreen = ({navigation}) => {
   useFocusEffect(
     useCallback(() => {
       BackHandler.addEventListener('hardwareBackPress', handleBackPress);
-      
-      // Reset isExpanded to false when HomeScreen is focused
-      isExpanded.value = false;
-
       return () => {
         BackHandler.removeEventListener('hardwareBackPress', handleBackPress);
       };
@@ -133,6 +127,7 @@ const HomeScreen = ({navigation}) => {
   useEffect(() => {
     fetchTweets(page);
   }, [page]);
+
   const handleOpenCamera = () => {
     const options = {
       mediaType: 'photo',
@@ -231,17 +226,9 @@ const HomeScreen = ({navigation}) => {
             <View key={index} style={styles.tweetContainer}>
               <TweetCard tweet={tweet} />
             </View>
-          </>
+          ))
         ) : (
-          Array.isArray(tweets) && tweets.length > 0 ? (
-            tweets.map((tweet, index) => (
-              <View key={index} style={styles.tweetContainer}>
-                <TweetCard tweet={tweet} />
-              </View>
-            ))
-          ) : (
-            <Text style={styles.noTweetsText}>No tweets available</Text>
-          )
+          <Text style={styles.noTweetsText}>No tweets available</Text>
         )}
         {loadingMore && (
           <ActivityIndicator
@@ -300,7 +287,9 @@ const mainButtonStyles = StyleSheet.create({
   },
   content: {
     fontSize: 48,
-    color: '#f8f9ff',
+    color: 'white',
+    lineHeight: 55,
+    marginBottom: 1,
   },
 });
 
@@ -352,31 +341,6 @@ const styles = StyleSheet.create({
   },
   loadingMore: {
     marginVertical: 20,
-  },
-  skeletonContainer: {
-    width: '100%',
-    padding: 20,
-    marginBottom: 20,
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    shadowColor: '#171717',
-    shadowOffset: { width: -0.5, height: 3.5 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-  },
-  skeletonHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  skeletonAvatar: {
-    marginRight: 10,
-  },
-  skeletonTextContainer: {
-    flex: 1,
-  },
-  skeleton: {
-    marginBottom: 10,
   },
 });
 
