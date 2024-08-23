@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useCallback} from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   StyleSheet,
   ScrollView,
@@ -12,7 +12,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useFocusEffect} from '@react-navigation/native';
+import { useFocusEffect } from '@react-navigation/native';
 import TweetCard from '../../components/TweetCard'; // Import TweetCard
 import Animated, {
   withDelay,
@@ -29,7 +29,7 @@ import config from '../../config';
 
 const serverUrl = config.SERVER_URL;
 
-const HomeScreen = ({navigation}) => {
+const HomeScreen = ({ navigation }) => {
   const [tweets, setTweets] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [page, setPage] = useState(1);
@@ -40,11 +40,11 @@ const HomeScreen = ({navigation}) => {
   const fetchTweets = async pageNum => {
     const token = await AsyncStorage.getItem('token');
     try {
-      const response = await axios.post(`${serverUrl}/userdata`, {token});
-      const {data, status} = response.data;
+      const response = await axios.post(`${serverUrl}/userdata`, { token });
+      const { data, status } = response.data;
       if (status === 'error') {
         Alert.alert('Error', 'Anda Telah Keluar dari Akun', [
-          {text: 'OK', onPress: () => navigation.navigate('Auths')},
+          { text: 'OK', onPress: () => navigation.navigate('Auths') },
         ]);
         return;
       }
@@ -63,9 +63,9 @@ const HomeScreen = ({navigation}) => {
         content: post.description,
         media: Array.isArray(post.media)
           ? post.media.map(mediaItem => ({
-              type: mediaItem.type,
-              uri: mediaItem.uri,
-            }))
+            type: mediaItem.type,
+            uri: mediaItem.uri,
+          }))
           : [],
         likesCount: post.likes.length,
         commentsCount: post.comments.length,
@@ -144,12 +144,12 @@ const HomeScreen = ({navigation}) => {
         const uri = response.assets[0].uri;
         console.log('Captured image URI:', uri);
         // Navigate to CreatePost and pass the image URI
-        navigation.navigate('CreatePost', {mediaUri: uri, mediaType: 'photo'});
+        navigation.navigate('CreatePost', { mediaUri: uri, mediaType: 'photo' });
       }
     });
   };
 
-  const FloatingActionButton = ({isExpanded, index, iconName, onPress}) => {
+  const FloatingActionButton = ({ isExpanded, index, iconName, onPress }) => {
     const animatedStyles = useAnimatedStyle(() => {
       const moveValue = isExpanded.value ? OFFSET * index : 0;
       const translateValue = withSpring(-moveValue, SPRING_CONFIG);
@@ -158,8 +158,8 @@ const HomeScreen = ({navigation}) => {
 
       return {
         transform: [
-          {translateY: translateValue},
-          {scale: withDelay(delay, withTiming(scaleValue))},
+          { translateY: translateValue },
+          { scale: withDelay(delay, withTiming(scaleValue)) },
         ],
         backgroundColor: isExpanded.value ? '#F3F3F3' : '#F3F3F3',
       };
@@ -191,8 +191,8 @@ const HomeScreen = ({navigation}) => {
 
     return {
       transform: [
-        {translateX: translateValue},
-        {rotate: withTiming(rotateValue)},
+        { translateX: translateValue },
+        { rotate: withTiming(rotateValue) },
       ],
     };
   });
@@ -211,8 +211,8 @@ const HomeScreen = ({navigation}) => {
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
-        onScroll={({nativeEvent}) => {
-          const {contentOffset, layoutMeasurement, contentSize} = nativeEvent;
+        onScroll={({ nativeEvent }) => {
+          const { contentOffset, layoutMeasurement, contentSize } = nativeEvent;
           const contentHeight = contentSize.height;
           const viewportHeight = layoutMeasurement.height;
           const scrollPosition = contentOffset.y + viewportHeight;
@@ -327,7 +327,7 @@ const styles = StyleSheet.create({
   },
   shadow: {
     shadowColor: '#171717',
-    shadowOffset: {width: -0.5, height: 3.5},
+    shadowOffset: { width: -0.5, height: 3.5 },
     shadowOpacity: 0.2,
     shadowRadius: 3,
   },

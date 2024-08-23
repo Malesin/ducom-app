@@ -63,12 +63,12 @@ export default function Profilescreen() {
     }
   }
 
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      getData();
-    }, 2000);
-    return () => clearInterval(intervalId);
-  }, []);
+  // useEffect(() => {
+  //   const intervalId = setInterval(() => {
+  //     getData();
+  //   }, 2000);
+  //   return () => clearInterval(intervalId);
+  // }, []);
 
   // Define the source for the profile image
   const profileImageSource = require('../../assets/profilepic.png');
