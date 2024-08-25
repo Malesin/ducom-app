@@ -11,7 +11,6 @@ import {
   RefreshControl,
   ActivityIndicator,
 } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 import TweetCard from '../../components/TweetCard'; // Import TweetCard
 import Animated, {
@@ -24,6 +23,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import * as ImagePicker from 'react-native-image-picker';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../../config';
 
@@ -49,6 +49,8 @@ const HomeScreen = ({ navigation }) => {
         return;
       }
 
+      const idUserLike = data._id; // Extract user ID
+
       const responseTweet = await axios.post(`${serverUrl}/posts`, {
         page: pageNum,
       });
@@ -70,6 +72,7 @@ const HomeScreen = ({ navigation }) => {
         likesCount: post.likes.length,
         commentsCount: post.comments.length,
         bookMarksCount: post.bookmarks.length,
+        isLiked: post.likes.includes(idUserLike),
       }));
 
       setTweets(prevTweets => {
@@ -86,6 +89,7 @@ const HomeScreen = ({ navigation }) => {
       setLoadingMore(false);
     }
   };
+
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
