@@ -36,8 +36,8 @@ const TweetCard = ({ tweet }) => {
       for (const media of tweet.media || []) {
         if (media.type === 'video' && media.uri) {
           try {
-            const { uri } = await createThumbnail({ url: media.uri });
-            newThumbnails[media.uri] = uri;
+            const { path } = await createThumbnail({ url: media.uri });
+            newThumbnails[media.uri] = path;
           } catch (error) {
             console.log('Error generating thumbnail:', error);
           }
@@ -60,7 +60,6 @@ const TweetCard = ({ tweet }) => {
           token: token,
           postId: tweet.id,
         });
-
 
         if (response.data.status === 'ok') {
           setLiked(true); // Directly update liked state
@@ -85,7 +84,6 @@ const TweetCard = ({ tweet }) => {
         token: token,
         postId: tweet.id,
       });
-
 
       if (response.data.status === 'ok') {
         setLiked(false); // Directly update liked state
