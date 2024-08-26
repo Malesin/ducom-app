@@ -46,7 +46,6 @@ export default function Profilescreen() {
       if (user.bannerPicture) {
         const banner = { uri: user.bannerPicture };
         setBanner(banner, "banner");
-        console.log(banner)
         console.log('Image Banner Retrieved Successfully');
       }
 

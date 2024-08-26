@@ -50,7 +50,6 @@ const HomeScreen = ({ navigation }) => {
       }
 
       const idUserLike = data._id; // Extract user ID
-
       const responseTweet = await axios.post(`${serverUrl}/posts`, {
         page: pageNum,
       });
@@ -72,7 +71,9 @@ const HomeScreen = ({ navigation }) => {
         likesCount: post.likes.length,
         commentsCount: post.comments.length,
         bookMarksCount: post.bookmarks.length,
-        isLiked: post.likes.includes(idUserLike),
+        isLiked: post.likes.map(likemap => {
+          likemap._id.includes(idUserLike)
+        })
       }));
 
       setTweets(prevTweets => {
