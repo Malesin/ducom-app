@@ -32,7 +32,7 @@ function Likescreen({ navigation }) {
                 Alert.alert('Error', 'Anda Telah Keluar dari Akun', [
                     { text: 'OK', onPress: () => navigation.navigate('Auths') },
                 ]);
-                return;
+                return [];
             }
 
             const idUserLike = data._id; // Extract user ID
@@ -59,18 +59,11 @@ function Likescreen({ navigation }) {
                 isLiked: post.likes.some(like => like._id === idUserLike),
             }));
 
-            setTweets(prevTweets => {
-                const newTweets = formattedTweets.filter(
-                    newTweet => !prevTweets.some(tweet => tweet.id === newTweet.id),
-                );
-
-                return pageNum === 1 ? newTweets : [...prevTweets, ...newTweets];
-            });
-            setIsFetched(true); // Set isFetched to true after fetching data
+            return formattedTweets;
         } catch (error) {
             console.error('Error fetching data:', error);
+            return [];
         } finally {
-            setLoading(false);
             setLoadingMore(false);
         }
     }, [navigation]);
@@ -78,22 +71,37 @@ function Likescreen({ navigation }) {
     useFocusEffect(
         useCallback(() => {
             if (!isFetched) { // Only fetch if data has not been fetched yet
-                fetchTweets(page);
+                (async () => {
+                    setLoading(true);
+                    const newTweets = await fetchTweets(page);
+                    setTweets(newTweets);
+                    setIsFetched(true);
+                    setLoading(false);
+                })();
             }
         }, [fetchTweets, page, isFetched])
     );
 
-    const handleLoadMore = () => {
+    const handleLoadMore = async () => {
         if (!loadingMore) {
             setLoadingMore(true);
-            setPage(prevPage => prevPage + 1);
+            const newPage = page + 1;
+            setPage(newPage);
+            const newTweets = await fetchTweets(newPage);
+            setTweets(prevTweets => {
+                // Filter to avoid duplicate tweets
+                const uniqueTweets = newTweets.filter(
+                    newTweet => !prevTweets.some(tweet => tweet.id === newTweet.id)
+                );
+                return [...prevTweets, ...uniqueTweets];
+            });
         }
     };
 
     return (
         <SafeAreaView style={styles.container}>
             {loading ? (
-                <ActivityIndicator size="large" color="#001374" style={styles.loading} />
+                <ActivityIndicator size="large" color="#001374" style={styles.loadingIndicator} />
             ) : (
                 <ScrollView
                     contentContainerStyle={styles.contentContainer}
@@ -152,7 +160,7 @@ const styles = StyleSheet.create({
     loadingMore: {
         marginVertical: 20,
     },
-    loading: {
+    loadingIndicator: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',

@@ -33,7 +33,7 @@ function Mediascreen({ navigation }) {
                 Alert.alert('Error', 'Anda Telah Keluar dari Akun', [
                     { text: 'OK', onPress: () => navigation.navigate('Auths') },
                 ]);
-                return;
+                return [];
             }
 
             const idUserLike = data._id; // Extract user ID
@@ -59,24 +59,14 @@ function Mediascreen({ navigation }) {
                     likesCount: post.likes.length,
                     commentsCount: post.comments.length,
                     bookMarksCount: post.bookmarks.length,
-                    isLiked: post.likes.map(likemap => {
-                        likemap._id.includes(idUserLike)
-                    })
+                    isLiked: post.likes.some(like => like._id === idUserLike) // Check if the user's ID is in the likes array
                 }));
 
-            setTweets(prevTweets => {
-                // Filter to avoid duplicate tweets
-                const newTweets = formattedTweets.filter(
-                    newTweet => !prevTweets.some(tweet => tweet.id === newTweet.id),
-                );
-
-                return pageNum === 1 ? newTweets : [...prevTweets, ...newTweets];
-            });
-            setIsFetched(true); // Set isFetched to true after fetching data
+            return formattedTweets;
         } catch (error) {
             console.error('Error fetching data:', error);
+            return [];
         } finally {
-            setLoading(false); // Set loading to false after fetching
             setLoadingMore(false);
         }
     }, [navigation]);
@@ -84,15 +74,30 @@ function Mediascreen({ navigation }) {
     useFocusEffect(
         useCallback(() => {
             if (!isFetched) { // Only fetch if data has not been fetched yet
-                fetchTweets(page);
+                (async () => {
+                    setLoading(true);
+                    const newTweets = await fetchTweets(page);
+                    setTweets(newTweets);
+                    setIsFetched(true);
+                    setLoading(false);
+                })();
             }
         }, [fetchTweets, page, isFetched])
     );
 
-    const handleLoadMore = () => {
+    const handleLoadMore = async () => {
         if (!loadingMore) {
             setLoadingMore(true);
-            setPage(prevPage => prevPage + 1);
+            const newPage = page + 1;
+            setPage(newPage);
+            const newTweets = await fetchTweets(newPage);
+            setTweets(prevTweets => {
+                // Filter to avoid duplicate tweets
+                const uniqueTweets = newTweets.filter(
+                    newTweet => !prevTweets.some(tweet => tweet.id === newTweet.id)
+                );
+                return [...prevTweets, ...uniqueTweets];
+            });
         }
     };
 
