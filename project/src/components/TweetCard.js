@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -12,14 +12,14 @@ import {
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Video from 'react-native-video';
-import { createThumbnail } from 'react-native-create-thumbnail';
+import {createThumbnail} from 'react-native-create-thumbnail';
 import DefaultAvatar from '../assets/avatar.png';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../config';
 const serverUrl = config.SERVER_URL;
 
-const TweetCard = ({ tweet }) => {
+const TweetCard = ({tweet}) => {
   const [liked, setLiked] = useState(tweet.isLiked);
   const [likesCount, setLikesCount] = useState(tweet.likesCount);
   const [bookmarked, setBookmarked] = useState(tweet.isBookmarked);
@@ -36,8 +36,8 @@ const TweetCard = ({ tweet }) => {
       for (const media of tweet.media || []) {
         if (media.type === 'video' && media.uri) {
           try {
-            const { uri } = await createThumbnail({ url: media.uri });
-            newThumbnails[media.uri] = uri;
+            const {path} = await createThumbnail({url: media.uri});
+            newThumbnails[media.uri] = path;
           } catch (error) {
             console.log('Error generating thumbnail:', error);
           }
@@ -60,7 +60,6 @@ const TweetCard = ({ tweet }) => {
           token: token,
           postId: tweet.id,
         });
-
 
         if (response.data.status === 'ok') {
           setLiked(true); // Directly update liked state
@@ -85,7 +84,6 @@ const TweetCard = ({ tweet }) => {
         token: token,
         postId: tweet.id,
       });
-
 
       if (response.data.status === 'ok') {
         setLiked(false); // Directly update liked state
@@ -166,20 +164,19 @@ const TweetCard = ({ tweet }) => {
     return `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
   };
 
-  const renderMediaItem = ({ item }) => {
+  const renderMediaItem = ({item}) => {
     if (!item.uri) {
       return null;
     }
 
-    // Determine the style based on the media type and count
     const mediaStyle =
       tweet.media.length === 1
         ? item.type === 'video'
           ? styles.singleMediaVideo
           : styles.singleMediaImage
         : item.type === 'video'
-          ? styles.tweetVideo
-          : styles.tweetImage;
+        ? styles.tweetVideo
+        : styles.tweetImage;
 
     return (
       <TouchableOpacity
@@ -187,7 +184,7 @@ const TweetCard = ({ tweet }) => {
         style={styles.mediaContainer}>
         {item.type === 'image' ? (
           <Image
-            source={{ uri: item.uri }}
+            source={{uri: item.uri}}
             style={mediaStyle}
             onError={() => console.log('Failed to load image')}
           />
@@ -195,7 +192,7 @@ const TweetCard = ({ tweet }) => {
           <TouchableOpacity
             onPress={() => openMediaPreview(item.uri)}
             style={styles.videoContainer}>
-            <Image source={{ uri: thumbnails[item.uri] }} style={mediaStyle} />
+            <Image source={{uri: thumbnails[item.uri]}} style={mediaStyle} />
             <MaterialCommunityIcons
               name="play-circle-outline"
               size={40}
@@ -213,7 +210,7 @@ const TweetCard = ({ tweet }) => {
       {/* User Info */}
       <View style={styles.userInfo}>
         <Image
-          source={tweet.userAvatar ? { uri: tweet.userAvatar } : DefaultAvatar}
+          source={tweet.userAvatar ? {uri: tweet.userAvatar} : DefaultAvatar}
           style={styles.avatar}
         />
         <View style={styles.userDetails}>
@@ -292,15 +289,15 @@ const TweetCard = ({ tweet }) => {
             <View style={styles.modalContainer}>
               {modalMediaUri ? (
                 modalMediaUri.endsWith('.jpg') ||
-                  modalMediaUri.endsWith('.png') ? (
+                modalMediaUri.endsWith('.png') ? (
                   <Image
-                    source={{ uri: modalMediaUri }}
+                    source={{uri: modalMediaUri}}
                     style={styles.modalImage}
                     onError={() => console.log('Failed to load image')}
                   />
                 ) : (
                   <Video
-                    source={{ uri: modalMediaUri }}
+                    source={{uri: modalMediaUri}}
                     style={styles.modalImage}
                     controls
                     resizeMode="contain"
@@ -315,7 +312,7 @@ const TweetCard = ({ tweet }) => {
   );
 };
 
-const InteractionButton = ({ icon, color, count, onPress }) => (
+const InteractionButton = ({icon, color, count, onPress}) => (
   <TouchableOpacity style={styles.actionButton} onPress={onPress}>
     <MaterialCommunityIcons name={icon} size={20} color={color} />
     <Text style={styles.actionText}>{count}</Text>
@@ -327,7 +324,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     padding: 10,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 1,

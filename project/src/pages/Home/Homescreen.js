@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {
   StyleSheet,
   ScrollView,
@@ -7,11 +7,10 @@ import {
   SafeAreaView,
   BackHandler,
   TouchableOpacity,
-  Text,
   RefreshControl,
   ActivityIndicator,
 } from 'react-native';
-import { useFocusEffect } from '@react-navigation/native';
+import {useFocusEffect} from '@react-navigation/native';
 import TweetCard from '../../components/TweetCard'; // Import TweetCard
 import Animated, {
   withDelay,
@@ -29,24 +28,24 @@ import config from '../../config';
 
 const serverUrl = config.SERVER_URL;
 
-const HomeScreen = ({ navigation }) => {
+const HomeScreen = ({navigation}) => {
   const [tweets, setTweets] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [page, setPage] = useState(1);
   const [loadingMore, setLoadingMore] = useState(false);
-
+  const [hasMore, setHasMore] = useState(true);
   const isExpanded = useSharedValue(false);
 
   const fetchTweets = async pageNum => {
     const token = await AsyncStorage.getItem('token');
     try {
-      const response = await axios.post(`${serverUrl}/userdata`, { token });
-      const { data, status } = response.data;
+      const response = await axios.post(`${serverUrl}/userdata`, {token});
+      const {data, status} = response.data;
       if (status === 'error') {
         Alert.alert('Error', 'Anda Telah Keluar dari Akun', [
-          { text: 'OK', onPress: () => navigation.navigate('Auths') },
+          {text: 'OK', onPress: () => navigation.navigate('Auths')},
         ]);
-        return;
+        return [];
       }
 
       const idUserLike = data._id; // Extract user ID
@@ -64,38 +63,30 @@ const HomeScreen = ({ navigation }) => {
         content: post.description,
         media: Array.isArray(post.media)
           ? post.media.map(mediaItem => ({
-            type: mediaItem.type,
-            uri: mediaItem.uri,
-          }))
+              type: mediaItem.type,
+              uri: mediaItem.uri,
+            }))
           : [],
         likesCount: post.likes.length,
         commentsCount: post.comments.length,
         bookMarksCount: post.bookmarks.length,
-        isLiked: post.likes.map(likemap => {
-          likemap._id.includes(idUserLike)
-        })
+        isLiked: post.likes.some(like => like._id === idUserLike), // Check if the user's ID is in the likes array
       }));
 
-      setTweets(prevTweets => {
-        // Filter to avoid duplicate tweets
-        const newTweets = formattedTweets.filter(
-          newTweet => !prevTweets.some(tweet => tweet.id === newTweet.id),
-        );
-
-        return pageNum === 1 ? newTweets : [...prevTweets, ...newTweets];
-      });
+      return formattedTweets;
     } catch (error) {
       console.error('Error fetching data:', error);
+      return [];
     } finally {
       setLoadingMore(false);
     }
   };
 
-
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     setPage(1);
-    await fetchTweets(1);
+    const newTweets = await fetchTweets(1);
+    setTweets(newTweets);
     setRefreshing(false);
   }, []);
 
@@ -130,8 +121,12 @@ const HomeScreen = ({ navigation }) => {
   );
 
   useEffect(() => {
-    fetchTweets(page);
-  }, [page]);
+    const loadInitialTweets = async () => {
+      const initialTweets = await fetchTweets(1);
+      setTweets(initialTweets.slice(0, 5));
+    };
+    loadInitialTweets();
+  }, []);
 
   const handleOpenCamera = () => {
     const options = {
@@ -149,12 +144,12 @@ const HomeScreen = ({ navigation }) => {
         const uri = response.assets[0].uri;
         console.log('Captured image URI:', uri);
         // Navigate to CreatePost and pass the image URI
-        navigation.navigate('CreatePost', { mediaUri: uri, mediaType: 'photo' });
+        navigation.navigate('CreatePost', {mediaUri: uri, mediaType: 'photo'});
       }
     });
   };
 
-  const FloatingActionButton = ({ isExpanded, index, iconName, onPress }) => {
+  const FloatingActionButton = ({isExpanded, index, iconName, onPress}) => {
     const animatedStyles = useAnimatedStyle(() => {
       const moveValue = isExpanded.value ? OFFSET * index : 0;
       const translateValue = withSpring(-moveValue, SPRING_CONFIG);
@@ -163,8 +158,8 @@ const HomeScreen = ({ navigation }) => {
 
       return {
         transform: [
-          { translateY: translateValue },
-          { scale: withDelay(delay, withTiming(scaleValue)) },
+          {translateY: translateValue},
+          {scale: withDelay(delay, withTiming(scaleValue))},
         ],
         backgroundColor: isExpanded.value ? '#F3F3F3' : '#F3F3F3',
       };
@@ -196,16 +191,26 @@ const HomeScreen = ({ navigation }) => {
 
     return {
       transform: [
-        { translateX: translateValue },
-        { rotate: withTiming(rotateValue) },
+        {translateX: translateValue},
+        {rotate: withTiming(rotateValue)},
       ],
     };
   });
 
-  const handleLoadMore = () => {
-    if (!loadingMore) {
+  const handleLoadMore = async () => {
+    if (!loadingMore && hasMore) {
       setLoadingMore(true);
-      setPage(prevPage => prevPage + 1);
+      const moreTweets = await fetchTweets(tweets.length / 5 + 1);
+      const newTweets = moreTweets.filter(
+        tweet => !tweets.some(existingTweet => existingTweet.id === tweet.id),
+      );
+      if (newTweets.length > 0) {
+        setTweets([...tweets, ...newTweets]);
+      }
+      setLoadingMore(false);
+      if (newTweets.length < 5) {
+        setHasMore(false);
+      }
     }
   };
 
@@ -216,8 +221,8 @@ const HomeScreen = ({ navigation }) => {
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
-        onScroll={({ nativeEvent }) => {
-          const { contentOffset, layoutMeasurement, contentSize } = nativeEvent;
+        onScroll={({nativeEvent}) => {
+          const {contentOffset, layoutMeasurement, contentSize} = nativeEvent;
           const contentHeight = contentSize.height;
           const viewportHeight = layoutMeasurement.height;
           const scrollPosition = contentOffset.y + viewportHeight;
@@ -226,15 +231,11 @@ const HomeScreen = ({ navigation }) => {
             handleLoadMore();
           }
         }}>
-        {Array.isArray(tweets) && tweets.length > 0 ? (
-          tweets.map((tweet, index) => (
-            <View key={index} style={styles.tweetContainer}>
-              <TweetCard tweet={tweet} />
-            </View>
-          ))
-        ) : (
-          <Text style={styles.noTweetsText}>No tweets available</Text>
-        )}
+        {tweets.map((tweet, index) => (
+          <View key={index} style={styles.tweetContainer}>
+            <TweetCard tweet={tweet} />
+          </View>
+        ))}
         {loadingMore && (
           <ActivityIndicator
             size="large"
@@ -332,7 +333,7 @@ const styles = StyleSheet.create({
   },
   shadow: {
     shadowColor: '#171717',
-    shadowOffset: { width: -0.5, height: 3.5 },
+    shadowOffset: {width: -0.5, height: 3.5},
     shadowOpacity: 0.2,
     shadowRadius: 3,
   },

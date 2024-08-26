@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   StyleSheet,
   TextInput,
@@ -15,10 +15,10 @@ import {
   useColorScheme,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { Button } from 'react-native-elements';
+import {Button} from 'react-native-elements';
 import * as ImagePicker from 'react-native-image-picker';
 import Video from 'react-native-video';
-import { createThumbnail } from 'react-native-create-thumbnail';
+import {createThumbnail} from 'react-native-create-thumbnail';
 import axios from 'axios';
 import config from '../../config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -27,7 +27,7 @@ import VideoCompressor from 'react-native-video-compressor';
 
 const serverUrl = config.SERVER_URL;
 
-const CreatePost = ({ route, navigation }) => {
+const CreatePost = ({route, navigation}) => {
   const [newPostText, setNewPostText] = useState('');
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState([]);
@@ -56,7 +56,7 @@ const CreatePost = ({ route, navigation }) => {
       const user = userResponse.data.data;
 
       if (user.profilePicture) {
-        const profile = { uri: user.profilePicture };
+        const profile = {uri: user.profilePicture};
         setProfilePicture(profile);
         console.log('Image Profile Retrieved Successfully');
       }
@@ -73,7 +73,7 @@ const CreatePost = ({ route, navigation }) => {
     if (route.params?.mediaUri) {
       setSelectedMedia(prevMedia => [
         ...prevMedia,
-        { uri: route.params.mediaUri },
+        {uri: route.params.mediaUri},
       ]);
       setMediaType(route.params.mediaType);
     }
@@ -101,7 +101,9 @@ const CreatePost = ({ route, navigation }) => {
           const compressedUri = await compressMedia(media.uri, mediaType);
 
           if (typeof compressedUri === 'string') {
-            const fileType = compressedUri.endsWith('.mp4') ? 'video/mp4' : 'image/jpeg';
+            const fileType = compressedUri.endsWith('.mp4')
+              ? 'video/mp4'
+              : 'image/jpeg';
 
             formData.append('media', {
               uri: compressedUri,
@@ -118,7 +120,9 @@ const CreatePost = ({ route, navigation }) => {
               break; // Stop adding more media if the limit of 4 is reached
             }
           } else {
-            console.error('Compressed URI is not a string, skipping this media.');
+            console.error(
+              'Compressed URI is not a string, skipping this media.',
+            );
           }
         }
 
@@ -138,7 +142,7 @@ const CreatePost = ({ route, navigation }) => {
             headers: {
               'Content-Type': 'multipart/form-data',
             },
-          }
+          },
         );
 
         if (uploadResponse.data.status === 'ok') {
@@ -177,15 +181,16 @@ const CreatePost = ({ route, navigation }) => {
     }
   };
 
-
   const compressMedia = async (uri, mediaType) => {
     if (mediaType === 'video/mp4') {
       try {
         console.log('Compressing video...');
 
         const compressedResult = await VideoCompressor.compress(uri, {
-          compressionMethod: 'auto',
-          maxSizeMB: 4.8, // Set the maximum size to below 4.9 MB
+          compressionMethod: 'manual',
+          resolution: '1920x1080',
+          maxSizeMB: 4.9,
+          bitrate: 12000,
         });
 
         const compressedUri = compressedResult?.path;
@@ -201,21 +206,38 @@ const CreatePost = ({ route, navigation }) => {
           console.log('Compression did not return a string:', compressedUri);
           return uri; // Return original URI if compression fails
         }
-
       } catch (error) {
         console.error('Error compressing video:', error);
         return uri; // Return original URI if compression fails
+      }
+    } else if (mediaType === 'image/heic' || mediaType === 'image/heif') {
+      try {
+        const uriWithPrefix = uri.startsWith('file://') ? uri : `file://${uri}`;
+
+        const {uri: resizedUri} = await ImageResizer.createResizedImage(
+          uriWithPrefix,
+          1920,
+          1080,
+          'HEIC',
+          80,
+        );
+
+        console.log('HEIF image resized successfully:', resizedUri);
+        return resizedUri;
+      } catch (error) {
+        console.error('Error resizing HEIF image:', error);
+        return uri; // Return original URI if resizing fails
       }
     } else if (mediaType === 'image/png' || mediaType === 'image/jpeg') {
       try {
         const uriWithPrefix = uri.startsWith('file://') ? uri : `file://${uri}`;
 
-        const { uri: resizedUri } = await ImageResizer.createResizedImage(
+        const {uri: resizedUri} = await ImageResizer.createResizedImage(
           uriWithPrefix,
-          800,
-          600,
+          1920,
+          1080,
           'JPEG',
-          80
+          80,
         );
 
         console.log('Image resized successfully:', resizedUri);
@@ -230,11 +252,11 @@ const CreatePost = ({ route, navigation }) => {
     }
   };
 
-
   const handleOpenCamera = () => {
     const options = {
       mediaType: 'mixed',
       saveToPhotos: true,
+      allowedFileTypes: ['heic', 'heif', 'jpeg', 'jpg', 'png'],
     };
 
     ImagePicker.launchCamera(options, async response => {
@@ -243,7 +265,7 @@ const CreatePost = ({ route, navigation }) => {
       } else if (response.errorCode) {
         console.log('ImagePicker Error: ', response.errorMessage);
       } else {
-        const { mediaType, assets } = response;
+        const {mediaType, assets} = response;
         if (assets && assets.length > 0) {
           const uri = assets[0].uri;
           if (mediaType === 'video') {
@@ -252,14 +274,14 @@ const CreatePost = ({ route, navigation }) => {
               const thumbnailUri = await generateThumbnail(uri);
               setSelectedMedia(prevMedia => [
                 ...prevMedia,
-                { uri, thumbnailUri },
+                {uri, thumbnailUri},
               ]);
               setMediaType(mediaType);
             } catch (error) {
               Alert.alert('Video Upload Error', error.message);
             }
           } else {
-            setSelectedMedia(prevMedia => [...prevMedia, { uri }]);
+            setSelectedMedia(prevMedia => [...prevMedia, {uri}]);
             setMediaType(mediaType);
           }
         }
@@ -271,6 +293,7 @@ const CreatePost = ({ route, navigation }) => {
     const options = {
       mediaType: 'mixed',
       selectionLimit: 4,
+      allowedFileTypes: ['heic', 'heif', 'jpeg', 'jpg', 'png'],
     };
 
     ImagePicker.launchImageLibrary(options, async response => {
@@ -297,7 +320,7 @@ const CreatePost = ({ route, navigation }) => {
         } else {
           setSelectedMedia(prevMedia => [
             ...prevMedia,
-            ...uris.map(uri => ({ uri })),
+            ...uris.map(uri => ({uri})),
           ]);
           setMediaType(types[0] || 'photo');
         }
@@ -319,7 +342,7 @@ const CreatePost = ({ route, navigation }) => {
 
   const generateThumbnail = async uri => {
     try {
-      const { uri: thumbnailUri } = await createThumbnail({ source: uri });
+      const {uri: thumbnailUri} = await createThumbnail({source: uri});
       return thumbnailUri;
     } catch (error) {
       console.error('Error generating thumbnail:', error);
@@ -349,9 +372,9 @@ const CreatePost = ({ route, navigation }) => {
       <View key={index} style={styles.mediaContainer}>
         <TouchableOpacity onPress={() => handleMediaPress(media.uri)}>
           {media.thumbnailUri ? (
-            <Image source={{ uri: media.thumbnailUri }} style={styles.media} />
+            <Image source={{uri: media.thumbnailUri}} style={styles.media} />
           ) : (
-            <Image source={{ uri: media.uri }} style={styles.media} />
+            <Image source={{uri: media.uri}} style={styles.media} />
           )}
         </TouchableOpacity>
         <TouchableOpacity
@@ -386,7 +409,7 @@ const CreatePost = ({ route, navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <Animated.View
-        style={[styles.contentContainer, { transform: [{ translateY }] }]}>
+        style={[styles.contentContainer, {transform: [{translateY}]}]}>
         <View style={styles.inputContainer}>
           <Image
             source={profilePicture || profilePictureUri}
@@ -418,13 +441,15 @@ const CreatePost = ({ route, navigation }) => {
             buttonStyle={styles.button}
             onPress={handleOpenGallery}
           />
-          {keyboardVisible && newPostText.length > 0 && (
-            <Button
-              title="Post"
-              buttonStyle={styles.postButton}
-              onPress={handlePostSubmit}
-            />
-          )}
+          {keyboardVisible &&
+            (newPostText.length > 0 || selectedMedia.length > 0) && (
+              <Button
+                title="Post"
+                buttonStyle={styles.postButton}
+                onPress={handlePostSubmit}
+                disabled={selectedMedia.length === 0 && !newPostText.trim()}
+              />
+            )}
         </View>
       </Animated.View>
 
@@ -441,13 +466,13 @@ const CreatePost = ({ route, navigation }) => {
             </TouchableOpacity>
             {previewMedia.endsWith('.mp4') ? (
               <Video
-                source={{ uri: previewMedia }}
+                source={{uri: previewMedia}}
                 style={styles.fullScreenMedia}
                 controls
               />
             ) : (
               <Image
-                source={{ uri: previewMedia }}
+                source={{uri: previewMedia}}
                 style={styles.fullScreenMedia}
               />
             )}
