@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   SafeAreaView,
   View,
@@ -8,13 +8,15 @@ import {
   TouchableOpacity,
   Modal,
   TouchableWithoutFeedback,
+  ScrollView,
+  RefreshControl,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import config from '../../config';
-import {Skeleton} from 'react-native-elements';
+import { Skeleton } from 'react-native-elements';
 
 const serverUrl = config.SERVER_URL;
 
@@ -24,15 +26,15 @@ export default function Profilescreen() {
   const [profilePicture, setProfilePicture] = useState(false);
   const [modalImageSource, setModalImageSource] = useState(null);
   const [userData, setUserData] = useState('');
-  const [loading, setLoading] = useState(true); // State untuk loading
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const navigation = useNavigation();
 
-  async function getData() {
+  const getData = useCallback(async () => {
     try {
       const token = await AsyncStorage.getItem('token');
       console.log('Token Retrieved Successfully');
 
-      // Ambil data pengguna
       const userResponse = await axios.post(`${serverUrl}/userdata`, {
         token: token,
       });
@@ -43,7 +45,7 @@ export default function Profilescreen() {
 
       if (user.bannerPicture) {
         const banner = { uri: user.bannerPicture };
-        setBanner(banner);
+        setBanner(banner, "banner");
         console.log('Image Banner Retrieved Successfully');
       }
 
@@ -53,25 +55,21 @@ export default function Profilescreen() {
         console.log('Image Profile Retrieved Successfully');
       }
 
-      // Menambahkan delay 1 detik sebelum mengubah loading ke false
-      setTimeout(() => {
-        setLoading(false);
-      }, 1000);
+      setLoading(false);
+      setRefreshing(false); // Stop the refreshing indicator
     } catch (error) {
       console.error('Error occurred:', error);
-      setLoading(false); // Set loading ke false jika terjadi error
+      setLoading(false);
+      setRefreshing(false); // Stop the refreshing indicator if there's an error
     }
-  }
+  }, []);
 
-  // useEffect(() => {
-  //   const intervalId = setInterval(() => {
-  //     getData();
-  //   }, 2000);
-  //   return () => clearInterval(intervalId);
-  // }, []);
+  useFocusEffect(getData);
 
-  // Define the source for the profile image
-  const profileImageSource = require('../../assets/profilepic.png');
+  const onRefresh = () => {
+    setRefreshing(true); // Start the refreshing indicator
+    getData(); // Fetch the data again
+  };
 
   const openModal = () => {
     setModalImageSource(profilePicture);
@@ -85,74 +83,81 @@ export default function Profilescreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.bannerContainer}>
-        {loading ? (
-          <Skeleton animation="pulse" height={150} width={'100%'} style={styles.skeletonBanner} />
-        ) : (
-          <Image
-            source={banner || require('../../assets/banner.png')}
-            style={styles.banner}
-          />
-        )}
-        <TouchableOpacity style={styles.settingsButton} onPress={() => { }}>
-          <MaterialCommunityIcons name="dots-vertical" size={30} color="#000" />
-        </TouchableOpacity>
-      </View>
-      <View style={styles.profileContainer}>
-        <TouchableOpacity onPress={openModal}>
+      <ScrollView
+        contentContainerStyle={styles.scrollViewContent}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+        <View style={styles.bannerContainer}>
           {loading ? (
-            <Skeleton animation="pulse" circle height={82} width={83} style={styles.skeletonProfile} />
+            <Skeleton animation="pulse" height={150} width={'100%'} style={styles.skeletonBanner} />
           ) : (
             <Image
-              source={profilePicture || profileImageSource}
-              style={styles.profile}
+              source={banner || require('../../assets/banner.png')}
+              style={styles.banner}
             />
           )}
-        </TouchableOpacity>
-        <View style={styles.profileText}>
-          {loading ? (
-            <>
-              <Skeleton
-                animation="pulse"
-                height={20}
-                width={150}
-                style={[styles.skeleton, styles.skeletonText]}
-              />
-              <Skeleton
-                animation="pulse"
-                height={14}
-                width={100}
-                style={[styles.skeleton, styles.skeletonText]}
-              />
-              <Skeleton
-                animation="pulse"
-                height={13}
-                width={200}
-                style={[styles.skeleton, styles.skeletonText]}
-              />
-              <Skeleton
-                animation="pulse"
-                height={30}
-                width={120}
-                style={[styles.skeleton, styles.skeletonText]}
-              />
-            </>
-          ) : (
-            <>
-              <Text style={styles.name}>{userData?.name}</Text>
-              <Text style={styles.username}>@{userData?.username}</Text>
-              <Text style={styles.description}>
-                {userData?.bio || 'No Description'}
-              </Text>
-              <TouchableOpacity
-                style={styles.editButton}
-                onPress={() => navigation.navigate('EditProfile')}>
-                <Text style={styles.editButtonText}>Edit Profile</Text>
-              </TouchableOpacity>
-            </>
-          )}
+          <TouchableOpacity style={styles.settingsButton} onPress={() => { }}>
+            <MaterialCommunityIcons name="dots-vertical" size={30} color="#000" />
+          </TouchableOpacity>
         </View>
-      </View>
+        <View style={styles.profileContainer}>
+          <TouchableOpacity onPress={openModal}>
+            {loading ? (
+              <Skeleton animation="pulse" circle height={82} width={83} style={styles.skeletonProfile} />
+            ) : (
+              <Image
+                source={profilePicture || require('../../assets/profilepic.png')}
+                style={styles.profile}
+              />
+            )}
+          </TouchableOpacity>
+          <View style={styles.profileText}>
+            {loading ? (
+              <>
+                <Skeleton
+                  animation="pulse"
+                  height={20}
+                  width={150}
+                  style={[styles.skeleton, styles.skeletonText]}
+                />
+                <Skeleton
+                  animation="pulse"
+                  height={14}
+                  width={100}
+                  style={[styles.skeleton, styles.skeletonText]}
+                />
+                <Skeleton
+                  animation="pulse"
+                  height={13}
+                  width={200}
+                  style={[styles.skeleton, styles.skeletonText]}
+                />
+                <Skeleton
+                  animation="pulse"
+                  height={30}
+                  width={120}
+                  style={[styles.skeleton, styles.skeletonText]}
+                />
+              </>
+            ) : (
+              <>
+                <Text style={styles.name}>{userData?.name}</Text>
+                <Text style={styles.username}>@{userData?.username}</Text>
+                <Text style={styles.description}>
+                  {userData?.bio || 'No Description'}
+                </Text>
+                <TouchableOpacity
+                  style={styles.editButton}
+                  onPress={() => navigation.navigate('EditProfile')}>
+                  <Text style={styles.editButtonText}>Edit Profile</Text>
+                </TouchableOpacity>
+              </>
+            )}
+          </View>
+        </View>
+      </ScrollView>
 
       <Modal
         visible={modalVisible}
@@ -177,6 +182,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+  },
+  scrollViewContent: {
+    flexGrow: 1,
   },
   bannerContainer: {
     position: 'relative',
@@ -262,9 +270,9 @@ const styles = StyleSheet.create({
   },
   skeletonProfile: {
     marginBottom: 30,
-    marginTop: 10, // Menambahkan jeda di atas skeleton profile picture
+    marginTop: 10,
   },
   skeletonText: {
-    marginLeft: 10, // Menambahkan jeda di sebelah profile picture
+    marginLeft: 10,
   },
 });
