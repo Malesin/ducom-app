@@ -21,6 +21,7 @@ function Likescreen({ navigation }) {
     const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
+    const [isFetched, setIsFetched] = useState(false); // State to track if data is already fetched
 
     const fetchTweets = useCallback(async (pageNum) => {
         const token = await AsyncStorage.getItem('token');
@@ -65,6 +66,7 @@ function Likescreen({ navigation }) {
 
                 return pageNum === 1 ? newTweets : [...prevTweets, ...newTweets];
             });
+            setIsFetched(true); // Set isFetched to true after fetching data
         } catch (error) {
             console.error('Error fetching data:', error);
         } finally {
@@ -75,13 +77,11 @@ function Likescreen({ navigation }) {
 
     useFocusEffect(
         useCallback(() => {
-            fetchTweets(page);
-        }, [fetchTweets, page])
+            if (!isFetched) { // Only fetch if data has not been fetched yet
+                fetchTweets(page);
+            }
+        }, [fetchTweets, page, isFetched])
     );
-
-    // useEffect(() => {
-    //     fetchTweets(page);
-    // }, [fetchTweets, page]);
 
     const handleLoadMore = () => {
         if (!loadingMore) {
