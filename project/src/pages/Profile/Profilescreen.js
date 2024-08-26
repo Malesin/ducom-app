@@ -41,6 +41,7 @@ export default function Profilescreen() {
       console.log('Data Retrieved Successfully');
 
       const user = userResponse.data.data;
+      console.log('User Data:', user); // Tambahkan log ini untuk memastikan data user diambil dengan benar
       setUserData(user);
 
       if (user.bannerPicture) {

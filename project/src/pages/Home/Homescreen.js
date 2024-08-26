@@ -46,15 +46,15 @@ const HomeScreen = ({ navigation }) => {
         Alert.alert('Error', 'Anda Telah Keluar dari Akun', [
           { text: 'OK', onPress: () => navigation.navigate('Auths') },
         ]);
-        return;
+        return [];
       }
-
+  
       const idUserLike = data._id; // Extract user ID
       const responseTweet = await axios.post(`${serverUrl}/posts`, {
         page: pageNum,
       });
       const dataTweet = responseTweet.data;
-
+  
       const formattedTweets = dataTweet.data.map(post => ({
         id: post._id,
         userAvatar: post.user.profilePicture,
@@ -64,38 +64,37 @@ const HomeScreen = ({ navigation }) => {
         content: post.description,
         media: Array.isArray(post.media)
           ? post.media.map(mediaItem => ({
-            type: mediaItem.type,
-            uri: mediaItem.uri,
-          }))
+              type: mediaItem.type,
+              uri: mediaItem.uri,
+            }))
           : [],
         likesCount: post.likes.length,
         commentsCount: post.comments.length,
         bookMarksCount: post.bookmarks.length,
-        isLiked: post.likes.map(likemap => {
-          likemap._id.includes(idUserLike)
-        })
+        isLiked: post.likes.some(like => like._id === idUserLike) // Check if the user's ID is in the likes array
       }));
-
-      setTweets(prevTweets => {
-        // Filter to avoid duplicate tweets
-        const newTweets = formattedTweets.filter(
-          newTweet => !prevTweets.some(tweet => tweet.id === newTweet.id),
-        );
-
-        return pageNum === 1 ? newTweets : [...prevTweets, ...newTweets];
-      });
+  
+      return formattedTweets;
     } catch (error) {
       console.error('Error fetching data:', error);
+      return [];
     } finally {
       setLoadingMore(false);
     }
-  };
-
+  };  
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     setPage(1);
-    await fetchTweets(1);
+    const newTweets = await fetchTweets(1);
+    setTweets(prevTweets => {
+      if (!newTweets) return prevTweets;
+      // Gabungkan tweet baru dengan tweet lama
+      const combinedTweets = newTweets.filter(
+        newTweet => !prevTweets.some(tweet => tweet.id === newTweet.id)
+      );
+      return [...combinedTweets, ...prevTweets];
+    });
     setRefreshing(false);
   }, []);
 
@@ -130,8 +129,13 @@ const HomeScreen = ({ navigation }) => {
   );
 
   useEffect(() => {
-    fetchTweets(page);
-  }, [page]);
+    const loadInitialTweets = async () => {
+      const initialTweets = await fetchTweets(1);
+      setTweets(initialTweets);
+    };
+
+    loadInitialTweets(); // Panggil fungsi untuk memuat tweet saat pertama kali masuk ke HomeScreen
+  }, []);
 
   const handleOpenCamera = () => {
     const options = {
