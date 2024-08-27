@@ -13,6 +13,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 import axios from 'axios';
 import config from '../../config';
+import { Skeleton } from 'react-native-elements'; // Import Skeleton
 
 const serverUrl = config.SERVER_URL;
 
@@ -101,10 +102,28 @@ function Mediascreen({ navigation }) {
         }
     };
 
+    const renderSkeleton = () => (
+        <>
+            {[...Array(5)].map((_, index) => (
+                <View key={index} style={styles.skeletonContainer}>
+                    <View style={styles.skeletonHeader}>
+                        <Skeleton animation="pulse" circle height={40} width={40} style={styles.skeletonAvatar} />
+                        <View style={styles.skeletonTextContainer}>
+                            <Skeleton animation="pulse" height={20} width={100} style={styles.skeleton} />
+                            <Skeleton animation="pulse" height={14} width={60} style={styles.skeleton} />
+                        </View>
+                    </View>
+                    <Skeleton animation="pulse" height={20} width={200} style={styles.skeleton} />
+                    <Skeleton animation="pulse" height={150} width={'100%'} style={styles.skeleton} />
+                </View>
+            ))}
+        </>
+    );
+
     return (
         <SafeAreaView style={styles.container}>
             {loading ? (
-                <ActivityIndicator size="large" color="#001374" style={styles.loadingIndicator} />
+                renderSkeleton()
             ) : (
                 <ScrollView
                     contentContainerStyle={styles.contentContainer}
@@ -128,11 +147,7 @@ function Mediascreen({ navigation }) {
                         <Text style={styles.noTweetsText}>No media posts available</Text>
                     )}
                     {loadingMore && (
-                        <ActivityIndicator
-                            size="large"
-                            color="#001374"
-                            style={styles.loadingMore}
-                        />
+                        renderSkeleton()
                     )}
                 </ScrollView>
             )}
@@ -167,5 +182,22 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    skeletonContainer: {
+        padding: 20,
+    },
+    skeletonHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 10,
+    },
+    skeletonAvatar: {
+        marginRight: 10,
+    },
+    skeletonTextContainer: {
+        flex: 1,
+    },
+    skeleton: {
+        marginBottom: 10,
     },
 });

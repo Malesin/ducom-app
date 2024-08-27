@@ -194,6 +194,7 @@ const styles = StyleSheet.create({
   profileText: {
     flex: 1,
     justifyContent: 'center',
+    minHeight: 150, // Set minimum height to avoid layout shift
   },
   name: {
     fontSize: 20,
@@ -215,7 +216,8 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 30,
     borderRadius: 50,
-    marginTop: 10,
+    marginTop: 20, // Tambahkan margin atas
+    marginBottom: 20, // Tambahkan margin bawah
   },
   editButtonText: {
     fontSize: 13,
