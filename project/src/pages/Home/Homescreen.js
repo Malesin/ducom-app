@@ -74,6 +74,7 @@ const HomeScreen = ({navigation}) => {
         commentsCount: post.comments.length,
         bookMarksCount: post.bookmarks.length,
         isLiked: post.likes.some(like => like._id === idUserLike), // Check if the user's ID is in the likes array
+        userId: post.user._id, // Add userId to the tweet object
       }));
 
       return formattedTweets;
@@ -226,6 +227,10 @@ const HomeScreen = ({navigation}) => {
     }
   };
 
+  const handleProfilePress = (userId) => {
+    navigation.navigate('Userprofile', { userId });
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       {loading ? (
@@ -271,7 +276,9 @@ const HomeScreen = ({navigation}) => {
           }}>
           {tweets.map((tweet, index) => (
             <View key={index} style={styles.tweetContainer}>
-              <TweetCard tweet={tweet} />
+              <TouchableOpacity onPress={() => handleProfilePress(tweet.userId)}>
+                <TweetCard tweet={tweet} />
+              </TouchableOpacity>
             </View>
           ))}
           {loadingMore && <LoadingIndicator />}
