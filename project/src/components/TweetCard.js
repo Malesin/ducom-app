@@ -14,6 +14,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import Video from 'react-native-video';
 import {createThumbnail} from 'react-native-create-thumbnail';
 import DefaultAvatar from '../assets/avatar.png';
+import BottomSheet from './BottomSheet';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../config';
@@ -28,6 +29,7 @@ const TweetCard = ({tweet}) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalMediaUri, setModalMediaUri] = useState('');
   const [thumbnails, setThumbnails] = useState({});
+  const [showBottomSheet, setShowBottomSheet] = useState(false);
 
   useEffect(() => {
     // Generate thumbnails for video media
@@ -69,9 +71,11 @@ const TweetCard = ({tweet}) => {
           });
         } else {
           console.log('Error in like response data:', response.data.data);
+          Alert.alert('Error', 'Failed to like post. Please try again.'); // Add alert here
         }
       } catch (error) {
         console.error('Error liking post:', error.message);
+        Alert.alert('Error', 'Failed to like post. Please try again.'); // Add alert here
       }
     }
   };
@@ -93,9 +97,11 @@ const TweetCard = ({tweet}) => {
         });
       } else {
         console.log('Error in unlike response data:', response.data.data);
+        Alert.alert('Error', 'Failed to unlike post. Please try again.'); // Add alert here
       }
     } catch (error) {
       console.error('Error unliking post:', error.message);
+      Alert.alert('Error', 'Failed to unlike post. Please try again.'); // Add alert here
     }
   };
 
@@ -115,7 +121,6 @@ const TweetCard = ({tweet}) => {
     setIsModalVisible(false);
     setModalMediaUri('');
   };
-
   const handleShare = async () => {
     try {
       await Share.share({
@@ -125,6 +130,7 @@ const TweetCard = ({tweet}) => {
       });
     } catch (error) {
       console.error('Error sharing:', error.message);
+      Alert.alert('Error', 'Failed to share post. Please try again.'); // Add alert here
     }
   };
 
@@ -223,7 +229,7 @@ const TweetCard = ({tweet}) => {
         <View style={styles.optionsContainer}>
           <TouchableOpacity
             style={styles.optionsButton}
-            onPress={() => console.log('More options pressed')}>
+            onPress={() => setShowBottomSheet(true)}>
             <MaterialCommunityIcons
               name="dots-horizontal"
               size={24}
@@ -231,6 +237,21 @@ const TweetCard = ({tweet}) => {
             />
           </TouchableOpacity>
         </View>
+
+        {/* BottomSheet Modal */}
+        <Modal
+          style={styles.BottomSheet}
+          animationType="slide"
+          transparent={true}
+          visible={showBottomSheet}
+          onRequestClose={() => setShowBottomSheet(false)}>
+          <TouchableWithoutFeedback onPress={() => setShowBottomSheet(false)}>
+            <View style={styles.overlay} />
+          </TouchableWithoutFeedback>
+          <View style={styles.bottomSheetContainer}>
+            <BottomSheet onClose={() => setShowBottomSheet(false)} />
+          </View>
+        </Modal>
       </View>
 
       {/* Tweet Content */}
@@ -241,7 +262,7 @@ const TweetCard = ({tweet}) => {
         <FlatList
           data={tweet.media}
           renderItem={renderMediaItem}
-          keyExtractor={(item, index) => index.toString()}
+          keyExtractor={index => index.toString()}
           horizontal
           showsHorizontalScrollIndicator={false}
           style={styles.mediaFlatList}
@@ -332,6 +353,19 @@ const styles = StyleSheet.create({
     maxWidth: 800,
     borderColor: '#E1E8ED',
     borderWidth: 1,
+  },
+  bottomSheetContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'transparent',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
   },
   userInfo: {
     flexDirection: 'row',

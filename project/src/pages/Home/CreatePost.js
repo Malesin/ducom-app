@@ -10,9 +10,11 @@ import {
   Modal,
   TouchableOpacity,
   Alert,
-  Animated, // Import Animated from react-native
+  Animated,
   colorScheme,
   useColorScheme,
+  ActivityIndicator,
+  Text,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {Button} from 'react-native-elements';
@@ -40,7 +42,6 @@ const CreatePost = ({route, navigation}) => {
   const styles = getStyles(colorScheme); // Get styles based on color scheme
 
   const profilePictureUri = require('../../assets/profilepic.png');
-  const [userProfilePicture, setUserProfilePicture] = useState(null);
 
   async function getData() {
     try {
@@ -88,9 +89,12 @@ const CreatePost = ({route, navigation}) => {
     }).start();
   }, [translateY]);
 
-  console.log(selectedMedia, 'woilah');
+  console.log(selectedMedia, 'Selected Media');
 
+  const [UploadProgress, setUploadProgress] = useState(0);
+  const [IsUploading, SetIsUploading] = useState(false);
   const handlePostSubmit = async () => {
+    SetIsUploading(true);
     const token = await AsyncStorage.getItem('token');
     try {
       if (selectedMedia.length > 0) {
@@ -142,6 +146,12 @@ const CreatePost = ({route, navigation}) => {
             headers: {
               'Content-Type': 'multipart/form-data',
             },
+            onUploadProgress: progressEvent => {
+              const progress = Math.round(
+                (progressEvent.loaded * 100) / progressEvent.total,
+              );
+              setUploadProgress(progress);
+            },
           },
         );
 
@@ -178,39 +188,13 @@ const CreatePost = ({route, navigation}) => {
       }
     } catch (error) {
       console.error('Error submitting post:', error.message);
+    } finally {
+      SetIsUploading(false);
     }
   };
 
   const compressMedia = async (uri, mediaType) => {
-    if (mediaType === 'video/mp4') {
-      try {
-        console.log('Compressing video...');
-
-        const compressedResult = await VideoCompressor.compress(uri, {
-          compressionMethod: 'manual',
-          resolution: '1920x1080',
-          maxSizeMB: 4.9,
-          bitrate: 12000,
-        });
-
-        const compressedUri = compressedResult?.path;
-
-        if (typeof compressedUri === 'string') {
-          const finalCompressedUri = compressedUri.startsWith('file://')
-            ? compressedUri
-            : `file://${compressedUri}`;
-
-          console.log('Video was compressed successfully:', finalCompressedUri);
-          return finalCompressedUri;
-        } else {
-          console.log('Compression did not return a string:', compressedUri);
-          return uri; // Return original URI if compression fails
-        }
-      } catch (error) {
-        console.error('Error compressing video:', error);
-        return uri; // Return original URI if compression fails
-      }
-    } else if (mediaType === 'image/heic' || mediaType === 'image/heif') {
+    if (mediaType === 'image/heic' || mediaType === 'image/heif') {
       try {
         const uriWithPrefix = uri.startsWith('file://') ? uri : `file://${uri}`;
 
@@ -246,9 +230,38 @@ const CreatePost = ({route, navigation}) => {
         console.error('Error resizing image:', error);
         return uri; // Return original URI if resizing fails
       }
+    }
+    if (mediaType === 'video/mp4') {
+      try {
+        console.log('Compressing video...');
+
+        const compressedResult = await VideoCompressor.compress(uri, {
+          compressionMethod: 'manual',
+          resolution: '1920x1080',
+          maxSizeMB: 4.9,
+          bitrate: 12000,
+        });
+
+        const compressedUri = compressedResult?.path;
+
+        if (typeof compressedUri === 'string') {
+          const finalCompressedUri = compressedUri.startsWith('file://')
+            ? compressedUri
+            : `file://${compressedUri}`;
+
+          console.log('Video was compressed successfully:', finalCompressedUri);
+          return finalCompressedUri;
+        } else {
+          console.log('Compression did not return a string:', compressedUri);
+          return uri; // Return original URI if compression fails
+        }
+      } catch (error) {
+        console.error('Error compressing video:', error);
+        return uri; // Return original URI if compression fails
+      }
     } else {
       console.error('Unsupported media type:', mediaType);
-      return uri; // Return original URI if media type is unsupported
+      return uri; // Return original URI if media type is unsuppo rted
     }
   };
 
@@ -408,6 +421,14 @@ const CreatePost = ({route, navigation}) => {
 
   return (
     <SafeAreaView style={styles.container}>
+      {IsUploading && (
+        <View style={styles.progressBarContainer}>
+          <ActivityIndicator size="large" color="#000" />
+          <Text style={styles.progressBarText}>
+            Uploading... ({UploadProgress}%)
+          </Text>
+        </View>
+      )}
       <Animated.View
         style={[styles.contentContainer, {transform: [{translateY}]}]}>
         <View style={styles.inputContainer}>
@@ -496,6 +517,16 @@ const getStyles = () =>
       flexDirection: 'row',
       alignItems: 'center',
       marginBottom: 16,
+    },
+    progressBarContainer: {
+      padding: 16,
+      backgroundColor: '#fff',
+      borderRadius: 8,
+    },
+    progressBarText: {
+      fontSize: 16,
+      color: '#333',
+      textAlign: 'center',
     },
     profilePicture: {
       width: 40,

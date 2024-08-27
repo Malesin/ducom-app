@@ -20,6 +20,7 @@ import Animated, {
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
+import {Skeleton} from 'react-native-elements';
 import * as ImagePicker from 'react-native-image-picker';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -33,10 +34,12 @@ const HomeScreen = ({navigation}) => {
   const [refreshing, setRefreshing] = useState(false);
   const [page, setPage] = useState(1);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [hasMore, setHasMore] = useState(true);
   const isExpanded = useSharedValue(false);
 
   const fetchTweets = async pageNum => {
+    setLoading(true);
     const token = await AsyncStorage.getItem('token');
     try {
       const response = await axios.post(`${serverUrl}/userdata`, {token});
@@ -78,7 +81,7 @@ const HomeScreen = ({navigation}) => {
       console.error('Error fetching data:', error);
       return [];
     } finally {
-      setLoadingMore(false);
+      setLoading(false);
     }
   };
 
@@ -89,6 +92,13 @@ const HomeScreen = ({navigation}) => {
     setTweets(newTweets);
     setRefreshing(false);
   }, []);
+  const LoadingIndicator = () => {
+    return (
+      <View style={styles.loadingIndicator}>
+        <ActivityIndicator size="large" color="#000" />
+      </View>
+    );
+  };
 
   const handleBackPress = () => {
     Alert.alert('Exit App', 'Are you sure want to exit', [
@@ -124,10 +134,15 @@ const HomeScreen = ({navigation}) => {
     const loadInitialTweets = async () => {
       const initialTweets = await fetchTweets(1);
       setTweets(initialTweets.slice(0, 5));
+      setLoading(false);
     };
     loadInitialTweets();
   }, []);
-
+  const onPostSuccess = () => {
+    console.log('Post created successfully, refreshing HomeScreen...');
+    setRefreshing(true);
+    onRefresh();
+  };
   const handleOpenCamera = () => {
     const options = {
       mediaType: 'photo',
@@ -205,7 +220,8 @@ const HomeScreen = ({navigation}) => {
         tweet => !tweets.some(existingTweet => existingTweet.id === tweet.id),
       );
       if (newTweets.length > 0) {
-        setTweets([...tweets, ...newTweets]);
+        setTweets(prevTweets => [...prevTweets, ...newTweets]);
+        setLoading(false);
       }
       setLoadingMore(false);
       if (newTweets.length < 5) {
@@ -216,34 +232,55 @@ const HomeScreen = ({navigation}) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView
-        contentContainerStyle={styles.contentContainer}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-        onScroll={({nativeEvent}) => {
-          const {contentOffset, layoutMeasurement, contentSize} = nativeEvent;
-          const contentHeight = contentSize.height;
-          const viewportHeight = layoutMeasurement.height;
-          const scrollPosition = contentOffset.y + viewportHeight;
-
-          if (scrollPosition >= contentHeight - 100) {
-            handleLoadMore();
+      {loading ? (
+        <View style={styles.skeletonScreen}>
+          {[1, 2, 3, 4, 5].map(index => (
+            <View key={index} style={styles.skeletonContainer}>
+              <Skeleton
+                animation="pulse"
+                width={500}
+                height={25}
+                style={styles.skeleton}
+              />
+              <Skeleton
+                animation="pulse"
+                width={200}
+                height={20}
+                style={styles.skeleton}
+              />
+              <Skeleton
+                animation="pulse"
+                width={350}
+                height={150}
+                style={styles.skeleton}
+              />
+            </View>
+          ))}
+        </View>
+      ) : (
+        <ScrollView
+          contentContainerStyle={styles.contentContainer}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
-        }}>
-        {tweets.map((tweet, index) => (
-          <View key={index} style={styles.tweetContainer}>
-            <TweetCard tweet={tweet} />
-          </View>
-        ))}
-        {loadingMore && (
-          <ActivityIndicator
-            size="large"
-            color="#001374"
-            style={styles.loadingMore}
-          />
-        )}
-      </ScrollView>
+          onScroll={({nativeEvent}) => {
+            const {contentOffset, layoutMeasurement, contentSize} = nativeEvent;
+            const contentHeight = contentSize.height;
+            const viewportHeight = layoutMeasurement.height;
+            const scrollPosition = contentOffset.y + viewportHeight;
+
+            if (scrollPosition >= contentHeight - 100) {
+              handleLoadMore();
+            }
+          }}>
+          {tweets.map((tweet, index) => (
+            <View key={index} style={styles.tweetContainer}>
+              <TweetCard tweet={tweet} />
+            </View>
+          ))}
+          {loadingMore && <LoadingIndicator />}
+        </ScrollView>
+      )}
 
       <View style={styles.fabContainer}>
         <AnimatedPressable
@@ -263,7 +300,7 @@ const HomeScreen = ({navigation}) => {
           isExpanded={isExpanded}
           index={2}
           iconName={'feather'}
-          onPress={() => navigation.navigate('CreatePost')} // Navigate to CreatePost screen
+          onPress={() => navigation.navigate('CreatePost', {onPostSuccess})} // Navigate to CreatePost screen
         />
       </View>
     </SafeAreaView>
@@ -292,9 +329,9 @@ const mainButtonStyles = StyleSheet.create({
     alignItems: 'center',
   },
   content: {
-    fontSize: 48,
+    fontSize: 45,
     color: 'white',
-    lineHeight: 55,
+    lineHeight: 60,
     marginBottom: 1,
   },
 });
@@ -311,6 +348,22 @@ const styles = StyleSheet.create({
   },
   tweetContainer: {
     width: '100%',
+  },
+  skeletonScreen: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  skeletonContainer: {
+    marginBottom: 16,
+  },
+  skeleton: {
+    borderRadius: 4,
+    marginBottom: 8,
+  },
+  loadingIndicator: {
+    alignItems: 'center',
+    marginVertical: 20,
   },
   fabContainer: {
     position: 'absolute',
