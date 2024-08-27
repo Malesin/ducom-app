@@ -18,7 +18,8 @@ import { Skeleton } from 'react-native-elements';
 
 const serverUrl = config.SERVER_URL;
 
-export default function Profilescreen() {
+export default function Userprofile({ route }) {
+  const { userId } = route.params;
   const [modalVisible, setModalVisible] = useState(false);
   const [banner, setBanner] = useState(false);
   const [profilePicture, setProfilePicture] = useState(false);
@@ -26,16 +27,21 @@ export default function Profilescreen() {
   const [userData, setUserData] = useState('');
   const navigation = useNavigation();
 
+  /**
+   * Fungsi untuk mengambil data pengguna dari server.
+   * Fungsi ini mengambil token dari AsyncStorage dan membuat permintaan GET ke server
+   * untuk mengambil data pengguna dengan userId yang diberikan.
+   */
   async function getData() {
     try {
       const token = await AsyncStorage.getItem('token');
-      console.log('Token Retrieved Successfully');
+      console.log('Token Berhasil Diambil');
 
-      // Ambil data pengguna
-      const userResponse = await axios.post(`${serverUrl}/userdata`, {
-        token: token,
+      // Ambil data pengguna lain
+      const userResponse = await axios.get(`${serverUrl}/userdata/${userId}`, {
+        headers: { Authorization: `Bearer ${token}` },
       });
-      console.log('Data Retrieved Successfully', userResponse.data);
+      console.log('Data Berhasil Diambil', userResponse.data);
 
       const user = userResponse.data.data;
       setUserData(user);
@@ -43,34 +49,38 @@ export default function Profilescreen() {
       if (user.bannerPicture) {
         const banner = { uri: user.bannerPicture };
         setBanner(banner);
-        console.log('Image Banner Retrieved Successfully');
+        console.log('Banner Berhasil Diambil');
       }
 
       if (user.profilePicture) {
         const profile = { uri: user.profilePicture };
         setProfilePicture(profile);
-        console.log('Image Profile Retrieved Successfully');
+        console.log('Foto Profil Berhasil Diambil');
       }
     } catch (error) {
-      console.error('Error occurred:', error);
+      console.error('Terjadi Kesalahan:', error);
     }
   }
 
+  // Ambil data pengguna saat komponen pertama kali dimuat
   useEffect(() => {
     getData();
   }, []);
 
+  // Ambil data pengguna setiap kali layar menjadi fokus
   useFocusEffect(
     useCallback(() => {
       getData();
     }, [])
   );
 
+  // Fungsi untuk membuka modal untuk melihat foto profil
   const openModal = () => {
     setModalImageSource(profilePicture);
     setModalVisible(true);
   };
 
+  // Fungsi untuk menutup modal
   const closeModal = () => {
     setModalVisible(false);
     setModalImageSource(null);
@@ -126,13 +136,8 @@ export default function Profilescreen() {
                 <Text style={styles.name}>{userData?.name}</Text>
                 <Text style={styles.username}>@{userData?.username}</Text>
                 <Text style={styles.description}>
-                  {userData?.bio || 'No Description'}
+                  {userData?.bio || 'Tidak Ada Deskripsi'}
                 </Text>
-                <TouchableOpacity
-                  style={styles.editButton}
-                  onPress={() => navigation.navigate('EditProfile')}>
-                  <Text style={styles.editButtonText}>Edit Profile</Text>
-                </TouchableOpacity>
               </>
             )}
           </View>
@@ -209,20 +214,6 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 13,
     color: '#000',
-  },
-  editButton: {
-    alignSelf: 'flex-start',
-    backgroundColor: '#E1E8ED',
-    paddingVertical: 10,
-    paddingHorizontal: 30,
-    borderRadius: 50,
-    marginTop: 20, // Tambahkan margin atas
-    marginBottom: 20, // Tambahkan margin bawah
-  },
-  editButtonText: {
-    fontSize: 13,
-    color: '#000',
-    fontWeight: 'bold',
   },
   modalBackground: {
     flex: 1,

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {
   StyleSheet,
   ScrollView,
@@ -7,11 +7,10 @@ import {
   SafeAreaView,
   BackHandler,
   TouchableOpacity,
-  Text,
   RefreshControl,
   ActivityIndicator,
 } from 'react-native';
-import { useFocusEffect } from '@react-navigation/native';
+import {useFocusEffect} from '@react-navigation/native';
 import TweetCard from '../../components/TweetCard'; // Import TweetCard
 import Animated, {
   withDelay,
@@ -21,6 +20,7 @@ import Animated, {
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
+import {Skeleton} from 'react-native-elements';
 import * as ImagePicker from 'react-native-image-picker';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -29,32 +29,34 @@ import config from '../../config';
 
 const serverUrl = config.SERVER_URL;
 
-const HomeScreen = ({ navigation }) => {
+const HomeScreen = ({navigation}) => {
   const [tweets, setTweets] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [page, setPage] = useState(1);
   const [loadingMore, setLoadingMore] = useState(false);
-
+  const [loading, setLoading] = useState(true);
+  const [hasMore, setHasMore] = useState(true);
   const isExpanded = useSharedValue(false);
 
   const fetchTweets = async pageNum => {
+    setLoading(true);
     const token = await AsyncStorage.getItem('token');
     try {
-      const response = await axios.post(`${serverUrl}/userdata`, { token });
-      const { data, status } = response.data;
+      const response = await axios.post(`${serverUrl}/userdata`, {token});
+      const {data, status} = response.data;
       if (status === 'error') {
         Alert.alert('Error', 'Anda Telah Keluar dari Akun', [
-          { text: 'OK', onPress: () => navigation.navigate('Auths') },
+          {text: 'OK', onPress: () => navigation.navigate('Auths')},
         ]);
         return [];
       }
-  
+
       const idUserLike = data._id; // Extract user ID
       const responseTweet = await axios.post(`${serverUrl}/posts`, {
         page: pageNum,
       });
       const dataTweet = responseTweet.data;
-  
+
       const formattedTweets = dataTweet.data.map(post => ({
         id: post._id,
         userAvatar: post.user.profilePicture,
@@ -71,32 +73,33 @@ const HomeScreen = ({ navigation }) => {
         likesCount: post.likes.length,
         commentsCount: post.comments.length,
         bookMarksCount: post.bookmarks.length,
-        isLiked: post.likes.some(like => like._id === idUserLike) // Check if the user's ID is in the likes array
+        isLiked: post.likes.some(like => like._id === idUserLike), // Check if the user's ID is in the likes array
+        userId: post.user._id, // Add userId to the tweet object
       }));
-  
+
       return formattedTweets;
     } catch (error) {
       console.error('Error fetching data:', error);
       return [];
     } finally {
-      setLoadingMore(false);
+      setLoading(false);
     }
-  };  
+  };
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     setPage(1);
     const newTweets = await fetchTweets(1);
-    setTweets(prevTweets => {
-      if (!newTweets) return prevTweets;
-      // Gabungkan tweet baru dengan tweet lama
-      const combinedTweets = newTweets.filter(
-        newTweet => !prevTweets.some(tweet => tweet.id === newTweet.id)
-      );
-      return [...combinedTweets, ...prevTweets];
-    });
+    setTweets(newTweets);
     setRefreshing(false);
   }, []);
+  const LoadingIndicator = () => {
+    return (
+      <View style={styles.loadingIndicator}>
+        <ActivityIndicator size="large" color="#000" />
+      </View>
+    );
+  };
 
   const handleBackPress = () => {
     Alert.alert('Exit App', 'Are you sure want to exit', [
@@ -131,10 +134,10 @@ const HomeScreen = ({ navigation }) => {
   useEffect(() => {
     const loadInitialTweets = async () => {
       const initialTweets = await fetchTweets(1);
-      setTweets(initialTweets);
+      setTweets(initialTweets.slice(0, 5));
+      setLoading(false);
     };
-
-    loadInitialTweets(); // Panggil fungsi untuk memuat tweet saat pertama kali masuk ke HomeScreen
+    loadInitialTweets();
   }, []);
 
   const handleOpenCamera = () => {
@@ -153,12 +156,12 @@ const HomeScreen = ({ navigation }) => {
         const uri = response.assets[0].uri;
         console.log('Captured image URI:', uri);
         // Navigate to CreatePost and pass the image URI
-        navigation.navigate('CreatePost', { mediaUri: uri, mediaType: 'photo' });
+        navigation.navigate('CreatePost', {mediaUri: uri, mediaType: 'photo'});
       }
     });
   };
 
-  const FloatingActionButton = ({ isExpanded, index, iconName, onPress }) => {
+  const FloatingActionButton = ({isExpanded, index, iconName, onPress}) => {
     const animatedStyles = useAnimatedStyle(() => {
       const moveValue = isExpanded.value ? OFFSET * index : 0;
       const translateValue = withSpring(-moveValue, SPRING_CONFIG);
@@ -167,8 +170,8 @@ const HomeScreen = ({ navigation }) => {
 
       return {
         transform: [
-          { translateY: translateValue },
-          { scale: withDelay(delay, withTiming(scaleValue)) },
+          {translateY: translateValue},
+          {scale: withDelay(delay, withTiming(scaleValue))},
         ],
         backgroundColor: isExpanded.value ? '#F3F3F3' : '#F3F3F3',
       };
@@ -200,53 +203,87 @@ const HomeScreen = ({ navigation }) => {
 
     return {
       transform: [
-        { translateX: translateValue },
-        { rotate: withTiming(rotateValue) },
+        {translateX: translateValue},
+        {rotate: withTiming(rotateValue)},
       ],
     };
   });
 
-  const handleLoadMore = () => {
-    if (!loadingMore) {
+  const handleLoadMore = async () => {
+    if (!loadingMore && hasMore) {
       setLoadingMore(true);
-      setPage(prevPage => prevPage + 1);
+      const moreTweets = await fetchTweets(tweets.length / 5 + 1);
+      const newTweets = moreTweets.filter(
+        tweet => !tweets.some(existingTweet => existingTweet.id === tweet.id),
+      );
+      if (newTweets.length > 0) {
+        setTweets(prevTweets => [...prevTweets, ...newTweets]);
+        setLoading(false);
+      }
+      setLoadingMore(false);
+      if (newTweets.length < 5) {
+        setHasMore(false);
+      }
     }
+  };
+
+  const handleProfilePress = (userId) => {
+    navigation.navigate('Userprofile', { userId });
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView
-        contentContainerStyle={styles.contentContainer}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-        onScroll={({ nativeEvent }) => {
-          const { contentOffset, layoutMeasurement, contentSize } = nativeEvent;
-          const contentHeight = contentSize.height;
-          const viewportHeight = layoutMeasurement.height;
-          const scrollPosition = contentOffset.y + viewportHeight;
-
-          if (scrollPosition >= contentHeight - 100) {
-            handleLoadMore();
-          }
-        }}>
-        {Array.isArray(tweets) && tweets.length > 0 ? (
-          tweets.map((tweet, index) => (
-            <View key={index} style={styles.tweetContainer}>
-              <TweetCard tweet={tweet} />
+      {loading ? (
+        <View style={styles.skeletonScreen}>
+          {[1, 2, 3, 4, 5].map(index => (
+            <View key={index} style={styles.skeletonContainer}>
+              <Skeleton
+                animation="pulse"
+                width={500}
+                height={25}
+                style={styles.skeleton}
+              />
+              <Skeleton
+                animation="pulse"
+                width={200}
+                height={20}
+                style={styles.skeleton}
+              />
+              <Skeleton
+                animation="pulse"
+                width={350}
+                height={150}
+                style={styles.skeleton}
+              />
             </View>
-          ))
-        ) : (
-          <Text style={styles.noTweetsText}>No tweets available</Text>
-        )}
-        {loadingMore && (
-          <ActivityIndicator
-            size="large"
-            color="#001374"
-            style={styles.loadingMore}
-          />
-        )}
-      </ScrollView>
+          ))}
+        </View>
+      ) : (
+        <ScrollView
+          contentContainerStyle={styles.contentContainer}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          onScroll={({nativeEvent}) => {
+            const {contentOffset, layoutMeasurement, contentSize} = nativeEvent;
+            const contentHeight = contentSize.height;
+            const viewportHeight = layoutMeasurement.height;
+            const scrollPosition = contentOffset.y + viewportHeight;
+
+            if (scrollPosition >= contentHeight - 100) {
+              handleLoadMore();
+            }
+          }}>
+          {tweets.map((tweet, index) => (
+            <View key={index} style={styles.tweetContainer}>
+              <TouchableOpacity onPress={() => handleProfilePress(tweet.userId)}>
+                <TweetCard tweet={tweet} />
+              </TouchableOpacity>
+            </View>
+          ))}
+          {loadingMore && <LoadingIndicator />}
+        </ScrollView>
+      )}
 
       <View style={styles.fabContainer}>
         <AnimatedPressable
@@ -315,6 +352,22 @@ const styles = StyleSheet.create({
   tweetContainer: {
     width: '100%',
   },
+  skeletonScreen: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  skeletonContainer: {
+    marginBottom: 16,
+  },
+  skeleton: {
+    borderRadius: 4,
+    marginBottom: 8,
+  },
+  loadingIndicator: {
+    alignItems: 'center',
+    marginVertical: 20,
+  },
   fabContainer: {
     position: 'absolute',
     bottom: 20,
@@ -336,7 +389,7 @@ const styles = StyleSheet.create({
   },
   shadow: {
     shadowColor: '#171717',
-    shadowOffset: { width: -0.5, height: 3.5 },
+    shadowOffset: {width: -0.5, height: 3.5},
     shadowOpacity: 0.2,
     shadowRadius: 3,
   },
