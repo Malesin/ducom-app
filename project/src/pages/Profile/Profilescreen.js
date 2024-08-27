@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   SafeAreaView,
   View,
@@ -8,8 +8,6 @@ import {
   TouchableOpacity,
   Modal,
   TouchableWithoutFeedback,
-  ScrollView,
-  RefreshControl,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
@@ -26,27 +24,25 @@ export default function Profilescreen() {
   const [profilePicture, setProfilePicture] = useState(false);
   const [modalImageSource, setModalImageSource] = useState(null);
   const [userData, setUserData] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
   const navigation = useNavigation();
 
-  const getData = useCallback(async () => {
+  async function getData() {
     try {
       const token = await AsyncStorage.getItem('token');
       console.log('Token Retrieved Successfully');
 
+      // Ambil data pengguna
       const userResponse = await axios.post(`${serverUrl}/userdata`, {
         token: token,
       });
-      console.log('Data Retrieved Successfully');
+      console.log('Data Retrieved Successfully', userResponse.data);
 
       const user = userResponse.data.data;
-      console.log('User Data:', user); // Tambahkan log ini untuk memastikan data user diambil dengan benar
       setUserData(user);
 
       if (user.bannerPicture) {
         const banner = { uri: user.bannerPicture };
-        setBanner(banner, "banner");
+        setBanner(banner);
         console.log('Image Banner Retrieved Successfully');
       }
 
@@ -55,22 +51,20 @@ export default function Profilescreen() {
         setProfilePicture(profile);
         console.log('Image Profile Retrieved Successfully');
       }
-
-      setLoading(false);
-      setRefreshing(false); // Stop the refreshing indicator
     } catch (error) {
       console.error('Error occurred:', error);
-      setLoading(false);
-      setRefreshing(false); // Stop the refreshing indicator if there's an error
     }
+  }
+
+  useEffect(() => {
+    getData();
   }, []);
 
-  useFocusEffect(getData);
-
-  const onRefresh = () => {
-    setRefreshing(true); // Start the refreshing indicator
-    getData(); // Fetch the data again
-  };
+  useFocusEffect(
+    useCallback(() => {
+      getData();
+    }, [])
+  );
 
   const openModal = () => {
     setModalImageSource(profilePicture);
@@ -84,62 +78,47 @@ export default function Profilescreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView
-        contentContainerStyle={styles.scrollViewContent}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-      >
-        <View style={styles.bannerContainer}>
-          {loading ? (
-            <Skeleton animation="pulse" height={150} width={'100%'} style={styles.skeletonBanner} />
-          ) : (
-            <Image
-              source={banner || require('../../assets/banner.png')}
-              style={styles.banner}
-            />
-          )}
-          <TouchableOpacity style={styles.settingsButton} onPress={() => { }}>
-            <MaterialCommunityIcons name="dots-vertical" size={30} color="#000" />
-          </TouchableOpacity>
-        </View>
+      <View style={styles.bannerContainer}>
+        <Image
+          source={banner || require('../../assets/banner.png')}
+          style={styles.banner}
+        />
+        <TouchableOpacity style={styles.settingsButton} onPress={() => {}}>
+          <MaterialCommunityIcons name="dots-vertical" size={30} color="#000" />
+        </TouchableOpacity>
         <View style={styles.profileContainer}>
           <TouchableOpacity onPress={openModal}>
-            {loading ? (
-              <Skeleton animation="pulse" circle height={82} width={83} style={styles.skeletonProfile} />
-            ) : (
-              <Image
-                source={profilePicture || require('../../assets/profilepic.png')}
-                style={styles.profile}
-              />
-            )}
+            <Image
+              source={profilePicture || require('../../assets/profilepic.png')}
+              style={styles.profile}
+            />
           </TouchableOpacity>
           <View style={styles.profileText}>
-            {loading ? (
+            {!userData ? (
               <>
                 <Skeleton
                   animation="pulse"
                   height={20}
                   width={150}
-                  style={[styles.skeleton, styles.skeletonText]}
+                  style={styles.skeleton}
                 />
                 <Skeleton
                   animation="pulse"
                   height={14}
                   width={100}
-                  style={[styles.skeleton, styles.skeletonText]}
+                  style={styles.skeleton}
                 />
                 <Skeleton
                   animation="pulse"
                   height={13}
                   width={200}
-                  style={[styles.skeleton, styles.skeletonText]}
+                  style={styles.skeleton}
                 />
                 <Skeleton
                   animation="pulse"
                   height={30}
                   width={120}
-                  style={[styles.skeleton, styles.skeletonText]}
+                  style={styles.skeleton}
                 />
               </>
             ) : (
@@ -158,7 +137,7 @@ export default function Profilescreen() {
             )}
           </View>
         </View>
-      </ScrollView>
+      </View>
 
       <Modal
         visible={modalVisible}
@@ -183,9 +162,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-  },
-  scrollViewContent: {
-    flexGrow: 1,
   },
   bannerContainer: {
     position: 'relative',
@@ -265,15 +241,5 @@ const styles = StyleSheet.create({
   },
   skeleton: {
     marginBottom: 10,
-  },
-  skeletonBanner: {
-    marginBottom: 20,
-  },
-  skeletonProfile: {
-    marginBottom: 30,
-    marginTop: 10,
-  },
-  skeletonText: {
-    marginLeft: 10,
   },
 });

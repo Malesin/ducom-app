@@ -1,46 +1,58 @@
-import React, {useState} from 'react';
-import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
-import {StyleSheet, View, Dimensions} from 'react-native';
+import React from 'react';
+import { StyleSheet, View, Dimensions } from 'react-native';
 import {
   Likescreen,
   Mediascreen,
   Postscreen,
-  Profilescreen,
   Replyscreen,
 } from '../pages';
-import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { Tabs, MaterialTabBar } from 'react-native-collapsible-tab-view'; // Import Tabs and MaterialTabBar
+import Profilescreen from '../pages/Profile/Profilescreen'; // Import Profilescreen
 
-const Tab = createMaterialTopTabNavigator();
-const {height} = Dimensions.get('window');
+const { height } = Dimensions.get('window');
 
 function TopTabNavigator() {
-  const [profileHeight, setProfileHeight] = useState(height * 0.4);
-
-  const handleProfileLayout = event => {
-    const {height: profileWrapperHeight} = event.nativeEvent.layout;
-    setProfileHeight(profileWrapperHeight);
-  };
+  const Header = () => (
+    <View style={styles.profileWrapper}>
+      <Profilescreen />
+    </View>
+  );
 
   return (
     <GestureHandlerRootView style={styles.container}>
-      <View
-        style={[styles.profileWrapper, {height: profileHeight}]}
-        onLayout={handleProfileLayout}>
-        <Profilescreen />
-      </View>
-      <View style={[styles.navigatorWrapper, {height: height - profileHeight}]}>
-        <Tab.Navigator
-          screenOptions={{
-            tabBarLabelStyle: styles.tabBarLabel,
-            tabBarIndicatorStyle: styles.tabBarIndicator,
-            tabBarStyle: styles.tabBar,
-          }}>
-          <Tab.Screen name="Posts" component={Postscreen} />
-          <Tab.Screen name="Replies" component={Replyscreen} />
-          <Tab.Screen name="Likes" component={Likescreen} />
-          <Tab.Screen name="Media" component={Mediascreen} />
-        </Tab.Navigator>
-      </View>
+      <Tabs.Container
+        renderHeader={Header}
+        renderTabBar={(props) => (
+          <MaterialTabBar
+            {...props}
+            style={styles.tabBar}
+            indicatorStyle={styles.tabBarIndicator}
+            labelStyle={styles.tabBarLabel}
+          />
+        )}
+      >
+        <Tabs.Tab name="Posts">
+          <Tabs.ScrollView>
+            <Postscreen />
+          </Tabs.ScrollView>
+        </Tabs.Tab>
+        <Tabs.Tab name="Replies">
+          <Tabs.ScrollView>
+            <Replyscreen />
+          </Tabs.ScrollView>
+        </Tabs.Tab>
+        <Tabs.Tab name="Likes">
+          <Tabs.ScrollView>
+            <Likescreen />
+          </Tabs.ScrollView>
+        </Tabs.Tab>
+        <Tabs.Tab name="Media">
+          <Tabs.ScrollView>
+            <Mediascreen />
+          </Tabs.ScrollView>
+        </Tabs.Tab>
+      </Tabs.Container>
     </GestureHandlerRootView>
   );
 }
@@ -52,23 +64,20 @@ const styles = StyleSheet.create({
   profileWrapper: {
     backgroundColor: '#fff',
   },
-  navigatorWrapper: {
-    flex: 1,
-  },
   tabBar: {
-    backgroundColor: '#fff',
+    backgroundColor: '#fff', // Warna latar belakang putih
     borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
+    borderBottomColor: '#ddd', // Warna border abu-abu
     elevation: 0,
   },
   tabBarLabel: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#000',
+    color: '#000', // Warna teks hitam
     textTransform: 'none',
   },
   tabBarIndicator: {
-    backgroundColor: '#000',
+    backgroundColor: '#000', // Warna indikator hitam
     height: 3,
   },
 });
