@@ -59,7 +59,8 @@ function Postscreen({ navigation }) {
                 likesCount: post.likes.length,
                 commentsCount: post.comments.length,
                 bookMarksCount: post.bookmarks.length,
-                isLiked: post.likes.some(like => like._id === idUser) // Check if the user's ID is in the likes array
+                isLiked: post.likes.some(like => like._id === idUser),
+                isBookmarked: post.bookmarks.some(bookmark => bookmark.user === idUser),
             }));
 
             return formattedTweets;
