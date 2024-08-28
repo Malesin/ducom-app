@@ -10,11 +10,11 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useNavigation, useFocusEffect} from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import config from '../../config';
-import {Skeleton} from 'react-native-elements';
+import { Skeleton } from 'react-native-elements';
 
 const serverUrl = config.SERVER_URL;
 
@@ -38,17 +38,16 @@ export default function Profilescreen() {
       console.log('Data Retrieved Successfully', userResponse.data);
 
       const user = userResponse.data.data;
-      console.log('User Data:', user); // Tambahkan log ini untuk memastikan data user diambil dengan benar
       setUserData(user);
 
       if (user.bannerPicture) {
-        const banner = {uri: user.bannerPicture};
-        setBanner(banner, 'banner');
+        const banner = { uri: user.bannerPicture };
+        setBanner(banner);
         console.log('Image Banner Retrieved Successfully');
       }
 
       if (user.profilePicture) {
-        const profile = {uri: user.profilePicture};
+        const profile = { uri: user.profilePicture };
         setProfilePicture(profile);
         console.log('Image Profile Retrieved Successfully');
       }
@@ -79,51 +78,20 @@ export default function Profilescreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView
-        contentContainerStyle={styles.scrollViewContent}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }>
-        <View style={styles.bannerContainer}>
-          {loading ? (
-            <Skeleton
-              animation="pulse"
-              height={150}
-              width={'100%'}
-              style={styles.skeletonBanner}
-            />
-          ) : (
-            <Image
-              source={banner || require('../../assets/banner.png')}
-              style={styles.banner}
-            />
-          )}
-          <TouchableOpacity style={styles.settingsButton} onPress={() => {}}>
-            <MaterialCommunityIcons
-              name="dots-vertical"
-              size={30}
-              color="#000"
-            />
-          </TouchableOpacity>
-        </View>
+      <View style={styles.bannerContainer}>
+        <Image
+          source={banner || require('../../assets/banner.png')}
+          style={styles.banner}
+        />
+        <TouchableOpacity style={styles.settingsButton} onPress={() => {}}>
+          <MaterialCommunityIcons name="dots-vertical" size={30} color="#000" />
+        </TouchableOpacity>
         <View style={styles.profileContainer}>
           <TouchableOpacity onPress={openModal}>
-            {loading ? (
-              <Skeleton
-                animation="pulse"
-                circle
-                height={82}
-                width={83}
-                style={styles.skeletonProfile}
-              />
-            ) : (
-              <Image
-                source={
-                  profilePicture || require('../../assets/profilepic.png')
-                }
-                style={styles.profile}
-              />
-            )}
+            <Image
+              source={profilePicture || require('../../assets/profilepic.png')}
+              style={styles.profile}
+            />
           </TouchableOpacity>
           <View style={styles.profileText}>
             {!userData ? (

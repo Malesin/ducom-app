@@ -11,7 +11,6 @@ import {
   TouchableOpacity,
   Alert,
   Animated,
-  colorScheme,
   useColorScheme,
   ActivityIndicator,
   Text,
@@ -38,7 +37,7 @@ const CreatePost = ({route, navigation}) => {
   const [mediaType, setMediaType] = useState(null);
   const [profilePicture, setProfilePicture] = useState(null);
   const [translateY] = useState(new Animated.Value(500)); // Initial position
-  const colorScheme = useColorScheme();
+  const colorScheme = useColorScheme(); // Get color scheme
   const styles = getStyles(colorScheme); // Get styles based on color scheme
 
   const profilePictureUri = require('../../assets/profilepic.png');
@@ -145,7 +144,7 @@ const CreatePost = ({route, navigation}) => {
             maxContentLength: Infinity,
             headers: {
               'Content-Type': 'multipart/form-data',
-            }
+            }, // <-- Add missing comma here
             onUploadProgress: progressEvent => {
               const progress = Math.round(
                 (progressEvent.loaded * 100) / progressEvent.total,
@@ -409,7 +408,7 @@ const CreatePost = ({route, navigation}) => {
     const keyboardDidHideListener = Keyboard.addListener(
       'keyboardDidHide',
       () => {
-        setKeyboardVisible(true);
+        setKeyboardVisible(false); // <-- Set to false here
       },
     );
 
@@ -504,7 +503,7 @@ const CreatePost = ({route, navigation}) => {
   );
 };
 
-const getStyles = () =>
+const getStyles = (colorScheme) => // <-- Add colorScheme parameter
   StyleSheet.create({
     container: {
       flex: 1,
@@ -540,7 +539,7 @@ const getStyles = () =>
       borderColor: 'transparent',
       padding: 12,
       borderRadius: 8,
-      color: colorScheme === 'dark' ? '#000000' : '#000000',
+      color: colorScheme === 'dark' ? '#000000' : '#000000', // Use colorScheme parameter
     },
     mediaContainer: {
       position: 'relative',
