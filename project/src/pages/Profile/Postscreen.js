@@ -1,16 +1,16 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {
-    StyleSheet,
-    ScrollView,
-    View,
-    Alert,
-    SafeAreaView,
-    Text,
-    ActivityIndicator,
+  StyleSheet,
+  ScrollView,
+  View,
+  Alert,
+  SafeAreaView,
+  Text,
+  ActivityIndicator,
 } from 'react-native';
 import TweetCard from '../../components/TweetCard'; // Import TweetCard
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useFocusEffect } from '@react-navigation/native';
+import {useFocusEffect} from '@react-navigation/native';
 import axios from 'axios';
 import config from '../../config';
 import { Skeleton } from 'react-native-elements'; // Import Skeleton
