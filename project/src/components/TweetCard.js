@@ -99,10 +99,58 @@ const TweetCard = ({ tweet }) => {
     }
   };
 
-  const handleBookmark = () => {
-    setBookmarked(prev => !prev);
-    setBookMarksCount(prev => (bookmarked ? prev - 1 : prev + 1));
+  const handleBookmark = async () => {
+    const token = await AsyncStorage.getItem('token');
+
+    if (bookmarked) {
+      await handleUnbookmark(); // Ensure unlike completes before proceeding
+    } else {
+      try {
+        const response = await axios.post(`${serverUrl}/bookmark-post`, {
+          token: token,
+          postId: tweet.id,
+        });
+
+
+        if (response.data.status === 'ok') {
+          setBookmarked(true); // Directly update liked state
+          setBookMarksCount(prevBookmarksCount => {
+            const newBookmarksCount = prevBookmarksCount + 1;
+            return newBookmarksCount;
+          });
+        } else {
+          console.log('Error in bookmark response data:', response.data.data);
+        }
+      } catch (error) {
+        console.error('Error bookmarking post:', error.message);
+      }
+    }
   };
+
+  const handleUnbookmark = async () => {
+    const token = await AsyncStorage.getItem('token');
+
+    try {
+      const response = await axios.post(`${serverUrl}/unbookmark-post`, {
+        token: token,
+        postId: tweet.id,
+      });
+
+
+      if (response.data.status === 'ok') {
+        setBookmarked(false); // Directly update liked state
+        setBookMarksCount(prevBookmarksCount => {
+          const newBookmarksCount = prevBookmarksCount - 1;
+          return newBookmarksCount;
+        });
+      } else {
+        console.log('Error in unbookmark response data:', response.data.data);
+      }
+    } catch (error) {
+      console.error('Error unbookmarking post:', error.message);
+    }
+  };
+
 
   const handleComment = () => setCommentsCount(prev => prev + 1);
 
