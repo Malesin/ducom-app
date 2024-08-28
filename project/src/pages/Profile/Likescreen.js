@@ -36,7 +36,7 @@ function Likescreen({ navigation }) {
                 return [];
             }
 
-            const idUserLike = data._id; // Extract user ID
+            const idUser = data._id; // Extract user ID
 
             const responseTweet = await axios.post(`${serverUrl}/liked-posts`, { token });
             const dataTweet = responseTweet.data;
@@ -57,7 +57,8 @@ function Likescreen({ navigation }) {
                 likesCount: post.likes.length,
                 commentsCount: post.comments.length,
                 bookMarksCount: post.bookmarks.length,
-                isLiked: post.likes.some(like => like._id === idUserLike),
+                isLiked: post.likes.some(like => like._id === idUser),
+                isBookmarked: post.bookmarks.some(bookmark => bookmark.user === idUser), 
             }));
 
             return formattedTweets;
