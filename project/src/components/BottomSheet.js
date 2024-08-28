@@ -14,7 +14,7 @@ import config from '../config';
 const serverUrl = config.SERVER_URL;
 
 const BottomSheet = () => {
-  const [userData, setUserData] = useState(null); // Initialize state
+  const [userData, setUserData] = useState(null); 
 
   useEffect(() => {
     const fetchData = async () => {

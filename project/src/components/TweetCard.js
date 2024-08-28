@@ -9,6 +9,7 @@ import {
   TouchableWithoutFeedback,
   Share,
   FlatList,
+  SafeAreaView,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Video from 'react-native-video';
@@ -20,7 +21,7 @@ import axios from 'axios';
 import config from '../config';
 const serverUrl = config.SERVER_URL;
 
-const TweetCard = ({tweet}) => {
+const TweetCard = ({tweet, navigation}) => {
   const [liked, setLiked] = useState(tweet.isLiked);
   const [likesCount, setLikesCount] = useState(tweet.likesCount);
   const [bookmarked, setBookmarked] = useState(tweet.isBookmarked);
@@ -110,7 +111,10 @@ const TweetCard = ({tweet}) => {
     setBookMarksCount(prev => (bookmarked ? prev - 1 : prev + 1));
   };
 
-  const handleComment = () => setCommentsCount(prev => prev + 1);
+  const handleComment = () => {
+    setCommentsCount(prev => prev + 1);
+    navigation.navigate('Comment');
+  };
 
   const openMediaPreview = uri => {
     setModalMediaUri(uri);
@@ -212,7 +216,7 @@ const TweetCard = ({tweet}) => {
   };
 
   return (
-    <View style={styles.card}>
+    <SafeAreaView style={styles.card}>
       {/* User Info */}
       <View style={styles.userInfo}>
         <Image
@@ -329,7 +333,7 @@ const TweetCard = ({tweet}) => {
           </View>
         </TouchableWithoutFeedback>
       </Modal>
-    </View>
+    </SafeAreaView>
   );
 };
 

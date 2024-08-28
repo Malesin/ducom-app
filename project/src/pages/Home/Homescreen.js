@@ -275,7 +275,7 @@ const HomeScreen = ({navigation}) => {
           }}>
           {tweets.map((tweet, index) => (
             <View key={index} style={styles.tweetContainer}>
-              <TweetCard tweet={tweet} />
+              <TweetCard tweet={tweet} navigation={navigation} />
             </View>
           ))}
           {loadingMore && <LoadingIndicator />}
