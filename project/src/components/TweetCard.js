@@ -39,7 +39,7 @@ const TweetCard = ({tweet, navigation}) => {
       for (const media of tweet.media || []) {
         if (media.type === 'video' && media.uri) {
           try {
-            const {path} = await createThumbnail({url: media.uri});
+            const { path } = await createThumbnail({ url: media.uri });
             newThumbnails[media.uri] = path;
           } catch (error) {
             console.log('Error generating thumbnail:', error);

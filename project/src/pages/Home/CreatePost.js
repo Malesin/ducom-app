@@ -145,13 +145,13 @@ const CreatePost = ({route, navigation}) => {
             maxContentLength: Infinity,
             headers: {
               'Content-Type': 'multipart/form-data',
-            },
+            }
             onUploadProgress: progressEvent => {
               const progress = Math.round(
                 (progressEvent.loaded * 100) / progressEvent.total,
               );
               setUploadProgress(progress);
-            },
+            }
           },
         );
 

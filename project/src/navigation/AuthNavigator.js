@@ -12,6 +12,7 @@ import {
   EditProfilePage,
   CreatePost,
   CommentScreen,
+  Userprofile, // Tambahkan import Userprofile
 } from '../pages';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
@@ -87,6 +88,11 @@ export default function MainNavigation() {
           name="EditProfile"
           component={EditProfilePage}
           options={{headerShown: true, title: 'Edit Profile'}}
+        />
+        <Stack.Screen
+          name="Userprofile"
+          component={Userprofile} // Tambahkan Userprofile ke dalam Stack.Navigator
+          options={{headerShown: true, title: 'User Profile'}}
         />
       </Stack.Navigator>
     </NavigationContainer>

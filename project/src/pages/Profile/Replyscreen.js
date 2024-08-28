@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, SafeAreaView, ScrollView } from 'react-native';
+import { View } from 'react-native';
 import TweetCard from '../../components/TweetCard';
 
-function Replyscreen({ navigation }) {
+function Replyscreen() {
     const [tweets, setTweets] = useState([
         {
             id: '1',
@@ -59,16 +59,12 @@ function Replyscreen({ navigation }) {
     ]);
 
     return (
-        <SafeAreaView>
-            <ScrollView>
-                <View>
-                    {tweets.map(tweet => (
-                        <TweetCard key={tweet.id} tweet={tweet} />
-                    ))}
-                </View>
-            </ScrollView>
-        </SafeAreaView>
+        <View>
+            {tweets.map(tweet => (
+                <TweetCard key={tweet.id} tweet={tweet} />
+            ))}
+        </View>
     );
 }
 
-export default Replyscreen;
+export default Replyscreen; 

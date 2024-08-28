@@ -19,6 +19,7 @@ import Mediascreen from './Profile/Mediascreen';
 import Postscreen from './Profile/Postscreen';
 import Replyscreen from './Profile/Replyscreen';
 import EditProfilePage from './Profile/EditProfilePage';
+import Userprofile from './Profile/Userprofile'; // Tambahkan import Userprofile
 
 export {
   Splashscreen,
@@ -42,4 +43,5 @@ export {
   Mediascreen,
   Replyscreen,
   EditProfilePage,
+  Userprofile, // Tambahkan Userprofile ke dalam export
 };
