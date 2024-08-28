@@ -11,9 +11,10 @@ import {
   Profilescreen,
   EditProfilePage,
   CreatePost,
+  CommentScreen,
   Userprofile, // Tambahkan import Userprofile
 } from '../pages';
-import {NavigationContainer, useTheme} from '@react-navigation/native';
+import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import BottomTabNavigator from './BottomTabNavigator';
 
@@ -72,6 +73,11 @@ export default function MainNavigation() {
           name="CreatePost"
           component={CreatePost}
           options={{headerShown: true, title: 'Create Post'}}
+        />
+        <Stack.Screen
+          name="Comment"
+          component={CommentScreen}
+          options={{headerShown: true, title: 'Comments'}}
         />
         <Stack.Screen
           name="Profile"

@@ -139,7 +139,11 @@ const HomeScreen = ({navigation}) => {
     };
     loadInitialTweets();
   }, []);
-
+  const onPostSuccess = () => {
+    console.log('Post created successfully, refreshing HomeScreen...');
+    setRefreshing(true);
+    onRefresh();
+  };
   const handleOpenCamera = () => {
     const options = {
       mediaType: 'photo',
@@ -303,7 +307,7 @@ const HomeScreen = ({navigation}) => {
           isExpanded={isExpanded}
           index={2}
           iconName={'feather'}
-          onPress={() => navigation.navigate('CreatePost')} // Navigate to CreatePost screen
+          onPress={() => navigation.navigate('CreatePost', {onPostSuccess})} // Navigate to CreatePost screen
         />
       </View>
     </SafeAreaView>
@@ -332,9 +336,9 @@ const mainButtonStyles = StyleSheet.create({
     alignItems: 'center',
   },
   content: {
-    fontSize: 48,
+    fontSize: 45,
     color: 'white',
-    lineHeight: 55,
+    lineHeight: 60,
     marginBottom: 1,
   },
 });

@@ -10,9 +10,11 @@ import {
   Modal,
   TouchableOpacity,
   Alert,
-  Animated, // Import Animated from react-native
+  Animated,
   colorScheme,
   useColorScheme,
+  ActivityIndicator,
+  Text,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {Button} from 'react-native-elements';
@@ -40,7 +42,6 @@ const CreatePost = ({route, navigation}) => {
   const styles = getStyles(colorScheme); // Get styles based on color scheme
 
   const profilePictureUri = require('../../assets/profilepic.png');
-  const [userProfilePicture, setUserProfilePicture] = useState(null);
 
   async function getData() {
     try {
@@ -88,9 +89,12 @@ const CreatePost = ({route, navigation}) => {
     }).start();
   }, [translateY]);
 
-  console.log(selectedMedia, 'woilah');
+  console.log(selectedMedia, 'Selected Media');
 
+  const [UploadProgress, setUploadProgress] = useState(0);
+  const [IsUploading, SetIsUploading] = useState(false);
   const handlePostSubmit = async () => {
+    SetIsUploading(true);
     const token = await AsyncStorage.getItem('token');
     try {
       if (selectedMedia.length > 0) {
@@ -141,7 +145,13 @@ const CreatePost = ({route, navigation}) => {
             maxContentLength: Infinity,
             headers: {
               'Content-Type': 'multipart/form-data',
-            },
+            }
+            onUploadProgress: progressEvent => {
+              const progress = Math.round(
+                (progressEvent.loaded * 100) / progressEvent.total,
+              );
+              setUploadProgress(progress);
+            }
           },
         );
 
@@ -178,19 +188,58 @@ const CreatePost = ({route, navigation}) => {
       }
     } catch (error) {
       console.error('Error submitting post:', error.message);
+    } finally {
+      SetIsUploading(false);
     }
   };
 
   const compressMedia = async (uri, mediaType) => {
+    if (mediaType === 'image/heic' || mediaType === 'image/heif') {
+      try {
+        const uriWithPrefix = uri.startsWith('file://') ? uri : `file://${uri}`;
+
+        const {uri: resizedUri} = await ImageResizer.createResizedImage(
+          uriWithPrefix,
+          1920,
+          1080,
+          'HEIC',
+          80,
+        );
+
+        console.log('HEIF image resized successfully:', resizedUri);
+        return resizedUri;
+      } catch (error) {
+        console.error('Error resizing HEIF image:', error);
+        return uri; // Return original URI if resizing fails
+      }
+    } else if (mediaType === 'image/png' || mediaType === 'image/jpeg') {
+      try {
+        const uriWithPrefix = uri.startsWith('file://') ? uri : `file://${uri}`;
+
+        const {uri: resizedUri} = await ImageResizer.createResizedImage(
+          uriWithPrefix,
+          1920,
+          1080,
+          'JPEG',
+          80,
+        );
+
+        console.log('Image resized successfully:', resizedUri);
+        return resizedUri;
+      } catch (error) {
+        console.error('Error resizing image:', error);
+        return uri; // Return original URI if resizing fails
+      }
+    }
     if (mediaType === 'video/mp4') {
       try {
         console.log('Compressing video...');
 
         const compressedResult = await VideoCompressor.compress(uri, {
           compressionMethod: 'manual',
-          bitrate: 1000, // Menyesuaikan bitrate
-          resolution: '1280x720', // Menyesuaikan resolusi
-          maxSizeMB: 4.8,
+          resolution: '1920x1080',
+          maxSizeMB: 4.9,
+          bitrate: 12000,
         });
 
         const compressedUri = compressedResult?.path;
@@ -210,27 +259,9 @@ const CreatePost = ({route, navigation}) => {
         console.error('Error compressing video:', error);
         return uri; // Return original URI if compression fails
       }
-    } else if (mediaType === 'image/png' || mediaType === 'image/jpeg') {
-      try {
-        const uriWithPrefix = uri.startsWith('file://') ? uri : `file://${uri}`;
-
-        const {uri: resizedUri} = await ImageResizer.createResizedImage(
-          uriWithPrefix,
-          800,
-          600,
-          'JPEG',
-          80,
-        );
-
-        console.log('Image resized successfully:', resizedUri);
-        return resizedUri;
-      } catch (error) {
-        console.error('Error resizing image:', error);
-        return uri; // Return original URI if resizing fails
-      }
     } else {
       console.error('Unsupported media type:', mediaType);
-      return uri; // Return original URI if media type is unsupported
+      return uri; // Return original URI if media type is unsuppo rted
     }
   };
 
@@ -238,6 +269,7 @@ const CreatePost = ({route, navigation}) => {
     const options = {
       mediaType: 'mixed',
       saveToPhotos: true,
+      allowedFileTypes: ['heic', 'heif', 'jpeg', 'jpg', 'png'],
     };
 
     ImagePicker.launchCamera(options, async response => {
@@ -274,6 +306,7 @@ const CreatePost = ({route, navigation}) => {
     const options = {
       mediaType: 'mixed',
       selectionLimit: 4,
+      allowedFileTypes: ['heic', 'heif', 'jpeg', 'jpg', 'png'],
     };
 
     ImagePicker.launchImageLibrary(options, async response => {
@@ -388,6 +421,14 @@ const CreatePost = ({route, navigation}) => {
 
   return (
     <SafeAreaView style={styles.container}>
+      {IsUploading && (
+        <View style={styles.progressBarContainer}>
+          <ActivityIndicator size="large" color="#000" />
+          <Text style={styles.progressBarText}>
+            Uploading... ({UploadProgress}%)
+          </Text>
+        </View>
+      )}
       <Animated.View
         style={[styles.contentContainer, {transform: [{translateY}]}]}>
         <View style={styles.inputContainer}>
@@ -421,13 +462,15 @@ const CreatePost = ({route, navigation}) => {
             buttonStyle={styles.button}
             onPress={handleOpenGallery}
           />
-          {keyboardVisible && newPostText.length > 0 && (
-            <Button
-              title="Post"
-              buttonStyle={styles.postButton}
-              onPress={handlePostSubmit}
-            />
-          )}
+          {keyboardVisible &&
+            (newPostText.length > 0 || selectedMedia.length > 0) && (
+              <Button
+                title="Post"
+                buttonStyle={styles.postButton}
+                onPress={handlePostSubmit}
+                disabled={selectedMedia.length === 0 && !newPostText.trim()}
+              />
+            )}
         </View>
       </Animated.View>
 
@@ -474,6 +517,16 @@ const getStyles = () =>
       flexDirection: 'row',
       alignItems: 'center',
       marginBottom: 16,
+    },
+    progressBarContainer: {
+      padding: 16,
+      backgroundColor: '#fff',
+      borderRadius: 8,
+    },
+    progressBarText: {
+      fontSize: 16,
+      color: '#333',
+      textAlign: 'center',
     },
     profilePicture: {
       width: 40,
