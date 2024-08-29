@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
@@ -13,7 +13,8 @@ import config from '../config';
 
 const serverUrl = config.SERVER_URL;
 
-const BottomSheet = ({username, postId}) => {
+const BottomSheet = ({ username, postId }) => {
+
   const deletePost = async () => {
     const token = await AsyncStorage.getItem('token');
     try {
@@ -21,9 +22,9 @@ const BottomSheet = ({username, postId}) => {
         token: token,
         postId: postId,
       });
-
+  
       if (response.data.status === 'ok') {
-        console.log('Postingan Berhasil Dihapus');
+        console.log("Postingan Berhasil Dihapus")
       }
     } catch (error) {
       console.error('Error: ', error);
@@ -59,6 +60,7 @@ const BottomSheet = ({username, postId}) => {
     </SafeAreaView>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {

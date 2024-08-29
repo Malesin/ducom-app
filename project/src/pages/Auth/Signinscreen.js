@@ -36,6 +36,7 @@ const Signinscreen = ({navigation}) => {
   }, []);
 
   const handleLogin = () => {
+    console.log("clicked")
     let valid = true;
     if (email === '') {
       setEmailError('Email cannot be empty');

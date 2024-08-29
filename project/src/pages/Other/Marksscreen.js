@@ -43,27 +43,26 @@ const Marksscreen = ({navigation}) => {
         });
         const dataTweet = responseTweet.data;
 
-        const formattedTweets = dataTweet.data.map(post => ({
-          id: post._id,
-          userAvatar: post.user.profilePicture,
-          userName: post.user.name,
-          userHandle: post.user.username,
-          postDate: post.created_at,
-          content: post.description,
-          media: Array.isArray(post.media)
-            ? post.media.map(mediaItem => ({
-                type: mediaItem.type,
-                uri: mediaItem.uri,
-              }))
-            : [],
-          likesCount: post.likes.length,
-          commentsCount: post.comments.length,
-          bookMarksCount: post.bookmarks.length,
-          isLiked: post.likes.some(like => like._id === idUser),
-          isBookmarked: post.bookmarks.some(
-            bookmark => bookmark.user === idUser,
-          ),
-        }));
+      const formattedTweets = dataTweet.data.map(post => ({
+        id: post._id,
+        userAvatar: post.user.profilePicture,
+        userName: post.user.name,
+        userHandle: post.user.username,
+        postDate: post.created_at,
+        content: post.description,
+        media: Array.isArray(post.media)
+          ? post.media.map(mediaItem => ({
+            type: mediaItem.type,
+            uri: mediaItem.uri,
+          }))
+          : [],
+        likesCount: post.likes.length,
+        commentsCount: post.comments.length,
+        bookMarksCount: post.bookmarks.length,
+        isLiked: post.likes.some(like => like._id === idUser), 
+        isBookmarked: post.bookmarks.some(bookmark => bookmark.user === idUser), 
+        userId: post.user._id
+      }));
 
         setTweets(prevTweets => {
           // Filter to avoid duplicate tweets

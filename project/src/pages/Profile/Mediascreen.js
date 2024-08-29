@@ -60,7 +60,8 @@ function Mediascreen({ navigation }) {
                     likesCount: post.likes.length,
                     commentsCount: post.comments.length,
                     bookMarksCount: post.bookmarks.length,
-                    isLiked: post.likes.some(like => like._id === idUserLike) // Check if the user's ID is in the likes array
+                    isLiked: post.likes.some(like => like._id === idUserLike),
+                    userId: post.user._id
                 }));
 
             return formattedTweets;

@@ -15,6 +15,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import config from '../../config';
 import { Skeleton } from 'react-native-elements';
+import TweetCard from '../../components/TweetCard';
 
 const serverUrl = config.SERVER_URL;
 
@@ -34,17 +35,17 @@ export default function Userprofile({ route }) {
    */
   async function getData() {
     try {
-      const token = await AsyncStorage.getItem('token');
       console.log('Token Berhasil Diambil');
 
       // Ambil data pengguna lain
-      const userResponse = await axios.get(`${serverUrl}/userdata/${userId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      console.log('Data Berhasil Diambil', userResponse.data);
+      const userResponse = await axios.post(`${serverUrl}/findUserId/`, {
+        userId: userId
+      })
+      console.log('Data Berhasil Diambil');
 
       const user = userResponse.data.data;
       setUserData(user);
+      console.log("userID: ", userId)
 
       if (user.bannerPicture) {
         const banner = { uri: user.bannerPicture };
@@ -61,7 +62,6 @@ export default function Userprofile({ route }) {
       console.error('Terjadi Kesalahan:', error);
     }
   }
-
   // Ambil data pengguna saat komponen pertama kali dimuat
   useEffect(() => {
     getData();
@@ -93,7 +93,7 @@ export default function Userprofile({ route }) {
           source={banner || require('../../assets/banner.png')}
           style={styles.banner}
         />
-        <TouchableOpacity style={styles.settingsButton} onPress={() => {}}>
+        <TouchableOpacity style={styles.settingsButton} onPress={() => { }}>
           <MaterialCommunityIcons name="dots-vertical" size={30} color="#000" />
         </TouchableOpacity>
         <View style={styles.profileContainer}>

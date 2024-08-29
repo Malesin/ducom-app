@@ -38,7 +38,7 @@ export default function Profilescreen() {
       const userResponse = await axios.post(`${serverUrl}/userdata`, {
         token: token,
       });
-      console.log('Data Retrieved Successfully', userResponse.data);
+      console.log('Data Retrieved Successfully');
 
       const user = userResponse.data.data;
       setUserData(user);
