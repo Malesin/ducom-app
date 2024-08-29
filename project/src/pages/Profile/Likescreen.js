@@ -58,7 +58,8 @@ function Likescreen({ navigation }) {
                 commentsCount: post.comments.length,
                 bookMarksCount: post.bookmarks.length,
                 isLiked: post.likes.some(like => like._id === idUser),
-                isBookmarked: post.bookmarks.some(bookmark => bookmark.user === idUser), 
+                isBookmarked: post.bookmarks.some(bookmark => bookmark.user === idUser),
+                userId: post.user._id
             }));
 
             return formattedTweets;
