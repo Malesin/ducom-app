@@ -13,54 +13,47 @@ import config from '../config';
 
 const serverUrl = config.SERVER_URL;
 
-const BottomSheet = () => {
-  const [userData, setUserData] = useState(null); 
+const BottomSheet = ({username, postId}) => {
+  const deletePost = async () => {
+    const token = await AsyncStorage.getItem('token');
+    try {
+      const response = await axios.post(`${serverUrl}/delete-post`, {
+        token: token,
+        postId: postId,
+      });
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const token = await AsyncStorage.getItem('token');
-        console.log('Token Retrieved Successfully');
-
-        const userResponse = await axios.post(`${serverUrl}/userdata`, {
-          token: token,
-        });
-        console.log('Data Retrieved Successfully');
-
-        const user = userResponse.data.data;
-        setUserData(user); // Update the state with the fetched data
-      } catch (error) {
-        console.error('Error occurred:', error);
+      if (response.data.status === 'ok') {
+        console.log('Postingan Berhasil Dihapus');
       }
-    };
-
-    fetchData();
-  }, []);
+    } catch (error) {
+      console.error('Error: ', error);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.optionRow}>
         <TouchableOpacity style={styles.option}>
           <MaterialIcons name="volume-off" size={24} color="#333" />
-          <Text style={styles.optionText}>Mute @{userData?.username}</Text>
+          <Text style={styles.optionText}>Mute @{username}</Text>
         </TouchableOpacity>
       </View>
       <View style={styles.optionRow}>
-        <TouchableOpacity style={styles.option}>
+        <TouchableOpacity style={styles.option} onPress={deletePost}>
           <MaterialIcons name="delete" size={24} color="#333" />
-          <Text style={styles.optionText}>Delete @{userData?.username}</Text>
+          <Text style={styles.optionText}>Delete Post @{username}</Text>
         </TouchableOpacity>
       </View>
       <View style={styles.optionRow}>
         <TouchableOpacity style={styles.option}>
           <MaterialIcons name="block" size={24} color="#333" />
-          <Text style={styles.optionText}>Block @{userData?.username}</Text>
+          <Text style={styles.optionText}>Block @{username}</Text>
         </TouchableOpacity>
       </View>
       <View style={styles.optionRow}>
         <TouchableOpacity style={styles.option}>
           <MaterialIcons name="report" size={24} color="#333" />
-          <Text style={styles.optionText}>Report @{userData?.username}</Text>
+          <Text style={styles.optionText}>Report @{username}</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
