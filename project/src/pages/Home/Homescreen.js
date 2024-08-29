@@ -32,7 +32,7 @@ const serverUrl = config.SERVER_URL;
 const HomeScreen = ({navigation}) => {
   const [tweets, setTweets] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
-  const [page, setPage] = useState(1);
+  const [setPage] = useState(1);
   const [loadingMore, setLoadingMore] = useState(false);
   const [loading, setLoading] = useState(true);
   const [hasMore, setHasMore] = useState(true);
@@ -76,7 +76,7 @@ const HomeScreen = ({navigation}) => {
         bookMarksCount: post.bookmarks.length,
         isLiked: post.likes.some(like => like._id === idUser),
         isBookmarked: post.bookmarks.some(bookmark => bookmark.user === idUser),
-        userId: post.user._id, 
+        userId: post.user._id,
       }));
 
       return formattedTweets;
@@ -278,7 +278,7 @@ const HomeScreen = ({navigation}) => {
           }}>
           {tweets.map((tweet, index) => (
             <View key={index} style={styles.tweetContainer}>
-                <TweetCard tweet={tweet} />
+              <TweetCard tweet={tweet} />
             </View>
           ))}
           {loadingMore && <LoadingIndicator />}

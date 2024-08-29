@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -15,16 +15,16 @@ import {
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Video from 'react-native-video';
-import { createThumbnail } from 'react-native-create-thumbnail';
+import {createThumbnail} from 'react-native-create-thumbnail';
 import DefaultAvatar from '../assets/avatar.png';
 import BottomSheet from './BottomSheet';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 import axios from 'axios';
 import config from '../config';
 const serverUrl = config.SERVER_URL;
 
-const TweetCard = ({ tweet, navigation }) => {
+const TweetCard = ({tweet, navigation}) => {
   const [liked, setLiked] = useState(tweet.isLiked);
   const [likesCount, setLikesCount] = useState(tweet.likesCount);
   const [bookmarked, setBookmarked] = useState(tweet.isBookmarked);
@@ -37,8 +37,8 @@ const TweetCard = ({ tweet, navigation }) => {
 
   const navigator = useNavigation();
 
-  const handleProfilePress = (userId) => {
-    navigator.navigate('Userprofile', { userId });
+  const handleProfilePress = userId => {
+    navigator.navigate('Userprofile', {userId});
   };
 
   useEffect(() => {
@@ -167,9 +167,9 @@ const TweetCard = ({ tweet, navigation }) => {
     }
   };
 
-  const handleCommentPress = () => {
+  const handleCommentPress = ({}) => {
     setCommentsCount(prev => prev + 1);
-    navigation.navigate('Comment');
+    navigator.navigate('Comment');
   };
 
   const openMediaPreview = uri => {
@@ -234,7 +234,7 @@ const TweetCard = ({ tweet, navigation }) => {
     return `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
   };
 
-  const renderMediaItem = ({ item }) => {
+  const renderMediaItem = ({item}) => {
     if (!item.uri) {
       return null;
     }
@@ -245,8 +245,8 @@ const TweetCard = ({ tweet, navigation }) => {
           ? styles.singleMediaVideo
           : styles.singleMediaImage
         : item.type === 'video'
-          ? styles.tweetVideo
-          : styles.tweetImage;
+        ? styles.tweetVideo
+        : styles.tweetImage;
 
     return (
       <TouchableOpacity
@@ -254,7 +254,7 @@ const TweetCard = ({ tweet, navigation }) => {
         style={styles.mediaContainer}>
         {item.type === 'image' ? (
           <Image
-            source={{ uri: item.uri }}
+            source={{uri: item.uri}}
             style={mediaStyle}
             onError={() => console.log('Failed to load image')}
           />
@@ -262,7 +262,7 @@ const TweetCard = ({ tweet, navigation }) => {
           <TouchableOpacity
             onPress={() => openMediaPreview(item.uri)}
             style={styles.videoContainer}>
-            <Image source={{ uri: thumbnails[item.uri] }} style={mediaStyle} />
+            <Image source={{uri: thumbnails[item.uri]}} style={mediaStyle} />
             <MaterialCommunityIcons
               name="play-circle-outline"
               size={40}
@@ -275,7 +275,7 @@ const TweetCard = ({ tweet, navigation }) => {
     );
   };
 
-  const tweetId = tweet.userId
+  const tweetId = tweet.userId;
 
   return (
     <SafeAreaView style={styles.card}>
@@ -283,7 +283,7 @@ const TweetCard = ({ tweet, navigation }) => {
       <View style={styles.userInfo}>
         <TouchableOpacity onPress={() => handleProfilePress(tweetId)}>
           <Image
-            source={tweet.userAvatar ? { uri: tweet.userAvatar } : DefaultAvatar}
+            source={tweet.userAvatar ? {uri: tweet.userAvatar} : DefaultAvatar}
             style={styles.avatar}
           />
         </TouchableOpacity>
@@ -321,13 +321,14 @@ const TweetCard = ({ tweet, navigation }) => {
           </TouchableWithoutFeedback>
           <View style={styles.bottomSheetContainer}>
             <BottomSheet
-              onClose={() => setShowBottomSheet(false)}
+              onClose={() => {
+                setShowBottomSheet(false);
+              }}
               username={tweet.userName}
               postId={tweet.id}
             />
           </View>
         </Modal>
-
       </View>
 
       {/* Tweet Content */}
@@ -386,15 +387,15 @@ const TweetCard = ({ tweet, navigation }) => {
             <View style={styles.modalContainer}>
               {modalMediaUri ? (
                 modalMediaUri.endsWith('.jpg') ||
-                  modalMediaUri.endsWith('.png') ? (
+                modalMediaUri.endsWith('.png') ? (
                   <Image
-                    source={{ uri: modalMediaUri }}
+                    source={{uri: modalMediaUri}}
                     style={styles.modalImage}
                     onError={() => console.log('Failed to load image')}
                   />
                 ) : (
                   <Video
-                    source={{ uri: modalMediaUri }}
+                    source={{uri: modalMediaUri}}
                     style={styles.modalImage}
                     controls
                     resizeMode="contain"
@@ -409,7 +410,7 @@ const TweetCard = ({ tweet, navigation }) => {
   );
 };
 
-const InteractionButton = ({ icon, color, count, onPress }) => (
+const InteractionButton = ({icon, color, count, onPress}) => (
   <TouchableOpacity style={styles.actionButton} onPress={onPress}>
     <MaterialCommunityIcons name={icon} size={20} color={color} />
     <Text style={styles.actionText}>{count}</Text>
@@ -421,7 +422,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     padding: 10,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 1,

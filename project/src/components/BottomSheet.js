@@ -4,8 +4,9 @@ import {
   View,
   TouchableOpacity,
   SafeAreaView,
+  ToastAndroid,
 } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, {useState} from 'react';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
@@ -13,7 +14,8 @@ import config from '../config';
 
 const serverUrl = config.SERVER_URL;
 
-const BottomSheet = ({ username, postId }) => {
+const BottomSheet = ({username, postId, onClose}) => {
+  const [isVisible] = useState(true);
 
   const deletePost = async () => {
     const token = await AsyncStorage.getItem('token');
@@ -22,19 +24,28 @@ const BottomSheet = ({ username, postId }) => {
         token: token,
         postId: postId,
       });
-  
+
       if (response.data.status === 'ok') {
-        console.log("Postingan Berhasil Dihapus")
+        console.log('Postingan Berhasil Dihapus');
+        ToastAndroid.show('Post deleted successfully!', ToastAndroid.SHORT);
+        onClose(); // Call the onClose function to close the bottom sheet
       }
     } catch (error) {
       console.error('Error: ', error);
+      ToastAndroid.show('Error when deleting post.', ToastAndroid.SHORT);
     }
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView
+      style={styles.container}
+      pointerEvents={isVisible ? 'auto' : 'none'}>
       <View style={styles.optionRow}>
-        <TouchableOpacity style={styles.option}>
+        <TouchableOpacity
+          style={styles.option}
+          onPress={() => {
+            onClose(); // Call the onClose function to close the bottom sheet
+          }}>
           <MaterialIcons name="volume-off" size={24} color="#333" />
           <Text style={styles.optionText}>Mute @{username}</Text>
         </TouchableOpacity>
@@ -46,13 +57,21 @@ const BottomSheet = ({ username, postId }) => {
         </TouchableOpacity>
       </View>
       <View style={styles.optionRow}>
-        <TouchableOpacity style={styles.option}>
+        <TouchableOpacity
+          style={styles.option}
+          onPress={() => {
+            onClose(); // Call the onClose function to close the bottom sheet
+          }}>
           <MaterialIcons name="block" size={24} color="#333" />
           <Text style={styles.optionText}>Block @{username}</Text>
         </TouchableOpacity>
       </View>
       <View style={styles.optionRow}>
-        <TouchableOpacity style={styles.option}>
+        <TouchableOpacity
+          style={styles.option}
+          onPress={() => {
+            onClose(); // Call the onClose function to close the bottom sheet
+          }}>
           <MaterialIcons name="report" size={24} color="#333" />
           <Text style={styles.optionText}>Report @{username}</Text>
         </TouchableOpacity>
@@ -60,7 +79,6 @@ const BottomSheet = ({ username, postId }) => {
     </SafeAreaView>
   );
 };
-
 
 const styles = StyleSheet.create({
   container: {

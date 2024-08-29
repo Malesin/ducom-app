@@ -150,7 +150,7 @@ const CreatePost = ({route, navigation}) => {
                 (progressEvent.loaded * 100) / progressEvent.total,
               );
               setUploadProgress(progress);
-            }
+            },
           },
         );
 
@@ -503,7 +503,9 @@ const CreatePost = ({route, navigation}) => {
   );
 };
 
-const getStyles = (colorScheme) => // <-- Add colorScheme parameter
+const getStyles = (
+  colorScheme, // <-- Add colorScheme parameter
+) =>
   StyleSheet.create({
     container: {
       flex: 1,
