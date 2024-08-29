@@ -17,6 +17,7 @@ import {
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import BottomTabNavigator from './BottomTabNavigator';
+import DrawerNavigator from './DrawerNavigator'; // Tambahkan import DrawerNavigator
 
 const Stack = createNativeStackNavigator();
 
@@ -93,6 +94,11 @@ export default function MainNavigation() {
           name="Userprofile"
           component={Userprofile} // Tambahkan Userprofile ke dalam Stack.Navigator
           options={{headerShown: true, title: 'User Profile'}}
+        />
+        <Stack.Screen
+          name="DrawerNavigator"
+          component={DrawerNavigator} // Tambahkan DrawerNavigator ke dalam Stack.Navigator
+          options={{headerShown: false}}
         />
       </Stack.Navigator>
     </NavigationContainer>

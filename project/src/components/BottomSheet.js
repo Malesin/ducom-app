@@ -29,7 +29,7 @@ const BottomSheet = ({ username, postId }) => {
     } catch (error) {
       console.error('Error: ', error);
     }
-  }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
