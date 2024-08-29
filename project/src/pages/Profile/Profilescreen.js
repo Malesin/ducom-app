@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   SafeAreaView,
   View,
@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Modal,
   TouchableWithoutFeedback,
+  Animated,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
@@ -24,6 +25,8 @@ export default function Profilescreen() {
   const [profilePicture, setProfilePicture] = useState(false);
   const [modalImageSource, setModalImageSource] = useState(null);
   const [userData, setUserData] = useState('');
+  const [dropdownVisible, setDropdownVisible] = useState(false);
+  const dropdownAnimation = useRef(new Animated.Value(0)).current;
   const navigation = useNavigation();
 
   async function getData() {
@@ -76,6 +79,35 @@ export default function Profilescreen() {
     setModalImageSource(null);
   };
 
+  // Fungsi untuk membuka dan menutup dropdown dengan animasi
+  const toggleDropdown = () => {
+    if (dropdownVisible) {
+      // Animasi untuk menutup dropdown
+      Animated.timing(dropdownAnimation, {
+        toValue: 0, // Nilai akhir animasi
+        duration: 150, // Durasi animasi dalam milidetik
+        useNativeDriver: true, // Menggunakan native driver untuk performa yang lebih baik
+      }).start(() => setDropdownVisible(false)); // Menyembunyikan dropdown setelah animasi selesai
+    } else {
+      setDropdownVisible(true); // Menampilkan dropdown sebelum animasi dimulai
+      // Animasi untuk membuka dropdown
+      Animated.timing(dropdownAnimation, {
+        toValue: 1, // Nilai akhir animasi
+        duration: 150, // Durasi animasi dalam milidetik
+        useNativeDriver: true, // Menggunakan native driver untuk performa yang lebih baik
+      }).start();
+    }
+  };
+
+  const handleDropdownItemPress = (item) => {
+    if (item === 'Need Help') {
+      navigation.navigate('FAQ');
+    }
+    // Handle item press
+    console.log(item);
+    toggleDropdown();
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.bannerContainer}>
@@ -83,9 +115,40 @@ export default function Profilescreen() {
           source={banner || require('../../assets/banner.png')}
           style={styles.banner}
         />
-        <TouchableOpacity style={styles.settingsButton} onPress={() => {}}>
+        <TouchableOpacity style={styles.settingsButton} onPress={toggleDropdown}>
           <MaterialCommunityIcons name="dots-vertical" size={30} color="#000" />
         </TouchableOpacity>
+        {dropdownVisible && (
+          <TouchableWithoutFeedback onPress={toggleDropdown}>
+            <View style={styles.dropdownOverlay}>
+              <Animated.View
+                style={[
+                  styles.dropdownMenu,
+                  {
+                    opacity: dropdownAnimation, // Mengatur opacity berdasarkan nilai animasi
+                    transform: [
+                      {
+                        scale: dropdownAnimation.interpolate({
+                          inputRange: [0, 1], // Rentang nilai input
+                          outputRange: [0.8, 1], // Rentang nilai output
+                        }),
+                      },
+                    ],
+                  },
+                ]}
+              >
+                <TouchableOpacity style={styles.dropdownItem} onPress={() => handleDropdownItemPress('Need Help')}>
+                  <MaterialCommunityIcons name="information" size={20} color="#fff" style={styles.dropdownIcon} />
+                  <Text style={styles.dropdownItemText}>Need Help?</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.dropdownItem} onPress={() => handleDropdownItemPress('Drafts')}>
+                  <MaterialCommunityIcons name="cog" size={20} color="#fff" style={styles.dropdownIcon} />
+                  <Text style={styles.dropdownItemText}>Settings</Text>
+                </TouchableOpacity>
+              </Animated.View>
+            </View>
+          </TouchableWithoutFeedback>
+        )}
         <View style={styles.profileContainer}>
           <TouchableOpacity onPress={openModal}>
             <Image
@@ -243,5 +306,42 @@ const styles = StyleSheet.create({
   },
   skeleton: {
     marginBottom: 10,
+  },
+  dropdownOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 999, // Ensure it is above other elements
+  },
+  dropdownMenu: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    width: 200,
+    backgroundColor: '#333', // Warna latar belakang hitam
+    borderRadius: 7,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    elevation: 5,
+    zIndex: 1000,
+    padding: 10, // Add padding for better appearance
+  },
+  dropdownItem: {
+    flexDirection: 'row', // Tambahkan flexDirection row
+    alignItems: 'center', // Tambahkan alignItems center
+    padding: 15, // Sesuaikan padding
+    borderBottomWidth: 1,
+    borderBottomColor: '#444', // Warna border abu-abu gelap
+  },
+  dropdownItemText: {
+    color: '#fff', // Warna teks putih
+    marginLeft: 10, // Tambahkan margin kiri untuk memberi jarak antara ikon dan teks
+  },
+  dropdownIcon: {
+    marginRight: 10, // Tambahkan margin kanan untuk memberi jarak antara ikon dan teks
   },
 });
