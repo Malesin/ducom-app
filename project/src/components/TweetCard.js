@@ -10,6 +10,8 @@ import {
   Share,
   FlatList,
   SafeAreaView,
+  Alert,
+  ToastAndroid,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Video from 'react-native-video';
@@ -39,7 +41,7 @@ const TweetCard = ({tweet, navigation}) => {
       for (const media of tweet.media || []) {
         if (media.type === 'video' && media.uri) {
           try {
-            const { path } = await createThumbnail({ url: media.uri });
+            const {path} = await createThumbnail({url: media.uri});
             newThumbnails[media.uri] = path;
           } catch (error) {
             console.log('Error generating thumbnail:', error);
@@ -118,13 +120,13 @@ const TweetCard = ({tweet, navigation}) => {
           postId: tweet.id,
         });
 
-
         if (response.data.status === 'ok') {
           setBookmarked(true); // Directly update liked state
           setBookMarksCount(prevBookmarksCount => {
             const newBookmarksCount = prevBookmarksCount + 1;
             return newBookmarksCount;
           });
+          ToastAndroid.show('Post added to bookmarks!', ToastAndroid.SHORT); // Show toast notification
         } else {
           console.log('Error in bookmark response data:', response.data.data);
         }
@@ -143,13 +145,13 @@ const TweetCard = ({tweet, navigation}) => {
         postId: tweet.id,
       });
 
-
       if (response.data.status === 'ok') {
         setBookmarked(false); // Directly update liked state
         setBookMarksCount(prevBookmarksCount => {
           const newBookmarksCount = prevBookmarksCount - 1;
           return newBookmarksCount;
         });
+        ToastAndroid.show('Post removed from bookmarks!', ToastAndroid.SHORT); // Show toast notification
       } else {
         console.log('Error in unbookmark response data:', response.data.data);
       }
@@ -158,8 +160,10 @@ const TweetCard = ({tweet, navigation}) => {
     }
   };
 
-
-  const handleComment = () => setCommentsCount(prev => prev + 1);
+  const handleCommentPress = () => {
+    setCommentsCount(prev => prev + 1);
+    navigation.navigate('Comment');
+  };
 
   const openMediaPreview = uri => {
     setModalMediaUri(uri);
@@ -181,6 +185,10 @@ const TweetCard = ({tweet, navigation}) => {
       console.error('Error sharing:', error.message);
       Alert.alert('Error', 'Failed to share post. Please try again.'); // Add alert here
     }
+  };
+
+  const handleOptionPress = () => {
+    setShowBottomSheet(true);
   };
 
   const formatDate = dateString => {
@@ -278,7 +286,7 @@ const TweetCard = ({tweet, navigation}) => {
         <View style={styles.optionsContainer}>
           <TouchableOpacity
             style={styles.optionsButton}
-            onPress={() => setShowBottomSheet(true)}>
+            onPress={handleOptionPress}>
             <MaterialCommunityIcons
               name="dots-horizontal"
               size={24}
@@ -331,7 +339,7 @@ const TweetCard = ({tweet, navigation}) => {
           icon="message-reply-outline"
           color="#040608"
           count={commentsCount}
-          onPress={handleComment}
+          onPress={handleCommentPress}
         />
         <InteractionButton
           icon={bookmarked ? 'bookmark' : 'bookmark-outline'}
