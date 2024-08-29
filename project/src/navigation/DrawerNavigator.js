@@ -13,6 +13,7 @@ const DrawerNavigator = () => {
   return (
     <SafeAreaView style={{flex: 1}}>
       <Drawer.Navigator
+        initialRouteName="Home" // Set Home as the initial route
         screenOptions={{
           headerTitle: () => (
             <View style={styles.headerTitleContainer}>
