@@ -140,9 +140,9 @@ const styles = StyleSheet.create({
   },
   tabBar: {
     backgroundColor: '#fff', // Warna latar belakang putih
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd', // Warna border abu-abu
-    elevation: 0,
+    borderBottomWidth: 0,
+    elevation: 0, // Menghilangkan bayangan di Android
+    shadowOpacity: 0, // Menghilangkan bayangan di iOS
   },
   tabBarLabel: {
     fontSize: 14,
