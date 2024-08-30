@@ -4,16 +4,22 @@ import {
   View,
   TouchableOpacity,
   SafeAreaView,
+  Alert,
 } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../config';
+import {
+  ALERT_TYPE,
+  Dialog,
+  AlertNotificationRoot,
+} from 'react-native-alert-notification';
 
 const serverUrl = config.SERVER_URL;
 
-const BottomSheet = ({ username, postId }) => {
+const BottomSheet = ({ username, postId, onClose, onDeleteSuccess }) => {
 
   const deletePost = async () => {
     const token = await AsyncStorage.getItem('token');
@@ -22,9 +28,17 @@ const BottomSheet = ({ username, postId }) => {
         token: token,
         postId: postId,
       });
-  
+
       if (response.data.status === 'ok') {
-        console.log("Postingan Berhasil Dihapus")
+        Dialog.show({
+          type: ALERT_TYPE.SUCCESS,
+          title: 'Success',
+          textBody: 'Postingan Berhasil Dihapus',
+          onHide: () => {
+            onClose(); // Tutup BottomSheet setelah alert ditutup
+            onDeleteSuccess(postId); // Panggil onDeleteSuccess setelah alert sukses
+          },
+        });
       }
     } catch (error) {
       console.error('Error: ', error);
@@ -32,32 +46,34 @@ const BottomSheet = ({ username, postId }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.optionRow}>
-        <TouchableOpacity style={styles.option}>
-          <MaterialIcons name="volume-off" size={24} color="#333" />
-          <Text style={styles.optionText}>Mute @{username}</Text>
-        </TouchableOpacity>
-      </View>
-      <View style={styles.optionRow}>
-        <TouchableOpacity style={styles.option} onPress={deletePost}>
-          <MaterialIcons name="delete" size={24} color="#333" />
-          <Text style={styles.optionText}>Delete Post @{username}</Text>
-        </TouchableOpacity>
-      </View>
-      <View style={styles.optionRow}>
-        <TouchableOpacity style={styles.option}>
-          <MaterialIcons name="block" size={24} color="#333" />
-          <Text style={styles.optionText}>Block @{username}</Text>
-        </TouchableOpacity>
-      </View>
-      <View style={styles.optionRow}>
-        <TouchableOpacity style={styles.option}>
-          <MaterialIcons name="report" size={24} color="#333" />
-          <Text style={styles.optionText}>Report @{username}</Text>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
+    <AlertNotificationRoot>
+      <SafeAreaView style={styles.container}>
+        <View style={styles.optionRow}>
+          <TouchableOpacity style={styles.option}>
+            <MaterialIcons name="volume-off" size={24} color="#333" />
+            <Text style={styles.optionText}>Mute @{username}</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.optionRow}>
+          <TouchableOpacity style={styles.option} onPress={deletePost}>
+            <MaterialIcons name="delete" size={24} color="#333" />
+            <Text style={styles.optionText}>Delete Post @{username}</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.optionRow}>
+          <TouchableOpacity style={styles.option}>
+            <MaterialIcons name="block" size={24} color="#333" />
+            <Text style={styles.optionText}>Block @{username}</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.optionRow}>
+          <TouchableOpacity style={styles.option}>
+            <MaterialIcons name="report" size={24} color="#333" />
+            <Text style={styles.optionText}>Report @{username}</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    </AlertNotificationRoot>
   );
 };
 
