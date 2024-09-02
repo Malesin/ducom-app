@@ -35,8 +35,8 @@ const TweetCard = ({ tweet, navigation }) => {
 
   const navigator = useNavigation();
 
-  const handleProfilePress = (userId) => {
-    navigator.navigate('Userprofile', { userId });
+  const handleProfilePress = (userIdPost) => {
+    navigator.navigate('Userprofile', { userIdPost });
   };
 
   useEffect(() => {
@@ -266,7 +266,7 @@ const TweetCard = ({ tweet, navigation }) => {
     );
   };
 
-  const tweetId = tweet.userId
+  const tweetId = tweet.userIdPost
 
   return (
     <SafeAreaView style={styles.card}>
@@ -313,8 +313,13 @@ const TweetCard = ({ tweet, navigation }) => {
           <View style={styles.bottomSheetContainer}>
             <BottomSheet
               onClose={() => setShowBottomSheet(false)}
-              username={tweet.userName}
+              username={tweet.userHandle}
               postId={tweet.id}
+              idUser={tweet.idUser}
+              userIdPost={tweet.userIdPost}
+              userEmailPost={tweet.userEmailPost}
+              allowedEmail={tweet.allowedEmail}
+              emailUser={tweet.emailUser}
             />
           </View>
         </Modal>
@@ -329,11 +334,12 @@ const TweetCard = ({ tweet, navigation }) => {
         <FlatList
           data={tweet.media}
           renderItem={renderMediaItem}
-          keyExtractor={index => index.toString()}
+          keyExtractor={(item, index) => item.uri || index.toString()} // Use a unique identifier like 'uri' or fallback to 'index'
           horizontal
           showsHorizontalScrollIndicator={false}
           style={styles.mediaFlatList}
         />
+
       ) : null}
 
       {/* Interactions */}
@@ -386,10 +392,11 @@ const TweetCard = ({ tweet, navigation }) => {
                 ) : (
                   <Video
                     source={{ uri: modalMediaUri }}
-                    style={styles.modalImage}
-                    controls
+                    style={{ width: '100%', height: '100%' }}
                     resizeMode="contain"
+                    controls
                   />
+
                 )
               ) : null}
             </View>

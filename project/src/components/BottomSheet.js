@@ -13,7 +13,8 @@ import config from '../config';
 
 const serverUrl = config.SERVER_URL;
 
-const BottomSheet = ({ username, postId }) => {
+const BottomSheet = ({ username, postId, idUser, userIdPost, allowedEmail, emailUser }) => {
+  const [isDeletePost, setIsDeletePost] = useState(false)
 
   const deletePost = async () => {
     const token = await AsyncStorage.getItem('token');
@@ -22,7 +23,7 @@ const BottomSheet = ({ username, postId }) => {
         token: token,
         postId: postId,
       });
-  
+
       if (response.data.status === 'ok') {
         console.log("Postingan Berhasil Dihapus")
       }
@@ -30,6 +31,17 @@ const BottomSheet = ({ username, postId }) => {
       console.error('Error: ', error);
     }
   }
+
+  useEffect(() => {
+    if (emailUser === allowedEmail) {
+      setIsDeletePost(true);
+    } else if (idUser === userIdPost) {
+      setIsDeletePost(true);
+    } else {
+      setIsDeletePost(false);
+    }
+  }, [idUser, userIdPost, emailUser, allowedEmail]);
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -39,12 +51,14 @@ const BottomSheet = ({ username, postId }) => {
           <Text style={styles.optionText}>Mute @{username}</Text>
         </TouchableOpacity>
       </View>
-      <View style={styles.optionRow}>
-        <TouchableOpacity style={styles.option} onPress={deletePost}>
-          <MaterialIcons name="delete" size={24} color="#333" />
-          <Text style={styles.optionText}>Delete Post @{username}</Text>
-        </TouchableOpacity>
-      </View>
+      {isDeletePost == true ? (
+        <View style={styles.optionRow}>
+          <TouchableOpacity style={styles.option} onPress={deletePost}>
+            <MaterialIcons name="delete" size={24} color="#333" />
+            <Text style={styles.optionText}>Delete Post @{username}</Text>
+          </TouchableOpacity>
+        </View>
+      ) : null}
       <View style={styles.optionRow}>
         <TouchableOpacity style={styles.option}>
           <MaterialIcons name="block" size={24} color="#333" />
