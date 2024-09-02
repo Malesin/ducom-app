@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {
   StyleSheet,
   ScrollView,
@@ -10,31 +10,31 @@ import {
 } from 'react-native';
 import TweetCard from '../../components/TweetCard'; // Import TweetCard
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useFocusEffect } from '@react-navigation/native';
+import {useFocusEffect} from '@react-navigation/native';
 import axios from 'axios';
 import config from '../../config';
 
 const serverUrl = config.SERVER_URL;
 
-const Marksscreen = ({ navigation }) => {
-
+const Marksscreen = ({navigation}) => {
   const [tweets, setTweets] = useState([]);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
 
-  const fetchTweets = useCallback(async (pageNum) => {
-    setLoading(true); // Set loading to true before starting the fetch
-    const token = await AsyncStorage.getItem('token');
-    try {
-      const response = await axios.post(`${serverUrl}/userdata`, { token });
-      const { data, status } = response.data;
-      if (status === 'error') {
-        Alert.alert('Error', 'Anda Telah Keluar dari Akun', [
-          { text: 'OK', onPress: () => navigation.navigate('Auths') },
-        ]);
-        return;
-      }
+  const fetchTweets = useCallback(
+    async pageNum => {
+      setLoading(true); // Set loading to true before starting the fetch
+      const token = await AsyncStorage.getItem('token');
+      try {
+        const response = await axios.post(`${serverUrl}/userdata`, {token});
+        const {data, status} = response.data;
+        if (status === 'error') {
+          Alert.alert('Error', 'Anda Telah Keluar dari Akun', [
+            {text: 'OK', onPress: () => navigation.navigate('Auths')},
+          ]);
+          return;
+        }
 
       const idUser = data._id; 
       const emailUser = data.email; 
@@ -69,26 +69,28 @@ const Marksscreen = ({ navigation }) => {
         emailUser : emailUser
       }));
 
-      setTweets(prevTweets => {
-        // Filter to avoid duplicate tweets
-        const newTweets = formattedTweets.filter(
-          newTweet => !prevTweets.some(tweet => tweet.id === newTweet.id),
-        );
+        setTweets(prevTweets => {
+          // Filter to avoid duplicate tweets
+          const newTweets = formattedTweets.filter(
+            newTweet => !prevTweets.some(tweet => tweet.id === newTweet.id),
+          );
 
-        return pageNum === 1 ? newTweets : [...prevTweets, ...newTweets];
-      });
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    } finally {
-      setLoading(false); // Set loading to false after fetching
-      setLoadingMore(false);
-    }
-  }, [navigation]);
+          return pageNum === 1 ? newTweets : [...prevTweets, ...newTweets];
+        });
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false); // Set loading to false after fetching
+        setLoadingMore(false);
+      }
+    },
+    [navigation],
+  );
 
   useFocusEffect(
     useCallback(() => {
       fetchTweets(page);
-    }, [fetchTweets, page])
+    }, [fetchTweets, page]),
   );
 
   const handleLoadMore = () => {
@@ -101,12 +103,16 @@ const Marksscreen = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       {loading ? (
-        <ActivityIndicator size="large" color="#001374" style={styles.loadingIndicator} />
+        <ActivityIndicator
+          size="large"
+          color="#001374"
+          style={styles.loadingIndicator}
+        />
       ) : (
         <ScrollView
           contentContainerStyle={styles.contentContainer}
-          onScroll={({ nativeEvent }) => {
-            const { contentOffset, layoutMeasurement, contentSize } = nativeEvent;
+          onScroll={({nativeEvent}) => {
+            const {contentOffset, layoutMeasurement, contentSize} = nativeEvent;
             const contentHeight = contentSize.height;
             const viewportHeight = layoutMeasurement.height;
             const scrollPosition = contentOffset.y + viewportHeight;
@@ -134,10 +140,10 @@ const Marksscreen = ({ navigation }) => {
         </ScrollView>
       )}
     </SafeAreaView>
-  )
-}
+  );
+};
 
-export default Marksscreen
+export default Marksscreen;
 
 const styles = StyleSheet.create({
   container: {

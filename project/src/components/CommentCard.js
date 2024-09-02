@@ -32,7 +32,7 @@ const CommentCard = () => {
           <TouchableOpacity onPress={handleLikePress}>
             <MaterialCommunityIcons
               name={isLiked ? 'heart' : 'heart-outline'} //Change icon based on like state
-              size={14}
+              size={16}
               color={isLiked ? 'red' : 'black'} //Change color based on like state
             />
           </TouchableOpacity>
@@ -40,11 +40,7 @@ const CommentCard = () => {
       </View>
       <View style={styles.actionContainer}>
         <TouchableOpacity>
-          <MaterialCommunityIcons
-            name="dots-vertical"
-            size={24}
-            color="#000"
-          />
+          <MaterialCommunityIcons name="dots-vertical" size={24} color="#000" />
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -78,7 +74,7 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   commentText: {
-    fontSize: 14,
+    fontSize: 15,
     marginLeft: 5,
     color: '#000',
   },

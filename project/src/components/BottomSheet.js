@@ -30,7 +30,7 @@ const BottomSheet = ({ username, postId, idUser, userIdPost, allowedEmail, email
     } catch (error) {
       console.error('Error: ', error);
     }
-  }
+  };
 
   useEffect(() => {
     if (emailUser === allowedEmail) {
