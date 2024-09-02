@@ -76,7 +76,11 @@ const HomeScreen = ({navigation}) => {
         bookMarksCount: post.bookmarks.length,
         isLiked: post.likes.some(like => like._id === idUser),
         isBookmarked: post.bookmarks.some(bookmark => bookmark.user === idUser),
-        userId: post.user._id, 
+        userIdPost: post.user._id,
+        idUser: idUser,
+        allowedEmail: post.allowedEmail,
+        userEmailPost: post.user.email,
+        // emailUser : emailUser
       }));
 
       return formattedTweets;

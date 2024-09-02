@@ -1,14 +1,13 @@
-import React, { useState, useCallback } from 'react';
-import { StyleSheet, View, Dimensions, RefreshControl } from 'react-native';
-import { Likescreen, Mediascreen, Postscreen, Replyscreen } from '../pages';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { Tabs, MaterialTabBar } from 'react-native-collapsible-tab-view';
-import Profilescreen from '../pages/Profile/Profilescreen';
-import { Skeleton } from 'react-native-elements';
+import React, {useState, useCallback} from 'react';
+import {StyleSheet, View, Dimensions, RefreshControl} from 'react-native';
+import {Mediascreen, Postscreen, Replyscreen, Userprofile} from '../pages';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import {Tabs, MaterialTabBar} from 'react-native-collapsible-tab-view';
+import {Skeleton} from 'react-native-elements';
 
-const { height } = Dimensions.get('window');
+const {height} = Dimensions.get('window');
 
-function TopTabNavigator() {
+function UserTopTabNavigator() {
   const [refreshing, setRefreshing] = useState(false);
   const [isScrollTop, setIsScrollTop] = useState(true);
 
@@ -20,13 +19,13 @@ function TopTabNavigator() {
   }, []);
 
   const handleScroll = event => {
-    const { contentOffset } = event.nativeEvent;
+    const {contentOffset} = event.nativeEvent;
     setIsScrollTop(contentOffset.y === 0);
   };
 
   const Header = () => (
     <View style={styles.profileWrapper}>
-      <Profilescreen />
+      <Userprofile />
     </View>
   );
 
@@ -114,20 +113,6 @@ function TopTabNavigator() {
             {refreshing ? renderSkeleton() : <Replyscreen />}
           </Tabs.ScrollView>
         </Tabs.Tab>
-        <Tabs.Tab name="Likes">
-          <Tabs.ScrollView
-            onScroll={handleScroll}
-            scrollEventThrottle={16}
-            refreshControl={
-              <RefreshControl
-                refreshing={refreshing}
-                onRefresh={onRefresh}
-                enabled={isScrollTop}
-              />
-            }>
-            {refreshing ? renderSkeleton() : <Likescreen />}
-          </Tabs.ScrollView>
-        </Tabs.Tab>
         <Tabs.Tab name="Media">
           <Tabs.ScrollView
             onScroll={handleScroll}
@@ -190,4 +175,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default TopTabNavigator;
+export default UserTopTabNavigator;

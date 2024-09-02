@@ -16,7 +16,6 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import config from '../../config';
 import { Skeleton } from 'react-native-elements';
-
 const serverUrl = config.SERVER_URL;
 
 export default function Profilescreen() {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {
   SafeAreaView,
   View,
@@ -10,17 +10,18 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import {useNavigation, useFocusEffect} from '@react-navigation/native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import config from '../../config';
-import { Skeleton } from 'react-native-elements';
+import {Skeleton} from 'react-native-elements';
 import TweetCard from '../../components/TweetCard';
+import UserTopTabNavigator from '../../navigation/UserTopTabNavigator';
 
 const serverUrl = config.SERVER_URL;
 
-export default function Userprofile({ route }) {
-  const { userId } = route.params;
+export default function Userprofile({route}) {
+  const {userIdPost} = route?.params || {};
   const [modalVisible, setModalVisible] = useState(false);
   const [banner, setBanner] = useState(false);
   const [profilePicture, setProfilePicture] = useState(false);
@@ -39,22 +40,21 @@ export default function Userprofile({ route }) {
 
       // Ambil data pengguna lain
       const userResponse = await axios.post(`${serverUrl}/findUserId/`, {
-        userId: userId
-      })
+        userId: userIdPost,
+      });
       console.log('Data Berhasil Diambil');
 
       const user = userResponse.data.data;
       setUserData(user);
-      console.log("userID: ", userId)
 
       if (user.bannerPicture) {
-        const banner = { uri: user.bannerPicture };
+        const banner = {uri: user.bannerPicture};
         setBanner(banner);
         console.log('Banner Berhasil Diambil');
       }
 
       if (user.profilePicture) {
-        const profile = { uri: user.profilePicture };
+        const profile = {uri: user.profilePicture};
         setProfilePicture(profile);
         console.log('Foto Profil Berhasil Diambil');
       }
@@ -71,7 +71,7 @@ export default function Userprofile({ route }) {
   useFocusEffect(
     useCallback(() => {
       getData();
-    }, [])
+    }, []),
   );
 
   // Fungsi untuk membuka modal untuk melihat foto profil
@@ -93,8 +93,8 @@ export default function Userprofile({ route }) {
           source={banner || require('../../assets/banner.png')}
           style={styles.banner}
         />
-        <TouchableOpacity style={styles.settingsButton} onPress={() => { }}>
-          <MaterialCommunityIcons name="dots-vertical" size={30} color="#000" />
+        <TouchableOpacity style={styles.settingsButton} onPress={() => {}}>
+          <MaterialCommunityIcons name="dots-vertical" size={30} color="#ddd" />
         </TouchableOpacity>
         <View style={styles.profileContainer}>
           <TouchableOpacity onPress={openModal}>
@@ -136,14 +136,13 @@ export default function Userprofile({ route }) {
                 <Text style={styles.name}>{userData?.name}</Text>
                 <Text style={styles.username}>@{userData?.username}</Text>
                 <Text style={styles.description}>
-                  {userData?.bio || 'Tidak Ada Deskripsi'}
+                  {userData?.bio || 'No Description'}
                 </Text>
               </>
             )}
           </View>
         </View>
       </View>
-
       <Modal
         visible={modalVisible}
         transparent
