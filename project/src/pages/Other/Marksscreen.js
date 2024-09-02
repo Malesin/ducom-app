@@ -36,12 +36,13 @@ const Marksscreen = ({navigation}) => {
           return;
         }
 
-        const idUser = data._id; // Extract user ID
-
-        const responseTweet = await axios.post(`${serverUrl}/user-bookmarks`, {
-          token: token,
-        });
-        const dataTweet = responseTweet.data;
+      const idUser = data._id; 
+      const emailUser = data.email; 
+      
+      const responseTweet = await axios.post(`${serverUrl}/user-bookmarks`, {
+        token: token
+      });
+      const dataTweet = responseTweet.data;
 
       const formattedTweets = dataTweet.data.map(post => ({
         id: post._id,
@@ -61,7 +62,11 @@ const Marksscreen = ({navigation}) => {
         bookMarksCount: post.bookmarks.length,
         isLiked: post.likes.some(like => like._id === idUser), 
         isBookmarked: post.bookmarks.some(bookmark => bookmark.user === idUser), 
-        userId: post.user._id
+        userIdPost: post.user._id,
+        idUser: idUser,
+        allowedEmail: post.allowedEmail,
+        userEmailPost: post.user.email,
+        emailUser : emailUser
       }));
 
         setTweets(prevTweets => {

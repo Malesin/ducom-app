@@ -51,7 +51,8 @@ const HomeScreen = ({navigation}) => {
         return [];
       }
 
-      const idUser = data._id; // Extract user ID
+      const idUser = data._id; 
+      const emailUser = data.email; 
 
       const responseTweet = await axios.post(`${serverUrl}/posts`, {
         page: pageNum,
@@ -76,13 +77,17 @@ const HomeScreen = ({navigation}) => {
         bookMarksCount: post.bookmarks.length,
         isLiked: post.likes.some(like => like._id === idUser),
         isBookmarked: post.bookmarks.some(bookmark => bookmark.user === idUser),
-        userId: post.user._id, 
+        userIdPost: post.user._id,
+        idUser: idUser,
+        allowedEmail: post.allowedEmail,
+        userEmailPost: post.user.email,
+        emailUser : emailUser
       }));
 
       return formattedTweets;
     } catch (error) {
       console.error('Error fetching data:', error);
-      return [];
+      return [];d
     } finally {
       setLoading(false);
     }
@@ -278,7 +283,7 @@ const HomeScreen = ({navigation}) => {
           }}>
           {tweets.map((tweet, index) => (
             <View key={index} style={styles.tweetContainer}>
-                <TweetCard tweet={tweet} />
+              <TweetCard tweet={tweet} />
             </View>
           ))}
           {loadingMore && <LoadingIndicator />}
@@ -303,7 +308,7 @@ const HomeScreen = ({navigation}) => {
           isExpanded={isExpanded}
           index={2}
           iconName={'feather'}
-          onPress={() => navigation.navigate('CreatePost', {onPostSuccess})} // Navigate to CreatePost screen
+          onPress={() => navigation.navigate('CreatePost', { onPostSuccess })} // Navigate to CreatePost screen
         />
       </View>
     </SafeAreaView>

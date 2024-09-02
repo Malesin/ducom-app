@@ -20,7 +20,7 @@ import TweetCard from '../../components/TweetCard';
 const serverUrl = config.SERVER_URL;
 
 export default function Userprofile({ route }) {
-  const { userId } = route.params;
+  const { userIdPost } = route.params;
   const [modalVisible, setModalVisible] = useState(false);
   const [banner, setBanner] = useState(false);
   const [profilePicture, setProfilePicture] = useState(false);
@@ -39,13 +39,13 @@ export default function Userprofile({ route }) {
 
       // Ambil data pengguna lain
       const userResponse = await axios.post(`${serverUrl}/findUserId/`, {
-        userId: userId
+        userId: userIdPost
       })
       console.log('Data Berhasil Diambil');
 
       const user = userResponse.data.data;
       setUserData(user);
-      console.log("userID: ", userId)
+      console.log("userIdPost: ", user)
 
       if (user.bannerPicture) {
         const banner = { uri: user.bannerPicture };
