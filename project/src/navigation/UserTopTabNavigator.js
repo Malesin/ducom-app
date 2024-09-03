@@ -1,6 +1,6 @@
 import React, {useState, useEffect, useCallback} from 'react';
 import {StyleSheet, View, Dimensions, RefreshControl} from 'react-native';
-import {Mediascreen, Postscreen, Replyscreen, Userprofile} from '../pages';
+import {Mediascreen, Userpost, Replyscreen, Userprofile} from '../pages'; // Ganti Postscreen dengan Userpost
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {Tabs, MaterialTabBar} from 'react-native-collapsible-tab-view';
 import {Skeleton} from 'react-native-elements';
@@ -103,7 +103,7 @@ function UserTopTabNavigator({route, navigation}) {
                 enabled={isScrollTop}
               />
             }>
-            {refreshing ? renderSkeleton() : <Postscreen />}
+            {refreshing ? renderSkeleton() : <Userpost route={{params: {userIdPost}}} navigation={navigation} />}
           </Tabs.ScrollView>
         </Tabs.Tab>
         <Tabs.Tab name="Replies">

@@ -19,8 +19,8 @@ import Animated, {
   useSharedValue,
   withSpring,
   withTiming,
+  cancelAnimation,
 } from 'react-native-reanimated';
-import {Skeleton} from 'react-native-elements';
 import * as ImagePicker from 'react-native-image-picker';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -95,10 +95,12 @@ const HomeScreen = ({navigation}) => {
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     setPage(1);
+    setHasMore(true); // Reset hasMore to true
     const newTweets = await fetchTweets(1);
-    setTweets(newTweets);
+    setTweets(newTweets.slice(0, 4)); // Only display 4 tweets
     setRefreshing(false);
   }, []);
+
   const LoadingIndicator = () => {
     return (
       <View style={styles.loadingIndicator}>
@@ -140,16 +142,18 @@ const HomeScreen = ({navigation}) => {
   useEffect(() => {
     const loadInitialTweets = async () => {
       const initialTweets = await fetchTweets(1);
-      setTweets(initialTweets.slice(0, 5));
+      setTweets(initialTweets.slice(0, 4)); // Load only 4 tweets initially
       setLoading(false);
     };
     loadInitialTweets();
   }, []);
+
   const onPostSuccess = () => {
     console.log('Post created successfully, refreshing HomeScreen...');
     setRefreshing(true);
     onRefresh();
   };
+
   const handleOpenCamera = () => {
     const options = {
       mediaType: 'photo',
@@ -193,6 +197,13 @@ const HomeScreen = ({navigation}) => {
       };
     });
 
+    useEffect(() => {
+      return () => {
+        cancelAnimation(animatedStyles);
+        cancelAnimation(iconStyle);
+      };
+    }, [animatedStyles, iconStyle]);
+
     return (
       <AnimatedPressable
         style={[animatedStyles, styles.shadow, styles.button]}
@@ -222,16 +233,16 @@ const HomeScreen = ({navigation}) => {
   const handleLoadMore = async () => {
     if (!loadingMore && hasMore) {
       setLoadingMore(true);
-      const moreTweets = await fetchTweets(tweets.length / 5 + 1);
+      const moreTweets = await fetchTweets(page + 1); // Load next page of tweets
       const newTweets = moreTweets.filter(
         tweet => !tweets.some(existingTweet => existingTweet.id === tweet.id),
       );
       if (newTweets.length > 0) {
-        setTweets(prevTweets => [...prevTweets, ...newTweets]);
-        setLoading(false);
+        setTweets(prevTweets => [...prevTweets, ...newTweets.slice(0, 4)]); // Add only 4 new tweets
+        setPage(prevPage => prevPage + 1); // Increment page number
       }
       setLoadingMore(false);
-      if (newTweets.length < 5) {
+      if (newTweets.length < 4) { // Check if less than 4 tweets are returned
         setHasMore(false);
       }
     }
@@ -239,55 +250,28 @@ const HomeScreen = ({navigation}) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      {loading ? (
-        <View style={styles.skeletonScreen}>
-          {[1, 2, 3, 4, 5].map(index => (
-            <View key={index} style={styles.skeletonContainer}>
-              <Skeleton
-                animation="pulse"
-                width={500}
-                height={25}
-                style={styles.skeleton}
-              />
-              <Skeleton
-                animation="pulse"
-                width={200}
-                height={20}
-                style={styles.skeleton}
-              />
-              <Skeleton
-                animation="pulse"
-                width={350}
-                height={150}
-                style={styles.skeleton}
-              />
-            </View>
-          ))}
-        </View>
-      ) : (
-        <ScrollView
-          contentContainerStyle={styles.contentContainer}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-          onScroll={({nativeEvent}) => {
-            const {contentOffset, layoutMeasurement, contentSize} = nativeEvent;
-            const contentHeight = contentSize.height;
-            const viewportHeight = layoutMeasurement.height;
-            const scrollPosition = contentOffset.y + viewportHeight;
+      <ScrollView
+        contentContainerStyle={styles.contentContainer}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+        onScroll={({nativeEvent}) => {
+          const {contentOffset, layoutMeasurement, contentSize} = nativeEvent;
+          const contentHeight = contentSize.height;
+          const viewportHeight = layoutMeasurement.height;
+          const scrollPosition = contentOffset.y + viewportHeight;
 
-            if (scrollPosition >= contentHeight - 100) {
-              handleLoadMore();
-            }
-          }}>
-          {tweets.map((tweet, index) => (
-            <View key={index} style={styles.tweetContainer}>
-                <TweetCard tweet={tweet} />
-            </View>
-          ))}
-          {loadingMore && <LoadingIndicator />}
-        </ScrollView>
-      )}
+          if (scrollPosition >= contentHeight - 100) {
+            handleLoadMore();
+          }
+        }}>
+        {tweets.map((tweet, index) => (
+          <View key={index} style={styles.tweetContainer}>
+            <TweetCard tweet={tweet} />
+          </View>
+        ))}
+        {loadingMore && <LoadingIndicator />}
+      </ScrollView>
 
       <View style={styles.fabContainer}>
         <AnimatedPressable
