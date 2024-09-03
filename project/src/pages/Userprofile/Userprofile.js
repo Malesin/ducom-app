@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useCallback} from 'react';
+import React, {useState, useEffect, useCallback, useRef} from 'react';
 import {
   SafeAreaView,
   View,
@@ -15,8 +15,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import config from '../../config';
 import {Skeleton} from 'react-native-elements';
-import TweetCard from '../../components/TweetCard';
-import UserTopTabNavigator from '../../navigation/UserTopTabNavigator';
+import Animated, { EasingNode } from 'react-native-reanimated';
 
 const serverUrl = config.SERVER_URL;
 
@@ -27,6 +26,8 @@ const Userprofile = ({route, navigation}) => {
   const [profilePicture, setProfilePicture] = useState(false);
   const [modalImageSource, setModalImageSource] = useState(null);
   const [userData, setUserData] = useState('');
+  const [dropdownVisible, setDropdownVisible] = useState(false);
+  const dropdownAnimation = useRef(new Animated.Value(0)).current;
 
   // Atur judul navigasi menjadi kosong saat komponen pertama kali dimuat
   useEffect(() => {
@@ -90,6 +91,34 @@ const Userprofile = ({route, navigation}) => {
     setModalImageSource(null);
   };
 
+  // Fungsi untuk membuka dan menutup dropdown dengan animasi
+  const toggleDropdown = () => {
+    if (dropdownVisible) {
+      // Animasi untuk menutup dropdown
+      Animated.timing(dropdownAnimation, {
+        toValue: 0, // Nilai akhir animasi
+        duration: 150, // Durasi animasi dalam milidetik
+        easing: EasingNode.linear, // Menggunakan easing linear
+        useNativeDriver: true, // Menggunakan native driver untuk performa yang lebih baik
+      }).start(() => setDropdownVisible(false)); // Menyembunyikan dropdown setelah animasi selesai
+    } else {
+      setDropdownVisible(true); // Menampilkan dropdown sebelum animasi dimulai
+      // Animasi untuk membuka dropdown
+      Animated.timing(dropdownAnimation, {
+        toValue: 1, // Nilai akhir animasi
+        duration: 150, // Durasi animasi dalam milidetik
+        easing: EasingNode.linear, // Menggunakan easing linear
+        useNativeDriver: true, // Menggunakan native driver untuk performa yang lebih baik
+      }).start();
+    }
+  };
+
+  const handleDropdownItemPress = (item) => {
+    // Handle item press
+    console.log(item);
+    toggleDropdown();
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.bannerContainer}>
@@ -97,9 +126,40 @@ const Userprofile = ({route, navigation}) => {
           source={banner || require('../../assets/banner.png')}
           style={styles.banner}
         />
-        <TouchableOpacity style={styles.settingsButton} onPress={() => {}}>
-          <MaterialCommunityIcons name="dots-vertical" size={30} color="#ddd" />
+        <TouchableOpacity style={styles.settingsButton} onPress={toggleDropdown}>
+          <MaterialCommunityIcons name="dots-vertical" size={30} color="#000000" />
         </TouchableOpacity>
+        {dropdownVisible && (
+          <TouchableWithoutFeedback onPress={toggleDropdown}>
+            <View style={styles.dropdownOverlay}>
+              <Animated.View
+                style={[
+                  styles.dropdownMenu,
+                  {
+                    opacity: dropdownAnimation, // Mengatur opacity berdasarkan nilai animasi
+                    transform: [
+                      {
+                        scale: dropdownAnimation.interpolate({
+                          inputRange: [0, 1], // Rentang nilai input
+                          outputRange: [0.8, 1], // Rentang nilai output
+                        }),
+                      },
+                    ],
+                  },
+                ]}
+              >
+                <TouchableOpacity style={styles.dropdownItem} onPress={() => handleDropdownItemPress('Block')}>
+                  <MaterialCommunityIcons name="block-helper" size={20} color="#000" style={styles.dropdownIcon} />
+                  <Text style={styles.dropdownItemText}>Block</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.dropdownItem} onPress={() => handleDropdownItemPress('Report')}>
+                  <MaterialCommunityIcons name="alert-circle-outline" size={20} color="#000" style={styles.dropdownIcon} />
+                  <Text style={styles.dropdownItemText}>Report</Text>
+                </TouchableOpacity>
+              </Animated.View>
+            </View>
+          </TouchableWithoutFeedback>
+        )}
         <View style={styles.profileContainer}>
           <TouchableOpacity onPress={openModal}>
             <Image
@@ -184,12 +244,12 @@ const styles = StyleSheet.create({
     right: 10,
     borderRadius: 30,
     padding: 3,
-    backgroundColor: 'rgba(217, 217, 217, 0.2)',
+    backgroundColor: 'rgba(217, 217, 217, 0.4)',
   },
   profileContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: 6,
     paddingHorizontal: 10,
   },
   profile: {
@@ -197,7 +257,7 @@ const styles = StyleSheet.create({
     height: 82,
     borderRadius: 40,
     marginRight: 20,
-    marginBottom: 30,
+    marginBottom: 15,
   },
   profileText: {
     flex: 1,
@@ -237,6 +297,42 @@ const styles = StyleSheet.create({
   },
   skeleton: {
     marginBottom: 10,
+  },
+  dropdownOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 999, // Ensure it is above other elements
+  },
+  dropdownMenu: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    width: 200,
+    backgroundColor: '#fff', // Warna latar belakang putih
+    borderRadius: 7,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    elevation: 5,
+    zIndex: 1000,
+    padding: 5, // Add padding for better appearance
+  },
+  dropdownItem: {
+    flexDirection: 'row', // Tambahkan flexDirection row
+    alignItems: 'center', // Tambahkan alignItems center
+    padding: 15, // Sesuaikan padding
+  },
+  dropdownItemText: {
+    color: '#000', // Warna teks hitam
+    marginLeft: 10, // Tambahkan margin kiri untuk memberi jarak antara ikon dan teks
+    fontWeight: 'bold', // Membuat teks menjadi bold
+  },
+  dropdownIcon: {
+    marginRight: 10, // Tambahkan margin kanan untuk memberi jarak antara ikon dan teks
   },
 });
 
