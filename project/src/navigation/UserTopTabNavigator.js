@@ -1,4 +1,4 @@
-import React, {useState, useCallback} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {StyleSheet, View, Dimensions, RefreshControl} from 'react-native';
 import {Mediascreen, Postscreen, Replyscreen, Userprofile} from '../pages';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
@@ -7,11 +7,16 @@ import {Skeleton} from 'react-native-elements';
 
 const {height} = Dimensions.get('window');
 
-function UserTopTabNavigator({route}) {
+function UserTopTabNavigator({route, navigation}) {
   const [refreshing, setRefreshing] = useState(false);
   const [isScrollTop, setIsScrollTop] = useState(true);
-  const {userIdPost} = route.params; // Ambil userIdPost dari params
-  console.log('Received userIdPost:', userIdPost); // Debugging
+  const {userIdPost, username} = route.params; // Ambil userIdPost dan username dari params
+
+  useEffect(() => {
+    if (username) {
+      navigation.setOptions({title: `@${username}`}); // Set judul berdasarkan username
+    }
+  }, [username, navigation]);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -27,7 +32,7 @@ function UserTopTabNavigator({route}) {
 
   const Header = () => (
     <View style={styles.profileWrapper}>
-      <Userprofile userIdPost={userIdPost} />
+      <Userprofile route={{params: {userIdPost}}} navigation={navigation} />
     </View>
   );
 

@@ -20,12 +20,18 @@ import UserTopTabNavigator from '../../navigation/UserTopTabNavigator';
 
 const serverUrl = config.SERVER_URL;
 
-const Userprofile = ({userIdPost}) => {
+const Userprofile = ({route, navigation}) => {
+  const {userIdPost} = route.params; // Ambil userIdPost dari route params
   const [modalVisible, setModalVisible] = useState(false);
   const [banner, setBanner] = useState(false);
   const [profilePicture, setProfilePicture] = useState(false);
   const [modalImageSource, setModalImageSource] = useState(null);
   const [userData, setUserData] = useState('');
+
+  // Atur judul navigasi menjadi kosong saat komponen pertama kali dimuat
+  useEffect(() => {
+    navigation.setOptions({title: ''});
+  }, [navigation]);
 
   async function getData() {
     try {
@@ -39,6 +45,10 @@ const Userprofile = ({userIdPost}) => {
 
       const user = userResponse.data.data;
       setUserData(user);
+
+      if (user.username) {
+        navigation.setOptions({title: `@${user.username}`}); // Set judul berdasarkan username
+      }
 
       if (user.bannerPicture) {
         const banner = {uri: user.bannerPicture};
@@ -55,6 +65,7 @@ const Userprofile = ({userIdPost}) => {
       console.error('Terjadi Kesalahan:', error);
     }
   }
+
   // Ambil data pengguna saat komponen pertama kali dimuat
   useEffect(() => {
     getData();

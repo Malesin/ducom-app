@@ -93,8 +93,9 @@ export default function MainNavigation() {
         />
         <Stack.Screen
           name="Userprofile"
-          component={UserTopTabNavigator} // Tambahkan Userprofile ke dalam Stack.Navigator
+          component={UserTopTabNavigator} // Pastikan UserTopTabNavigator diatur sebagai layar langsung
           options={{headerShown: true, title: 'User Profile'}}
+          initialParams={{userIdPost: '', username: ''}} // Tambahkan initialParams untuk userIdPost dan username
         />
         <Stack.Screen
           name="DrawerNavigator"
