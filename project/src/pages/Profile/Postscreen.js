@@ -34,9 +34,11 @@ function Postscreen({ navigation }) {
                     { text: 'OK', onPress: () => navigation.navigate('Auths') },
                 ]);
                 return [];
-            }
+            }     
+            
+            const idUser = data._id; 
+            const emailUser = data.email; 
 
-            const idUser = data._id; // Extract user ID
             const responseTweet = await axios.post(`${serverUrl}/my-posts`, {
                 token: token,
                 page: pageNum,
@@ -61,7 +63,11 @@ function Postscreen({ navigation }) {
                 bookMarksCount: post.bookmarks.length,
                 isLiked: post.likes.some(like => like._id === idUser),
                 isBookmarked: post.bookmarks.some(bookmark => bookmark.user === idUser),
-                userId: post.user._id
+                userIdPost: post.user._id,
+                idUser: idUser,
+                allowedEmail: post.allowedEmail,
+                userEmailPost: post.user.email,
+                emailUser : emailUser
             }));
 
             return formattedTweets;

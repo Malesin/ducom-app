@@ -325,6 +325,11 @@ const TweetCard = ({tweet, navigation}) => {
               }}
               username={tweet.userName}
               postId={tweet.id}
+              idUser={tweet.idUser}
+              userIdPost={tweet.userIdPost}
+              userEmailPost={tweet.userEmailPost}
+              allowedEmail={tweet.allowedEmail}
+              emailUser={tweet.emailUser}
             />
           </View>
         </Modal>
@@ -338,11 +343,12 @@ const TweetCard = ({tweet, navigation}) => {
         <FlatList
           data={tweet.media}
           renderItem={renderMediaItem}
-          keyExtractor={index => index.toString()}
+          keyExtractor={(item, index) => item.uri || index.toString()} // Use a unique identifier like 'uri' or fallback to 'index'
           horizontal
           showsHorizontalScrollIndicator={false}
           style={styles.mediaFlatList}
         />
+
       ) : null}
 
       {/* Interactions */}
@@ -398,7 +404,9 @@ const TweetCard = ({tweet, navigation}) => {
                     style={styles.modalImage}
                     controls
                     resizeMode="contain"
+                    controls
                   />
+
                 )
               ) : null}
             </View>

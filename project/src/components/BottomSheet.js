@@ -36,6 +36,17 @@ const BottomSheet = ({username, postId, onClose}) => {
     }
   };
 
+  useEffect(() => {
+    if (emailUser === allowedEmail) {
+      setIsDeletePost(true);
+    } else if (idUser === userIdPost) {
+      setIsDeletePost(true);
+    } else {
+      setIsDeletePost(false);
+    }
+  }, [idUser, userIdPost, emailUser, allowedEmail]);
+
+
   return (
     <SafeAreaView
       style={styles.container}

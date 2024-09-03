@@ -37,7 +37,8 @@ function Mediascreen({ navigation }) {
                 return [];
             }
 
-            const idUserLike = data._id; // Extract user ID
+            const idUser = data._id; 
+            const emailUser = data.email; 
 
             const responseTweet = await axios.post(`${serverUrl}/my-posts`, {
                 token: token
@@ -60,8 +61,12 @@ function Mediascreen({ navigation }) {
                     likesCount: post.likes.length,
                     commentsCount: post.comments.length,
                     bookMarksCount: post.bookmarks.length,
-                    isLiked: post.likes.some(like => like._id === idUserLike),
-                    userId: post.user._id
+                    isLiked: post.likes.some(like => like._id === idUser),
+                    userIdPost: post.user._id,
+                    idUser: idUser,
+                    allowedEmail: post.allowedEmail,
+                    userEmailPost: post.user.email,
+                    emailUser : emailUser
                 }));
 
             return formattedTweets;

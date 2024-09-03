@@ -82,7 +82,7 @@ const HomeScreen = ({navigation}) => {
       return formattedTweets;
     } catch (error) {
       console.error('Error fetching data:', error);
-      return [];
+      return [];d
     } finally {
       setLoading(false);
     }
