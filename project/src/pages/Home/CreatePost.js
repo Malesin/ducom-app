@@ -150,7 +150,7 @@ const CreatePost = ({ route, navigation }) => {
                 (progressEvent.loaded * 100) / progressEvent.total,
               );
               setUploadProgress(progress);
-            }
+            },
           },
         );
 
@@ -280,6 +280,7 @@ const CreatePost = ({ route, navigation }) => {
         const { mediaType, assets } = response;
         if (assets && assets.length > 0) {
           const uri = assets[0].uri;
+          setMediaType(assets[0].type);
           if (mediaType === 'video') {
             try {
               await checkVideoDuration(uri);
@@ -315,24 +316,26 @@ const CreatePost = ({ route, navigation }) => {
       } else if (response.errorCode) {
         console.log('ImagePicker Error: ', response.errorMessage);
       } else {
-        const { mediaType, assets } = response;
+        const {mediaType, assets} = response;
         if (assets && assets.length > 0) {
           const uri = assets[0].uri;
+          setMediaType(assets[0].type);
           if (mediaType === 'video') {
-            const { path } = await createThumbnail({
+            const {path} = await createThumbnail({
               url: uri,
               timeStamp: 1000,
             });
 
             setSelectedMedia(prevMedia => [
               ...prevMedia,
-              { uri, type: 'video/mp4', thumbnail: path },
+              {uri, type: 'video/mp4', thumbnail: path},
             ]);
           } else {
             setSelectedMedia(prevMedia => [
               ...prevMedia,
-              { uri, type: 'image/jpeg' },
+              {uri, type: mediaType},
             ]);
+            setMediaType(mediaType);
           }
         }
       }
@@ -503,7 +506,9 @@ const CreatePost = ({ route, navigation }) => {
   );
 };
 
-const getStyles = (colorScheme) => // <-- Add colorScheme parameter
+const getStyles = (
+  colorScheme, // <-- Add colorScheme parameter
+) =>
   StyleSheet.create({
     container: {
       flex: 1,

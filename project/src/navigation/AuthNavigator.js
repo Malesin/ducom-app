@@ -92,12 +92,12 @@ export default function MainNavigation() {
         />
         <Stack.Screen
           name="Userprofile"
-          component={Userprofile} // Tambahkan Userprofile ke dalam Stack.Navigator
+          component={Userprofile}
           options={{headerShown: true, title: 'User Profile'}}
         />
         <Stack.Screen
           name="DrawerNavigator"
-          component={DrawerNavigator} // Tambahkan DrawerNavigator ke dalam Stack.Navigator
+          component={DrawerNavigator} 
           options={{headerShown: false}}
         />
       </Stack.Navigator>

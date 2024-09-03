@@ -11,7 +11,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import {useFocusEffect} from '@react-navigation/native';
-import TweetCard from '../../components/TweetCard'; // Import TweetCard
+import TweetCard from '../../components/TweetCard';
 import Animated, {
   withDelay,
   interpolate,
@@ -52,7 +52,6 @@ const HomeScreen = ({navigation}) => {
       }
 
       const idUser = data._id; 
-      const emailUser = data.email; 
 
       const responseTweet = await axios.post(`${serverUrl}/posts`, {
         page: pageNum,
@@ -77,11 +76,7 @@ const HomeScreen = ({navigation}) => {
         bookMarksCount: post.bookmarks.length,
         isLiked: post.likes.some(like => like._id === idUser),
         isBookmarked: post.bookmarks.some(bookmark => bookmark.user === idUser),
-        userIdPost: post.user._id,
-        idUser: idUser,
-        allowedEmail: post.allowedEmail,
-        userEmailPost: post.user.email,
-        emailUser : emailUser
+        userId: post.user._id,
       }));
 
       return formattedTweets;
@@ -134,7 +129,7 @@ const HomeScreen = ({navigation}) => {
 
   useFocusEffect(
     useCallback(() => {
-      isExpanded.value = false; // Reset FAB state when screen comes into focus
+      isExpanded.value = false; 
     }, []),
   );
 
@@ -166,7 +161,6 @@ const HomeScreen = ({navigation}) => {
       } else {
         const uri = response.assets[0].uri;
         console.log('Captured image URI:', uri);
-        // Navigate to CreatePost and pass the image URI
         navigation.navigate('CreatePost', {mediaUri: uri, mediaType: 'photo'});
       }
     });
@@ -281,8 +275,8 @@ const HomeScreen = ({navigation}) => {
               handleLoadMore();
             }
           }}>
-          {tweets.map((tweet, index) => (
-            <View key={index} style={styles.tweetContainer}>
+          {tweets.map(tweet => (
+            <View key={tweet.id} style={styles.tweetContainer}>
               <TweetCard tweet={tweet} />
             </View>
           ))}
@@ -302,13 +296,13 @@ const HomeScreen = ({navigation}) => {
           isExpanded={isExpanded}
           index={1}
           iconName={'camera-outline'}
-          onPress={handleOpenCamera} // Added onPress handler to open camera
+          onPress={handleOpenCamera} 
         />
         <FloatingActionButton
           isExpanded={isExpanded}
           index={2}
           iconName={'feather'}
-          onPress={() => navigation.navigate('CreatePost', { onPostSuccess })} // Navigate to CreatePost screen
+          onPress={() => navigation.navigate('CreatePost', {onPostSuccess})}
         />
       </View>
     </SafeAreaView>

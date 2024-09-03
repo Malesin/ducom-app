@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, {useState, useEffect, useCallback, useRef} from 'react';
 import {
   SafeAreaView,
   View,
@@ -11,11 +11,11 @@ import {
   Animated,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import {useNavigation, useFocusEffect} from '@react-navigation/native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import config from '../../config';
-import { Skeleton } from 'react-native-elements';
+import {Skeleton} from 'react-native-elements';
 
 const serverUrl = config.SERVER_URL;
 
@@ -44,13 +44,13 @@ export default function Profilescreen() {
       setUserData(user);
 
       if (user.bannerPicture) {
-        const banner = { uri: user.bannerPicture };
+        const banner = {uri: user.bannerPicture};
         setBanner(banner);
         console.log('Image Banner Retrieved Successfully');
       }
 
       if (user.profilePicture) {
-        const profile = { uri: user.profilePicture };
+        const profile = {uri: user.profilePicture};
         setProfilePicture(profile);
         console.log('Image Profile Retrieved Successfully');
       }
@@ -66,7 +66,7 @@ export default function Profilescreen() {
   useFocusEffect(
     useCallback(() => {
       getData();
-    }, [])
+    }, []),
   );
 
   const openModal = () => {
@@ -82,7 +82,6 @@ export default function Profilescreen() {
   // Fungsi untuk membuka dan menutup dropdown dengan animasi
   const toggleDropdown = () => {
     if (dropdownVisible) {
-      // Animasi untuk menutup dropdown
       Animated.timing(dropdownAnimation, {
         toValue: 0, // Nilai akhir animasi
         duration: 150, // Durasi animasi dalam milidetik
@@ -90,7 +89,6 @@ export default function Profilescreen() {
       }).start(() => setDropdownVisible(false)); // Menyembunyikan dropdown setelah animasi selesai
     } else {
       setDropdownVisible(true); // Menampilkan dropdown sebelum animasi dimulai
-      // Animasi untuk membuka dropdown
       Animated.timing(dropdownAnimation, {
         toValue: 1, // Nilai akhir animasi
         duration: 150, // Durasi animasi dalam milidetik
@@ -99,7 +97,7 @@ export default function Profilescreen() {
     }
   };
 
-  const handleDropdownItemPress = (item) => {
+  const handleDropdownItemPress = item => {
     if (item === 'Need Help') {
       navigation.navigate('FAQ');
     }
@@ -115,7 +113,9 @@ export default function Profilescreen() {
           source={banner || require('../../assets/banner.png')}
           style={styles.banner}
         />
-        <TouchableOpacity style={styles.settingsButton} onPress={toggleDropdown}>
+        <TouchableOpacity
+          style={styles.settingsButton}
+          onPress={toggleDropdown}>
           <MaterialCommunityIcons name="dots-vertical" size={30} color="#000" />
         </TouchableOpacity>
         {dropdownVisible && (
@@ -135,14 +135,27 @@ export default function Profilescreen() {
                       },
                     ],
                   },
-                ]}
-              >
-                <TouchableOpacity style={styles.dropdownItem} onPress={() => handleDropdownItemPress('Need Help')}>
-                  <MaterialCommunityIcons name="information" size={20} color="#fff" style={styles.dropdownIcon} />
+                ]}>
+                <TouchableOpacity
+                  style={styles.dropdownItem}
+                  onPress={() => handleDropdownItemPress('Need Help')}>
+                  <MaterialCommunityIcons
+                    name="information"
+                    size={20}
+                    color="#fff"
+                    style={styles.dropdownIcon}
+                  />
                   <Text style={styles.dropdownItemText}>Need Help?</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.dropdownItem} onPress={() => handleDropdownItemPress('Drafts')}>
-                  <MaterialCommunityIcons name="cog" size={20} color="#fff" style={styles.dropdownIcon} />
+                <TouchableOpacity
+                  style={styles.dropdownItem}
+                  onPress={() => handleDropdownItemPress('Drafts')}>
+                  <MaterialCommunityIcons
+                    name="cog"
+                    size={20}
+                    color="#fff"
+                    style={styles.dropdownIcon}
+                  />
                   <Text style={styles.dropdownItemText}>Settings</Text>
                 </TouchableOpacity>
               </Animated.View>
@@ -257,7 +270,7 @@ const styles = StyleSheet.create({
   profileText: {
     flex: 1,
     justifyContent: 'center',
-    minHeight: 150, // Set minimum height to avoid layout shift
+    minHeight: 150,
   },
   name: {
     fontSize: 20,
@@ -279,8 +292,8 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 30,
     borderRadius: 50,
-    marginTop: 20, // Tambahkan margin atas
-    marginBottom: 20, // Tambahkan margin bawah
+    marginTop: 20,
+    marginBottom: 20,
   },
   editButtonText: {
     fontSize: 13,
@@ -313,35 +326,35 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    zIndex: 999, // Ensure it is above other elements
+    zIndex: 999,
   },
   dropdownMenu: {
     position: 'absolute',
     top: 10,
     right: 10,
     width: 200,
-    backgroundColor: '#333', // Warna latar belakang hitam
+    backgroundColor: '#333',
     borderRadius: 7,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.8,
     shadowRadius: 2,
     elevation: 5,
     zIndex: 1000,
-    padding: 10, // Add padding for better appearance
+    padding: 10,
   },
   dropdownItem: {
-    flexDirection: 'row', // Tambahkan flexDirection row
-    alignItems: 'center', // Tambahkan alignItems center
-    padding: 15, // Sesuaikan padding
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 15,
     borderBottomWidth: 1,
-    borderBottomColor: '#444', // Warna border abu-abu gelap
+    borderBottomColor: '#444',
   },
   dropdownItemText: {
-    color: '#fff', // Warna teks putih
-    marginLeft: 10, // Tambahkan margin kiri untuk memberi jarak antara ikon dan teks
+    color: '#fff',
+    marginLeft: 10,
   },
   dropdownIcon: {
-    marginRight: 10, // Tambahkan margin kanan untuk memberi jarak antara ikon dan teks
+    marginRight: 10,
   },
 });
