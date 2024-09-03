@@ -14,6 +14,18 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 const CommentScreen = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [inputHeight, setInputHeight] = useState(null);
+  const [comments, setComments] = useState([
+    {id: 1, text: 'Comment 1'},
+    {id: 2, text: 'Comment 2'},
+    {id: 3, text: 'Comment 3'},
+    {id: 4, text: 'Comment 4'},
+    {id: 5, text: 'Comment 5'},
+    {id: 6, text: 'Comment 6'},
+    {id: 7, text: 'Comment 7'},
+    {id: 8, text: 'Comment 8'},
+    {id: 9, text: 'Comment 8'},
+    {id: 10, text: 'Comment 8'},
+  ]);
 
   const handleTextInputChange = text => {
     if (text.length > 0) {
@@ -27,10 +39,18 @@ const CommentScreen = () => {
     setInputHeight(event.nativeEvent.contentSize.height);
   };
 
+  const handleAddComment = text => {
+    setComments([...comments, {id: comments.length + 1, text}]);
+  };
+
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.commentContainer}>
-        <CommentCard />
+      <ScrollView
+        style={styles.commentContainer}
+        contentContainerStyle={{paddingBottom: 50}}>
+        {comments.map(comment => (
+          <CommentCard key={comment.id} text={comment.text} />
+        ))}
       </ScrollView>
       <View style={[styles.inputContainer, {height: inputHeight}]}>
         <Image
@@ -46,7 +66,9 @@ const CommentScreen = () => {
           onContentSizeChange={handleTextInputContentSizeChange}
         />
         {isTyping && (
-          <TouchableOpacity style={styles.iconContainer}>
+          <TouchableOpacity
+            style={styles.iconContainer}
+            onPress={() => handleAddComment(text)}>
             <MaterialCommunityIcons
               name="upload"
               size={20}
@@ -65,6 +87,7 @@ export default CommentScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#fff',
   },
   commentContainer: {
     flex: 1,
@@ -74,15 +97,16 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    padding: 12,
-    backgroundColor: '#FFF',
+    padding: 14,
+    backgroundColor: '#fff',
     flexDirection: 'row',
     alignItems: 'center',
+    borderColor: '#d3d3d3',
+    borderTopWidth: 1,
   },
   inputComment: {
     borderWidth: 1,
     borderColor: 'transparent',
-    borderRadius: 20,
     padding: 18,
     flex: 1,
     marginLeft: 10,

@@ -280,6 +280,7 @@ const CreatePost = ({route, navigation}) => {
         const {mediaType, assets} = response;
         if (assets && assets.length > 0) {
           const uri = assets[0].uri;
+          setMediaType(assets[0].type);
           if (mediaType === 'video') {
             try {
               await checkVideoDuration(uri);
@@ -306,35 +307,36 @@ const CreatePost = ({route, navigation}) => {
       mediaType: 'mixed',
       selectionLimit: 4,
       allowedFileTypes: ['heic', 'heif', 'jpeg', 'jpg', 'png'],
+      saveToPhotos: true,
     };
 
     ImagePicker.launchImageLibrary(options, async response => {
-      if (!response.didCancel && !response.error) {
-        const uris = response.assets.map(asset => asset.uri);
-        const types = response.assets.map(asset => asset.type);
-        if (types[0] === 'video') {
-          try {
-            await checkVideoDuration(uris[0]);
-            const thumbnailUris = await Promise.all(
-              uris.map(uri => generateThumbnail(uri)),
-            );
+      if (response.didCancel) {
+        console.log('User cancelled media selection');
+      } else if (response.errorCode) {
+        console.log('ImagePicker Error: ', response.errorMessage);
+      } else {
+        const {mediaType, assets} = response;
+        if (assets && assets.length > 0) {
+          const uri = assets[0].uri;
+          setMediaType(assets[0].type);
+          if (mediaType === 'video') {
+            const {path} = await createThumbnail({
+              url: uri,
+              timeStamp: 1000,
+            });
+
             setSelectedMedia(prevMedia => [
               ...prevMedia,
-              ...uris.map((uri, index) => ({
-                uri,
-                thumbnailUri: thumbnailUris[index],
-              })),
+              {uri, type: 'video/mp4', thumbnail: path},
             ]);
-            setMediaType(types[0] || 'photo');
-          } catch (error) {
-            Alert.alert('Video Upload Error', error.message);
+          } else {
+            setSelectedMedia(prevMedia => [
+              ...prevMedia,
+              {uri, type: mediaType},
+            ]);
+            setMediaType(mediaType);
           }
-        } else {
-          setSelectedMedia(prevMedia => [
-            ...prevMedia,
-            ...uris.map(uri => ({uri})),
-          ]);
-          setMediaType(types[0] || 'photo');
         }
       }
     });

@@ -27,12 +27,12 @@ const BottomSheet = ({username, postId, onClose}) => {
 
       if (response.data.status === 'ok') {
         console.log('Postingan Berhasil Dihapus');
-        ToastAndroid.show('Post deleted successfully!', ToastAndroid.SHORT);
-        onClose(); // Call the onClose function to close the bottom sheet
+        ToastAndroid.show('Post deleted successfully!', ToastAndroid.LONG);
+        onClose();
       }
     } catch (error) {
       console.error('Error: ', error);
-      ToastAndroid.show('Error when deleting post.', ToastAndroid.SHORT);
+      ToastAndroid.show('Error when deleting post.', ToastAndroid.LONG);
     }
   };
 
@@ -44,36 +44,36 @@ const BottomSheet = ({username, postId, onClose}) => {
         <TouchableOpacity
           style={styles.option}
           onPress={() => {
-            onClose(); // Call the onClose function to close the bottom sheet
+            onClose();
           }}>
           <MaterialIcons name="volume-off" size={24} color="#333" />
-          <Text style={styles.optionText}>Mute @{username}</Text>
+          <Text style={styles.optionTextMute}>Mute @{username}</Text>
         </TouchableOpacity>
       </View>
       <View style={styles.optionRow}>
         <TouchableOpacity style={styles.option} onPress={deletePost}>
           <MaterialIcons name="delete" size={24} color="#333" />
-          <Text style={styles.optionText}>Delete Post @{username}</Text>
+          <Text style={styles.optionTextDelete}>Delete Post @{username}</Text>
         </TouchableOpacity>
       </View>
       <View style={styles.optionRow}>
         <TouchableOpacity
           style={styles.option}
           onPress={() => {
-            onClose(); // Call the onClose function to close the bottom sheet
+            onClose();
           }}>
           <MaterialIcons name="block" size={24} color="#333" />
-          <Text style={styles.optionText}>Block @{username}</Text>
+          <Text style={styles.optionTextBlock}>Block @{username}</Text>
         </TouchableOpacity>
       </View>
       <View style={styles.optionRow}>
         <TouchableOpacity
           style={styles.option}
           onPress={() => {
-            onClose(); // Call the onClose function to close the bottom sheet
+            onClose();
           }}>
-          <MaterialIcons name="report" size={24} color="#333" />
-          <Text style={styles.optionText}>Report @{username}</Text>
+          <MaterialIcons name="report" size={24} color="#FF2800" />
+          <Text style={styles.optionTextReport}>Report @{username}</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -106,9 +106,27 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 10,
   },
-  optionText: {
+  optionTextMute: {
     fontSize: 16,
     color: '#333',
+    marginLeft: 16,
+    fontWeight: 'bold',
+  },
+  optionTextDelete: {
+    fontSize: 16,
+    color: '#333',
+    marginLeft: 16,
+    fontWeight: 'bold',
+  },
+  optionTextBlock: {
+    fontSize: 16,
+    color: '#333',
+    marginLeft: 16,
+    fontWeight: 'bold',
+  },
+  optionTextReport: {
+    fontSize: 16,
+    color: '#FF2800',
     marginLeft: 16,
     fontWeight: 'bold',
   },

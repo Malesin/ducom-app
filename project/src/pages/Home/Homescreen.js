@@ -11,7 +11,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import {useFocusEffect} from '@react-navigation/native';
-import TweetCard from '../../components/TweetCard'; // Import TweetCard
+import TweetCard from '../../components/TweetCard';
 import Animated, {
   withDelay,
   interpolate,
@@ -32,7 +32,7 @@ const serverUrl = config.SERVER_URL;
 const HomeScreen = ({navigation}) => {
   const [tweets, setTweets] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
-  const [setPage] = useState(1);
+  const [page, setPage] = useState(1);
   const [loadingMore, setLoadingMore] = useState(false);
   const [loading, setLoading] = useState(true);
   const [hasMore, setHasMore] = useState(true);
@@ -51,7 +51,7 @@ const HomeScreen = ({navigation}) => {
         return [];
       }
 
-      const idUser = data._id; // Extract user ID
+      const idUser = data._id; 
 
       const responseTweet = await axios.post(`${serverUrl}/posts`, {
         page: pageNum,
@@ -129,7 +129,7 @@ const HomeScreen = ({navigation}) => {
 
   useFocusEffect(
     useCallback(() => {
-      isExpanded.value = false; // Reset FAB state when screen comes into focus
+      isExpanded.value = false; 
     }, []),
   );
 
@@ -161,7 +161,6 @@ const HomeScreen = ({navigation}) => {
       } else {
         const uri = response.assets[0].uri;
         console.log('Captured image URI:', uri);
-        // Navigate to CreatePost and pass the image URI
         navigation.navigate('CreatePost', {mediaUri: uri, mediaType: 'photo'});
       }
     });
@@ -276,8 +275,8 @@ const HomeScreen = ({navigation}) => {
               handleLoadMore();
             }
           }}>
-          {tweets.map((tweet, index) => (
-            <View key={index} style={styles.tweetContainer}>
+          {tweets.map(tweet => (
+            <View key={tweet.id} style={styles.tweetContainer}>
               <TweetCard tweet={tweet} />
             </View>
           ))}
@@ -297,13 +296,13 @@ const HomeScreen = ({navigation}) => {
           isExpanded={isExpanded}
           index={1}
           iconName={'camera-outline'}
-          onPress={handleOpenCamera} // Added onPress handler to open camera
+          onPress={handleOpenCamera} 
         />
         <FloatingActionButton
           isExpanded={isExpanded}
           index={2}
           iconName={'feather'}
-          onPress={() => navigation.navigate('CreatePost', {onPostSuccess})} // Navigate to CreatePost screen
+          onPress={() => navigation.navigate('CreatePost', {onPostSuccess})}
         />
       </View>
     </SafeAreaView>
