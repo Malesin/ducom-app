@@ -23,8 +23,8 @@ const CommentScreen = () => {
     {id: 6, text: 'Comment 6'},
     {id: 7, text: 'Comment 7'},
     {id: 8, text: 'Comment 8'},
-    {id: 9, text: 'Comment 8'},
-    {id: 10, text: 'Comment 8'},
+    {id: 9, text: 'Comment 9'},
+    {id: 10, text: 'Comment 10'},
   ]);
 
   const handleTextInputChange = text => {
@@ -120,10 +120,10 @@ const styles = StyleSheet.create({
   },
   iconContainer: {
     backgroundColor: '#001374',
-    padding: 6,
+    padding: 4,
     borderRadius: 4,
-    width: 32,
-    height: 32,
+    width: 28,
+    height: 28,
     marginRight: 10,
     alignItems: 'center',
   },
