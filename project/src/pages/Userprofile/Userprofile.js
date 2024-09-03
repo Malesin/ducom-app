@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useCallback, useRef} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {
   SafeAreaView,
   View,
@@ -15,7 +15,6 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import config from '../../config';
 import {Skeleton} from 'react-native-elements';
-import Animated, { EasingNode } from 'react-native-reanimated';
 
 const serverUrl = config.SERVER_URL;
 
@@ -27,7 +26,6 @@ const Userprofile = ({route, navigation}) => {
   const [modalImageSource, setModalImageSource] = useState(null);
   const [userData, setUserData] = useState('');
   const [dropdownVisible, setDropdownVisible] = useState(false);
-  const dropdownAnimation = useRef(new Animated.Value(0)).current;
 
   // Atur judul navigasi menjadi kosong saat komponen pertama kali dimuat
   useEffect(() => {
@@ -91,26 +89,9 @@ const Userprofile = ({route, navigation}) => {
     setModalImageSource(null);
   };
 
-  // Fungsi untuk membuka dan menutup dropdown dengan animasi
+  // Fungsi untuk membuka dan menutup dropdown
   const toggleDropdown = () => {
-    if (dropdownVisible) {
-      // Animasi untuk menutup dropdown
-      Animated.timing(dropdownAnimation, {
-        toValue: 0, // Nilai akhir animasi
-        duration: 150, // Durasi animasi dalam milidetik
-        easing: EasingNode.linear, // Menggunakan easing linear
-        useNativeDriver: true, // Menggunakan native driver untuk performa yang lebih baik
-      }).start(() => setDropdownVisible(false)); // Menyembunyikan dropdown setelah animasi selesai
-    } else {
-      setDropdownVisible(true); // Menampilkan dropdown sebelum animasi dimulai
-      // Animasi untuk membuka dropdown
-      Animated.timing(dropdownAnimation, {
-        toValue: 1, // Nilai akhir animasi
-        duration: 150, // Durasi animasi dalam milidetik
-        easing: EasingNode.linear, // Menggunakan easing linear
-        useNativeDriver: true, // Menggunakan native driver untuk performa yang lebih baik
-      }).start();
-    }
+    setDropdownVisible(!dropdownVisible);
   };
 
   const handleDropdownItemPress = (item) => {
@@ -132,22 +113,7 @@ const Userprofile = ({route, navigation}) => {
         {dropdownVisible && (
           <TouchableWithoutFeedback onPress={toggleDropdown}>
             <View style={styles.dropdownOverlay}>
-              <Animated.View
-                style={[
-                  styles.dropdownMenu,
-                  {
-                    opacity: dropdownAnimation, // Mengatur opacity berdasarkan nilai animasi
-                    transform: [
-                      {
-                        scale: dropdownAnimation.interpolate({
-                          inputRange: [0, 1], // Rentang nilai input
-                          outputRange: [0.8, 1], // Rentang nilai output
-                        }),
-                      },
-                    ],
-                  },
-                ]}
-              >
+              <View style={styles.dropdownMenu}>
                 <TouchableOpacity style={styles.dropdownItem} onPress={() => handleDropdownItemPress('Block')}>
                   <MaterialCommunityIcons name="block-helper" size={20} color="#000" style={styles.dropdownIcon} />
                   <Text style={styles.dropdownItemText}>Block</Text>
@@ -156,7 +122,7 @@ const Userprofile = ({route, navigation}) => {
                   <MaterialCommunityIcons name="alert-circle-outline" size={20} color="#000" style={styles.dropdownIcon} />
                   <Text style={styles.dropdownItemText}>Report</Text>
                 </TouchableOpacity>
-              </Animated.View>
+              </View>
             </View>
           </TouchableWithoutFeedback>
         )}
@@ -319,7 +285,7 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     elevation: 5,
     zIndex: 1000,
-    padding: 5, // Add padding for better appearance
+    padding: 10, // Add padding for better appearance
   },
   dropdownItem: {
     flexDirection: 'row', // Tambahkan flexDirection row
