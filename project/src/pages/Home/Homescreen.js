@@ -26,6 +26,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../../config';
+import { Skeleton } from 'react-native-elements'; // Pastikan Anda telah menginstal dan mengimpor Skeleton
 
 const serverUrl = config.SERVER_URL;
 
@@ -36,6 +37,7 @@ const HomeScreen = ({navigation}) => {
   const [loadingMore, setLoadingMore] = useState(false);
   const [loading, setLoading] = useState(true);
   const [hasMore, setHasMore] = useState(true);
+  const [showSkeleton, setShowSkeleton] = useState(true); // State untuk mengontrol tampilan skeleton
   const isExpanded = useSharedValue(false);
 
   const fetchTweets = async pageNum => {
@@ -94,11 +96,13 @@ const HomeScreen = ({navigation}) => {
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
+    setShowSkeleton(true); // Tampilkan skeleton saat refresh
     setPage(1);
     setHasMore(true); // Reset hasMore to true
     const newTweets = await fetchTweets(1);
     setTweets(newTweets.slice(0, 4)); // Only display 4 tweets
     setRefreshing(false);
+    setShowSkeleton(false); // Sembunyikan skeleton setelah refresh selesai
   }, []);
 
   const LoadingIndicator = () => {
@@ -144,6 +148,7 @@ const HomeScreen = ({navigation}) => {
       const initialTweets = await fetchTweets(1);
       setTweets(initialTweets.slice(0, 4)); // Load only 4 tweets initially
       setLoading(false);
+      setShowSkeleton(false); // Sembunyikan skeleton setelah data awal di-load
     };
     loadInitialTweets();
   }, []);
@@ -265,11 +270,38 @@ const HomeScreen = ({navigation}) => {
             handleLoadMore();
           }
         }}>
-        {tweets.map((tweet, index) => (
-          <View key={index} style={styles.tweetContainer}>
-            <TweetCard tweet={tweet} />
-          </View>
-        ))}
+        {showSkeleton ? (
+          <>
+            <View style={styles.skeletonContainer}>
+              <View style={styles.skeletonHeader}>
+                <Skeleton circle height={40} width={40} style={styles.skeletonAvatar} />
+                <View style={styles.skeletonTextContainer}>
+                  <Skeleton height={50} width={100} style={styles.skeleton} />
+                  <Skeleton height={14} width={60} style={styles.skeleton} />
+                </View>
+              </View>
+              <Skeleton height={20} width={200} style={styles.skeleton} />
+              <Skeleton height={150} width={'100%'} style={styles.skeleton} />
+            </View>
+            <View style={styles.skeletonContainer}>
+              <View style={styles.skeletonHeader}>
+                <Skeleton circle height={40} width={40} style={styles.skeletonAvatar} />
+                <View style={styles.skeletonTextContainer}>
+                  <Skeleton height={20} width={100} style={styles.skeleton} />
+                  <Skeleton height={14} width={60} style={styles.skeleton} />
+                </View>
+              </View>
+              <Skeleton height={20} width={200} style={styles.skeleton} />
+              <Skeleton height={150} width={'100%'} style={styles.skeleton} />
+            </View>
+          </>
+        ) : (
+          tweets.map((tweet, index) => (
+            <View key={index} style={styles.tweetContainer}>
+              <TweetCard tweet={tweet} />
+            </View>
+          ))
+        )}
         {loadingMore && <LoadingIndicator />}
       </ScrollView>
 
@@ -347,6 +379,17 @@ const styles = StyleSheet.create({
   },
   skeletonContainer: {
     marginBottom: 16,
+  },
+  skeletonHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  skeletonAvatar: {
+    marginRight: 8,
+  },
+  skeletonTextContainer: {
+    flex: 1,
   },
   skeleton: {
     borderRadius: 4,
