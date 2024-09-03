@@ -20,20 +20,13 @@ import UserTopTabNavigator from '../../navigation/UserTopTabNavigator';
 
 const serverUrl = config.SERVER_URL;
 
-export default function Userprofile({route}) {
-  const {userIdPost} = route?.params || {};
+const Userprofile = ({userIdPost}) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [banner, setBanner] = useState(false);
   const [profilePicture, setProfilePicture] = useState(false);
   const [modalImageSource, setModalImageSource] = useState(null);
   const [userData, setUserData] = useState('');
-  const navigation = useNavigation();
 
-  /**
-   * Fungsi untuk mengambil data pengguna dari server.
-   * Fungsi ini mengambil token dari AsyncStorage dan membuat permintaan GET ke server
-   * untuk mengambil data pengguna dengan userId yang diberikan.
-   */
   async function getData() {
     try {
       console.log('Token Berhasil Diambil');
@@ -160,7 +153,7 @@ export default function Userprofile({route}) {
       </Modal>
     </SafeAreaView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -235,3 +228,5 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
 });
+
+export default Userprofile;

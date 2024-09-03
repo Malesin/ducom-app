@@ -7,9 +7,11 @@ import {Skeleton} from 'react-native-elements';
 
 const {height} = Dimensions.get('window');
 
-function UserTopTabNavigator() {
+function UserTopTabNavigator({route}) {
   const [refreshing, setRefreshing] = useState(false);
   const [isScrollTop, setIsScrollTop] = useState(true);
+  const {userIdPost} = route.params; // Ambil userIdPost dari params
+  console.log('Received userIdPost:', userIdPost); // Debugging
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -25,7 +27,7 @@ function UserTopTabNavigator() {
 
   const Header = () => (
     <View style={styles.profileWrapper}>
-      <Userprofile />
+      <Userprofile userIdPost={userIdPost} />
     </View>
   );
 
