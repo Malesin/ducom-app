@@ -336,7 +336,7 @@ const TweetCard = ({ tweet, navigation }) => {
       </View>
 
       {/* Tweet Content */}
-      <Text style={styles.tweetText}>{tweet.content}</Text>
+      <Text style={styles.tweetText}>{tweet.content || null}</Text>
 
       {/* Tweet Media with Horizontal Scroll */}
       {tweet.media && tweet.media.length > 0 ? (
@@ -401,9 +401,9 @@ const TweetCard = ({ tweet, navigation }) => {
                 ) : (
                   <Video
                     source={{ uri: modalMediaUri }}
-                    style={{ width: '100%', height: '100%' }}
-                    resizeMode="contain"
+                    style={styles.modalImage}
                     controls
+                    resizeMode="contain"
                   />
 
                 )
