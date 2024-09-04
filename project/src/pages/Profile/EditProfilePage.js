@@ -96,7 +96,7 @@ export default function EditProfilePage() {
   };
   const validateName = name => {
     const nameRegex = /^[a-zA-Z]+( [a-zA-Z]+)*$/;
-    return nameRegex.test(name) && name.length <= 10;
+    return nameRegex.test(name) && name.length <= 40;
   };
 
   useEffect(() => {

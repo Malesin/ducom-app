@@ -99,7 +99,7 @@ export default function MainNavigation() {
         />
         <Stack.Screen
           name="DrawerNavigator"
-          component={DrawerNavigator} // Tambahkan DrawerNavigator ke dalam Stack.Navigator
+          component={DrawerNavigator} 
           options={{headerShown: false}}
         />
       </Stack.Navigator>

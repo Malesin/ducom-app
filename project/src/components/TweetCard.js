@@ -36,16 +36,14 @@ const TweetCard = ({tweet}) => {
   const [thumbnails, setThumbnails] = useState({});
   const [showBottomSheet, setShowBottomSheet] = useState(false);
 
-  const navigation = useNavigation();
+  const navigator = useNavigation();
 
   const handleProfilePress = () => {
-    console.log('Navigating to Userprofile with userIdPost:', tweet.userIdPost);
-    navigation.navigate('Userprofile', { userIdPost: tweet.userIdPost });
+    navigator.navigate('Userprofile', { userIdPost: tweet.userIdPost });
   };
   
 
   useEffect(() => {
-    // Generate thumbnails for video media
     const generateThumbnails = async () => {
       const newThumbnails = {};
       for (const media of tweet.media || []) {
@@ -68,7 +66,7 @@ const TweetCard = ({tweet}) => {
     const token = await AsyncStorage.getItem('token');
 
     if (liked) {
-      await handleUnlike(); // Ensure unlike completes before proceeding
+      await handleUnlike();
     } else {
       try {
         const response = await axios.post(`${serverUrl}/like-post`, {
@@ -77,18 +75,18 @@ const TweetCard = ({tweet}) => {
         });
 
         if (response.data.status === 'ok') {
-          setLiked(true); // Directly update liked state
+          setLiked(true);
           setLikesCount(prevLikesCount => {
             const newLikesCount = prevLikesCount + 1;
             return newLikesCount;
           });
         } else {
           console.log('Error in like response data:', response.data.data);
-          Alert.alert('Error', 'Failed to like post. Please try again.'); // Add alert here
+          Alert.alert('Error', 'Failed to like post. Please try again.');
         }
       } catch (error) {
         console.error('Error liking post:', error.message);
-        Alert.alert('Error', 'Failed to like post. Please try again.'); // Add alert here
+        Alert.alert('Error', 'Failed to like post. Please try again.');
       }
     }
   };
@@ -103,18 +101,18 @@ const TweetCard = ({tweet}) => {
       });
 
       if (response.data.status === 'ok') {
-        setLiked(false); // Directly update liked state
+        setLiked(false);
         setLikesCount(prevLikesCount => {
           const newLikesCount = prevLikesCount - 1;
           return newLikesCount;
         });
       } else {
         console.log('Error in unlike response data:', response.data.data);
-        Alert.alert('Error', 'Failed to unlike post. Please try again.'); // Add alert here
+        Alert.alert('Error', 'Failed to unlike post. Please try again.');
       }
     } catch (error) {
       console.error('Error unliking post:', error.message);
-      Alert.alert('Error', 'Failed to unlike post. Please try again.'); // Add alert here
+      Alert.alert('Error', 'Failed to unlike post. Please try again.');
     }
   };
 
@@ -122,7 +120,7 @@ const TweetCard = ({tweet}) => {
     const token = await AsyncStorage.getItem('token');
 
     if (bookmarked) {
-      await handleUnbookmark(); // Ensure unlike completes before proceeding
+      await handleUnbookmark();
     } else {
       try {
         const response = await axios.post(`${serverUrl}/bookmark-post`, {
@@ -131,12 +129,12 @@ const TweetCard = ({tweet}) => {
         });
 
         if (response.data.status === 'ok') {
-          setBookmarked(true); // Directly update liked state
+          setBookmarked(true);
           setBookMarksCount(prevBookmarksCount => {
             const newBookmarksCount = prevBookmarksCount + 1;
             return newBookmarksCount;
           });
-          ToastAndroid.show('Post added to bookmarks!', ToastAndroid.SHORT); // Show toast notification
+          ToastAndroid.show('Post added to bookmarks!', ToastAndroid.SHORT);
         } else {
           console.log('Error in bookmark response data:', response.data.data);
         }
@@ -156,12 +154,12 @@ const TweetCard = ({tweet}) => {
       });
 
       if (response.data.status === 'ok') {
-        setBookmarked(false); // Directly update liked state
+        setBookmarked(false);
         setBookMarksCount(prevBookmarksCount => {
           const newBookmarksCount = prevBookmarksCount - 1;
           return newBookmarksCount;
         });
-        ToastAndroid.show('Post removed from bookmarks!', ToastAndroid.SHORT); // Show toast notification
+        ToastAndroid.show('Post removed from bookmarks!', ToastAndroid.SHORT);
       } else {
         console.log('Error in unbookmark response data:', response.data.data);
       }
@@ -170,9 +168,9 @@ const TweetCard = ({tweet}) => {
     }
   };
 
-  const handleCommentPress = () => {
+  const handleCommentPress = ({}) => {
     setCommentsCount(prev => prev + 1);
-    navigation.navigate('Comment');
+    navigator.navigate('Comment');
   };
 
   const openMediaPreview = uri => {
@@ -193,7 +191,7 @@ const TweetCard = ({tweet}) => {
       });
     } catch (error) {
       console.error('Error sharing:', error.message);
-      Alert.alert('Error', 'Failed to share post. Please try again.'); // Add alert here
+      Alert.alert('Error', 'Failed to share post. Please try again.');
     }
   };
 
@@ -278,7 +276,7 @@ const TweetCard = ({tweet}) => {
     );
   };
 
-  const tweetId = tweet.userIdPost;
+  const tweetId = tweet.userId;
 
   return (
     <SafeAreaView style={styles.card}>
@@ -324,7 +322,9 @@ const TweetCard = ({tweet}) => {
           </TouchableWithoutFeedback>
           <View style={styles.bottomSheetContainer}>
             <BottomSheet
-              onClose={() => setShowBottomSheet(false)}
+              onClose={() => {
+                setShowBottomSheet(false);
+              }}
               username={tweet.userHandle}
               postId={tweet.id}
               idUser={tweet.idUser}
@@ -350,6 +350,7 @@ const TweetCard = ({tweet}) => {
           showsHorizontalScrollIndicator={false}
           style={styles.mediaFlatList}
         />
+
       ) : null}
 
       {/* Interactions */}
@@ -402,10 +403,11 @@ const TweetCard = ({tweet}) => {
                 ) : (
                   <Video
                     source={{uri: modalMediaUri}}
-                    style={{width: '100%', height: '100%'}}
-                    resizeMode="contain"
+                    style={styles.modalImage}
                     controls
+                    resizeMode="contain"
                   />
+
                 )
               ) : null}
             </View>

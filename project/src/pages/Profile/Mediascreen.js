@@ -37,32 +37,37 @@ function Mediascreen({navigation}) {
           return [];
         }
 
-        const idUserLike = data._id;
+            const idUser = data._id; 
+            const emailUser = data.email; 
 
         const responseTweet = await axios.post(`${serverUrl}/my-posts`, {
           token: token,
         });
         const dataTweet = responseTweet.data;
 
-        const formattedTweets = dataTweet.data
-          .filter(post => Array.isArray(post.media) && post.media.length > 0)
-          .map(post => ({
-            id: post._id,
-            userAvatar: post.user.profilePicture,
-            userName: post.user.name,
-            userHandle: post.user.username,
-            postDate: post.created_at,
-            content: post.description,
-            media: post.media.map(mediaItem => ({
-              type: mediaItem.type,
-              uri: mediaItem.uri,
-            })),
-            likesCount: post.likes.length,
-            commentsCount: post.comments.length,
-            bookMarksCount: post.bookmarks.length,
-            isLiked: post.likes.some(like => like._id === idUserLike),
-            userId: post.user._id,
-          }));
+            const formattedTweets = dataTweet.data
+                .filter(post => Array.isArray(post.media) && post.media.length > 0) // Filter posts with media
+                .map(post => ({
+                    id: post._id,
+                    userAvatar: post.user.profilePicture,
+                    userName: post.user.name,
+                    userHandle: post.user.username,
+                    postDate: post.created_at,
+                    content: post.description,
+                    media: post.media.map(mediaItem => ({
+                        type: mediaItem.type,
+                        uri: mediaItem.uri,
+                    })),
+                    likesCount: post.likes.length,
+                    commentsCount: post.comments.length,
+                    bookMarksCount: post.bookmarks.length,
+                    isLiked: post.likes.some(like => like._id === idUser),
+                    userIdPost: post.user._id,
+                    idUser: idUser,
+                    allowedEmail: post.allowedEmail,
+                    userEmailPost: post.user.email,
+                    emailUser : emailUser
+                }));
 
         return formattedTweets;
       } catch (error) {

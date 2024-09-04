@@ -11,7 +11,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import {useFocusEffect} from '@react-navigation/native';
-import TweetCard from '../../components/TweetCard'; // Import TweetCard
+import TweetCard from '../../components/TweetCard';
 import Animated, {
   withDelay,
   interpolate,
@@ -52,8 +52,8 @@ const HomeScreen = ({navigation}) => {
         ]);
         return [];
       }
-
-      const idUser = data._id; // Extract user ID
+      const emailUser = data.email
+      const idUser = data._id; 
 
       const responseTweet = await axios.post(`${serverUrl}/posts`, {
         page: pageNum,
@@ -82,13 +82,13 @@ const HomeScreen = ({navigation}) => {
         idUser: idUser,
         allowedEmail: post.allowedEmail,
         userEmailPost: post.user.email,
-        // emailUser : emailUser
+        emailUser : emailUser
       }));
 
       return formattedTweets;
     } catch (error) {
       console.error('Error fetching data:', error);
-      return [];
+      return [];d
     } finally {
       setLoading(false);
     }
@@ -139,7 +139,7 @@ const HomeScreen = ({navigation}) => {
 
   useFocusEffect(
     useCallback(() => {
-      isExpanded.value = false; // Reset FAB state when screen comes into focus
+      isExpanded.value = false; 
     }, []),
   );
 
@@ -174,7 +174,6 @@ const HomeScreen = ({navigation}) => {
       } else {
         const uri = response.assets[0].uri;
         console.log('Captured image URI:', uri);
-        // Navigate to CreatePost and pass the image URI
         navigation.navigate('CreatePost', {mediaUri: uri, mediaType: 'photo'});
       }
     });
@@ -338,13 +337,13 @@ const HomeScreen = ({navigation}) => {
           isExpanded={isExpanded}
           index={1}
           iconName={'camera-outline'}
-          onPress={handleOpenCamera} // Added onPress handler to open camera
+          onPress={handleOpenCamera} 
         />
         <FloatingActionButton
           isExpanded={isExpanded}
           index={2}
           iconName={'feather'}
-          onPress={() => navigation.navigate('CreatePost', {onPostSuccess})} // Navigate to CreatePost screen
+          onPress={() => navigation.navigate('CreatePost', {onPostSuccess})}
         />
       </View>
     </SafeAreaView>
