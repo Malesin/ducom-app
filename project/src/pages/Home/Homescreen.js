@@ -146,7 +146,7 @@ const HomeScreen = ({navigation}) => {
   useEffect(() => {
     const loadInitialTweets = async () => {
       const initialTweets = await fetchTweets(1);
-      setTweets(initialTweets.slice(0, 4)); // Load only 4 tweets initially
+      setTweets(initialTweets.slice(0, 5)); // Load only 4 tweets initially
       setLoading(false);
       setShowSkeleton(false); // Sembunyikan skeleton setelah data awal di-load
     };
@@ -243,7 +243,7 @@ const HomeScreen = ({navigation}) => {
         tweet => !tweets.some(existingTweet => existingTweet.id === tweet.id),
       );
       if (newTweets.length > 0) {
-        setTweets(prevTweets => [...prevTweets, ...newTweets.slice(0, 4)]); // Add only 4 new tweets
+        setTweets(prevTweets => [...prevTweets, ...newTweets.slice(0, 5)]); // Add only 4 new tweets
         setPage(prevPage => prevPage + 1); // Increment page number
       }
       setLoadingMore(false);
