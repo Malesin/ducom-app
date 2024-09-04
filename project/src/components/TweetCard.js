@@ -18,13 +18,14 @@ import Video from 'react-native-video';
 import {createThumbnail} from 'react-native-create-thumbnail';
 import DefaultAvatar from '../assets/avatar.png';
 import BottomSheet from './BottomSheet';
+import {Userprofile} from '../pages';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useNavigation} from '@react-navigation/native';
 import axios from 'axios';
 import config from '../config';
 const serverUrl = config.SERVER_URL;
 
-const TweetCard = ({tweet, navigation}) => {
+const TweetCard = ({tweet}) => {
   const [liked, setLiked] = useState(tweet.isLiked);
   const [likesCount, setLikesCount] = useState(tweet.likesCount);
   const [bookmarked, setBookmarked] = useState(tweet.isBookmarked);
@@ -37,9 +38,10 @@ const TweetCard = ({tweet, navigation}) => {
 
   const navigator = useNavigation();
 
-  const handleProfilePress = userId => {
-    navigator.navigate('Userprofile', {userId});
+  const handleProfilePress = () => {
+    navigator.navigate('Userprofile', { userIdPost: tweet.userIdPost });
   };
+  
 
   useEffect(() => {
     const generateThumbnails = async () => {
@@ -73,18 +75,18 @@ const TweetCard = ({tweet, navigation}) => {
         });
 
         if (response.data.status === 'ok') {
-          setLiked(true); 
+          setLiked(true);
           setLikesCount(prevLikesCount => {
             const newLikesCount = prevLikesCount + 1;
             return newLikesCount;
           });
         } else {
           console.log('Error in like response data:', response.data.data);
-          Alert.alert('Error', 'Failed to like post. Please try again.'); 
+          Alert.alert('Error', 'Failed to like post. Please try again.');
         }
       } catch (error) {
         console.error('Error liking post:', error.message);
-        Alert.alert('Error', 'Failed to like post. Please try again.'); 
+        Alert.alert('Error', 'Failed to like post. Please try again.');
       }
     }
   };
@@ -106,11 +108,11 @@ const TweetCard = ({tweet, navigation}) => {
         });
       } else {
         console.log('Error in unlike response data:', response.data.data);
-        Alert.alert('Error', 'Failed to unlike post. Please try again.'); 
+        Alert.alert('Error', 'Failed to unlike post. Please try again.');
       }
     } catch (error) {
       console.error('Error unliking post:', error.message);
-      Alert.alert('Error', 'Failed to unlike post. Please try again.'); 
+      Alert.alert('Error', 'Failed to unlike post. Please try again.');
     }
   };
 
@@ -118,7 +120,7 @@ const TweetCard = ({tweet, navigation}) => {
     const token = await AsyncStorage.getItem('token');
 
     if (bookmarked) {
-      await handleUnbookmark(); 
+      await handleUnbookmark();
     } else {
       try {
         const response = await axios.post(`${serverUrl}/bookmark-post`, {
@@ -132,7 +134,7 @@ const TweetCard = ({tweet, navigation}) => {
             const newBookmarksCount = prevBookmarksCount + 1;
             return newBookmarksCount;
           });
-          ToastAndroid.show('Post added to bookmarks!', ToastAndroid.SHORT); 
+          ToastAndroid.show('Post added to bookmarks!', ToastAndroid.SHORT);
         } else {
           console.log('Error in bookmark response data:', response.data.data);
         }
@@ -189,7 +191,7 @@ const TweetCard = ({tweet, navigation}) => {
       });
     } catch (error) {
       console.error('Error sharing:', error.message);
-      Alert.alert('Error', 'Failed to share post. Please try again.'); 
+      Alert.alert('Error', 'Failed to share post. Please try again.');
     }
   };
 
@@ -280,7 +282,7 @@ const TweetCard = ({tweet, navigation}) => {
     <SafeAreaView style={styles.card}>
       {/* User Info */}
       <View style={styles.userInfo}>
-        <TouchableOpacity onPress={() => handleProfilePress(tweetId)}>
+        <TouchableOpacity onPress={() => handleProfilePress()}>
           <Image
             source={tweet.userAvatar ? {uri: tweet.userAvatar} : DefaultAvatar}
             style={styles.avatar}

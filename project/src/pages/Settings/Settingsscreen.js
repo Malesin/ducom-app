@@ -16,11 +16,13 @@ const Settingsscreen = ({ navigation }) => {
       },
       {
         text: 'Logout',
-
         onPress: async () => {
           await AsyncStorage.removeItem('token');
           await AsyncStorage.clear();
-          navigation.navigate('Auths');
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'Auths' }],
+          });
           console.log("Logout successfully");
         },
       },

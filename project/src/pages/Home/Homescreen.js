@@ -19,13 +19,14 @@ import Animated, {
   useSharedValue,
   withSpring,
   withTiming,
+  cancelAnimation,
 } from 'react-native-reanimated';
-import {Skeleton} from 'react-native-elements';
 import * as ImagePicker from 'react-native-image-picker';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../../config';
+import { Skeleton } from 'react-native-elements'; // Pastikan Anda telah menginstal dan mengimpor Skeleton
 
 const serverUrl = config.SERVER_URL;
 
@@ -36,6 +37,7 @@ const HomeScreen = ({navigation}) => {
   const [loadingMore, setLoadingMore] = useState(false);
   const [loading, setLoading] = useState(true);
   const [hasMore, setHasMore] = useState(true);
+  const [showSkeleton, setShowSkeleton] = useState(true); // State untuk mengontrol tampilan skeleton
   const isExpanded = useSharedValue(false);
 
   const fetchTweets = async pageNum => {
@@ -50,7 +52,7 @@ const HomeScreen = ({navigation}) => {
         ]);
         return [];
       }
-
+      const emailUser = data.email
       const idUser = data._id; 
 
       const responseTweet = await axios.post(`${serverUrl}/posts`, {
@@ -76,7 +78,11 @@ const HomeScreen = ({navigation}) => {
         bookMarksCount: post.bookmarks.length,
         isLiked: post.likes.some(like => like._id === idUser),
         isBookmarked: post.bookmarks.some(bookmark => bookmark.user === idUser),
-        userId: post.user._id,
+        userIdPost: post.user._id,
+        idUser: idUser,
+        allowedEmail: post.allowedEmail,
+        userEmailPost: post.user.email,
+        emailUser : emailUser
       }));
 
       return formattedTweets;
@@ -90,11 +96,15 @@ const HomeScreen = ({navigation}) => {
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
+    setShowSkeleton(true); // Tampilkan skeleton saat refresh
     setPage(1);
+    setHasMore(true); // Reset hasMore to true
     const newTweets = await fetchTweets(1);
-    setTweets(newTweets);
+    setTweets(newTweets.slice(0, 4)); // Only display 4 tweets
     setRefreshing(false);
+    setShowSkeleton(false); // Sembunyikan skeleton setelah refresh selesai
   }, []);
+
   const LoadingIndicator = () => {
     return (
       <View style={styles.loadingIndicator}>
@@ -136,16 +146,19 @@ const HomeScreen = ({navigation}) => {
   useEffect(() => {
     const loadInitialTweets = async () => {
       const initialTweets = await fetchTweets(1);
-      setTweets(initialTweets.slice(0, 5));
+      setTweets(initialTweets.slice(0, 5)); // Load only 4 tweets initially
       setLoading(false);
+      setShowSkeleton(false); // Sembunyikan skeleton setelah data awal di-load
     };
     loadInitialTweets();
   }, []);
+
   const onPostSuccess = () => {
     console.log('Post created successfully, refreshing HomeScreen...');
     setRefreshing(true);
     onRefresh();
   };
+
   const handleOpenCamera = () => {
     const options = {
       mediaType: 'photo',
@@ -188,6 +201,13 @@ const HomeScreen = ({navigation}) => {
       };
     });
 
+    useEffect(() => {
+      return () => {
+        cancelAnimation(animatedStyles);
+        cancelAnimation(iconStyle);
+      };
+    }, [animatedStyles, iconStyle]);
+
     return (
       <AnimatedPressable
         style={[animatedStyles, styles.shadow, styles.button]}
@@ -217,72 +237,93 @@ const HomeScreen = ({navigation}) => {
   const handleLoadMore = async () => {
     if (!loadingMore && hasMore) {
       setLoadingMore(true);
-      const moreTweets = await fetchTweets(tweets.length / 5 + 1);
+      const moreTweets = await fetchTweets(page + 1); // Load next page of tweets
       const newTweets = moreTweets.filter(
         tweet => !tweets.some(existingTweet => existingTweet.id === tweet.id),
       );
       if (newTweets.length > 0) {
-        setTweets(prevTweets => [...prevTweets, ...newTweets]);
-        setLoading(false);
+        setTweets(prevTweets => [...prevTweets, ...newTweets.slice(0, 5)]); // Add only 4 new tweets
+        setPage(prevPage => prevPage + 1); // Increment page number
       }
       setLoadingMore(false);
-      if (newTweets.length < 5) {
+      if (newTweets.length < 4) { // Check if less than 4 tweets are returned
         setHasMore(false);
       }
     }
   };
 
+  const renderSkeleton = () => (
+    <>
+      {[...Array(5)].map((_, index) => (
+        <View key={index} style={styles.skeletonContainer}>
+          <View style={styles.skeletonHeader}>
+            <Skeleton
+              animation="pulse"
+              circle
+              height={40}
+              width={40}
+              style={styles.skeletonAvatar}
+            />
+            <View style={styles.skeletonTextContainer}>
+              <Skeleton
+                animation="pulse"
+                height={20}
+                width={100}
+                style={styles.skeleton}
+              />
+              <Skeleton
+                animation="pulse"
+                height={14}
+                width={60}
+                style={styles.skeleton}
+              />
+            </View>
+          </View>
+          <Skeleton
+            animation="pulse"
+            height={20}
+            width={300}
+            style={[styles.skeleton, { borderRadius: 3 }]}
+          />
+          <Skeleton
+            animation="pulse"
+            height={200}
+            width={400}
+            style={[styles.skeleton, { borderRadius: 7 }]}
+          />
+        </View>
+      ))}
+    </>
+  );
+
   return (
     <SafeAreaView style={styles.container}>
-      {loading ? (
-        <View style={styles.skeletonScreen}>
-          {[1, 2, 3, 4, 5].map(index => (
-            <View key={index} style={styles.skeletonContainer}>
-              <Skeleton
-                animation="pulse"
-                width={500}
-                height={25}
-                style={styles.skeleton}
-              />
-              <Skeleton
-                animation="pulse"
-                width={200}
-                height={20}
-                style={styles.skeleton}
-              />
-              <Skeleton
-                animation="pulse"
-                width={350}
-                height={150}
-                style={styles.skeleton}
-              />
-            </View>
-          ))}
-        </View>
-      ) : (
-        <ScrollView
-          contentContainerStyle={styles.contentContainer}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-          onScroll={({nativeEvent}) => {
-            const {contentOffset, layoutMeasurement, contentSize} = nativeEvent;
-            const contentHeight = contentSize.height;
-            const viewportHeight = layoutMeasurement.height;
-            const scrollPosition = contentOffset.y + viewportHeight;
+      <ScrollView
+        contentContainerStyle={styles.contentContainer}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+        onScroll={({nativeEvent}) => {
+          const {contentOffset, layoutMeasurement, contentSize} = nativeEvent;
+          const contentHeight = contentSize.height;
+          const viewportHeight = layoutMeasurement.height;
+          const scrollPosition = contentOffset.y + viewportHeight;
 
-            if (scrollPosition >= contentHeight - 100) {
-              handleLoadMore();
-            }
-          }}>
-          {tweets.map(tweet => (
-            <View key={tweet.id} style={styles.tweetContainer}>
+          if (scrollPosition >= contentHeight - 100) {
+            handleLoadMore();
+          }
+        }}>
+        {showSkeleton ? (
+          renderSkeleton()
+        ) : (
+          tweets.map((tweet, index) => (
+            <View key={index} style={styles.tweetContainer}>
               <TweetCard tweet={tweet} />
             </View>
-          ))}
-          {loadingMore && <LoadingIndicator />}
-        </ScrollView>
-      )}
+          ))
+        )}
+        {loadingMore && <LoadingIndicator />}
+      </ScrollView>
 
       <View style={styles.fabContainer}>
         <AnimatedPressable
@@ -351,17 +392,28 @@ const styles = StyleSheet.create({
   tweetContainer: {
     width: '100%',
   },
-  skeletonScreen: {
+  skeletonScreen: {   
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
   skeletonContainer: {
-    marginBottom: 16,
+    padding: 20,
+    alignItems: 'flex-start', // Align items to the left
+  },
+  skeletonHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  skeletonAvatar: {
+    marginRight: 10,
+  },
+  skeletonTextContainer: {
+    flex: 1,
   },
   skeleton: {
-    borderRadius: 4,
-    marginBottom: 8,
+    marginBottom: 10,
   },
   loadingIndicator: {
     alignItems: 'center',

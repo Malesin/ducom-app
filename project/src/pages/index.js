@@ -19,7 +19,10 @@ import Mediascreen from './Profile/Mediascreen';
 import Postscreen from './Profile/Postscreen';
 import Replyscreen from './Profile/Replyscreen';
 import EditProfilePage from './Profile/EditProfilePage';
-import Userprofile from './Profile/Userprofile'; // Tambahkan import Userprofile
+import Userprofile from './Userprofile/Userprofile';
+import Userpost from './Userprofile/Userpost'; // Tambahkan import Userpost
+import Userreply from './Userprofile/Userreply'; // Tambahkan import Userreply
+import Usermedia from './Userprofile/Usermedia'; // Tambahkan import Usermedia
 
 export {
   Splashscreen,
@@ -43,5 +46,8 @@ export {
   Mediascreen,
   Replyscreen,
   EditProfilePage,
-  Userprofile, // Tambahkan Userprofile ke dalam export
+  Userprofile,
+  Userpost, // Tambahkan Userpost ke dalam export
+  Userreply, // Tambahkan Userreply ke dalam export
+  Usermedia, // Tambahkan Usermedia ke dalam export
 };

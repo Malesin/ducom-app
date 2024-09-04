@@ -7,24 +7,39 @@ import {
   Image,
   TouchableOpacity,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useState, useCallback} from 'react';
 import CommentCard from '../../components/CommentCard';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const CommentScreen = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [inputHeight, setInputHeight] = useState(null);
+  const textInputRef = React.createRef();
+
   const [comments, setComments] = useState([
-    {id: 1, text: 'Comment 1'},
-    {id: 2, text: 'Comment 2'},
-    {id: 3, text: 'Comment 3'},
-    {id: 4, text: 'Comment 4'},
-    {id: 5, text: 'Comment 5'},
-    {id: 6, text: 'Comment 6'},
-    {id: 7, text: 'Comment 7'},
-    {id: 8, text: 'Comment 8'},
-    {id: 9, text: 'Comment 9'},
-    {id: 10, text: 'Comment 10'},
+    {
+      id: 1,
+      text: 'dikit lagi lucu bang',
+      replies: [
+        {id: 1, text: 'elu kali yang lucu'},
+        {id: 2, text: 'lol amat ni orang'},
+      ],
+    },
+    {
+      id: 2,
+      text: 'keren bang motornya, info spek',
+      replies: [
+        {id: 1, text: 'spek 63 kayaknya bang'},
+        {id: 2, text: 'knalpot pake merk apa bang'},
+        {id: 3, text: 'arm bor2an'},
+        {id: 4, text: 'master rem pake apa bang'},
+      ],
+    },
+    {
+      id: 3,
+      text: 'info settingan kiriannya bang',
+      replies: [],
+    },
   ]);
 
   const handleTextInputChange = text => {
@@ -40,8 +55,35 @@ const CommentScreen = () => {
   };
 
   const handleAddComment = text => {
-    setComments([...comments, {id: comments.length + 1, text}]);
+    setComments([...comments, {id: comments.length + 1, text, replies: []}]);
   };
+
+  const handleAddReply = (commentId, replyText) => {
+    setComments(
+      comments.map(comment => {
+        if (comment.id === commentId) {
+          return {
+            ...comment,
+            replies: [
+              ...comment.replies,
+              {id: comment.replies.length + 1, text: replyText},
+            ],
+          };
+        }
+        return comment;
+      }),
+    );
+  };
+
+  const handleReplyPress = useCallback(
+    commentId => {
+      setIsTyping(true);
+      if (textInputRef.current) {
+        textInputRef.current.focus();
+      }
+    },
+    [textInputRef, setIsTyping],
+  );
 
   return (
     <SafeAreaView style={styles.container}>
@@ -49,7 +91,14 @@ const CommentScreen = () => {
         style={styles.commentContainer}
         contentContainerStyle={{paddingBottom: 50}}>
         {comments.map(comment => (
-          <CommentCard key={comment.id} text={comment.text} />
+          <CommentCard
+            key={comment.id}
+            text={comment.text}
+            replies={comment.replies}
+            hasReplies={comment.replies.length > 0}
+            onAddReply={replyText => handleAddReply(comment.id, replyText)}
+            onReplyPress={() => handleReplyPress(comment.id)}
+          />
         ))}
       </ScrollView>
       <View style={[styles.inputContainer, {height: inputHeight}]}>
@@ -58,6 +107,7 @@ const CommentScreen = () => {
           style={styles.profilePicture}
         />
         <TextInput
+          ref={textInputRef}
           style={[styles.inputComment, {height: inputHeight}]}
           placeholder="add comments"
           maxLength={500}
