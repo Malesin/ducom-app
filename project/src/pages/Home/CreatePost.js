@@ -47,7 +47,6 @@ const CreatePost = ({ route, navigation }) => {
       const token = await AsyncStorage.getItem('token');
       console.log('Token Retrieved Successfully');
 
-      // Ambil data pengguna
       const userResponse = await axios.post(`${serverUrl}/userdata`, {
         token: token,
       });
