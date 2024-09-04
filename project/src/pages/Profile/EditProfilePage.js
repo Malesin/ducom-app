@@ -39,6 +39,8 @@ export default function EditProfilePage() {
   const [newProfileImage, setNewProfileImage] = useState('');
   const [newBannerImage, setNewBannerImage] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [isBannerLoading, setIsBannerLoading] = useState(true);
+  const [isProfilePictureLoading, setIsProfilePictureLoading] = useState(true);
   const colorScheme = useColorScheme();
   const styles = getStyles(colorScheme); // Get styles based on color scheme
 
@@ -75,6 +77,18 @@ export default function EditProfilePage() {
   useEffect(() => {
     getData();
   }, []);
+
+  useEffect(() => {
+    if (banner) {
+      setIsBannerLoading(false);
+    }
+  }, [banner]);
+
+  useEffect(() => {
+    if (profilePicture) {
+      setIsProfilePictureLoading(false);
+    }
+  }, [profilePicture]);
 
   const validateUsername = username => {
     const usernameRegex = /^[a-z0-10]{4,15}$/;
@@ -313,8 +327,8 @@ export default function EditProfilePage() {
       <SafeAreaView style={{flex: 1}}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <View style={styles.bannerContainer}>
-            {isLoading ? (
-              <Skeleton containerStyle={styles.banner} animation="wave" />
+            {isBannerLoading ? (
+              <Skeleton containerStyle={[styles.banner, { height: 500 }]} animation="wave" />
             ) : (
               <TouchableOpacity onPress={selectImageBanner}>
                 <ImageBackground
@@ -334,11 +348,8 @@ export default function EditProfilePage() {
           </View>
 
           <View style={styles.contentContainer}>
-            {isLoading ? (
-              <Skeleton
-                containerStyle={styles.profilePicture}
-                animation="wave"
-              />
+            {isProfilePictureLoading ? (
+              <Skeleton containerStyle={[styles.profilePicture, { height: 150 }]} animation="wave" />
             ) : (
               <TouchableOpacity onPress={selectImageProfile}>
                 <ImageBackground
@@ -363,7 +374,7 @@ export default function EditProfilePage() {
               <View style={styles.usernameInputContainer}>
                 <Text style={styles.usernameStatic}> @</Text>
                 {isLoading ? (
-                  <Skeleton height={20} width={100} animation="wave" />
+                  <Skeleton height={30} width={100} animation="wave" />
                 ) : isEditing ? (
                   <TextInput
                     style={styles.usernameInput}
