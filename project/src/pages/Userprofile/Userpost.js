@@ -7,22 +7,23 @@ import {
   Text,
   ActivityIndicator,
 } from 'react-native';
-import TweetCard from '../../components/TweetCard'; // Import TweetCard
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import TweetCard from '../../components/TweetCard';
 import axios from 'axios';
 import config from '../../config';
 
 const serverUrl = config.SERVER_URL;
 
-const Userpost = ({route, navigation}) => {
-  const {userIdPost} = route.params;
+const Userpost = ({route}) => {
+  const {userIdPost} = route?.params;
   const [tweets, setTweets] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const fetchTweets = useCallback(async () => {
-    const token = await AsyncStorage.getItem('token');
     try {
-      const response = await axios.post(`${serverUrl}/post`, {id: userIdPost, token});
+      const response = await axios.post(`${serverUrl}/userId-posts`, {
+        userId: userIdPost,
+      });
+
       const dataTweet = response.data;
 
       const formattedTweets = dataTweet.data.map(post => ({
@@ -42,7 +43,9 @@ const Userpost = ({route, navigation}) => {
         commentsCount: post.comments.length,
         bookMarksCount: post.bookmarks.length,
         isLiked: post.likes.some(like => like._id === userIdPost),
-        isBookmarked: post.bookmarks.some(bookmark => bookmark.user === userIdPost),
+        isBookmarked: post.bookmarks.some(
+          bookmark => bookmark.user === userIdPost,
+        ),
         userIdPost: post.user._id,
       }));
 

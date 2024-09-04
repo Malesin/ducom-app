@@ -1,6 +1,6 @@
 import React, {useState, useEffect, useCallback} from 'react';
 import {StyleSheet, View, Dimensions, RefreshControl} from 'react-native';
-import {Mediascreen, Userpost, Replyscreen, Userprofile} from '../pages'; // Ganti Postscreen dengan Userpost
+import {Usermedia, Userpost, Replyscreen, Userprofile} from '../pages'; // Ganti Postscreen dengan Userpost
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {Tabs, MaterialTabBar} from 'react-native-collapsible-tab-view';
 import {Skeleton} from 'react-native-elements';
@@ -10,11 +10,11 @@ const {height} = Dimensions.get('window');
 function UserTopTabNavigator({route, navigation}) {
   const [refreshing, setRefreshing] = useState(false);
   const [isScrollTop, setIsScrollTop] = useState(true);
-  const {userIdPost, username} = route.params; // Ambil userIdPost dan username dari params
+  const {userIdPost, userIdMedia, username} = route.params;
 
   useEffect(() => {
     if (username) {
-      navigation.setOptions({title: `@${username}`}); // Set judul berdasarkan username
+      navigation.setOptions({title: `@${username}`});
     }
   }, [username, navigation]);
 
@@ -103,7 +103,14 @@ function UserTopTabNavigator({route, navigation}) {
                 enabled={isScrollTop}
               />
             }>
-            {refreshing ? renderSkeleton() : <Userpost route={{params: {userIdPost}}} navigation={navigation} />}
+            {refreshing ? (
+              renderSkeleton()
+            ) : (
+              <Userpost
+                route={{params: {userIdPost}}}
+                navigation={navigation}
+              />
+            )}
           </Tabs.ScrollView>
         </Tabs.Tab>
         <Tabs.Tab name="Replies">
@@ -131,7 +138,11 @@ function UserTopTabNavigator({route, navigation}) {
                 enabled={isScrollTop}
               />
             }>
-            {refreshing ? renderSkeleton() : <Mediascreen />}
+            {refreshing ? (
+              renderSkeleton()
+            ) : (
+              <Usermedia route={{params: {userIdPost}}} />
+            )}
           </Tabs.ScrollView>
         </Tabs.Tab>
       </Tabs.Container>
