@@ -6,7 +6,7 @@ import {
   SafeAreaView,
   ToastAndroid,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, { useState, useEffect } from 'react';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
@@ -14,7 +14,8 @@ import config from '../config';
 
 const serverUrl = config.SERVER_URL;
 
-const BottomSheet = ({username, postId, onClose}) => {
+const BottomSheet = ({ username, postId, idUser, userIdPost, allowedEmail, emailUser, onClose }) => {
+  const [isDeletePost, setIsDeletePost] = useState(false)
   const [isVisible] = useState(true);
 
   const deletePost = async () => {

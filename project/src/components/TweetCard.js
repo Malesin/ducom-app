@@ -323,7 +323,7 @@ const TweetCard = ({tweet, navigation}) => {
               onClose={() => {
                 setShowBottomSheet(false);
               }}
-              username={tweet.userName}
+              username={tweet.userHandle}
               postId={tweet.id}
               idUser={tweet.idUser}
               userIdPost={tweet.userIdPost}
