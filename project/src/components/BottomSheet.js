@@ -6,7 +6,7 @@ import {
   SafeAreaView,
   ToastAndroid,
 } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
@@ -27,7 +27,7 @@ const BottomSheet = ({ username, postId, idUser, userIdPost, allowedEmail, email
       });
 
       if (response.data.status === 'ok') {
-        console.log("Postingan Berhasil Dihapus")
+        console.log('Postingan Berhasil Dihapus');
       }
     } catch (error) {
       console.error('Error: ', error);
@@ -43,7 +43,6 @@ const BottomSheet = ({ username, postId, idUser, userIdPost, allowedEmail, email
       setIsDeletePost(false);
     }
   }, [idUser, userIdPost, emailUser, allowedEmail]);
-
 
   return (
     <SafeAreaView style={styles.container}>
@@ -69,14 +68,13 @@ const BottomSheet = ({ username, postId, idUser, userIdPost, allowedEmail, email
       </View>
       <View style={styles.optionRow}>
         <TouchableOpacity style={styles.option}>
-          <MaterialIcons name="report" size={24} color="#333" />
-          <Text style={styles.optionText}>Report @{username}</Text>
+          <MaterialIcons name="report" size={24} color="#D60000" />
+          <Text style={styles.optionTextReport}>Report @{username}</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
 };
-
 
 const styles = StyleSheet.create({
   container: {
@@ -107,6 +105,12 @@ const styles = StyleSheet.create({
   optionText: {
     fontSize: 16,
     color: '#333',
+    marginLeft: 16,
+    fontWeight: 'bold',
+  },
+  optionTextReport: {
+    fontSize: 16,
+    color: '#D60000',
     marginLeft: 16,
     fontWeight: 'bold',
   },

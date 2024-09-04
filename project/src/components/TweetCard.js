@@ -18,7 +18,6 @@ import Video from 'react-native-video';
 import {createThumbnail} from 'react-native-create-thumbnail';
 import DefaultAvatar from '../assets/avatar.png';
 import BottomSheet from './BottomSheet';
-import {Userprofile} from '../pages';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useNavigation} from '@react-navigation/native';
 import axios from 'axios';
@@ -39,9 +38,8 @@ const TweetCard = ({tweet}) => {
   const navigator = useNavigation();
 
   const handleProfilePress = () => {
-    navigator.navigate('Userprofile', { userIdPost: tweet.userIdPost });
+    navigator.navigate('Userprofile', {userIdPost: tweet.userIdPost});
   };
-  
 
   useEffect(() => {
     const generateThumbnails = async () => {
@@ -312,7 +310,6 @@ const TweetCard = ({tweet}) => {
         </View>
 
         <Modal
-          style={styles.BottomSheet}
           animationType="slide"
           transparent={true}
           visible={showBottomSheet}
@@ -350,7 +347,6 @@ const TweetCard = ({tweet}) => {
           showsHorizontalScrollIndicator={false}
           style={styles.mediaFlatList}
         />
-
       ) : null}
 
       {/* Interactions */}
@@ -407,7 +403,6 @@ const TweetCard = ({tweet}) => {
                     controls
                     resizeMode="contain"
                   />
-
                 )
               ) : null}
             </View>
