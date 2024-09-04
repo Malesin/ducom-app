@@ -6,32 +6,28 @@ import {
   View,
   Image,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   Modal,
 } from 'react-native';
+import CommentSheet from './CommentSheet';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const CommentCard = ({text, hasReplies, replies, onReplyPress}) => {
   const [isLiked, setIsLiked] = useState(false);
-  const [dropdownVisible, setDropdownVisible] = useState(false);
   const [showReplies, setShowReplies] = useState(false);
   const [showMoreReplies, setShowMoreReplies] = useState(false);
+  const [showCommentSheet, setShowCommentSheet] = useState(false);
 
   const handleLikePress = () => {
     setIsLiked(!isLiked);
   };
 
-  const handleActionPress = () => {
-    setDropdownVisible(!dropdownVisible);
-  };
-
-  const closeDropdown = () => {
-    setDropdownVisible(false);
-  };
-
   const handleViewMoreReplies = () => {
     setShowReplies(!showReplies);
   };
-
+  const handleActionPress = () => {
+    setShowCommentSheet(true);
+  };
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.cardContainer}>
@@ -103,27 +99,24 @@ const CommentCard = ({text, hasReplies, replies, onReplyPress}) => {
             />
           </TouchableOpacity>
         </View>
-      </View>
-
-      {dropdownVisible && (
         <Modal
+          style={styles.CommentSheet}
+          animationType="slide"
           transparent={true}
-          animationType="fade"
-          visible={dropdownVisible}
-          onRequestClose={closeDropdown}>
-          <TouchableOpacity style={styles.modalOverlay} onPress={closeDropdown}>
-            <View style={styles.dropdownContainer}>
-              <TouchableOpacity style={styles.dropdownItem}>
-                <Text style={styles.dropdownItemText}>Delete</Text>
-              </TouchableOpacity>
-              <View style={styles.dropdownDivider} />
-              <TouchableOpacity style={styles.dropdownItem}>
-                <Text style={styles.dropdownItemText}>Report</Text>
-              </TouchableOpacity>
-            </View>
-          </TouchableOpacity>
+          visible={showCommentSheet}
+          onRequestClose={() => setShowCommentSheet(false)}>
+          <TouchableWithoutFeedback onPress={() => setShowCommentSheet(false)}>
+            <View style={styles.overlay} />
+          </TouchableWithoutFeedback>
+          <View style={styles.CommentSheetContainer}>
+            <CommentSheet
+              onClose={() => {
+                setShowCommentSheet(false);
+              }}
+            />
+          </View>
         </Modal>
-      )}
+      </View>
     </SafeAreaView>
   );
 };
@@ -192,29 +185,19 @@ const styles = StyleSheet.create({
     right: 10,
     top: 10,
   },
-  modalOverlay: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0)',
-  },
-  dropdownContainer: {
+  CommentSheetContainer: {
     position: 'absolute',
-    alignItems: 'center',
-    top: 80,
-    right: 50,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 16,
   },
-  dropdownItem: {
-    alignItems: 'center',
-    borderWidth: 1,
-    width: 65,
-    height: 30,
-    backgroundColor: '#E1E1E1',
-  },
-  dropdownItemText: {
-    alignItems: 'center',
-    fontSize: 15,
-    color: '#000',
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
   },
   viewMoreRepliesButton: {
     marginTop: 10,
