@@ -18,6 +18,7 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import BottomTabNavigator from './BottomTabNavigator';
 import DrawerNavigator from './DrawerNavigator'; // Tambahkan import DrawerNavigator
+import UserTopTabNavigator from './UserTopTabNavigator';
 
 const Stack = createNativeStackNavigator();
 
@@ -92,8 +93,9 @@ export default function MainNavigation() {
         />
         <Stack.Screen
           name="Userprofile"
-          component={Userprofile}
+          component={UserTopTabNavigator} // Pastikan UserTopTabNavigator diatur sebagai layar langsung
           options={{headerShown: true, title: 'User Profile'}}
+          initialParams={{userIdPost: '', username: ''}} // Tambahkan initialParams untuk userIdPost dan username
         />
         <Stack.Screen
           name="DrawerNavigator"

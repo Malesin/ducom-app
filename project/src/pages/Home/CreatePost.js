@@ -143,7 +143,7 @@ const CreatePost = ({ route, navigation }) => {
             maxContentLength: Infinity,
             headers: {
               'Content-Type': 'multipart/form-data',
-            }, // <-- Add missing comma here
+            },
             onUploadProgress: progressEvent => {
               const progress = Math.round(
                 (progressEvent.loaded * 100) / progressEvent.total,
@@ -163,7 +163,10 @@ const CreatePost = ({ route, navigation }) => {
           });
 
           if (postResponse.data.status === 'ok') {
-            navigation.navigate('Home');
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'Home' }],
+            });
             console.log('Post created successfully with media');
           } else {
             console.error('Failed to create post:', postResponse.data.data);
@@ -178,7 +181,10 @@ const CreatePost = ({ route, navigation }) => {
         });
 
         if (postResponse.data.status === 'ok') {
-          navigation.navigate('Home');
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'Home' }],
+          });
           console.log('Post created successfully without media');
         } else {
           console.error('Failed to create post:', postResponse.data.data);

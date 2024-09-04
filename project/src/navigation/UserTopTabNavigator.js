@@ -1,32 +1,38 @@
-import React, { useState, useCallback } from 'react';
-import { StyleSheet, View, Dimensions, RefreshControl } from 'react-native';
-import { Likescreen, Mediascreen, Postscreen, Replyscreen } from '../pages';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { Tabs, MaterialTabBar } from 'react-native-collapsible-tab-view';
-import Profilescreen from '../pages/Profile/Profilescreen';
-import { Skeleton } from 'react-native-elements';
+import React, {useState, useEffect, useCallback} from 'react';
+import {StyleSheet, View, Dimensions, RefreshControl} from 'react-native';
+import {Usermedia, Userpost, Replyscreen, Userprofile} from '../pages'; // Ganti Postscreen dengan Userpost
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import {Tabs, MaterialTabBar} from 'react-native-collapsible-tab-view';
+import {Skeleton} from 'react-native-elements';
 
-const { height } = Dimensions.get('window');
+const {height} = Dimensions.get('window');
 
-function TopTabNavigator() {
+function UserTopTabNavigator({route, navigation}) {
   const [refreshing, setRefreshing] = useState(false);
   const [isScrollTop, setIsScrollTop] = useState(true);
+  const {userIdPost, userIdMedia, username} = route.params;
+
+  useEffect(() => {
+    if (username) {
+      navigation.setOptions({title: `@${username}`});
+    }
+  }, [username, navigation]);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     setTimeout(() => {
       setRefreshing(false);
-    }, 300); 
+    }, 300); // Set to 0,3 second
   }, []);
 
   const handleScroll = event => {
-    const { contentOffset } = event.nativeEvent;
+    const {contentOffset} = event.nativeEvent;
     setIsScrollTop(contentOffset.y === 0);
   };
 
   const Header = () => (
     <View style={styles.profileWrapper}>
-      <Profilescreen />
+      <Userprofile route={{params: {userIdPost}}} navigation={navigation} />
     </View>
   );
 
@@ -97,7 +103,14 @@ function TopTabNavigator() {
                 enabled={isScrollTop}
               />
             }>
-            {refreshing ? renderSkeleton() : <Postscreen />}
+            {refreshing ? (
+              renderSkeleton()
+            ) : (
+              <Userpost
+                route={{params: {userIdPost}}}
+                navigation={navigation}
+              />
+            )}
           </Tabs.ScrollView>
         </Tabs.Tab>
         <Tabs.Tab name="Replies">
@@ -114,20 +127,6 @@ function TopTabNavigator() {
             {refreshing ? renderSkeleton() : <Replyscreen />}
           </Tabs.ScrollView>
         </Tabs.Tab>
-        <Tabs.Tab name="Likes">
-          <Tabs.ScrollView
-            onScroll={handleScroll}
-            scrollEventThrottle={16}
-            refreshControl={
-              <RefreshControl
-                refreshing={refreshing}
-                onRefresh={onRefresh}
-                enabled={isScrollTop}
-              />
-            }>
-            {refreshing ? renderSkeleton() : <Likescreen />}
-          </Tabs.ScrollView>
-        </Tabs.Tab>
         <Tabs.Tab name="Media">
           <Tabs.ScrollView
             onScroll={handleScroll}
@@ -139,7 +138,11 @@ function TopTabNavigator() {
                 enabled={isScrollTop}
               />
             }>
-            {refreshing ? renderSkeleton() : <Mediascreen />}
+            {refreshing ? (
+              renderSkeleton()
+            ) : (
+              <Usermedia route={{params: {userIdPost}}} />
+            )}
           </Tabs.ScrollView>
         </Tabs.Tab>
       </Tabs.Container>
@@ -155,19 +158,19 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   tabBar: {
-    backgroundColor: '#fff',
+    backgroundColor: '#fff', // Warna latar belakang putih
     borderBottomWidth: 0,
-    elevation: 0, 
-    shadowOpacity: 0, 
+    elevation: 0, // Menghilangkan bayangan di Android
+    shadowOpacity: 0, // Menghilangkan bayangan di iOS
   },
   tabBarLabel: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#000',
+    color: '#000', // Warna teks hitam
     textTransform: 'none',
   },
   tabBarIndicator: {
-    backgroundColor: '#000',
+    backgroundColor: '#000', // Warna indikator hitam
     height: 3,
   },
   skeletonContainer: {
@@ -186,8 +189,8 @@ const styles = StyleSheet.create({
   },
   skeleton: {
     marginBottom: 10,
-    backgroundColor: '#e1e1e1', 
+    backgroundColor: '#e1e1e1', // Warna skeleton
   },
 });
 
-export default TopTabNavigator;
+export default UserTopTabNavigator;
