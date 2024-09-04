@@ -253,6 +253,50 @@ const HomeScreen = ({navigation}) => {
     }
   };
 
+  const renderSkeleton = () => (
+    <>
+      {[...Array(5)].map((_, index) => (
+        <View key={index} style={styles.skeletonContainer}>
+          <View style={styles.skeletonHeader}>
+            <Skeleton
+              animation="pulse"
+              circle
+              height={40}
+              width={40}
+              style={styles.skeletonAvatar}
+            />
+            <View style={styles.skeletonTextContainer}>
+              <Skeleton
+                animation="pulse"
+                height={20}
+                width={100}
+                style={styles.skeleton}
+              />
+              <Skeleton
+                animation="pulse"
+                height={14}
+                width={60}
+                style={styles.skeleton}
+              />
+            </View>
+          </View>
+          <Skeleton
+            animation="pulse"
+            height={20}
+            width={300}
+            style={[styles.skeleton, { borderRadius: 3 }]}
+          />
+          <Skeleton
+            animation="pulse"
+            height={200}
+            width={400}
+            style={[styles.skeleton, { borderRadius: 7 }]}
+          />
+        </View>
+      ))}
+    </>
+  );
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
@@ -271,30 +315,7 @@ const HomeScreen = ({navigation}) => {
           }
         }}>
         {showSkeleton ? (
-          <>
-            <View style={styles.skeletonContainer}>
-              <View style={styles.skeletonHeader}>
-                <Skeleton circle height={40} width={40} style={styles.skeletonAvatar} />
-                <View style={styles.skeletonTextContainer}>
-                  <Skeleton height={50} width={100} style={styles.skeleton} />
-                  <Skeleton height={14} width={60} style={styles.skeleton} />
-                </View>
-              </View>
-              <Skeleton height={20} width={200} style={styles.skeleton} />
-              <Skeleton height={150} width={'100%'} style={styles.skeleton} />
-            </View>
-            <View style={styles.skeletonContainer}>
-              <View style={styles.skeletonHeader}>
-                <Skeleton circle height={40} width={40} style={styles.skeletonAvatar} />
-                <View style={styles.skeletonTextContainer}>
-                  <Skeleton height={20} width={100} style={styles.skeleton} />
-                  <Skeleton height={14} width={60} style={styles.skeleton} />
-                </View>
-              </View>
-              <Skeleton height={20} width={200} style={styles.skeleton} />
-              <Skeleton height={150} width={'100%'} style={styles.skeleton} />
-            </View>
-          </>
+          renderSkeleton()
         ) : (
           tweets.map((tweet, index) => (
             <View key={index} style={styles.tweetContainer}>
@@ -372,28 +393,28 @@ const styles = StyleSheet.create({
   tweetContainer: {
     width: '100%',
   },
-  skeletonScreen: {
+  skeletonScreen: {   
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
   skeletonContainer: {
-    marginBottom: 16,
+    padding: 20,
+    alignItems: 'flex-start', // Align items to the left
   },
   skeletonHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 10,
   },
   skeletonAvatar: {
-    marginRight: 8,
+    marginRight: 10,
   },
   skeletonTextContainer: {
     flex: 1,
   },
   skeleton: {
-    borderRadius: 4,
-    marginBottom: 8,
+    marginBottom: 10,
   },
   loadingIndicator: {
     alignItems: 'center',

@@ -137,11 +137,11 @@ export default function Profilescreen() {
                 ]}
               >
                 <TouchableOpacity style={styles.dropdownItem} onPress={() => handleDropdownItemPress('Need Help')}>
-                  <MaterialCommunityIcons name="information" size={20} color="#fff" style={styles.dropdownIcon} />
+                  <MaterialCommunityIcons name="information" size={20} color="#000" style={styles.dropdownIcon} />
                   <Text style={styles.dropdownItemText}>Need Help?</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.dropdownItem} onPress={() => handleDropdownItemPress('Drafts')}>
-                  <MaterialCommunityIcons name="cog" size={20} color="#fff" style={styles.dropdownIcon} />
+                  <MaterialCommunityIcons name="cog" size={20} color="#000" style={styles.dropdownIcon} />
                   <Text style={styles.dropdownItemText}>Settings</Text>
                 </TouchableOpacity>
               </Animated.View>
@@ -319,7 +319,7 @@ const styles = StyleSheet.create({
     top: 10,
     right: 10,
     width: 200,
-    backgroundColor: '#333', // Warna latar belakang hitam
+    backgroundColor: '#fff', // Warna latar belakang putih
     borderRadius: 7,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -333,11 +333,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row', // Tambahkan flexDirection row
     alignItems: 'center', // Tambahkan alignItems center
     padding: 15, // Sesuaikan padding
-    borderBottomWidth: 1,
-    borderBottomColor: '#444', // Warna border abu-abu gelap
+    // Hapus borderBottomWidth dan borderBottomColor
   },
   dropdownItemText: {
-    color: '#fff', // Warna teks putih
+    color: '#000', // Warna teks hitam
     marginLeft: 10, // Tambahkan margin kiri untuk memberi jarak antara ikon dan teks
   },
   dropdownIcon: {
