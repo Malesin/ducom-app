@@ -20,6 +20,7 @@ const BottomSheet = ({
   userIdPost,
   allowedEmail,
   emailUser,
+  onClose, // Tambahkan onClose sebagai prop
 }) => {
   const [isDeletePost, setIsDeletePost] = useState(false);
   const [isOwnAccount, setIsOwnAccount] = useState(false);
@@ -34,6 +35,7 @@ const BottomSheet = ({
 
       if (response.data.status === 'ok') {
         console.log('Postingan Berhasil Dihapus');
+        onClose(); // Panggil onClose setelah penghapusan berhasil
       }
     } catch (error) {
       console.error('Error: ', error);

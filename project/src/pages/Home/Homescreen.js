@@ -311,6 +311,12 @@ const HomeScreen = ({navigation}) => {
     </>
   );
 
+  const onDeleteSuccess = () => {
+    console.log('Post deleted successfully, refreshing HomeScreen...');
+    setRefreshing(true);
+    onRefresh();
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
@@ -333,7 +339,7 @@ const HomeScreen = ({navigation}) => {
         ) : (
           tweets.map((tweet, index) => (
             <View key={index} style={styles.tweetContainer}>
-              <TweetCard tweet={tweet} />
+              <TweetCard tweet={tweet} onDeleteSuccess={onDeleteSuccess} />
             </View>
           ))
         )}
