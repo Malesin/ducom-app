@@ -22,6 +22,7 @@ const BottomSheet = ({
   emailUser,
 }) => {
   const [isDeletePost, setIsDeletePost] = useState(false);
+  const [isOwnAccount, setIsOwnAccount] = useState(false);
 
   const deletePost = async () => {
     const token = await AsyncStorage.getItem('token');
@@ -40,43 +41,52 @@ const BottomSheet = ({
   };
 
   useEffect(() => {
-    if (emailUser === allowedEmail) {
-      setIsDeletePost(true);
-    } else if (idUser === userIdPost) {
+    // Check if the current user is the owner of the account
+    if (emailUser === allowedEmail || idUser === userIdPost) {
+      setIsOwnAccount(true);
       setIsDeletePost(true);
     } else {
+      setIsOwnAccount(false);
       setIsDeletePost(false);
     }
   }, [idUser, userIdPost, emailUser, allowedEmail]);
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.optionRow}>
-        <TouchableOpacity style={styles.option}>
-          <MaterialIcons name="volume-off" size={24} color="#333" />
-          <Text style={styles.optionText}>Mute @{username}</Text>
-        </TouchableOpacity>
-      </View>
-      {isDeletePost == true ? (
+      {!isOwnAccount && (
+        <View style={styles.optionRow}>
+          <TouchableOpacity style={styles.option}>
+            <MaterialIcons name="volume-off" size={24} color="#333" />
+            <Text style={styles.optionText}>Mute @{username}</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+      {isDeletePost && (
         <View style={styles.optionRow}>
           <TouchableOpacity style={styles.option} onPress={deletePost}>
             <MaterialIcons name="delete" size={24} color="#333" />
-            <Text style={styles.optionText}>Delete Post @{username}</Text>
+            <Text style={styles.optionText}>
+              Delete {isOwnAccount ? '' : `Post @${username}`}
+            </Text>
           </TouchableOpacity>
         </View>
-      ) : null}
-      <View style={styles.optionRow}>
-        <TouchableOpacity style={styles.option}>
-          <MaterialIcons name="block" size={24} color="#333" />
-          <Text style={styles.optionText}>Block @{username}</Text>
-        </TouchableOpacity>
-      </View>
-      <View style={styles.optionRow}>
-        <TouchableOpacity style={styles.option}>
-          <MaterialIcons name="report" size={24} color="#D60000" />
-          <Text style={styles.optionTextReport}>Report @{username}</Text>
-        </TouchableOpacity>
-      </View>
+      )}
+      {!isOwnAccount && (
+        <>
+          <View style={styles.optionRow}>
+            <TouchableOpacity style={styles.option}>
+              <MaterialIcons name="block" size={24} color="#333" />
+              <Text style={styles.optionText}>Block @{username}</Text>
+            </TouchableOpacity>
+          </View>
+          <View style={styles.optionRow}>
+            <TouchableOpacity style={styles.option}>
+              <MaterialIcons name="report" size={24} color="#D60000" />
+              <Text style={styles.optionTextReport}>Report @{username}</Text>
+            </TouchableOpacity>
+          </View>
+        </>
+      )}
     </SafeAreaView>
   );
 };
