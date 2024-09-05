@@ -121,28 +121,14 @@ export default function Profilescreen() {
         {dropdownVisible && (
           <TouchableWithoutFeedback onPress={toggleDropdown}>
             <View style={styles.dropdownOverlay}>
-              <Animated.View
-                style={[
-                  styles.dropdownMenu,
-                  {
-                    opacity: dropdownAnimation, // Mengatur opacity berdasarkan nilai animasi
-                    transform: [
-                      {
-                        scale: dropdownAnimation.interpolate({
-                          inputRange: [0, 1], // Rentang nilai input
-                          outputRange: [0.8, 1], // Rentang nilai output
-                        }),
-                      },
-                    ],
-                  },
-                ]}>
+              <View style={styles.dropdownMenu}>
                 <TouchableOpacity
                   style={styles.dropdownItem}
                   onPress={() => handleDropdownItemPress('Need Help')}>
                   <MaterialCommunityIcons
                     name="information"
                     size={20}
-                    color="#fff"
+                    color="#000"
                     style={styles.dropdownIcon}
                   />
                   <Text style={styles.dropdownItemText}>Need Help?</Text>
@@ -153,12 +139,12 @@ export default function Profilescreen() {
                   <MaterialCommunityIcons
                     name="cog"
                     size={20}
-                    color="#fff"
+                    color="#000"
                     style={styles.dropdownIcon}
                   />
                   <Text style={styles.dropdownItemText}>Settings</Text>
                 </TouchableOpacity>
-              </Animated.View>
+              </View>
             </View>
           </TouchableWithoutFeedback>
         )}
@@ -326,35 +312,34 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    zIndex: 999,
+    zIndex: 999, // Ensure it is above other elements
   },
   dropdownMenu: {
     position: 'absolute',
     top: 10,
     right: 10,
     width: 200,
-    backgroundColor: '#333',
+    backgroundColor: '#fff', // Warna latar belakang putih
     borderRadius: 7,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.8,
     shadowRadius: 2,
     elevation: 5,
     zIndex: 1000,
-    padding: 10,
+    padding: 10, // Add padding for better appearance
   },
   dropdownItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#444',
+    flexDirection: 'row', // Tambahkan flexDirection row
+    alignItems: 'center', // Tambahkan alignItems center
+    padding: 15, // Sesuaikan padding
   },
   dropdownItemText: {
-    color: '#fff',
-    marginLeft: 10,
+    color: '#000', // Warna teks hitam
+    marginLeft: 10, // Tambahkan margin kiri untuk memberi jarak antara ikon dan teks
+    fontWeight: 'bold', // Membuat teks menjadi bold
   },
   dropdownIcon: {
-    marginRight: 10,
+    marginRight: 10, // Tambahkan margin kanan untuk memberi jarak antara ikon dan teks
   },
 });
