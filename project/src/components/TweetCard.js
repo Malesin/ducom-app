@@ -284,9 +284,8 @@ const TweetCard = ({tweet, onDeleteSuccess}) => {
       });
 
       if (response.data.status === 'ok') {
-        ToastAndroid.show('Post deleted successfully!', ToastAndroid.SHORT);
-        setShowBottomSheet(false); // Tutup BottomSheet
-        onDeleteSuccess(); // Panggil fungsi refresh setelah penghapusan berhasil
+        ToastAndroid.show('Tweet berhasil dihapus', ToastAndroid.SHORT);
+        onDeleteSuccess();
       } else {
         console.log('Error in delete response data:', response.data.data);
         Alert.alert('Error', 'Failed to delete post. Please try again.');

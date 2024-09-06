@@ -13,20 +13,20 @@ import CommentSheet from './CommentSheet';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const CommentCard = ({ text, hasReplies, replies, onReplyPress, username, profilePicture, onAddReply, commentId, postId, userIdPost, idUser, allowedEmail }) => {
+const CommentCard = ({ text, hasReplies, replies, onReplyPress, username, profilePicture, onAddReply, commentId, postId, userIdPost, idUser, allowedEmail, emailUser, onDeleteSuccess }) => {
   const [isLiked, setIsLiked] = useState(false);
   const [showReplies, setShowReplies] = useState(false);
   const [showMoreReplies, setShowMoreReplies] = useState(false);
   const [showCommentSheet, setShowCommentSheet] = useState(false);
-  const [gettoken, setGetToken] = useState()
+  const [gettoken, setGetToken] = useState();
 
   const tokenconst = async () => {
     const token = await AsyncStorage.getItem('token');
-    setGetToken(token)
-  }
+    setGetToken(token);
+  };
 
   useEffect(() => {
-    tokenconst()
+    tokenconst();
   }, []);
 
   const handleLikePress = () => {
@@ -90,9 +90,11 @@ const CommentCard = ({ text, hasReplies, replies, onReplyPress, username, profil
                       onAddReply={onAddReply}
                       commentId={reply.id}
                       postId={postId}
-                      userIdPost={userIdPost}
+                      userIdPost={reply.userIdPost} // Pastikan userIdPost diteruskan
                       idUser={idUser}
-                      allowedEmail={allowedEmail}
+                      allowedEmail={reply.allowedEmail} // Pastikan allowedEmail diteruskan
+                      emailUser={emailUser} // Pastikan emailUser diteruskan
+                      onDeleteSuccess={onDeleteSuccess} // Tambahkan prop onDeleteSuccess
                     />
                   </View>
                 ))}
@@ -139,6 +141,8 @@ const CommentCard = ({ text, hasReplies, replies, onReplyPress, username, profil
               userIdPost={userIdPost}
               idUser={idUser}
               allowedEmail={allowedEmail}
+              emailUser={emailUser} // Pastikan emailUser diteruskan
+              onDeleteSuccess={onDeleteSuccess} // Tambahkan prop onDeleteSuccess
             />
           </View>
         </Modal>
@@ -146,7 +150,6 @@ const CommentCard = ({ text, hasReplies, replies, onReplyPress, username, profil
     </SafeAreaView>
   );
 };
-
 
 export default CommentCard;
 
