@@ -6,7 +6,9 @@ import {
   ScrollView,
   Image,
   TouchableOpacity,
-  Keyboard
+  Keyboard,
+  RefreshControl,
+  ToastAndroid // Tambahkan import ToastAndroid
 } from 'react-native';
 import React, { useState, useCallback, useEffect } from 'react';
 import CommentCard from '../../components/CommentCard';
@@ -17,15 +19,17 @@ import config from '../../config';
 const serverUrl = config.SERVER_URL;
 
 const CommentScreen = ({ route }) => {
-  const { postId, idUser, profilePicture } = route?.params;
+  const { postId, idUser, profilePicture, emailUser } = route?.params;
   const [isTyping, setIsTyping] = useState(false);
   const [inputHeight, setInputHeight] = useState(null);
   const [comment, setComment] = useState();
   const textInputRef = React.createRef();
   const [comments, setComments] = useState([]);
   const [replyToCommentId, setReplyToCommentId] = useState(null);
-  
+  const [refreshing, setRefreshing] = useState(false); // Tambahkan state refreshing
+
   const fetchComments = useCallback(async () => {
+    setRefreshing(true); // Set refreshing to true saat fetch dimulai
     try {
       const response = await axios.post(`${serverUrl}/comments`, { postId: postId });
       const dataComment = response.data.data;
@@ -58,12 +62,23 @@ const CommentScreen = ({ route }) => {
       setComments(formattedComments);
     } catch (error) {
       console.error('Error fetching data:', error);
+    } finally {
+      setRefreshing(false); // Set refreshing to false saat fetch selesai
     }
   }, [postId]);
+
+  const onRefresh = useCallback(() => {
+    fetchComments();
+  }, [fetchComments]);
 
   useEffect(() => {
     fetchComments();
   }, [fetchComments]);
+
+  const onDeleteSuccess = () => {
+    ToastAndroid.show('Komentar berhasil dihapus', ToastAndroid.SHORT);
+    fetchComments(); // Refresh comments after deletion
+  };
 
   const handleTextInputChange = text => {
     if (text.length > 0) {
@@ -109,7 +124,10 @@ const CommentScreen = ({ route }) => {
     <SafeAreaView style={styles.container}>
       <ScrollView
         style={styles.commentContainer}
-        contentContainerStyle={{ paddingBottom: 50 }}>
+        contentContainerStyle={{ paddingBottom: 50 }}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }>
         {comments.map(comment => (
           <CommentCard
             key={comment.id}
@@ -125,6 +143,8 @@ const CommentScreen = ({ route }) => {
             userIdPost={comment.userIdPost}
             idUser={idUser}
             allowedEmail={comment.allowedEmail}
+            emailUser={emailUser} // Pastikan emailUser diteruskan
+            onDeleteSuccess={onDeleteSuccess} // Tambahkan prop onDeleteSuccess
           />
         ))}
       </ScrollView>
