@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useCallback} from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   StyleSheet,
   ScrollView,
@@ -13,8 +13,7 @@ import config from '../../config';
 
 const serverUrl = config.SERVER_URL;
 
-const Usermedia = ({route}) => {
-  const {userIdPost} = route?.params;
+const Usermedia = ({ userIdPost, profilePicture }) => {
   const [tweets, setTweets] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -23,6 +22,8 @@ const Usermedia = ({route}) => {
       const response = await axios.post(`${serverUrl}/userId-posts`, {
         userId: userIdPost,
       });
+
+      console.log(response.data, "resp")
 
       const dataTweet = response.data;
 
@@ -36,9 +37,9 @@ const Usermedia = ({route}) => {
           content: post.description,
           media: Array.isArray(post.media)
             ? post.media.map(mediaItem => ({
-                type: mediaItem.type,
-                uri: mediaItem.uri,
-              }))
+              type: mediaItem.type,
+              uri: mediaItem.uri,
+            }))
             : [],
           likesCount: post.likes.length,
           commentsCount: post.comments.length,
@@ -48,6 +49,7 @@ const Usermedia = ({route}) => {
             bookmark => bookmark.user === userIdPost,
           ),
           userIdPost: post.user._id,
+          profilePicture: profilePicture,
         }))
         .filter(post => post.media.length > 0); // Filter hanya tweet yang memiliki media
 

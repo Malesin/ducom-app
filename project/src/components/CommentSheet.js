@@ -6,19 +6,58 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import config from '../config';
 
-const CommentSheet = () => {
+const serverUrl = config.SERVER_URL;
+
+const CommentSheet = ({ commentId, postId, token, emailUser, allowedEmail, idUser, userIdPost }) => {
+  const [isDeleteComment, setIsDeleteComment] = useState(false)
+console.log(allowedEmail)
+  const deleteComment = async () => {
+
+    try {
+      const response = await axios.post(`${serverUrl}/delete-comment`, {
+        token: token,
+        postId: postId,
+        commentId: commentId
+      });
+
+      if (response.data.status === 'ok') {
+        console.log('Comment Berhasil Dihapus');
+      }
+    } catch (error) {
+      console.error('Error: ', error);
+    }
+  };
+
+  useEffect(() => {
+    if (emailUser === allowedEmail) {
+      setIsDeleteComment(true);
+    } else if (idUser === userIdPost) {
+      setIsDeleteComment(true);
+    } else {
+      setIsDeleteComment(false);
+    }
+  }, [idUser, userIdPost, emailUser, allowedEmail]);
+
+  const reportComment = async () => {
+    console.log("Report Comment")
+  }
+
   return (
     <SafeAreaView>
       <View style={styles.optionRow}>
-        <TouchableOpacity style={styles.option}>
+        {isDeleteComment ? (          
+        <TouchableOpacity style={styles.option} onPress={deleteComment}>
           <MaterialIcons name="delete" size={24} color="#333" />
           <Text style={styles.optionText}>Delete Comment</Text>
         </TouchableOpacity>
+        ) : null}
       </View>
       <View style={styles.optionRow}>
-        <TouchableOpacity style={styles.option}>
+        <TouchableOpacity style={styles.option} onPress={reportComment}>
           <MaterialIcons name="report" size={24} color="#D60000" />
           <Text style={styles.optionTextReport}>Report Comment</Text>
         </TouchableOpacity>

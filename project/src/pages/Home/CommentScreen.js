@@ -6,45 +6,69 @@ import {
   ScrollView,
   Image,
   TouchableOpacity,
+  Keyboard
 } from 'react-native';
-import React, {useState, useCallback} from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import CommentCard from '../../components/CommentCard';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import config from '../../config';
+const serverUrl = config.SERVER_URL;
 
-const CommentScreen = () => {
+const CommentScreen = ({ route }) => {
+  const { postId, idUser, profilePicture } = route?.params;
   const [isTyping, setIsTyping] = useState(false);
   const [inputHeight, setInputHeight] = useState(null);
+  const [comment, setComment] = useState();
   const textInputRef = React.createRef();
+  const [comments, setComments] = useState([]);
+  const [replyToCommentId, setReplyToCommentId] = useState(null);
+  
+  const fetchComments = useCallback(async () => {
+    try {
+      const response = await axios.post(`${serverUrl}/comments`, { postId: postId });
+      const dataComment = response.data.data;
 
-  const [comments, setComments] = useState([
-    {
-      id: 1,
-      text: 'dikit lagi lucu bang',
-      replies: [
-        {id: 1, text: 'elu kali yang lucu'},
-        {id: 2, text: 'lol amat ni orang'},
-      ],
-    },
-    {
-      id: 2,
-      text: 'keren bang motornya, info spek',
-      replies: [
-        {id: 1, text: 'spek 63 kayaknya bang'},
-        {id: 2, text: 'knalpot pake merk apa bang'},
-        {id: 3, text: 'arm bor2an'},
-        {id: 4, text: 'master rem pake apa bang'},
-      ],
-    },
-    {
-      id: 3,
-      text: 'info settingan kiriannya bang',
-      replies: [],
-    },
-  ]);
+      const formattedComments = dataComment.map(comment => ({
+        id: comment._id,
+        text: comment.comment,
+        userIdPost: comment.user._id,
+        idUser: idUser,
+        email: comment.user.email,
+        replies: Array.isArray(comment.replies)
+          ? comment.replies.map(reply => ({
+            id: reply._id,
+            text: reply.comment,
+            userIdPost: reply.user._id,
+            idUser: idUser,
+            username: reply.user.username,
+            email: reply.user.email,
+            profilePicture: reply.user.profilePicture,
+            replies: reply.replies || [],
+            allowedEmail: reply.allowedEmail
+
+          }))
+          : [],
+        username: comment.user.username,
+        profilePicture: comment.user.profilePicture,
+        allowedEmail: comment.allowedEmail
+      }));
+
+      setComments(formattedComments);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  }, [postId]);
+
+  useEffect(() => {
+    fetchComments();
+  }, [fetchComments]);
 
   const handleTextInputChange = text => {
     if (text.length > 0) {
       setIsTyping(true);
+      setComment(text);
     } else {
       setIsTyping(false);
     }
@@ -54,71 +78,76 @@ const CommentScreen = () => {
     setInputHeight(event.nativeEvent.contentSize.height);
   };
 
-  const handleAddComment = text => {
-    setComments([...comments, {id: comments.length + 1, text, replies: []}]);
+  const handleAddComment = async () => {
+    const token = await AsyncStorage.getItem('token');
+    try {
+      const respAddCom = await axios.post(`${serverUrl}/comment-post`, {
+        token: token,
+        postId: postId,
+        comment: comment,
+        parentCommentId: replyToCommentId // Parent comment ID is sent
+      });
+
+      fetchComments(); // Fetch updated comments after adding a new one
+      setReplyToCommentId(null); // Reset the reply-to comment
+      setComment(''); // Clear the input field
+      Keyboard.dismiss(); // Hide the keyboard after sending the comment
+    } catch (error) {
+      console.error('Error data:', error);
+    }
   };
 
-  const handleAddReply = (commentId, replyText) => {
-    setComments(
-      comments.map(comment => {
-        if (comment.id === commentId) {
-          return {
-            ...comment,
-            replies: [
-              ...comment.replies,
-              {id: comment.replies.length + 1, text: replyText},
-            ],
-          };
-        }
-        return comment;
-      }),
-    );
+  const handleReplyPress = (commentId) => {
+    setIsTyping(true);
+    setReplyToCommentId(commentId); // Set the comment/reply to reply to
+    if (textInputRef.current) {
+      textInputRef.current.focus();
+    }
   };
-
-  const handleReplyPress = useCallback(
-    commentId => {
-      setIsTyping(true);
-      if (textInputRef.current) {
-        textInputRef.current.focus();
-      }
-    },
-    [textInputRef, setIsTyping],
-  );
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
         style={styles.commentContainer}
-        contentContainerStyle={{paddingBottom: 50}}>
+        contentContainerStyle={{ paddingBottom: 50 }}>
         {comments.map(comment => (
           <CommentCard
             key={comment.id}
             text={comment.text}
             replies={comment.replies}
             hasReplies={comment.replies.length > 0}
-            onAddReply={replyText => handleAddReply(comment.id, replyText)}
+            username={comment.username}
+            profilePicture={comment.profilePicture}
             onReplyPress={() => handleReplyPress(comment.id)}
+            onAddReply={replyText => handleAddReply(comment.id, replyText)}
+            commentId={comment.id}
+            postId={postId}
+            userIdPost={comment.userIdPost}
+            idUser={idUser}
+            allowedEmail={comment.allowedEmail}
           />
         ))}
       </ScrollView>
-      <View style={[styles.inputContainer, {height: inputHeight}]}>
+      <View style={[styles.inputContainer, { height: inputHeight }]}>
         <Image
-          source={require('../../assets/profilepic.png')}
+          source={{uri: profilePicture}}
           style={styles.profilePicture}
         />
         <TextInput
           ref={textInputRef}
-          style={[styles.inputComment, {height: inputHeight}]}
+          style={[styles.inputComment, { height: inputHeight }]}
           placeholder="add comments"
           maxLength={500}
           multiline={true}
+          value={comment} // Bind the state to the TextInput
           onChangeText={handleTextInputChange}
           onContentSizeChange={handleTextInputContentSizeChange}
         />
+
         {isTyping && (
           <TouchableOpacity
             style={styles.iconContainer}
-            onPress={() => handleAddComment(text)}>
+            onPress={() => handleAddComment()}>
             <MaterialCommunityIcons
               name="upload"
               size={20}
@@ -131,6 +160,7 @@ const CommentScreen = () => {
     </SafeAreaView>
   );
 };
+
 
 export default CommentScreen;
 

@@ -57,6 +57,7 @@ const HomeScreen = ({navigation}) => {
       }
       const emailUser = data.email
       const idUser = data._id; 
+      const profilePicture = data.profilePicture
 
       const responseTweet = await axios.post(`${serverUrl}/posts`, {
         page: pageNum,
@@ -85,7 +86,8 @@ const HomeScreen = ({navigation}) => {
         idUser: idUser,
         allowedEmail: post.allowedEmail,
         userEmailPost: post.user.email,
-        emailUser : emailUser
+        emailUser : emailUser,
+        profilePicture: profilePicture
       }));
 
       return formattedTweets;

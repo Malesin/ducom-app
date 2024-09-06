@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useCallback} from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   StyleSheet,
   ScrollView,
@@ -13,8 +13,7 @@ import config from '../../config';
 
 const serverUrl = config.SERVER_URL;
 
-const Userpost = ({route}) => {
-  const {userIdPost} = route?.params;
+const Userpost = ({ userIdPost, profilePicture }) => {
   const [tweets, setTweets] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -35,9 +34,9 @@ const Userpost = ({route}) => {
         content: post.description,
         media: Array.isArray(post.media)
           ? post.media.map(mediaItem => ({
-              type: mediaItem.type,
-              uri: mediaItem.uri,
-            }))
+            type: mediaItem.type,
+            uri: mediaItem.uri,
+          }))
           : [],
         likesCount: post.likes.length,
         commentsCount: post.comments.length,
@@ -47,6 +46,7 @@ const Userpost = ({route}) => {
           bookmark => bookmark.user === userIdPost,
         ),
         userIdPost: post.user._id,
+        profilePicture: profilePicture
       }));
 
       setTweets(formattedTweets);

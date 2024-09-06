@@ -1,20 +1,20 @@
-import React, {useState, useEffect, useCallback} from 'react';
-import {StyleSheet, View, Dimensions, RefreshControl} from 'react-native';
-import {Usermedia, Userpost, Replyscreen, Userprofile} from '../pages'; // Ganti Postscreen dengan Userpost
-import {GestureHandlerRootView} from 'react-native-gesture-handler';
-import {Tabs, MaterialTabBar} from 'react-native-collapsible-tab-view';
-import {Skeleton} from 'react-native-elements';
+import React, { useState, useEffect, useCallback } from 'react';
+import { StyleSheet, View, Dimensions, RefreshControl } from 'react-native';
+import { Usermedia, Userpost, Replyscreen, Userprofile } from '../pages'; // Ganti Postscreen dengan Userpost
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { Tabs, MaterialTabBar } from 'react-native-collapsible-tab-view';
+import { Skeleton } from 'react-native-elements';
 
-const {height} = Dimensions.get('window');
+const { height } = Dimensions.get('window');
 
-function UserTopTabNavigator({route, navigation}) {
+function UserTopTabNavigator({ route, navigation }) {
   const [refreshing, setRefreshing] = useState(false);
   const [isScrollTop, setIsScrollTop] = useState(true);
-  const {userIdPost, userIdMedia, username} = route.params;
+  const { userIdPost, profilePicture, username } = route.params;
 
   useEffect(() => {
     if (username) {
-      navigation.setOptions({title: `@${username}`});
+      navigation.setOptions({ title: `@${username}` });
     }
   }, [username, navigation]);
 
@@ -26,13 +26,13 @@ function UserTopTabNavigator({route, navigation}) {
   }, []);
 
   const handleScroll = event => {
-    const {contentOffset} = event.nativeEvent;
+    const { contentOffset } = event.nativeEvent;
     setIsScrollTop(contentOffset.y === 0);
   };
 
   const Header = () => (
     <View style={styles.profileWrapper}>
-      <Userprofile route={{params: {userIdPost}}} navigation={navigation} />
+      <Userprofile userIdPost={userIdPost} navigation={navigation} />
     </View>
   );
 
@@ -107,8 +107,7 @@ function UserTopTabNavigator({route, navigation}) {
               renderSkeleton()
             ) : (
               <Userpost
-                route={{params: {userIdPost}}}
-                navigation={navigation}
+                userIdPost={userIdPost} profilePicture={profilePicture} navigation={navigation}
               />
             )}
           </Tabs.ScrollView>
@@ -141,7 +140,7 @@ function UserTopTabNavigator({route, navigation}) {
             {refreshing ? (
               renderSkeleton()
             ) : (
-              <Usermedia route={{params: {userIdPost}}} />
+              <Usermedia userIdPost={userIdPost} profilePicture={profilePicture} />
             )}
           </Tabs.ScrollView>
         </Tabs.Tab>

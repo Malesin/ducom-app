@@ -4,6 +4,7 @@ import {
   View,
   TouchableOpacity,
   SafeAreaView,
+  ToastAndroid,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -13,16 +14,9 @@ import config from '../config';
 
 const serverUrl = config.SERVER_URL;
 
-const BottomSheet = ({
-  username,
-  postId,
-  idUser,
-  userIdPost,
-  allowedEmail,
-  emailUser,
-  onClose, // Tambahkan onClose sebagai prop
-}) => {
-  const [isDeletePost, setIsDeletePost] = useState(false);
+const BottomSheet = ({ username, postId, idUser, userIdPost, allowedEmail, emailUser, onClose }) => {
+  const [isDeletePost, setIsDeletePost] = useState(false)
+  const [isVisible] = useState(true);
   const [isOwnAccount, setIsOwnAccount] = useState(false);
 
   const deletePost = async () => {

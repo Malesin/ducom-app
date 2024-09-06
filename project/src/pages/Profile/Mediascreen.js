@@ -1,4 +1,4 @@
-import React, {useState, useCallback} from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   StyleSheet,
   ScrollView,
@@ -9,14 +9,14 @@ import {
 } from 'react-native';
 import TweetCard from '../../components/TweetCard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useFocusEffect} from '@react-navigation/native';
+import { useFocusEffect } from '@react-navigation/native';
 import axios from 'axios';
 import config from '../../config';
-import {Skeleton} from 'react-native-elements';
+import { Skeleton } from 'react-native-elements';
 
 const serverUrl = config.SERVER_URL;
 
-function Mediascreen({navigation}) {
+function Mediascreen({ navigation }) {
   const [tweets, setTweets] = useState([]);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -28,46 +28,49 @@ function Mediascreen({navigation}) {
       setLoading(true);
       const token = await AsyncStorage.getItem('token');
       try {
-        const response = await axios.post(`${serverUrl}/userdata`, {token});
-        const {data, status} = response.data;
+        const response = await axios.post(`${serverUrl}/userdata`, { token });
+        const { data, status } = response.data;
         if (status === 'error') {
           Alert.alert('Error', 'Anda Telah Keluar dari Akun', [
-            {text: 'OK', onPress: () => navigation.navigate('Auths')},
+            { text: 'OK', onPress: () => navigation.navigate('Auths') },
           ]);
           return [];
         }
 
-            const idUser = data._id; 
-            const emailUser = data.email; 
+        const idUser = data._id;
+        const emailUser = data.email;
+        const profilePicture = data.profilePicture
 
         const responseTweet = await axios.post(`${serverUrl}/my-posts`, {
           token: token,
         });
         const dataTweet = responseTweet.data;
 
-            const formattedTweets = dataTweet.data
-                .filter(post => Array.isArray(post.media) && post.media.length > 0) // Filter posts with media
-                .map(post => ({
-                    id: post._id,
-                    userAvatar: post.user.profilePicture,
-                    userName: post.user.name,
-                    userHandle: post.user.username,
-                    postDate: post.created_at,
-                    content: post.description,
-                    media: post.media.map(mediaItem => ({
-                        type: mediaItem.type,
-                        uri: mediaItem.uri,
-                    })),
-                    likesCount: post.likes.length,
-                    commentsCount: post.comments.length,
-                    bookMarksCount: post.bookmarks.length,
-                    isLiked: post.likes.some(like => like._id === idUser),
-                    userIdPost: post.user._id,
-                    idUser: idUser,
-                    allowedEmail: post.allowedEmail,
-                    userEmailPost: post.user.email,
-                    emailUser : emailUser
-                }));
+        const formattedTweets = dataTweet.data
+          .filter(post => Array.isArray(post.media) && post.media.length > 0) // Filter posts with media
+          .map(post => ({
+            id: post._id,
+            userAvatar: post.user.profilePicture,
+            userName: post.user.name,
+            userHandle: post.user.username,
+            postDate: post.created_at,
+            content: post.description,
+            media: post.media.map(mediaItem => ({
+              type: mediaItem.type,
+              uri: mediaItem.uri,
+            })),
+            likesCount: post.likes.length,
+            commentsCount: post.comments.length,
+            bookMarksCount: post.bookmarks.length,
+            isLiked: post.likes.some(like => like._id === idUser),
+            userIdPost: post.user._id,
+            idUser: idUser,
+            allowedEmail: post.allowedEmail,
+            userEmailPost: post.user.email,
+            emailUser: emailUser,
+            profilePicture: profilePicture
+
+          }));
 
         return formattedTweets;
       } catch (error) {
@@ -160,8 +163,8 @@ function Mediascreen({navigation}) {
       ) : (
         <ScrollView
           contentContainerStyle={styles.contentContainer}
-          onScroll={({nativeEvent}) => {
-            const {contentOffset, layoutMeasurement, contentSize} = nativeEvent;
+          onScroll={({ nativeEvent }) => {
+            const { contentOffset, layoutMeasurement, contentSize } = nativeEvent;
             const contentHeight = contentSize.height;
             const viewportHeight = layoutMeasurement.height;
             const scrollPosition = contentOffset.y + viewportHeight;

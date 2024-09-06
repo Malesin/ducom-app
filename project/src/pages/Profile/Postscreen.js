@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useCallback} from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   StyleSheet,
   ScrollView,
@@ -9,74 +9,77 @@ import {
 } from 'react-native';
 import TweetCard from '../../components/TweetCard'; // Import TweetCard
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useFocusEffect} from '@react-navigation/native';
+import { useFocusEffect } from '@react-navigation/native';
 import axios from 'axios';
 import config from '../../config';
-import {Skeleton} from 'react-native-elements'; // Import Skeleton
+import { Skeleton } from 'react-native-elements'; // Import Skeleton
 
 const serverUrl = config.SERVER_URL;
 
-function Postscreen({navigation}) {
+function Postscreen({ navigation }) {
   const [tweets, setTweets] = useState([]);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [isFetched, setIsFetched] = useState(false); // State to track if data is already fetched
 
-    const fetchTweets = useCallback(async (pageNum) => {
-        const token = await AsyncStorage.getItem('token');
-        try {
-            const response = await axios.post(`${serverUrl}/userdata`, { token });
-            const { data, status } = response.data;
-            if (status === 'error') {
-                Alert.alert('Error', 'Anda Telah Keluar dari Akun', [
-                    { text: 'OK', onPress: () => navigation.navigate('Auths') },
-                ]);
-                return [];
-            }     
-            
-            const idUser = data._id; 
-            const emailUser = data.email; 
-
-            const responseTweet = await axios.post(`${serverUrl}/my-posts`, {
-                token: token,
-                page: pageNum,
-            });
-            const dataTweet = responseTweet.data;
-
-            const formattedTweets = dataTweet.data.map(post => ({
-                id: post._id,
-                userAvatar: post.user.profilePicture,
-                userName: post.user.name,
-                userHandle: post.user.username,
-                postDate: post.created_at,
-                content: post.description,
-                media: Array.isArray(post.media)
-                    ? post.media.map(mediaItem => ({
-                        type: mediaItem.type,
-                        uri: mediaItem.uri,
-                    }))
-                    : [],
-                likesCount: post.likes.length,
-                commentsCount: post.comments.length,
-                bookMarksCount: post.bookmarks.length,
-                isLiked: post.likes.some(like => like._id === idUser),
-                isBookmarked: post.bookmarks.some(bookmark => bookmark.user === idUser),
-                userIdPost: post.user._id,
-                idUser: idUser,
-                allowedEmail: post.allowedEmail,
-                userEmailPost: post.user.email,
-                emailUser : emailUser
-            }));
-
-        return formattedTweets;
-      } catch (error) {
-        console.error('Error fetching data:', error);
+  const fetchTweets = useCallback(async (pageNum) => {
+    const token = await AsyncStorage.getItem('token');
+    try {
+      const response = await axios.post(`${serverUrl}/userdata`, { token });
+      const { data, status } = response.data;
+      if (status === 'error') {
+        Alert.alert('Error', 'Anda Telah Keluar dari Akun', [
+          { text: 'OK', onPress: () => navigation.navigate('Auths') },
+        ]);
         return [];
-      } finally {
-        setLoadingMore(false);
       }
-    },
+
+      const idUser = data._id;
+      const emailUser = data.email;
+      const profilePicture = data.profilePicture
+
+      const responseTweet = await axios.post(`${serverUrl}/my-posts`, {
+        token: token,
+        page: pageNum,
+      });
+      const dataTweet = responseTweet.data;
+
+      const formattedTweets = dataTweet.data.map(post => ({
+        id: post._id,
+        userAvatar: post.user.profilePicture,
+        userName: post.user.name,
+        userHandle: post.user.username,
+        postDate: post.created_at,
+        content: post.description,
+        media: Array.isArray(post.media)
+          ? post.media.map(mediaItem => ({
+            type: mediaItem.type,
+            uri: mediaItem.uri,
+          }))
+          : [],
+        likesCount: post.likes.length,
+        commentsCount: post.comments.length,
+        bookMarksCount: post.bookmarks.length,
+        isLiked: post.likes.some(like => like._id === idUser),
+        isBookmarked: post.bookmarks.some(bookmark => bookmark.user === idUser),
+        userIdPost: post.user._id,
+        idUser: idUser,
+        allowedEmail: post.allowedEmail,
+        userEmailPost: post.user.email,
+        emailUser: emailUser,
+        profilePicture: profilePicture
+
+      }));
+
+      return formattedTweets;
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      return [];
+    } finally {
+      setLoadingMore(false);
+    }
+  },
     [navigation],
   );
 
@@ -160,8 +163,8 @@ function Postscreen({navigation}) {
       ) : (
         <ScrollView
           contentContainerStyle={styles.contentContainer}
-          onScroll={({nativeEvent}) => {
-            const {contentOffset, layoutMeasurement, contentSize} = nativeEvent;
+          onScroll={({ nativeEvent }) => {
+            const { contentOffset, layoutMeasurement, contentSize } = nativeEvent;
             const contentHeight = contentSize.height;
             const viewportHeight = layoutMeasurement.height;
             const scrollPosition = contentOffset.y + viewportHeight;

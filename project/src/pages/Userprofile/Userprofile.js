@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useCallback} from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   SafeAreaView,
   View,
@@ -10,16 +10,15 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useNavigation, useFocusEffect} from '@react-navigation/native';
-import axios from 'axios';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 import config from '../../config';
-import {Skeleton} from 'react-native-elements';
-
 const serverUrl = config.SERVER_URL;
+import { Skeleton } from 'react-native-elements';
 
-const Userprofile = ({route, navigation}) => {
-  const {userIdPost} = route.params; // Ambil userIdPost dari route params
+
+const Userprofile = ({ userIdPost, navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [banner, setBanner] = useState(false);
   const [profilePicture, setProfilePicture] = useState(false);
@@ -29,7 +28,7 @@ const Userprofile = ({route, navigation}) => {
 
   // Atur judul navigasi menjadi kosong saat komponen pertama kali dimuat
   useEffect(() => {
-    navigation.setOptions({title: ''});
+    navigation.setOptions({ title: '' });
   }, [navigation]);
 
   async function getData() {
@@ -46,17 +45,17 @@ const Userprofile = ({route, navigation}) => {
       setUserData(user);
 
       if (user.username) {
-        navigation.setOptions({title: `@${user.username}`}); // Set judul berdasarkan username
+        navigation.setOptions({ title: `@${user.username}` }); // Set judul berdasarkan username
       }
 
       if (user.bannerPicture) {
-        const banner = {uri: user.bannerPicture};
+        const banner = { uri: user.bannerPicture };
         setBanner(banner);
         console.log('Banner Berhasil Diambil');
       }
 
       if (user.profilePicture) {
-        const profile = {uri: user.profilePicture};
+        const profile = { uri: user.profilePicture };
         setProfilePicture(profile);
         console.log('Foto Profil Berhasil Diambil');
       }
