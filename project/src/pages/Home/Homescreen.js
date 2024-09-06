@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   RefreshControl,
   ActivityIndicator,
+  Dimensions,
 } from 'react-native';
 import {useFocusEffect} from '@react-navigation/native';
 import TweetCard from '../../components/TweetCard';
@@ -29,6 +30,8 @@ import config from '../../config';
 import { Skeleton } from 'react-native-elements'; // Pastikan Anda telah menginstal dan mengimpor Skeleton
 
 const serverUrl = config.SERVER_URL;
+
+const { width: screenWidth } = Dimensions.get('window');
 
 const HomeScreen = ({navigation}) => {
   const [tweets, setTweets] = useState([]);
@@ -155,6 +158,18 @@ const HomeScreen = ({navigation}) => {
     loadInitialTweets();
   }, []);
 
+  useFocusEffect(
+    useCallback(() => {
+      const checkLoginStatus = async () => {
+        const token = await AsyncStorage.getItem('token');
+        if (!token) {
+          navigation.navigate('Auths'); // Redirect to Auths if not logged in
+        }
+      };
+      checkLoginStatus();
+    }, [])
+  );
+
   const onPostSuccess = () => {
     console.log('Post created successfully, refreshing HomeScreen...');
     setRefreshing(true);
@@ -270,13 +285,13 @@ const HomeScreen = ({navigation}) => {
               <Skeleton
                 animation="pulse"
                 height={20}
-                width={100}
+                width="25%" // 25% of the screen width
                 style={styles.skeleton}
               />
               <Skeleton
                 animation="pulse"
                 height={14}
-                width={60}
+                width="15%" // 15% of the screen width
                 style={styles.skeleton}
               />
             </View>
@@ -284,19 +299,25 @@ const HomeScreen = ({navigation}) => {
           <Skeleton
             animation="pulse"
             height={20}
-            width={300}
+            width="75%" // 75% of the screen width
             style={[styles.skeleton, { borderRadius: 3 }]}
           />
           <Skeleton
             animation="pulse"
             height={200}
-            width={400}
+            width="100%" // 100% of the screen width
             style={[styles.skeleton, { borderRadius: 7 }]}
           />
         </View>
       ))}
     </>
   );
+
+  const onDeleteSuccess = () => {
+    console.log('Post deleted successfully, refreshing HomeScreen...');
+    setRefreshing(true);
+    onRefresh();
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -320,7 +341,7 @@ const HomeScreen = ({navigation}) => {
         ) : (
           tweets.map((tweet, index) => (
             <View key={index} style={styles.tweetContainer}>
-              <TweetCard tweet={tweet} />
+              <TweetCard tweet={tweet} onDeleteSuccess={onDeleteSuccess} />
             </View>
           ))
         )}
@@ -402,11 +423,13 @@ const styles = StyleSheet.create({
   skeletonContainer: {
     padding: 20,
     alignItems: 'flex-start', // Align items to the left
+    width: '100%', // Ensure the container takes full width
   },
   skeletonHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 10,
+    width: '100%', // Ensure the header takes full width
   },
   skeletonAvatar: {
     marginRight: 10,

@@ -68,7 +68,7 @@ const Signinscreen = ({navigation}) => {
               text2: 'Login Successfully!!',
               onHide: () => {
                 setTimeout(() => {
-                  navigation.navigate('DrawerNavigator'); // Direct to DrawerNavigator
+                  navigation.navigate('Home'); // Direct to Home
                 }, 1000);
               },
             });

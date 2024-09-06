@@ -24,7 +24,7 @@ import axios from 'axios';
 import config from '../config';
 const serverUrl = config.SERVER_URL;
 
-const TweetCard = ({ tweet }) => {
+const TweetCard = ({tweet, onDeleteSuccess}) => {
   const [liked, setLiked] = useState(tweet.isLiked);
   const [likesCount, setLikesCount] = useState(tweet.likesCount);
   const [bookmarked, setBookmarked] = useState(tweet.isBookmarked);
@@ -273,6 +273,30 @@ const TweetCard = ({ tweet }) => {
     );
   };
 
+  const tweetId = tweet.userId;
+
+  const handleDelete = async () => {
+    const token = await AsyncStorage.getItem('token');
+    try {
+      const response = await axios.post(`${serverUrl}/delete-post`, {
+        token: token,
+        postId: tweet.id,
+      });
+
+      if (response.data.status === 'ok') {
+        ToastAndroid.show('Post deleted successfully!', ToastAndroid.SHORT);
+        setShowBottomSheet(false); // Tutup BottomSheet
+        onDeleteSuccess(); // Panggil fungsi refresh setelah penghapusan berhasil
+      } else {
+        console.log('Error in delete response data:', response.data.data);
+        Alert.alert('Error', 'Failed to delete post. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error deleting post:', error.message);
+      Alert.alert('Error', 'Failed to delete post. Please try again.');
+    }
+  };
+
   return (
     <SafeAreaView style={styles.card}>
       {/* User Info */}
@@ -318,6 +342,7 @@ const TweetCard = ({ tweet }) => {
             <BottomSheet
               onClose={() => {
                 setShowBottomSheet(false);
+                onDeleteSuccess(); // Panggil onDeleteSuccess setelah BottomSheet tertutup
               }}
               username={tweet.userHandle}
               postId={tweet.id}
@@ -326,6 +351,7 @@ const TweetCard = ({ tweet }) => {
               userEmailPost={tweet.userEmailPost}
               allowedEmail={tweet.allowedEmail}
               emailUser={tweet.emailUser}
+              onDelete={handleDelete}
             />
           </View>
         </Modal>
