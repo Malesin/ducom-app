@@ -38,6 +38,7 @@ const Marksscreen = ({navigation}) => {
 
       const idUser = data._id; 
       const emailUser = data.email; 
+      const profilePicture = data.profilePicture
       
       const responseTweet = await axios.post(`${serverUrl}/user-bookmarks`, {
         token: token
@@ -66,7 +67,8 @@ const Marksscreen = ({navigation}) => {
         idUser: idUser,
         allowedEmail: post.allowedEmail,
         userEmailPost: post.user.email,
-        emailUser : emailUser
+        emailUser : emailUser,
+        profilePicture: profilePicture
       }));
 
         setTweets(prevTweets => {

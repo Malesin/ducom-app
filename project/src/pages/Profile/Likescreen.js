@@ -36,9 +36,10 @@ function Likescreen({ navigation }) {
                 return [];
             }
 
-            const idUser = data._id; 
-            const emailUser = data.email; 
-            
+            const idUser = data._id;
+            const emailUser = data.email;
+            const profilePicture = data.profilePicture
+
             const responseTweet = await axios.post(`${serverUrl}/liked-posts`, { token });
             const dataTweet = responseTweet.data;
 
@@ -64,7 +65,9 @@ function Likescreen({ navigation }) {
                 idUser: idUser,
                 allowedEmail: post.allowedEmail,
                 userEmailPost: post.user.email,
-                emailUser : emailUser
+                emailUser: emailUser,
+                profilePicture: profilePicture
+
             }));
 
             return formattedTweets;

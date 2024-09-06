@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -15,16 +15,16 @@ import {
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Video from 'react-native-video';
-import {createThumbnail} from 'react-native-create-thumbnail';
+import { createThumbnail } from 'react-native-create-thumbnail';
 import DefaultAvatar from '../assets/avatar.png';
 import BottomSheet from './BottomSheet';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {useNavigation} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import config from '../config';
 const serverUrl = config.SERVER_URL;
 
-const TweetCard = ({tweet}) => {
+const TweetCard = ({ tweet }) => {
   const [liked, setLiked] = useState(tweet.isLiked);
   const [likesCount, setLikesCount] = useState(tweet.likesCount);
   const [bookmarked, setBookmarked] = useState(tweet.isBookmarked);
@@ -38,7 +38,7 @@ const TweetCard = ({tweet}) => {
   const navigator = useNavigation();
 
   const handleProfilePress = () => {
-    navigator.navigate('Userprofile', {userIdPost: tweet.userIdPost});
+    navigator.navigate('Userprofile', { userIdPost: tweet.userIdPost, profilePicture: tweet.profilePicture });
   };
 
   useEffect(() => {
@@ -47,7 +47,7 @@ const TweetCard = ({tweet}) => {
       for (const media of tweet.media || []) {
         if (media.type === 'video' && media.uri) {
           try {
-            const {path} = await createThumbnail({url: media.uri});
+            const { path } = await createThumbnail({ url: media.uri });
             newThumbnails[media.uri] = path;
           } catch (error) {
             console.log('Error generating thumbnail:', error);
@@ -166,9 +166,8 @@ const TweetCard = ({tweet}) => {
     }
   };
 
-  const handleCommentPress = ({}) => {
-    setCommentsCount(prev => prev + 1);
-    navigator.navigate('Comment');
+  const handleCommentPress = () => {
+    navigator.navigate('Comment', { postId: tweet.id, idUser: tweet.idUser, profilePicture: tweet.profilePicture});
   };
 
   const openMediaPreview = uri => {
@@ -233,7 +232,7 @@ const TweetCard = ({tweet}) => {
     return `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
   };
 
-  const renderMediaItem = ({item}) => {
+  const renderMediaItem = ({ item }) => {
     if (!item.uri) {
       return null;
     }
@@ -244,8 +243,8 @@ const TweetCard = ({tweet}) => {
           ? styles.singleMediaVideo
           : styles.singleMediaImage
         : item.type === 'video'
-        ? styles.tweetVideo
-        : styles.tweetImage;
+          ? styles.tweetVideo
+          : styles.tweetImage;
 
     return (
       <TouchableOpacity
@@ -253,7 +252,7 @@ const TweetCard = ({tweet}) => {
         style={styles.mediaContainer}>
         {item.type === 'image' ? (
           <Image
-            source={{uri: item.uri}}
+            source={{ uri: item.uri }}
             style={mediaStyle}
             onError={() => console.log('Failed to load image')}
           />
@@ -261,7 +260,7 @@ const TweetCard = ({tweet}) => {
           <TouchableOpacity
             onPress={() => openMediaPreview(item.uri)}
             style={styles.videoContainer}>
-            <Image source={{uri: thumbnails[item.uri]}} style={mediaStyle} />
+            <Image source={{ uri: thumbnails[item.uri] }} style={mediaStyle} />
             <MaterialCommunityIcons
               name="play-circle-outline"
               size={40}
@@ -274,23 +273,21 @@ const TweetCard = ({tweet}) => {
     );
   };
 
-  const tweetId = tweet.userId;
-
   return (
     <SafeAreaView style={styles.card}>
       {/* User Info */}
       <View style={styles.userInfo}>
         <TouchableOpacity onPress={() => handleProfilePress()}>
           <Image
-            source={tweet.userAvatar ? {uri: tweet.userAvatar} : DefaultAvatar}
+            source={tweet.userAvatar ? { uri: tweet.userAvatar } : DefaultAvatar}
             style={styles.avatar}
           />
         </TouchableOpacity>
         <View style={styles.userDetails}>
-          <TouchableOpacity onPress={() => handleProfilePress(tweetId)}>
+          <TouchableOpacity onPress={() => handleProfilePress()}>
             <Text style={styles.userName}>{tweet.userName}</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleProfilePress(tweetId)}>
+          <TouchableOpacity onPress={() => handleProfilePress()}>
             <Text style={styles.userHandle}>@{tweet.userHandle}</Text>
           </TouchableOpacity>
           <Text style={styles.postDate}>{formatDate(tweet.postDate)}</Text>
@@ -362,7 +359,7 @@ const TweetCard = ({tweet}) => {
           icon="message-reply-outline"
           color="#040608"
           count={commentsCount}
-          onPress={handleCommentPress}
+          onPress={() => handleCommentPress()}
         />
         <InteractionButton
           icon={bookmarked ? 'bookmark' : 'bookmark-outline'}
@@ -390,15 +387,15 @@ const TweetCard = ({tweet}) => {
             <View style={styles.modalContainer}>
               {modalMediaUri ? (
                 modalMediaUri.endsWith('.jpg') ||
-                modalMediaUri.endsWith('.png') ? (
+                  modalMediaUri.endsWith('.png') ? (
                   <Image
-                    source={{uri: modalMediaUri}}
+                    source={{ uri: modalMediaUri }}
                     style={styles.modalImage}
                     onError={() => console.log('Failed to load image')}
                   />
                 ) : (
                   <Video
-                    source={{uri: modalMediaUri}}
+                    source={{ uri: modalMediaUri }}
                     style={styles.modalImage}
                     controls
                     resizeMode="contain"
@@ -413,7 +410,7 @@ const TweetCard = ({tweet}) => {
   );
 };
 
-const InteractionButton = ({icon, color, count, onPress}) => (
+const InteractionButton = ({ icon, color, count, onPress }) => (
   <TouchableOpacity style={styles.actionButton} onPress={onPress}>
     <MaterialCommunityIcons name={icon} size={20} color={color} />
     <Text style={styles.actionText}>{count}</Text>
@@ -425,7 +422,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     padding: 10,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 1,

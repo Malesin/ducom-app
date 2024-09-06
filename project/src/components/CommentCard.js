@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -11,12 +11,23 @@ import {
 } from 'react-native';
 import CommentSheet from './CommentSheet';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const CommentCard = ({text, hasReplies, replies, onReplyPress}) => {
+const CommentCard = ({ text, hasReplies, replies, onReplyPress, username, profilePicture, onAddReply, commentId, postId, userIdPost, idUser, allowedEmail }) => {
   const [isLiked, setIsLiked] = useState(false);
   const [showReplies, setShowReplies] = useState(false);
   const [showMoreReplies, setShowMoreReplies] = useState(false);
   const [showCommentSheet, setShowCommentSheet] = useState(false);
+  const [gettoken, setGetToken] = useState()
+
+  const tokenconst = async () => {
+    const token = await AsyncStorage.getItem('token');
+    setGetToken(token)
+  }
+
+  useEffect(() => {
+    tokenconst()
+  }, []);
 
   const handleLikePress = () => {
     setIsLiked(!isLiked);
@@ -25,20 +36,22 @@ const CommentCard = ({text, hasReplies, replies, onReplyPress}) => {
   const handleViewMoreReplies = () => {
     setShowReplies(!showReplies);
   };
+
   const handleActionPress = () => {
     setShowCommentSheet(true);
   };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.cardContainer}>
         <View style={styles.profileContainer}>
           <Image
-            source={require('../assets/profilepic.png')}
+            source={{ uri: profilePicture } || require('../assets/profilepic.png')}
             style={styles.profileImage}
           />
         </View>
         <View style={styles.commentContainer}>
-          <Text style={styles.username}>@agnesputrii_</Text>
+          <Text style={styles.username}>@{username}</Text>
           <Text style={styles.commentText}>{text}</Text>
           <View style={styles.replyAndLikeContainer}>
             <TouchableOpacity style={styles.replyButton} onPress={onReplyPress}>
@@ -65,12 +78,21 @@ const CommentCard = ({text, hasReplies, replies, onReplyPress}) => {
             <View style={styles.repliesContainer}>
               {replies
                 .slice(0, showMoreReplies ? replies.length : 3)
-                .map((reply, index) => (
-                  <View key={index} style={styles.replyItem}>
+                .map(reply => (
+                  <View key={reply.id} style={styles.replyItem}>
                     <CommentCard
                       text={reply.text}
-                      hasReplies={false}
-                      replies={[]}
+                      username={reply.username}
+                      profilePicture={reply.profilePicture}
+                      replies={reply.replies} // Nested replies
+                      hasReplies={reply.replies.length > 0}
+                      onReplyPress={() => onReplyPress(reply.id)} // Reply to nested reply
+                      onAddReply={onAddReply}
+                      commentId={reply.id}
+                      postId={postId}
+                      userIdPost={userIdPost}
+                      idUser={idUser}
+                      allowedEmail={allowedEmail}
                     />
                   </View>
                 ))}
@@ -79,9 +101,7 @@ const CommentCard = ({text, hasReplies, replies, onReplyPress}) => {
                   style={styles.viewMoreRepliesButton}
                   onPress={() => setShowMoreReplies(!showMoreReplies)}>
                   <Text style={styles.viewMoreRepliesButtonText}>
-                    {showMoreReplies
-                      ? ''
-                      : `View ${replies.length - 3} more replies`}
+                    {showMoreReplies ? 'Hide more replies' : `View ${replies.length - 3} more replies`}
                   </Text>
                 </TouchableOpacity>
               )}
@@ -113,6 +133,12 @@ const CommentCard = ({text, hasReplies, replies, onReplyPress}) => {
               onClose={() => {
                 setShowCommentSheet(false);
               }}
+              commentId={commentId}
+              postId={postId}
+              token={gettoken}
+              userIdPost={userIdPost}
+              idUser={idUser}
+              allowedEmail={allowedEmail}
             />
           </View>
         </Modal>
@@ -120,6 +146,7 @@ const CommentCard = ({text, hasReplies, replies, onReplyPress}) => {
     </SafeAreaView>
   );
 };
+
 
 export default CommentCard;
 
