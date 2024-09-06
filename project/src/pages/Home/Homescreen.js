@@ -10,6 +10,7 @@ import {
   RefreshControl,
   ActivityIndicator,
   Dimensions,
+  ToastAndroid, // Tambahkan import ToastAndroid
 } from 'react-native';
 import {useFocusEffect} from '@react-navigation/native';
 import TweetCard from '../../components/TweetCard';
@@ -314,7 +315,7 @@ const HomeScreen = ({navigation}) => {
   );
 
   const onDeleteSuccess = () => {
-    console.log('Post deleted successfully, refreshing HomeScreen...');
+    ToastAndroid.show('Tweet berhasil dihapus', ToastAndroid.SHORT);
     setRefreshing(true);
     onRefresh();
   };
