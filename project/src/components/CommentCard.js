@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -12,8 +12,26 @@ import {
 import CommentSheet from './CommentSheet';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useNavigation} from '@react-navigation/native'; // Tambahkan import ini
 
-const CommentCard = ({ text, hasReplies, replies, onReplyPress, username, profilePicture, onAddReply, commentId, postId, userIdPost, idUser, allowedEmail, emailUser, onDeleteSuccess }) => {
+const CommentCard = ({
+  text,
+  hasReplies,
+  replies,
+  onReplyPress,
+  username,
+  profilePicture,
+  onAddReply,
+  commentId,
+  postId,
+  userIdPost,
+  idUser,
+  allowedEmail,
+  emailUser,
+  onDeleteSuccess,
+}) => {
+  const navigation = useNavigation(); // Tambahkan ini
+
   const [isLiked, setIsLiked] = useState(false);
   const [showReplies, setShowReplies] = useState(false);
   const [showMoreReplies, setShowMoreReplies] = useState(false);
@@ -41,14 +59,25 @@ const CommentCard = ({ text, hasReplies, replies, onReplyPress, username, profil
     setShowCommentSheet(true);
   };
 
+  const handleProfilePress = () => {
+    navigation.navigate('Userprofile', {
+      userIdPost: userIdPost,
+      profilePicture: profilePicture,
+    });
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.cardContainer}>
         <View style={styles.profileContainer}>
-          <Image
-            source={{ uri: profilePicture } || require('../assets/profilepic.png')}
-            style={styles.profileImage}
-          />
+          <TouchableOpacity onPress={handleProfilePress}>
+            <Image
+              source={
+                {uri: profilePicture} || require('../assets/profilepic.png')
+              }
+              style={styles.profileImage}
+            />
+          </TouchableOpacity>
         </View>
         <View style={styles.commentContainer}>
           <Text style={styles.username}>@{username}</Text>
@@ -103,7 +132,9 @@ const CommentCard = ({ text, hasReplies, replies, onReplyPress, username, profil
                   style={styles.viewMoreRepliesButton}
                   onPress={() => setShowMoreReplies(!showMoreReplies)}>
                   <Text style={styles.viewMoreRepliesButtonText}>
-                    {showMoreReplies ? 'Hide more replies' : `View ${replies.length - 3} more replies`}
+                    {showMoreReplies
+                      ? 'Hide more replies'
+                      : `View ${replies.length - 3} more replies`}
                   </Text>
                 </TouchableOpacity>
               )}
@@ -141,8 +172,8 @@ const CommentCard = ({ text, hasReplies, replies, onReplyPress, username, profil
               userIdPost={userIdPost}
               idUser={idUser}
               allowedEmail={allowedEmail}
-              emailUser={emailUser} // Pastikan emailUser diteruskan
-              onDeleteSuccess={onDeleteSuccess} // Tambahkan prop onDeleteSuccess
+              emailUser={emailUser}
+              onDeleteSuccess={onDeleteSuccess}
             />
           </View>
         </Modal>

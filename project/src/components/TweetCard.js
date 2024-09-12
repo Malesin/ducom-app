@@ -38,7 +38,11 @@ const TweetCard = ({tweet, onDeleteSuccess}) => {
   const navigator = useNavigation();
 
   const handleProfilePress = () => {
-    navigator.navigate('Userprofile', { userIdPost: tweet.userIdPost, profilePicture: tweet.profilePicture });
+    if (tweet.userIdPost === tweet.idUser) {
+      navigator.navigate('Profile');
+    } else {
+      navigator.navigate('Userprofile', { userIdPost: tweet.userIdPost, profilePicture: tweet.profilePicture });
+    }
   };
 
   useEffect(() => {
@@ -300,17 +304,17 @@ const TweetCard = ({tweet, onDeleteSuccess}) => {
     <SafeAreaView style={styles.card}>
       {/* User Info */}
       <View style={styles.userInfo}>
-        <TouchableOpacity onPress={() => handleProfilePress()}>
+        <TouchableOpacity onPress={handleProfilePress}>
           <Image
             source={tweet.userAvatar ? { uri: tweet.userAvatar } : DefaultAvatar}
             style={styles.avatar}
           />
         </TouchableOpacity>
         <View style={styles.userDetails}>
-          <TouchableOpacity onPress={() => handleProfilePress()}>
+          <TouchableOpacity onPress={handleProfilePress}>
             <Text style={styles.userName}>{tweet.userName}</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleProfilePress()}>
+          <TouchableOpacity onPress={handleProfilePress}>
             <Text style={styles.userHandle}>@{tweet.userHandle}</Text>
           </TouchableOpacity>
           <Text style={styles.postDate}>{formatDate(tweet.postDate)}</Text>
