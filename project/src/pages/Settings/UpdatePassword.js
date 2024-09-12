@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import React from 'react';
 
-const UpdatePassword = () => {
+const UpdatePassword = ({navigation}) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.inputContainer}>
@@ -40,7 +40,9 @@ const UpdatePassword = () => {
           <Text style={styles.buttonText}>Update</Text>
         </TouchableOpacity>
       </View>
-      <TouchableOpacity style={styles.forgotPasswordContainer}>
+      <TouchableOpacity
+        style={styles.forgotPasswordContainer}
+        onPress={() => navigation.navigate('Forgotpass')}>
         <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
       </TouchableOpacity>
     </SafeAreaView>

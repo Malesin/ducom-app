@@ -12,11 +12,12 @@ import {
   EditProfilePage,
   CreatePost,
   CommentScreen,
+  ReportScreen,
 } from '../pages';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import BottomTabNavigator from './BottomTabNavigator';
-import DrawerNavigator from './DrawerNavigator'; 
+import DrawerNavigator from './DrawerNavigator';
 import UserTopTabNavigator from './UserTopTabNavigator';
 
 const Stack = createNativeStackNavigator();
@@ -71,6 +72,11 @@ export default function MainNavigation() {
           options={{headerShown: false}}
         />
         <Stack.Screen
+          name="Report"
+          component={ReportScreen}
+          options={{headerShown: true, title: 'Report'}}
+        />
+        <Stack.Screen
           name="CreatePost"
           component={CreatePost}
           options={{headerShown: true, title: 'Create Post'}}
@@ -98,7 +104,7 @@ export default function MainNavigation() {
         />
         <Stack.Screen
           name="DrawerNavigator"
-          component={DrawerNavigator} 
+          component={DrawerNavigator}
           options={{headerShown: false}}
         />
       </Stack.Navigator>

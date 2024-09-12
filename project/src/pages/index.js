@@ -10,6 +10,7 @@ import OTPScreen from './Auth/OTPScreen';
 import CreatePassword from './Auth/CreatePassword';
 import FAQscreen from './Settings/FAQscreen';
 import Marksscreen from './Other/Marksscreen';
+import ReportScreen from './Other/ReportScreen';
 import Settingsscreen from './Settings/Settingsscreen';
 import AccountInformation from './Settings/AccountInformation';
 import UpdatePassword from './Settings/UpdatePassword';
@@ -39,6 +40,7 @@ export {
   CreatePassword,
   FAQscreen,
   Marksscreen,
+  ReportScreen,
   Settingsscreen,
   AccountInformation,
   UpdatePassword,

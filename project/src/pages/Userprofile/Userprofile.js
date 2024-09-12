@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {
   SafeAreaView,
   View,
@@ -10,15 +10,13 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useNavigation, useFocusEffect} from '@react-navigation/native';
 import axios from 'axios';
 import config from '../../config';
 const serverUrl = config.SERVER_URL;
-import { Skeleton } from 'react-native-elements';
+import {Skeleton} from 'react-native-elements';
 
-
-const Userprofile = ({ userIdPost, navigation }) => {
+const Userprofile = ({userIdPost, navigation}) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [banner, setBanner] = useState(false);
   const [profilePicture, setProfilePicture] = useState(false);
@@ -26,9 +24,8 @@ const Userprofile = ({ userIdPost, navigation }) => {
   const [userData, setUserData] = useState('');
   const [dropdownVisible, setDropdownVisible] = useState(false);
 
-  // Atur judul navigasi menjadi kosong saat komponen pertama kali dimuat
   useEffect(() => {
-    navigation.setOptions({ title: '' });
+    navigation.setOptions({title: ''});
   }, [navigation]);
 
   async function getData() {
@@ -45,17 +42,17 @@ const Userprofile = ({ userIdPost, navigation }) => {
       setUserData(user);
 
       if (user.username) {
-        navigation.setOptions({ title: `@${user.username}` }); // Set judul berdasarkan username
+        navigation.setOptions({title: `@${user.username}`}); // Set judul berdasarkan username
       }
 
       if (user.bannerPicture) {
-        const banner = { uri: user.bannerPicture };
+        const banner = {uri: user.bannerPicture};
         setBanner(banner);
         console.log('Banner Berhasil Diambil');
       }
 
       if (user.profilePicture) {
-        const profile = { uri: user.profilePicture };
+        const profile = {uri: user.profilePicture};
         setProfilePicture(profile);
         console.log('Foto Profil Berhasil Diambil');
       }
@@ -93,7 +90,7 @@ const Userprofile = ({ userIdPost, navigation }) => {
     setDropdownVisible(!dropdownVisible);
   };
 
-  const handleDropdownItemPress = (item) => {
+  const handleDropdownItemPress = item => {
     // Handle item press
     console.log(item);
     toggleDropdown();
@@ -106,19 +103,39 @@ const Userprofile = ({ userIdPost, navigation }) => {
           source={banner || require('../../assets/banner.png')}
           style={styles.banner}
         />
-        <TouchableOpacity style={styles.settingsButton} onPress={toggleDropdown}>
-          <MaterialCommunityIcons name="dots-vertical" size={30} color="#000000" />
+        <TouchableOpacity
+          style={styles.settingsButton}
+          onPress={toggleDropdown}>
+          <MaterialCommunityIcons
+            name="dots-vertical"
+            size={30}
+            color="#000000"
+          />
         </TouchableOpacity>
         {dropdownVisible && (
           <TouchableWithoutFeedback onPress={toggleDropdown}>
             <View style={styles.dropdownOverlay}>
               <View style={styles.dropdownMenu}>
-                <TouchableOpacity style={styles.dropdownItem} onPress={() => handleDropdownItemPress('Block')}>
-                  <MaterialCommunityIcons name="block-helper" size={20} color="#000" style={styles.dropdownIcon} />
+                <TouchableOpacity
+                  style={styles.dropdownItem}
+                  onPress={() => handleDropdownItemPress('Block')}>
+                  <MaterialCommunityIcons
+                    name="block-helper"
+                    size={20}
+                    color="#000"
+                    style={styles.dropdownIcon}
+                  />
                   <Text style={styles.dropdownItemText}>Block</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.dropdownItem} onPress={() => handleDropdownItemPress('Report')}>
-                  <MaterialCommunityIcons name="alert-circle-outline" size={20} color="#000" style={styles.dropdownIcon} />
+                <TouchableOpacity
+                  style={styles.dropdownItem}
+                  onPress={() => handleDropdownItemPress('Report')}>
+                  <MaterialCommunityIcons
+                    name="alert-circle-outline"
+                    size={20}
+                    color="#000"
+                    style={styles.dropdownIcon}
+                  />
                   <Text style={styles.dropdownItemText}>Report</Text>
                 </TouchableOpacity>
               </View>
@@ -279,7 +296,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff', // Warna latar belakang putih
     borderRadius: 7,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.8,
     shadowRadius: 2,
     elevation: 5,

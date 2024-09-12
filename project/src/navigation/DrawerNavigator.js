@@ -10,10 +10,10 @@ import {
   Settingsscreen,
   AccountInformation,
   UpdatePassword,
-} from '../pages'; // Import AccountInformationScreen
+} from '../pages';
 
 // Import the logo image
-import logo from './../assets/logo1.png'; // Update the path according to your project structure
+import logo from './../assets/logo1.png';
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
