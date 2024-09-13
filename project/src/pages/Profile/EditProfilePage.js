@@ -14,11 +14,6 @@ import {useNavigation} from '@react-navigation/native';
 import {SafeAreaView} from 'react-native';
 import {Skeleton} from 'react-native-elements';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {
-  ALERT_TYPE,
-  Dialog,
-  AlertNotificationRoot,
-} from 'react-native-alert-notification';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ImagePicker from 'react-native-image-crop-picker';
 import axios from 'axios';
@@ -42,7 +37,7 @@ export default function EditProfilePage() {
   const [isBannerLoading, setIsBannerLoading] = useState(true);
   const [isProfilePictureLoading, setIsProfilePictureLoading] = useState(true);
   const colorScheme = useColorScheme();
-  const styles = getStyles(colorScheme); // Get styles based on color scheme
+  const styles = getStyles(colorScheme);
 
   async function getData() {
     try {
@@ -91,7 +86,7 @@ export default function EditProfilePage() {
   }, [profilePicture]);
 
   const validateUsername = username => {
-    const usernameRegex = /^[a-z0-10]{4,15}$/;
+    const usernameRegex = /^[a-z0-9]{4,15}$/;
     return usernameRegex.test(username) && !username.includes(' ');
   };
   const validateName = name => {
@@ -146,29 +141,12 @@ export default function EditProfilePage() {
         onPress: async () => {
           try {
             if (!username) {
-              Dialog.show({
-                type: ALERT_TYPE.DANGER,
-                title: 'Invalid username',
-                textBody: 'Username cannot be empty!',
-              });
-              return;
             } else if (!validateUsername(username)) {
-              Dialog.show({
-                type: ALERT_TYPE.DANGER,
-                title: 'Invalid Username',
-                textBody:
-                  '4-15 characters, only lowercase letters and numbers without spaces.',
-              });
               return;
             }
 
             // Only validate name if it's different from the current name
             if (name && name !== userData?.name && !validateName(name)) {
-              Dialog.show({
-                type: ALERT_TYPE.DANGER,
-                title: 'Invalid Name',
-                textBody: 'Name can only be alphabetical and maximum 40 char.',
-              });
               return;
             }
 
@@ -186,11 +164,6 @@ export default function EditProfilePage() {
               );
               if (checkUsernameResponse.data.status === 'error') {
                 setIsSaving(false);
-                Dialog.show({
-                  type: ALERT_TYPE.DANGER,
-                  title: 'Error',
-                  textBody: 'Username already exists!',
-                });
                 return;
               }
               updatedUserData.username = username;
@@ -248,24 +221,9 @@ export default function EditProfilePage() {
             );
 
             if (response.data.status === 'update') {
-              Dialog.show({
-                type: ALERT_TYPE.SUCCESS,
-                title: 'Success',
-                textBody: 'Updated Successfully!',
-                onHide: () => {
-                  setTimeout(() => {
-                    Dialog.hide();
-                    navigation.goBack();
-                  }, 1000); // Delay 1 second before hiding the dialog and navigating back
-                },
-              });
+              navigation.goBack();
             } else {
               setIsSaving(false);
-              Dialog.show({
-                type: ALERT_TYPE.DANGER,
-                title: 'Error',
-                textBody: 'An Error Occurred. Please Try Again Later.',
-              });
             }
           } catch (error) {
             setIsSaving(false);
@@ -277,7 +235,7 @@ export default function EditProfilePage() {
     ]);
   };
 
-  const MAX_IMAGE_SIZE_MB = 5; // Maksimal ukuran gambar dalam MB
+  const MAX_IMAGE_SIZE_MB = 5;
 
   const selectImageProfile = () => {
     ImagePicker.openPicker({
@@ -323,123 +281,123 @@ export default function EditProfilePage() {
   };
 
   return (
-    <AlertNotificationRoot>
-      <SafeAreaView style={{flex: 1}}>
-        <ScrollView contentContainerStyle={styles.scrollContainer}>
-          <View style={styles.bannerContainer}>
-            {isBannerLoading ? (
-              <Skeleton containerStyle={[styles.banner, { height: 500 }]} animation="wave" />
-            ) : (
-              <TouchableOpacity onPress={selectImageBanner}>
-                <ImageBackground
-                  source={banner || require('../../assets/banner.png')}
-                  style={styles.banner}
-                  resizeMode="cover">
-                  <View style={styles.overlay}>
-                    <MaterialCommunityIcons
-                      name="camera"
-                      size={50}
-                      color="#fff"
-                    />
-                  </View>
-                </ImageBackground>
-              </TouchableOpacity>
-            )}
-          </View>
-
-          <View style={styles.contentContainer}>
-            {isProfilePictureLoading ? (
-              <Skeleton containerStyle={[styles.profilePicture, { height: 150 }]} animation="wave" />
-            ) : (
-              <TouchableOpacity onPress={selectImageProfile}>
-                <ImageBackground
-                  source={
-                    profilePicture || require('../../assets/profilepic.png')
-                  }
-                  style={styles.profilePicture}
-                  imageStyle={styles.profileImage}
-                  resizeMode="cover">
-                  <View style={styles.profileOverlay}>
-                    <MaterialCommunityIcons
-                      name="camera"
-                      size={30}
-                      color="#fff"
-                    />
-                  </View>
-                </ImageBackground>
-              </TouchableOpacity>
-            )}
-
-            <View style={styles.usernameContainer}>
-              <View style={styles.usernameInputContainer}>
-                <Text style={styles.usernameStatic}> @</Text>
-                {isLoading ? (
-                  <Skeleton height={30} width={100} animation="wave" />
-                ) : isEditing ? (
-                  <TextInput
-                    style={styles.usernameInput}
-                    value={username}
-                    onChangeText={text => setUsername(text)}
-                    onBlur={() => setIsEditing(false)}
-                    autoFocus
-                  />
-                ) : (
-                  <Text style={styles.username}> {username} </Text>
-                )}
-              </View>
-              {!isLoading && (
-                <TouchableOpacity onPress={() => setIsEditing(true)}>
+    <SafeAreaView style={{flex: 1}}>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <View style={styles.bannerContainer}>
+          {isBannerLoading ? (
+            <Skeleton
+              containerStyle={[styles.banner, {height: 500}]}
+              animation="wave"
+            />
+          ) : (
+            <TouchableOpacity onPress={selectImageBanner}>
+              <ImageBackground
+                source={banner || require('../../assets/banner.png')}
+                style={styles.banner}
+                resizeMode="cover">
+                <View style={styles.overlay}>
                   <MaterialCommunityIcons
-                    name="pencil"
-                    size={17}
-                    color="#000"
+                    name="camera"
+                    size={50}
+                    color="#fff"
                   />
-                </TouchableOpacity>
+                </View>
+              </ImageBackground>
+            </TouchableOpacity>
+          )}
+        </View>
+
+        <View style={styles.contentContainer}>
+          {isProfilePictureLoading ? (
+            <Skeleton
+              containerStyle={[styles.profilePicture, {height: 150}]}
+              animation="wave"
+            />
+          ) : (
+            <TouchableOpacity onPress={selectImageProfile}>
+              <ImageBackground
+                source={
+                  profilePicture || require('../../assets/profilepic.png')
+                }
+                style={styles.profilePicture}
+                imageStyle={styles.profileImage}
+                resizeMode="cover">
+                <View style={styles.profileOverlay}>
+                  <MaterialCommunityIcons
+                    name="camera"
+                    size={30}
+                    color="#fff"
+                  />
+                </View>
+              </ImageBackground>
+            </TouchableOpacity>
+          )}
+
+          <View style={styles.usernameContainer}>
+            <View style={styles.usernameInputContainer}>
+              <Text style={styles.usernameStatic}> @</Text>
+              {isLoading ? (
+                <Skeleton height={30} width={100} animation="wave" />
+              ) : isEditing ? (
+                <TextInput
+                  style={styles.usernameInput}
+                  value={username}
+                  onChangeText={text => setUsername(text)}
+                  onBlur={() => setIsEditing(false)}
+                  autoFocus
+                />
+              ) : (
+                <Text style={styles.username}> {username} </Text>
               )}
             </View>
-
-            <View style={styles.inputContainer}>
-              <TextInput
-                value={name}
-                onChangeText={setName}
-                style={styles.textInput}
-                placeholder={userData?.name}
-                placeholderTextColor={
-                  colorScheme === 'dark' ? '#cccccc' : '#888888'
-                } // Adjust placeholder text color based on theme
-                autoCapitalize="none"
-              />
-            </View>
-
-            <View style={styles.inputContainer}>
-              <TextInput
-                value={bio}
-                onChangeText={setBio}
-                style={styles.textInput}
-                placeholder={userData?.bio || 'Bio'}
-                placeholderTextColor={
-                  colorScheme === 'dark' ? '#cccccc' : '#888888'
-                } // Adjust placeholder text color based on theme
-                autoCapitalize="none"
-                multiline
-                maxLength={150}
-              />
-            </View>
-
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={styles.textInput}
-                placeholder={userData?.email}
-                placeholderTextColor={
-                  colorScheme === 'dark' ? '#cccccc' : '#888888'
-                } // Adjust placeholder text color based on theme
-                editable={false}
-              />
-            </View>
+            {!isLoading && (
+              <TouchableOpacity onPress={() => setIsEditing(true)}>
+                <MaterialCommunityIcons name="pencil" size={17} color="#000" />
+              </TouchableOpacity>
+            )}
           </View>
-        </ScrollView>
-      </SafeAreaView>
-    </AlertNotificationRoot>
+
+          <View style={styles.inputContainer}>
+            <TextInput
+              value={name}
+              onChangeText={setName}
+              style={styles.textInput}
+              placeholder={userData?.name}
+              placeholderTextColor={
+                colorScheme === 'dark' ? '#cccccc' : '#888888'
+              }
+              autoCapitalize="none"
+            />
+          </View>
+
+          <View style={styles.inputContainer}>
+            <TextInput
+              value={bio}
+              onChangeText={setBio}
+              style={styles.textInput}
+              placeholder={userData?.bio || 'Bio'}
+              placeholderTextColor={
+                colorScheme === 'dark' ? '#cccccc' : '#888888'
+              }
+              autoCapitalize="none"
+              multiline
+              maxLength={150}
+            />
+          </View>
+
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.textInput}
+              placeholder={userData?.email}
+              placeholderTextColor={
+                colorScheme === 'dark' ? '#cccccc' : '#888888'
+              }
+              editable={false}
+            />
+          </View>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
@@ -468,7 +426,7 @@ const getStyles = colorScheme => {
       marginBottom: 20,
     },
     profileImage: {
-      borderRadius: 60, // Ensures the image is circular
+      borderRadius: 60,
     },
     overlay: {
       flex: 1,
@@ -485,7 +443,7 @@ const getStyles = colorScheme => {
       justifyContent: 'center',
       alignItems: 'center',
       backgroundColor: 'rgba(0, 0, 0, 0.5)',
-      borderRadius: 60, // Circular overlay
+      borderRadius: 60,
     },
     contentContainer: {
       width: '100%',

@@ -4,19 +4,29 @@ import {
   View,
   TouchableOpacity,
   SafeAreaView,
-  ToastAndroid,
 } from 'react-native';
+import {useNavigation} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../config';
 
 const serverUrl = config.SERVER_URL;
 
-const BottomSheet = ({ username, postId, idUser, userIdPost, allowedEmail, emailUser, onClose }) => {
-  const [isDeletePost, setIsDeletePost] = useState(false)
-  const [isVisible] = useState(true);
+const BottomSheet = ({
+  username,
+  postId,
+  idUser,
+  userIdPost,
+  allowedEmail,
+  emailUser,
+  onClose,
+}) => {
+  const navigation = useNavigation();
+  const [isDeletePost, setIsDeletePost] = useState(false);
+  const [isPinnedAccount, setIsPinnedAccount] = useState(false);
   const [isOwnAccount, setIsOwnAccount] = useState(false);
 
   const deletePost = async () => {
@@ -29,7 +39,7 @@ const BottomSheet = ({ username, postId, idUser, userIdPost, allowedEmail, email
 
       if (response.data.status === 'ok') {
         console.log('Postingan Berhasil Dihapus');
-        onClose(); // Panggil onClose setelah penghapusan berhasil
+        onClose();
       }
     } catch (error) {
       console.error('Error: ', error);
@@ -37,13 +47,14 @@ const BottomSheet = ({ username, postId, idUser, userIdPost, allowedEmail, email
   };
 
   useEffect(() => {
-    // Check if the current user is the owner of the account
     if (emailUser === allowedEmail || idUser === userIdPost) {
       setIsOwnAccount(true);
       setIsDeletePost(true);
+      setIsPinnedAccount(true);
     } else {
       setIsOwnAccount(false);
       setIsDeletePost(false);
+      setIsPinnedAccount(false);
     }
   }, [idUser, userIdPost, emailUser, allowedEmail]);
 
@@ -57,6 +68,14 @@ const BottomSheet = ({ username, postId, idUser, userIdPost, allowedEmail, email
           </TouchableOpacity>
         </View>
       )}
+      {isPinnedAccount && (
+        <View style={styles.optionRow}>
+          <TouchableOpacity style={styles.option}>
+            <MaterialCommunityIcons name="pin" size={24} color="#333" />
+            <Text style={styles.optionText}>Pin @{username}</Text>
+          </TouchableOpacity>
+        </View>
+      )}
       {isDeletePost && (
         <View style={styles.optionRow}>
           <TouchableOpacity style={styles.option} onPress={deletePost}>
@@ -67,6 +86,7 @@ const BottomSheet = ({ username, postId, idUser, userIdPost, allowedEmail, email
           </TouchableOpacity>
         </View>
       )}
+
       {!isOwnAccount && (
         <>
           <View style={styles.optionRow}>
@@ -76,7 +96,9 @@ const BottomSheet = ({ username, postId, idUser, userIdPost, allowedEmail, email
             </TouchableOpacity>
           </View>
           <View style={styles.optionRow}>
-            <TouchableOpacity style={styles.option}>
+            <TouchableOpacity
+              style={styles.option}
+              onPress={() => navigation.navigate('Report')}>
               <MaterialIcons name="report" size={24} color="#D60000" />
               <Text style={styles.optionTextReport}>Report @{username}</Text>
             </TouchableOpacity>

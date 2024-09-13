@@ -1,12 +1,10 @@
-import React, { useState, useCallback } from 'react';
-import { StyleSheet, View, Dimensions, RefreshControl } from 'react-native';
-import { Likescreen, Mediascreen, Postscreen, Replyscreen } from '../pages';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { Tabs, MaterialTabBar } from 'react-native-collapsible-tab-view';
+import React, {useState, useCallback} from 'react';
+import {StyleSheet, View, RefreshControl} from 'react-native';
+import {Likescreen, Mediascreen, Postscreen, Replyscreen} from '../pages';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import {Tabs, MaterialTabBar} from 'react-native-collapsible-tab-view';
 import Profilescreen from '../pages/Profile/Profilescreen';
-import { Skeleton } from 'react-native-elements';
-
-const { height } = Dimensions.get('window');
+import {Skeleton} from 'react-native-elements';
 
 function TopTabNavigator() {
   const [refreshing, setRefreshing] = useState(false);
@@ -16,11 +14,11 @@ function TopTabNavigator() {
     setRefreshing(true);
     setTimeout(() => {
       setRefreshing(false);
-    }, 300); 
+    }, 300);
   }, []);
 
   const handleScroll = event => {
-    const { contentOffset } = event.nativeEvent;
+    const {contentOffset} = event.nativeEvent;
     setIsScrollTop(contentOffset.y === 0);
   };
 
@@ -157,8 +155,8 @@ const styles = StyleSheet.create({
   tabBar: {
     backgroundColor: '#fff',
     borderBottomWidth: 0,
-    elevation: 0, 
-    shadowOpacity: 0, 
+    elevation: 0,
+    shadowOpacity: 0,
   },
   tabBarLabel: {
     fontSize: 14,
@@ -186,7 +184,7 @@ const styles = StyleSheet.create({
   },
   skeleton: {
     marginBottom: 10,
-    backgroundColor: '#e1e1e1', 
+    backgroundColor: '#e1e1e1',
   },
 });
 

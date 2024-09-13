@@ -5,7 +5,6 @@ import {
   TextInput,
   SafeAreaView,
   TouchableOpacity,
-  ActivityIndicator,
 } from 'react-native';
 import {
   ALERT_TYPE,
@@ -21,7 +20,7 @@ const serverUrl = config.SERVER_URL;
 const Forgotpassword = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
-  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
+  const [setIsButtonDisabled] = useState(false);
 
   const handleContinue = async () => {
     setIsButtonDisabled(true); // Disable the button immediately

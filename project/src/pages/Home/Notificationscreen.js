@@ -1,6 +1,7 @@
 import React from 'react';
 import {SafeAreaView, ScrollView, StyleSheet} from 'react-native';
-import MentionCard from '../../components/MentionCard'; // Ensure correct path to MentionCard component
+import MentionCard from '../../components/MentionCard';
+import LikeNotification from '../../components/LikeNotification';
 
 const Notificationscreen = () => {
   // Example tweet data
@@ -27,6 +28,7 @@ const Notificationscreen = () => {
         {mentions.map((mention, index) => (
           <MentionCard key={index} tweet={mention} />
         ))}
+        <LikeNotification />
       </ScrollView>
     </SafeAreaView>
   );

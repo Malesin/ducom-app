@@ -321,31 +321,27 @@ const CreatePost = ({ route, navigation }) => {
       } else if (response.errorCode) {
         console.log('ImagePicker Error: ', response.errorMessage);
       } else {
-        const {mediaType, assets} = response;
+        const { assets } = response;
         if (assets && assets.length > 0) {
-          const uri = assets[0].uri;
-          setMediaType(assets[0].type);
-          if (mediaType === 'video') {
-            const {path} = await createThumbnail({
-              url: uri,
-              timeStamp: 1000,
-            });
-
-            setSelectedMedia(prevMedia => [
-              ...prevMedia,
-              {uri, type: 'video/mp4', thumbnail: path},
-            ]);
-          } else {
-            setSelectedMedia(prevMedia => [
-              ...prevMedia,
-              {uri, type: mediaType},
-            ]);
-            setMediaType(mediaType);
+          const currentMediaCount = selectedMedia.length;
+          const newMediaCount = assets.length;
+          if (currentMediaCount + newMediaCount > 4) {
+            Alert.alert('Limit Exceeded', 'You can only upload up to 4 media items.');
+            return;
           }
+
+          const newMedia = await Promise.all(assets.map(async asset => {
+            const thumbnail = asset.type === 'video' ? (await createThumbnail({ url: asset.uri, timeStamp: 1000 })).path : null;
+            return {
+              uri: asset.uri,
+              type: asset.type,
+              thumbnail,
+            };
+          }));
+          setSelectedMedia(prevMedia => [...prevMedia, ...newMedia]);
         }
       }
     });
-
   };
 
   const checkVideoDuration = uri => {
@@ -391,8 +387,8 @@ const CreatePost = ({ route, navigation }) => {
     return (
       <View key={index} style={styles.mediaContainer}>
         <TouchableOpacity onPress={() => handleMediaPress(media.uri)}>
-          {media.thumbnailUri ? (
-            <Image source={{ uri: media.thumbnailUri }} style={styles.media} />
+          {media.thumbnail ? (
+            <Image source={{ uri: media.thumbnail }} style={styles.media} />
           ) : (
             <Image source={{ uri: media.uri }} style={styles.media} />
           )}
