@@ -12,9 +12,13 @@ import {
 import CommentSheet from './CommentSheet';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import config from '../config';
 
-const CommentCard = ({ text, hasReplies, replies, onReplyPress, username, profilePicture, onAddReply, commentId, postId, userIdPost, idUser, allowedEmail, emailUser, onDeleteSuccess }) => {
-  const [isLiked, setIsLiked] = useState(false);
+const serverUrl = config.SERVER_URL;
+
+const CommentCard = ({ text, hasReplies, replies, onReplyPress, username, profilePicture, onAddReply, commentId, postId, userIdPost, idUser, allowedEmail, emailUser, onDeleteSuccess, isLikedCom }) => {
+  const [isLiked, setIsLiked] = useState(isLikedCom);
   const [showReplies, setShowReplies] = useState(false);
   const [showMoreReplies, setShowMoreReplies] = useState(false);
   const [showCommentSheet, setShowCommentSheet] = useState(false);
@@ -29,8 +33,46 @@ const CommentCard = ({ text, hasReplies, replies, onReplyPress, username, profil
     tokenconst();
   }, []);
 
-  const handleLikePress = () => {
-    setIsLiked(!isLiked);
+  const handleLikePress = async () => {
+    console.log(postId, "postId")
+    console.log(commentId, "commentId")
+    if (isLiked) {
+      await handleUnlikePress();
+    } else {
+      try {
+        const respLike = await axios.post(`${serverUrl}/like-comment`, {
+          token: gettoken,
+          postId: postId,
+          commentId: commentId
+        });
+
+        if (respLike.data.status === 'ok') {
+          setIsLiked(true);
+        } else {
+          console.log('Error in like respLike data:', respLike.data.data);
+        }
+      } catch (error) {
+        console.error('Error: ', error);
+      }
+    };
+  }
+
+  const handleUnlikePress = async () => {
+    try {
+      const respUnlike = await axios.post(`${serverUrl}/unlike-comment`, {
+        token: gettoken,
+        postId: postId,
+        commentId: commentId
+      });
+
+      if (respUnlike.data.status === 'ok') {
+        setIsLiked(false);
+      } else {
+        console.log('Error in unlike respUnlike data:', respUnlike.data.data);
+      }
+    } catch (error) {
+      console.error('Error unliking post:', error.message);
+    }
   };
 
   const handleViewMoreReplies = () => {
@@ -84,17 +126,18 @@ const CommentCard = ({ text, hasReplies, replies, onReplyPress, username, profil
                       text={reply.text}
                       username={reply.username}
                       profilePicture={reply.profilePicture}
-                      replies={reply.replies} // Nested replies
+                      replies={reply.replies}
                       hasReplies={reply.replies.length > 0}
-                      onReplyPress={() => onReplyPress(reply.id)} // Reply to nested reply
+                      onReplyPress={() => onReplyPress(reply.id)}
                       onAddReply={onAddReply}
                       commentId={reply.id}
                       postId={postId}
-                      userIdPost={reply.userIdPost} // Pastikan userIdPost diteruskan
+                      userIdPost={reply.userIdPost}
                       idUser={idUser}
-                      allowedEmail={reply.allowedEmail} // Pastikan allowedEmail diteruskan
-                      emailUser={emailUser} // Pastikan emailUser diteruskan
-                      onDeleteSuccess={onDeleteSuccess} // Tambahkan prop onDeleteSuccess
+                      allowedEmail={allowedEmail}
+                      emailUser={emailUser}
+                      onDeleteSuccess={onDeleteSuccess}
+                      isLikedCom={reply.isLikedCom}
                     />
                   </View>
                 ))}
@@ -149,6 +192,7 @@ const CommentCard = ({ text, hasReplies, replies, onReplyPress, username, profil
       </View>
     </SafeAreaView>
   );
+
 };
 
 export default CommentCard;
@@ -214,6 +258,14 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 10,
     top: 10,
+  },
+  replyFixedActions: {
+    position: 'absolute',
+    right: 10,
+    top: 10,
+  },
+  replyActionButton: {
+    padding: 5,
   },
   CommentSheetContainer: {
     position: 'absolute',

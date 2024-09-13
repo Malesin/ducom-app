@@ -15,6 +15,7 @@ const serverUrl = config.SERVER_URL;
 
 const CommentSheet = ({ commentId, postId, token, emailUser, allowedEmail, idUser, userIdPost, onDeleteSuccess, onClose }) => {
   const [isDeleteComment, setIsDeleteComment] = useState(false);
+  const [isReportComment, setIsReportComment] = useState(false);
 
   const deleteComment = async () => {
     try {
@@ -24,13 +25,11 @@ const CommentSheet = ({ commentId, postId, token, emailUser, allowedEmail, idUse
         commentId: commentId
       });
 
-      console.log('Response from server:', response.data); // Tambahkan log untuk memeriksa respons
-
       if (response.data.status === 'ok') {
         console.log('Comment Berhasil Dihapus');
-        ToastAndroid.show('Komentar berhasil dihapus', ToastAndroid.SHORT); // Tampilkan toast
-        onDeleteSuccess(); // Panggil callback onDeleteSuccess
-        onClose(); // Tutup CommentSheet
+        ToastAndroid.show('Komentar berhasil dihapus', ToastAndroid.SHORT);
+        onDeleteSuccess();
+        onClose();
       } else {
         console.error('Failed to delete comment:', response.data.message);
       }
@@ -44,11 +43,43 @@ const CommentSheet = ({ commentId, postId, token, emailUser, allowedEmail, idUse
       setIsDeleteComment(true);
     } else {
       setIsDeleteComment(false);
+      console.log("muncul")
+    }
+
+    if (emailUser !== allowedEmail) {
+      if (idUser === userIdPost) {
+        setIsReportComment(false);
+      } else {
+        setIsReportComment(true);
+      }
+    } else {
+      if (idUser === userIdPost) {
+        setIsReportComment(false);
+      } else {
+        setIsReportComment(true);
+      }
     }
   }, [idUser, userIdPost, emailUser, allowedEmail]);
 
   const reportComment = async () => {
-    console.log("Report Comment");
+    // try {
+    //   const response = await axios.post(`${serverUrl}/report-comment`, {
+    //     token: token,
+    //     postId: postId,
+    //     commentId: commentId,
+    //     reporterEmail: emailUser
+    //   });
+
+    //   if (response.data.status === 'ok') {
+    //     console.log('Comment reported successfully');
+    //     ToastAndroid.show('Komentar berhasil dilaporkan', ToastAndroid.SHORT);
+    //   } else {
+    //     console.error('Failed to report comment:', response.data.message);
+    //   }
+    // } catch (error) {
+    //   console.error('Error reporting comment: ', error);
+    // }
+    console.log("report comment")
   };
 
   return (
@@ -61,17 +92,18 @@ const CommentSheet = ({ commentId, postId, token, emailUser, allowedEmail, idUse
           </TouchableOpacity>
         ) : null}
       </View>
-      {!isDeleteComment && (
+      {isReportComment ? (
         <View style={styles.optionRow}>
           <TouchableOpacity style={styles.option} onPress={reportComment}>
             <MaterialIcons name="report" size={24} color="#D60000" />
             <Text style={styles.optionTextReport}>Report Comment</Text>
           </TouchableOpacity>
         </View>
-      )}
+      ) : null}
     </SafeAreaView>
   );
 };
+
 
 export default CommentSheet;
 

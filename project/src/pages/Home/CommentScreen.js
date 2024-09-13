@@ -40,6 +40,7 @@ const CommentScreen = ({ route }) => {
         userIdPost: comment.user._id,
         idUser: idUser,
         email: comment.user.email,
+        isLikedCom: comment.likes.some(like => like.user === idUser),
         replies: Array.isArray(comment.replies)
           ? comment.replies.map(reply => ({
             id: reply._id,
@@ -48,6 +49,7 @@ const CommentScreen = ({ route }) => {
             idUser: idUser,
             username: reply.user.username,
             email: reply.user.email,
+            isLikedCom: reply.likes.some(like => like.user === idUser),
             profilePicture: reply.user.profilePicture,
             replies: reply.replies || [],
             allowedEmail: reply.allowedEmail
@@ -81,13 +83,16 @@ const CommentScreen = ({ route }) => {
   };
 
   const handleTextInputChange = text => {
+    setComment(text); // Set the comment regardless of length
+
+    // Check if text length is greater than 0
     if (text.length > 0) {
       setIsTyping(true);
-      setComment(text);
     } else {
       setIsTyping(false);
     }
   };
+
 
   const handleTextInputContentSizeChange = event => {
     setInputHeight(event.nativeEvent.contentSize.height);
@@ -96,7 +101,7 @@ const CommentScreen = ({ route }) => {
   const handleAddComment = async () => {
     const token = await AsyncStorage.getItem('token');
     try {
-      const respAddCom = await axios.post(`${serverUrl}/comment-post`, {
+      await axios.post(`${serverUrl}/comment-post`, {
         token: token,
         postId: postId,
         comment: comment,
@@ -143,6 +148,7 @@ const CommentScreen = ({ route }) => {
             userIdPost={comment.userIdPost}
             idUser={idUser}
             allowedEmail={comment.allowedEmail}
+            isLikedCom={comment.isLikedCom}
             emailUser={emailUser} // Pastikan emailUser diteruskan
             onDeleteSuccess={onDeleteSuccess} // Tambahkan prop onDeleteSuccess
           />
@@ -150,7 +156,7 @@ const CommentScreen = ({ route }) => {
       </ScrollView>
       <View style={[styles.inputContainer, { height: inputHeight }]}>
         <Image
-          source={{uri: profilePicture}}
+          source={{ uri: profilePicture }}
           style={styles.profilePicture}
         />
         <TextInput

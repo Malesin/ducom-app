@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useCallback} from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   StyleSheet,
   ScrollView,
@@ -12,7 +12,7 @@ import {
   Dimensions,
   ToastAndroid, // Tambahkan import ToastAndroid
 } from 'react-native';
-import {useFocusEffect} from '@react-navigation/native';
+import { useFocusEffect } from '@react-navigation/native';
 import TweetCard from '../../components/TweetCard';
 import Animated, {
   withDelay,
@@ -34,7 +34,7 @@ const serverUrl = config.SERVER_URL;
 
 const { width: screenWidth } = Dimensions.get('window');
 
-const HomeScreen = ({navigation}) => {
+const HomeScreen = ({ navigation }) => {
   const [tweets, setTweets] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [page, setPage] = useState(1);
@@ -48,18 +48,18 @@ const HomeScreen = ({navigation}) => {
     setLoading(true);
     const token = await AsyncStorage.getItem('token');
     try {
-      const response = await axios.post(`${serverUrl}/userdata`, {token});
-      const {data, status} = response.data;
+      const response = await axios.post(`${serverUrl}/userdata`, { token });
+      const { data, status } = response.data;
       if (status === 'error') {
         Alert.alert('Error', 'Anda Telah Keluar dari Akun', [
-          {text: 'OK', onPress: () => navigation.navigate('Auths')},
+          { text: 'OK', onPress: () => navigation.navigate('Auths') },
         ]);
         return [];
       }
       const emailUser = data.email
-      const idUser = data._id; 
+      const idUser = data._id;
       const profilePicture = data.profilePicture
-
+      
       const responseTweet = await axios.post(`${serverUrl}/posts`, {
         page: pageNum,
       });
@@ -74,9 +74,9 @@ const HomeScreen = ({navigation}) => {
         content: post.description,
         media: Array.isArray(post.media)
           ? post.media.map(mediaItem => ({
-              type: mediaItem.type,
-              uri: mediaItem.uri,
-            }))
+            type: mediaItem.type,
+            uri: mediaItem.uri,
+          }))
           : [],
         likesCount: post.likes.length,
         commentsCount: post.comments.length,
@@ -87,14 +87,14 @@ const HomeScreen = ({navigation}) => {
         idUser: idUser,
         allowedEmail: post.allowedEmail,
         userEmailPost: post.user.email,
-        emailUser : emailUser,
+        emailUser: emailUser,
         profilePicture: profilePicture
       }));
 
       return formattedTweets;
     } catch (error) {
       console.error('Error fetching data:', error);
-      return [];d
+      return []; d
     } finally {
       setLoading(false);
     }
@@ -145,7 +145,7 @@ const HomeScreen = ({navigation}) => {
 
   useFocusEffect(
     useCallback(() => {
-      isExpanded.value = false; 
+      isExpanded.value = false;
     }, []),
   );
 
@@ -192,12 +192,12 @@ const HomeScreen = ({navigation}) => {
       } else {
         const uri = response.assets[0].uri;
         console.log('Captured image URI:', uri);
-        navigation.navigate('CreatePost', {mediaUri: uri, mediaType: 'photo'});
+        navigation.navigate('CreatePost', { mediaUri: uri, mediaType: 'photo' });
       }
     });
   };
 
-  const FloatingActionButton = ({isExpanded, index, iconName, onPress}) => {
+  const FloatingActionButton = ({ isExpanded, index, iconName, onPress }) => {
     const animatedStyles = useAnimatedStyle(() => {
       const moveValue = isExpanded.value ? OFFSET * index : 0;
       const translateValue = withSpring(-moveValue, SPRING_CONFIG);
@@ -206,8 +206,8 @@ const HomeScreen = ({navigation}) => {
 
       return {
         transform: [
-          {translateY: translateValue},
-          {scale: withDelay(delay, withTiming(scaleValue))},
+          { translateY: translateValue },
+          { scale: withDelay(delay, withTiming(scaleValue)) },
         ],
         backgroundColor: isExpanded.value ? '#F3F3F3' : '#F3F3F3',
       };
@@ -246,8 +246,8 @@ const HomeScreen = ({navigation}) => {
 
     return {
       transform: [
-        {translateX: translateValue},
-        {rotate: withTiming(rotateValue)},
+        { translateX: translateValue },
+        { rotate: withTiming(rotateValue) },
       ],
     };
   });
@@ -327,8 +327,8 @@ const HomeScreen = ({navigation}) => {
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
-        onScroll={({nativeEvent}) => {
-          const {contentOffset, layoutMeasurement, contentSize} = nativeEvent;
+        onScroll={({ nativeEvent }) => {
+          const { contentOffset, layoutMeasurement, contentSize } = nativeEvent;
           const contentHeight = contentSize.height;
           const viewportHeight = layoutMeasurement.height;
           const scrollPosition = contentOffset.y + viewportHeight;
@@ -361,13 +361,13 @@ const HomeScreen = ({navigation}) => {
           isExpanded={isExpanded}
           index={1}
           iconName={'camera-outline'}
-          onPress={handleOpenCamera} 
+          onPress={handleOpenCamera}
         />
         <FloatingActionButton
           isExpanded={isExpanded}
           index={2}
           iconName={'feather'}
-          onPress={() => navigation.navigate('CreatePost', {onPostSuccess})}
+          onPress={() => navigation.navigate('CreatePost', { onPostSuccess })}
         />
       </View>
     </SafeAreaView>
@@ -416,7 +416,7 @@ const styles = StyleSheet.create({
   tweetContainer: {
     width: '100%',
   },
-  skeletonScreen: {   
+  skeletonScreen: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
@@ -466,7 +466,7 @@ const styles = StyleSheet.create({
   },
   shadow: {
     shadowColor: '#171717',
-    shadowOffset: {width: -0.5, height: 3.5},
+    shadowOffset: { width: -0.5, height: 3.5 },
     shadowOpacity: 0.2,
     shadowRadius: 3,
   },
