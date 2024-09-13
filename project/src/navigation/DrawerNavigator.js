@@ -8,11 +8,8 @@ import {
   FAQscreen,
   Marksscreen,
   Settingsscreen,
-  AccountInformation,
-  UpdatePassword,
 } from '../pages';
 
-// Import the logo image
 import logo from './../assets/logo1.png';
 
 const Drawer = createDrawerNavigator();
@@ -25,16 +22,6 @@ const SettingsStackNavigator = () => {
         name="Settings"
         component={Settingsscreen}
         options={{headerShown: false}}
-      />
-      <Stack.Screen
-        name="AccountInformation"
-        component={AccountInformation}
-        options={{title: 'Account Information'}}
-      />
-      <Stack.Screen
-        name="UpdatePassword"
-        component={UpdatePassword}
-        options={{title: 'Update Password'}}
       />
     </Stack.Navigator>
   );
@@ -102,7 +89,7 @@ const DrawerNavigator = () => {
         />
         <Drawer.Screen
           name="Settings"
-          component={SettingsStackNavigator} // Use the stack navigator for settings
+          component={SettingsStackNavigator} 
           options={{
             drawerLabel: 'Settings',
             drawerIcon: ({color}) => (

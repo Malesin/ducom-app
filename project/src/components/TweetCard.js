@@ -29,7 +29,7 @@ const TweetCard = ({tweet, onDeleteSuccess}) => {
   const [likesCount, setLikesCount] = useState(tweet.likesCount);
   const [bookmarked, setBookmarked] = useState(tweet.isBookmarked);
   const [bookMarksCount, setBookMarksCount] = useState(tweet.bookMarksCount);
-  const [commentsCount, setCommentsCount] = useState(tweet.commentsCount);
+  const [commentsCount] = useState(tweet.commentsCount);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalMediaUri, setModalMediaUri] = useState('');
   const [thumbnails, setThumbnails] = useState({});

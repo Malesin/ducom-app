@@ -51,7 +51,7 @@ const Settingsscreen = ({navigation}) => {
           <MaterialCommunityIcons name="key-outline" size={25} color="#000" />
           <Text style={styles.buttonText}>Password</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('DeactiveDeleteAccount')}>
           <MaterialCommunityIcons
             name="account-cancel"
             size={25}
@@ -63,11 +63,11 @@ const Settingsscreen = ({navigation}) => {
       <View style={styles.separator} />
       <View style={styles.section}>
         <Text style={styles.title}>Privacy and Interactions</Text>
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('BlockedAccount')}>
           <MaterialCommunityIcons name="cancel" size={25} color="#000" />
           <Text style={styles.buttonText}>Blocked Accounts</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('MutedAccount')}>
           <MaterialCommunityIcons name="volume-off" size={25} color="#000" />
           <Text style={styles.buttonText}>Muted Accounts</Text>
         </TouchableOpacity>
@@ -75,7 +75,7 @@ const Settingsscreen = ({navigation}) => {
       <View style={styles.separator} />
       <View style={styles.section}>
         <Text style={styles.title}>Support</Text>
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('FAQ')}>
           <MaterialCommunityIcons
             name="help-circle-outline"
             size={25}

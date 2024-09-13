@@ -28,11 +28,10 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../../config';
-import { Skeleton } from 'react-native-elements'; // Pastikan Anda telah menginstal dan mengimpor Skeleton
+import { Skeleton } from 'react-native-elements'; 
 
 const serverUrl = config.SERVER_URL;
 
-const { width: screenWidth } = Dimensions.get('window');
 
 const HomeScreen = ({navigation}) => {
   const [tweets, setTweets] = useState([]);
@@ -41,7 +40,7 @@ const HomeScreen = ({navigation}) => {
   const [loadingMore, setLoadingMore] = useState(false);
   const [loading, setLoading] = useState(true);
   const [hasMore, setHasMore] = useState(true);
-  const [showSkeleton, setShowSkeleton] = useState(true); // State untuk mengontrol tampilan skeleton
+  const [showSkeleton, setShowSkeleton] = useState(true);
   const isExpanded = useSharedValue(false);
 
   const fetchTweets = async pageNum => {

@@ -41,7 +41,7 @@ const AccountInformation = () => {
         <Text style={styles.label}>Username</Text>
         <View style={styles.infoRow}>
         <Text style={styles.infoText}>
-            @{userData ? userData.username : 'Loading...'}
+            @{userData ? userData.username : ''}
           </Text>
         </View>
       </View>
@@ -56,7 +56,7 @@ const AccountInformation = () => {
         <Text style={styles.label}>Email</Text>
         <View style={styles.infoRow}>
           <Text style={styles.infoText}>
-            {userData ? userData.email : 'Loading...'}
+            {userData ? userData.email : ''}
           </Text>
         </View>
       </TouchableOpacity>

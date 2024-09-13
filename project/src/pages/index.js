@@ -26,6 +26,9 @@ import Userprofile from './Userprofile/Userprofile';
 import Userpost from './Userprofile/Userpost';
 import Userreply from './Userprofile/Userreply';
 import Usermedia from './Userprofile/Usermedia';
+import BlockedAccount from './Settings/BlockedAccount';
+import MutedAccount from './Settings/MutedAccount';
+import DeactiveDeleteAccount from './Settings/DeactiveDeleteAccount';
 
 export {
   Splashscreen,
@@ -56,4 +59,7 @@ export {
   Userpost,
   Userreply,
   Usermedia,
+  BlockedAccount,
+  MutedAccount,
+  DeactiveDeleteAccount,
 };
