@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -83,14 +83,25 @@ const CommentCard = ({ text, hasReplies, replies, onReplyPress, username, profil
     setShowCommentSheet(true);
   };
 
+  const handleProfilePress = () => {
+    navigation.navigate('Userprofile', {
+      userIdPost: userIdPost,
+      profilePicture: profilePicture,
+    });
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.cardContainer}>
         <View style={styles.profileContainer}>
-          <Image
-            source={{ uri: profilePicture } || require('../assets/profilepic.png')}
-            style={styles.profileImage}
-          />
+          <TouchableOpacity onPress={handleProfilePress}>
+            <Image
+              source={
+                {uri: profilePicture} || require('../assets/profilepic.png')
+              }
+              style={styles.profileImage}
+            />
+          </TouchableOpacity>
         </View>
         <View style={styles.commentContainer}>
           <Text style={styles.username}>@{username}</Text>
@@ -146,7 +157,9 @@ const CommentCard = ({ text, hasReplies, replies, onReplyPress, username, profil
                   style={styles.viewMoreRepliesButton}
                   onPress={() => setShowMoreReplies(!showMoreReplies)}>
                   <Text style={styles.viewMoreRepliesButtonText}>
-                    {showMoreReplies ? 'Hide more replies' : `View ${replies.length - 3} more replies`}
+                    {showMoreReplies
+                      ? 'Hide more replies'
+                      : `View ${replies.length - 3} more replies`}
                   </Text>
                 </TouchableOpacity>
               )}
@@ -184,8 +197,8 @@ const CommentCard = ({ text, hasReplies, replies, onReplyPress, username, profil
               userIdPost={userIdPost}
               idUser={idUser}
               allowedEmail={allowedEmail}
-              emailUser={emailUser} // Pastikan emailUser diteruskan
-              onDeleteSuccess={onDeleteSuccess} // Tambahkan prop onDeleteSuccess
+              emailUser={emailUser}
+              onDeleteSuccess={onDeleteSuccess}
             />
           </View>
         </Modal>

@@ -12,13 +12,18 @@ import {
   EditProfilePage,
   CreatePost,
   CommentScreen,
-  Userprofile, // Tambahkan import Userprofile
+  ReportScreen,
+  AccountInformation, // Tambahkan import ini
+  UpdatePassword, // Tambahkan import ini
+  BlockedAccount,
+  MutedAccount,
 } from '../pages';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import BottomTabNavigator from './BottomTabNavigator';
-import DrawerNavigator from './DrawerNavigator'; // Tambahkan import DrawerNavigator
+import DrawerNavigator from './DrawerNavigator';
 import UserTopTabNavigator from './UserTopTabNavigator';
+import DeactiveDeleteAccount from '../pages/Settings/DeactiveDeleteAccount';
 
 const Stack = createNativeStackNavigator();
 
@@ -72,6 +77,11 @@ export default function MainNavigation() {
           options={{headerShown: false}}
         />
         <Stack.Screen
+          name="Report"
+          component={ReportScreen}
+          options={{headerShown: true, title: 'Report'}}
+        />
+        <Stack.Screen
           name="CreatePost"
           component={CreatePost}
           options={{headerShown: true, title: 'Create Post'}}
@@ -99,8 +109,33 @@ export default function MainNavigation() {
         />
         <Stack.Screen
           name="DrawerNavigator"
-          component={DrawerNavigator} 
+          component={DrawerNavigator}
           options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="AccountInformation"
+          component={AccountInformation}
+          options={{headerShown: true, title: 'Account Information'}} // Tambahkan ini
+        />
+        <Stack.Screen
+          name="UpdatePassword"
+          component={UpdatePassword}
+          options={{headerShown: true, title: 'Update Password'}} // Tambahkan ini
+        />
+        <Stack.Screen
+          name="BlockedAccount"
+          component={BlockedAccount}
+          options={{headerShown: true, title: 'Blocked Accounts'}}
+        />
+        <Stack.Screen
+          name="MutedAccount"
+          component={MutedAccount}
+          options={{headerShown: true, title: 'Muted Accounts'}}
+        />
+        <Stack.Screen
+          name="DeactiveDeleteAccount"
+          component={DeactiveDeleteAccount}
+          options={{headerShown: true, title: 'Deactivate or Delete Account'}}
         />
       </Stack.Navigator>
     </NavigationContainer>

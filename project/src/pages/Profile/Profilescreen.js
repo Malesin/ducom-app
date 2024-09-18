@@ -100,6 +100,10 @@ export default function Profilescreen() {
   const handleDropdownItemPress = item => {
     if (item === 'Need Help') {
       navigation.navigate('FAQ');
+    } else {
+      if (item === 'Settings and Support') {
+        navigation.navigate('Settings');
+      }
     }
     // Handle item press
     console.log(item);
@@ -135,7 +139,7 @@ export default function Profilescreen() {
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.dropdownItem}
-                  onPress={() => handleDropdownItemPress('Drafts')}>
+                  onPress={() => handleDropdownItemPress('Settings and Support')}>
                   <MaterialCommunityIcons
                     name="cog"
                     size={20}
@@ -322,7 +326,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff', // Warna latar belakang putih
     borderRadius: 7,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.8,
     shadowRadius: 2,
     elevation: 5,

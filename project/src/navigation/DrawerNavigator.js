@@ -1,13 +1,31 @@
 import React from 'react';
 import {createDrawerNavigator} from '@react-navigation/drawer';
+import {createStackNavigator} from '@react-navigation/stack';
 import {Image, StyleSheet, View, SafeAreaView} from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import {Homescreen, FAQscreen, Marksscreen, Settingsscreen} from '../pages';
+import {
+  Homescreen,
+  FAQscreen,
+  Marksscreen,
+  Settingsscreen,
+} from '../pages';
 
-// Import the logo image
-import logo from './../assets/logo1.png'; // Update the path according to your project structure
+import logo from './../assets/logo1.png';
 
 const Drawer = createDrawerNavigator();
+const Stack = createStackNavigator();
+
+const SettingsStackNavigator = () => {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="Settings"
+        component={Settingsscreen}
+        options={{headerShown: false}}
+      />
+    </Stack.Navigator>
+  );
+};
 
 const DrawerNavigator = () => {
   return (
@@ -71,7 +89,7 @@ const DrawerNavigator = () => {
         />
         <Drawer.Screen
           name="Settings"
-          component={Settingsscreen}
+          component={SettingsStackNavigator} 
           options={{
             drawerLabel: 'Settings',
             drawerIcon: ({color}) => (

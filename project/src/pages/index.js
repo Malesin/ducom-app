@@ -10,7 +10,10 @@ import OTPScreen from './Auth/OTPScreen';
 import CreatePassword from './Auth/CreatePassword';
 import FAQscreen from './Settings/FAQscreen';
 import Marksscreen from './Other/Marksscreen';
+import ReportScreen from './Other/ReportScreen';
 import Settingsscreen from './Settings/Settingsscreen';
+import AccountInformation from './Settings/AccountInformation';
+import UpdatePassword from './Settings/UpdatePassword';
 import Profilescreen from './Profile/Profilescreen';
 import Notificationscreen from './Home/Notificationscreen';
 import TermsandConditionscreen from './Settings/TermsandConditionscreen';
@@ -20,9 +23,12 @@ import Postscreen from './Profile/Postscreen';
 import Replyscreen from './Profile/Replyscreen';
 import EditProfilePage from './Profile/EditProfilePage';
 import Userprofile from './Userprofile/Userprofile';
-import Userpost from './Userprofile/Userpost'; // Tambahkan import Userpost
-import Userreply from './Userprofile/Userreply'; // Tambahkan import Userreply
-import Usermedia from './Userprofile/Usermedia'; // Tambahkan import Usermedia
+import Userpost from './Userprofile/Userpost';
+import Userreply from './Userprofile/Userreply';
+import Usermedia from './Userprofile/Usermedia';
+import BlockedAccount from './Settings/BlockedAccount';
+import MutedAccount from './Settings/MutedAccount';
+import DeactiveDeleteAccount from './Settings/DeactiveDeleteAccount';
 
 export {
   Splashscreen,
@@ -37,7 +43,10 @@ export {
   CreatePassword,
   FAQscreen,
   Marksscreen,
+  ReportScreen,
   Settingsscreen,
+  AccountInformation,
+  UpdatePassword,
   Profilescreen,
   Notificationscreen,
   TermsandConditionscreen,
@@ -47,7 +56,10 @@ export {
   Replyscreen,
   EditProfilePage,
   Userprofile,
-  Userpost, // Tambahkan Userpost ke dalam export
-  Userreply, // Tambahkan Userreply ke dalam export
-  Usermedia, // Tambahkan Usermedia ke dalam export
+  Userpost,
+  Userreply,
+  Usermedia,
+  BlockedAccount,
+  MutedAccount,
+  DeactiveDeleteAccount,
 };
