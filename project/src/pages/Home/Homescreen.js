@@ -10,7 +10,8 @@ import {
   RefreshControl,
   ActivityIndicator,
   Dimensions,
-  ToastAndroid, // Tambahkan import ToastAndroid
+  ToastAndroid,
+  Text, // Tambahkan import Text
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import TweetCard from '../../components/TweetCard';
@@ -41,9 +42,25 @@ const HomeScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [hasMore, setHasMore] = useState(true);
   const [showSkeleton, setShowSkeleton] = useState(true);
+  const [isConnected, setIsConnected] = useState(true); // Tambahkan state untuk koneksi
   const isExpanded = useSharedValue(false);
 
+  useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener(state => {
+      setIsConnected(state.isConnected);
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
   const fetchTweets = async pageNum => {
+    if (!isConnected) {
+      setLoading(false);
+      return [];
+    }
+
     setLoading(true);
     const token = await AsyncStorage.getItem('token');
     try {
@@ -108,7 +125,7 @@ const HomeScreen = ({ navigation }) => {
     setTweets(newTweets.slice(0, 4)); // Only display 4 tweets
     setRefreshing(false);
     setShowSkeleton(false); // Sembunyikan skeleton setelah refresh selesai
-  }, []);
+  }, [isConnected]);
 
   const LoadingIndicator = () => {
     return (
@@ -156,7 +173,7 @@ const HomeScreen = ({ navigation }) => {
       setShowSkeleton(false); // Sembunyikan skeleton setelah data awal di-load
     };
     loadInitialTweets();
-  }, []);
+  }, [isConnected]);
 
   useFocusEffect(
     useCallback(() => {
@@ -321,6 +338,11 @@ const HomeScreen = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
+      {!isConnected && (
+        <View style={styles.noConnectionContainer}>
+          <Text style={styles.noConnectionText}>No Internet Connection.</Text>
+        </View>
+      )}
       <ScrollView
         contentContainerStyle={styles.contentContainer}
         refreshControl={
@@ -479,6 +501,15 @@ const styles = StyleSheet.create({
   },
   loadingMore: {
     marginVertical: 20,
+  },
+  noConnectionContainer: {
+    padding: 10,
+    backgroundColor: '#d3d3d3',
+    alignItems: 'center',
+  },
+  noConnectionText: {
+    color: '#000000',
+    fontSize: 16,
   },
 });
 

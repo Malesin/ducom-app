@@ -46,7 +46,9 @@ const Userpost = ({ userIdPost, profilePicture }) => {
           bookmark => bookmark.user === userIdPost,
         ),
         userIdPost: post.user._id,
-        profilePicture: profilePicture
+        profilePicture: profilePicture,
+        allowedEmail: post.allowedEmail,
+        userEmailPost: post.user.email,
       }));
 
       setTweets(formattedTweets);

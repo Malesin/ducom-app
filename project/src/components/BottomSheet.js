@@ -50,7 +50,7 @@ const BottomSheet = ({
     if (emailUser === allowedEmail || idUser === userIdPost) {
       setIsOwnAccount(true);
       setIsDeletePost(true);
-      setIsPinnedAccount(true);
+      setIsPinnedAccount(true); // Hanya pemilik akun yang bisa pin
     } else {
       setIsOwnAccount(false);
       setIsDeletePost(false);
@@ -68,7 +68,7 @@ const BottomSheet = ({
           </TouchableOpacity>
         </View>
       )}
-      {isPinnedAccount && (
+      {isOwnAccount && ( // Hanya tampilkan opsi pin jika isOwnAccount true
         <View style={styles.optionRow}>
           <TouchableOpacity style={styles.option}>
             <MaterialCommunityIcons name="pin" size={24} color="#333" />
