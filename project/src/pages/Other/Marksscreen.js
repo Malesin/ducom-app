@@ -1,4 +1,4 @@
-import React, {useState, useCallback, useEffect} from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   StyleSheet,
   ScrollView,
@@ -7,28 +7,15 @@ import {
 
   Alert,
   SafeAreaView,
-  BackHandler,
-  TouchableOpacity,
-  RefreshControl,
+  Text,
   ActivityIndicator,
 
   RefreshControl,
   Dimensions,
 } from 'react-native';
-import { useFocusEffect } from '@react-navigation/native';
-import TweetCard from '../../components/TweetCard';
-import Animated, {
-  withDelay,
-  interpolate,
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-  withTiming,
-  cancelAnimation,
-} from 'react-native-reanimated';
-import * as ImagePicker from 'react-native-image-picker';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import TweetCard from '../../components/TweetCard'; // Import TweetCard
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
 import axios from 'axios';
 import config from '../../config';
 
@@ -39,9 +26,8 @@ const serverUrl = config.SERVER_URL;
 const { width: screenWidth } = Dimensions.get('window');
 
 
-const Marksscreen = ({navigation}) => {
+const Marksscreen = ({ navigation }) => {
   const [tweets, setTweets] = useState([]);
-  const [refreshing, setRefreshing] = useState(false);
   const [page, setPage] = useState(1);
 
   const [loading, setLoading] = useState(true);
@@ -60,25 +46,25 @@ const Marksscreen = ({navigation}) => {
       const token = await AsyncStorage.getItem('token');
 
       try {
-        const response = await axios.post(`${serverUrl}/userdata`, {token});
-        const {data, status} = response.data;
+        const response = await axios.post(`${serverUrl}/userdata`, { token });
+        const { data, status } = response.data;
 
         if (status === 'error') {
 
           Alert.alert('Error', 'Anda Telah Keluar dari Akun', [
 
-            {text: 'OK', onPress: () => navigation.navigate('Auths')},
+            { text: 'OK', onPress: () => navigation.navigate('Auths') },
 
           ]);
           return [];
 
         }
 
-        const idUser = data._id; 
-        const emailUser = data.email; 
+        const idUser = data._id;
+        const emailUser = data.email;
 
         const profilePicture = data.profilePicture;
-      
+
         const responseTweet = await axios.post(`${serverUrl}/user-bookmarks`, {
           token: token
         });
@@ -104,8 +90,8 @@ const Marksscreen = ({navigation}) => {
           commentsCount: post.comments.length,
 
           bookMarksCount: post.bookmarks.length,
-          isLiked: post.likes.some(like => like._id === idUser), 
-          isBookmarked: post.bookmarks.some(bookmark => bookmark.user === idUser), 
+          isLiked: post.likes.some(like => like._id === idUser),
+          isBookmarked: post.bookmarks.some(bookmark => bookmark.user === idUser),
           userIdPost: post.user._id,
 
           idUser: idUser,
@@ -113,7 +99,7 @@ const Marksscreen = ({navigation}) => {
 
           userEmailPost: post.user.email,
 
-          emailUser : emailUser,
+          emailUser: emailUser,
 
           profilePicture: profilePicture
         }));
@@ -172,71 +158,6 @@ const Marksscreen = ({navigation}) => {
       }
     }
 
-  };
-=======
-
-      const initialTweets = await fetchTweets(1);
-      setTweets(initialTweets.slice(0, 5)); // Load only 4 tweets initially
-
-      setLoading(false);
-      setShowSkeleton(false); // Sembunyikan skeleton setelah data awal di-load
-
-    };
-
-    loadInitialTweets();
-
-  }, [fetchTweets]);
-
->>>>>>> 1007c9fc7fcc9baa51f005ccbea1ee5fb929477a
-
-  const renderSkeleton = () => (
-    <>
-      {[...Array(5)].map((_, index) => (
-        <View key={index} style={styles.skeletonContainer}>
-          <View style={styles.skeletonHeader}>
-            <Skeleton
-              animation="pulse"
-              circle
-              height={40}
-              width={40}
-              style={styles.skeletonAvatar}
-            />
-            <View style={styles.skeletonTextContainer}>
-              <Skeleton
-                animation="pulse"
-                height={20}
-                width="25%" // 25% of the screen width
-                style={styles.skeleton}
-              />
-              <Skeleton
-                animation="pulse"
-                height={14}
-                width="15%" // 15% of the screen width
-                style={styles.skeleton}
-              />
-            </View>
-          </View>
-          <Skeleton
-            animation="pulse"
-            height={20}
-            width="75%" // 75% of the screen width
-            style={[styles.skeleton, { borderRadius: 3 }]}
-          />
-          <Skeleton
-            animation="pulse"
-            height={200}
-            width="100%" // 100% of the screen width
-            style={[styles.skeleton, { borderRadius: 7 }]}
-          />
-        </View>
-      ))}
-    </>
-  );
-
-  const onDeleteSuccess = () => {
-    ToastAndroid.show('Tweet berhasil dihapus', ToastAndroid.SHORT);
-    setRefreshing(true);
-    onRefresh();
   };
 
   const renderSkeleton = () => (
@@ -341,8 +262,8 @@ const Marksscreen = ({navigation}) => {
 
         }
 
-        onScroll={({nativeEvent}) => {
-          const {contentOffset, layoutMeasurement, contentSize} = nativeEvent;
+        onScroll={({ nativeEvent }) => {
+          const { contentOffset, layoutMeasurement, contentSize } = nativeEvent;
           const contentHeight = contentSize.height;
 
           const viewportHeight = layoutMeasurement.height;
@@ -386,34 +307,7 @@ const Marksscreen = ({navigation}) => {
   );
 };
 
-const SPRING_CONFIG = {
-  duration: 1200,
-  overshootClamping: true,
-  dampingRatio: 0.8,
-};
-
-const OFFSET = 60;
-
-const AnimatedPressable = Animated.createAnimatedComponent(TouchableOpacity);
-
-const mainButtonStyles = StyleSheet.create({
-  button: {
-    zIndex: 1,
-    height: 66,
-    width: 66,
-    borderRadius: 100,
-    backgroundColor: '#001374',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  content: {
-    fontSize: 45,
-    color: 'white',
-    lineHeight: 60,
-    marginBottom: 1,
-  },
-});
+export default Marksscreen;
 
 const styles = StyleSheet.create({
 
@@ -434,7 +328,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
 
-  skeletonScreen: {   
+  skeletonScreen: {
 
     flex: 1,
 
@@ -491,5 +385,3 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
 });
-
-export default MarkScreen;
