@@ -10,12 +10,10 @@ import {
 } from 'react-native';
 import React, {useState} from 'react';
 import {useFocusEffect} from '@react-navigation/native';
-import CheckInternet from '../../components/CheckInternet';
 
 const Authscreen = ({navigation}) => {
   const [selectedButton, setSelectedButton] = useState('login');
   const [slideAnim] = useState(new Animated.Value(0));
-  const [isConnected, setIsConnected] = useState(false);
 
   const handlePress = button => {
     setSelectedButton(button);
