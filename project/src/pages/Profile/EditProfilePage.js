@@ -36,6 +36,7 @@ export default function EditProfilePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isBannerLoading, setIsBannerLoading] = useState(true);
   const [isProfilePictureLoading, setIsProfilePictureLoading] = useState(true);
+  const [nameError, setNameError] = useState('');
   const colorScheme = useColorScheme();
   const styles = getStyles(colorScheme);
 
@@ -87,40 +88,16 @@ export default function EditProfilePage() {
 
   const validateUsername = username => {
     const usernameRegex = /^[a-z0-9]{4,15}$/;
+    const specialCharRegex = /[!@#$%^&*()\-+={}[\]|\\:;"'<>,.?/~`]/;
+    if (specialCharRegex.test(username)) {
+      return false;
+    }
     return usernameRegex.test(username) && !username.includes(' ');
   };
   const validateName = name => {
     const nameRegex = /^[a-zA-Z]+( [a-zA-Z]+)*$/;
     return nameRegex.test(name) && name.length <= 40;
   };
-
-  useEffect(() => {
-    const beforeRemoveListener = navigation.addListener('beforeRemove', e => {
-      if (isSaving) {
-        return;
-      }
-
-      e.preventDefault();
-      Alert.alert('Konfirmasi', 'Apakah anda ingin membatalkan perubahan?', [
-        {
-          text: 'No',
-          style: 'cancel',
-          onPress: () => {},
-        },
-        {
-          text: 'Yes',
-          onPress: () => {
-            setUsername(userData?.username);
-            setName(userData?.name);
-            setBio(userData?.bio);
-            navigation.dispatch(e.data.action);
-          },
-        },
-      ]);
-    });
-
-    return beforeRemoveListener;
-  }, [navigation, userData, isSaving]);
 
   navigation.setOptions({
     headerRight: () => (
@@ -132,107 +109,119 @@ export default function EditProfilePage() {
 
   const handleSave = async () => {
     setIsSaving(true);
+    let hasError = false; // Tambahkan variabel untuk melacak error
 
-    Alert.alert('Confirmation', 'Do you want to save the changes?', [
-      {text: 'No', style: 'cancel', onPress: () => setIsSaving(false)},
-      {
-        text: 'Yes',
-        style: 'default',
-        onPress: async () => {
-          try {
-            if (!username) {
-            } else if (!validateUsername(username)) {
-              return;
-            }
+    if (!username) {
+        console.log('Error: Username tidak boleh kosong');
+        hasError = true; // Tandai ada error
+    } else if (!validateUsername(username)) {
+        console.log('Invalid username. Must be 4-15 characters long, lowercase letters and numbers only, with no spaces.');
+        hasError = true; // Tandai ada error
+    }
 
-            // Only validate name if it's different from the current name
-            if (name && name !== userData?.name && !validateName(name)) {
-              return;
-            }
+    // Validasi nama
+    if (name && name !== userData?.name && !validateName(name)) {
+        setNameError('Name can only contain letters and spaces, and must be up to 40 characters long.');
+        hasError = true; // Tandai ada error
+    } else {
+        setNameError(''); // Hapus error jika valid
+    }
 
-            const token = await AsyncStorage.getItem('token');
-            const updatedUserData = {token: token};
+    // Validasi bio
+    if (bio && bio.length > 150) {
+        console.log('Error: Bio tidak boleh lebih dari 150 karakter');
+        hasError = true; // Tandai ada error
+    }
 
-            if (name && name !== userData?.name) {
-              updatedUserData.name = name;
-            }
+    if (hasError) {
+        setIsSaving(false);
+        return; // Hentikan eksekusi jika ada error
+    }
 
-            if (username && username !== userData?.username) {
-              const checkUsernameResponse = await axios.post(
-                `${serverUrl}/check-username`,
-                {username},
-              );
-              if (checkUsernameResponse.data.status === 'error') {
-                setIsSaving(false);
-                return;
-              }
-              updatedUserData.username = username;
-            }
+    try {
+      const token = await AsyncStorage.getItem('token');
+      const updatedUserData = {token: token};
 
-            if (bio && bio !== userData?.bio) {
-              updatedUserData.bio = bio;
-            }
+      if (name && name !== userData?.name) {
+        updatedUserData.name = name;
+      }
 
-            // Upload the new profile image if exists
-            if (newProfileImage) {
-              const profileFormData = new FormData();
-              profileFormData.append('image', {
-                uri: newProfileImage.path,
-                name: newProfileImage.filename || 'profile.jpg',
-                type: newProfileImage.mime,
-              });
-              profileFormData.append('token', token);
+      if (username && username !== userData?.username) {
+        // Cek apakah username sudah digunakan
+        const checkUsernameResponse = await axios.post(
+          `${serverUrl}/check-username`,
+          {username},
+        );
+        if (checkUsernameResponse.data.status === 'error') {
+          console.log('Error: Username sudah diambil');
+          setIsSaving(false);
+          return;
+        }
+        updatedUserData.username = username;
+      }
 
-              await axios.post(
-                `${serverUrl}/upload-image-profile`,
-                profileFormData,
-                {
-                  headers: {
-                    'Content-Type': 'multipart/form-data',
-                  },
-                },
-              );
-            }
+      if (bio && bio !== userData?.bio) {
+        updatedUserData.bio = bio;
+      }
 
-            // Upload the new banner image if exists
-            if (newBannerImage) {
-              const bannerFormData = new FormData();
-              bannerFormData.append('image', {
-                uri: newBannerImage.path,
-                name: newBannerImage.filename || 'banner.jpg',
-                type: newBannerImage.mime,
-              });
-              bannerFormData.append('token', token);
+      // Upload the new profile image if exists
+      if (newProfileImage) {
+        const profileFormData = new FormData();
+        profileFormData.append('image', {
+          uri: newProfileImage.path,
+          name: newProfileImage.filename || 'profile.jpg',
+          type: newProfileImage.mime,
+        });
+        profileFormData.append('token', token);
 
-              await axios.post(
-                `${serverUrl}/upload-image-banner`,
-                bannerFormData,
-                {
-                  headers: {
-                    'Content-Type': 'multipart/form-data',
-                  },
-                },
-              );
-            }
+        await axios.post(
+          `${serverUrl}/upload-image-profile`,
+          profileFormData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          },
+        );
+      }
 
-            const response = await axios.post(
-              `${serverUrl}/update-profile`,
-              updatedUserData,
-            );
+      // Upload the new banner image if exists
+      if (newBannerImage) {
+        const bannerFormData = new FormData();
+        bannerFormData.append('image', {
+          uri: newBannerImage.path,
+          name: newBannerImage.filename || 'banner.jpg',
+          type: newBannerImage.mime,
+        });
+        bannerFormData.append('token', token);
 
-            if (response.data.status === 'update') {
-              navigation.goBack();
-            } else {
-              setIsSaving(false);
-            }
-          } catch (error) {
-            setIsSaving(false);
-            console.error('Error updating profile:', error);
-            Alert.alert('Error', 'Failed to update profile');
-          }
-        },
-      },
-    ]);
+        await axios.post(
+          `${serverUrl}/upload-image-banner`,
+          bannerFormData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          },
+        );
+      }
+
+      const response = await axios.post(
+        `${serverUrl}/update-profile`,
+        updatedUserData,
+      );
+
+      if (response.data.status === 'update') {
+        console.log('Data berhasil diubah');
+        navigation.goBack();
+      } else {
+        setIsSaving(false);
+      }
+    } catch (error) {
+      setIsSaving(false);
+      console.error('Error updating profile:', error);
+      console.log('Error: Failed to update profile');
+    }
   };
 
   const MAX_IMAGE_SIZE_MB = 5;
@@ -345,6 +334,7 @@ export default function EditProfilePage() {
                   onChangeText={text => setUsername(text)}
                   onBlur={() => setIsEditing(false)}
                   autoFocus
+                  maxLength={15}
                 />
               ) : (
                 <Text style={styles.username}> {username} </Text>
@@ -367,7 +357,11 @@ export default function EditProfilePage() {
                 colorScheme === 'dark' ? '#cccccc' : '#888888'
               }
               autoCapitalize="none"
+              maxLength={40}
             />
+            {nameError ? (
+              <Text style={styles.errorText}>{nameError}</Text>
+            ) : null}
           </View>
 
           <View style={styles.inputContainer}>
@@ -493,6 +487,10 @@ const getStyles = colorScheme => {
       borderRadius: 10,
       padding: 10,
       width: '100%',
+    },
+    errorText: {
+      color: 'red',
+      marginTop: 5,
     },
     saveButton: {
       backgroundColor: '#00137F',
