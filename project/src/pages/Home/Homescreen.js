@@ -13,6 +13,7 @@ import {
   ToastAndroid,
   Text, // Tambahkan import Text
 } from 'react-native';
+import NetInfo from '@react-native-community/netinfo'; // Tambahkan import NetInfo
 import { useFocusEffect } from '@react-navigation/native';
 import TweetCard from '../../components/TweetCard';
 import Animated, {
@@ -29,10 +30,9 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../../config';
-import { Skeleton } from 'react-native-elements'; 
+import { Skeleton } from 'react-native-elements';
 
 const serverUrl = config.SERVER_URL;
-
 
 const HomeScreen = ({ navigation }) => {
   const [tweets, setTweets] = useState([]);
@@ -75,7 +75,7 @@ const HomeScreen = ({ navigation }) => {
       const emailUser = data.email
       const idUser = data._id;
       const profilePicture = data.profilePicture
-      
+
       const responseTweet = await axios.post(`${serverUrl}/posts`, {
         page: pageNum,
       });
@@ -110,7 +110,7 @@ const HomeScreen = ({ navigation }) => {
       return formattedTweets;
     } catch (error) {
       console.error('Error fetching data:', error);
-      return []; d
+      return [];
     } finally {
       setLoading(false);
     }

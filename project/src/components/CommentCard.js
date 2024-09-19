@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -17,7 +17,7 @@ import config from '../config';
 
 const serverUrl = config.SERVER_URL;
 
-const CommentCard = ({ text, hasReplies, replies, onReplyPress, username, profilePicture, onAddReply, commentId, postId, userIdPost, idUser, allowedEmail, emailUser, onDeleteSuccess, isLikedCom }) => {
+const CommentCard = ({ text, hasReplies, replies, onReplyPress, username, profilePicture, onAddReply, commentId, postId, userIdPost, idUser, allowedEmail, emailUser, onDeleteSuccess, isLikedCom, parentCommentId }) => {
   const [isLiked, setIsLiked] = useState(isLikedCom);
   const [showReplies, setShowReplies] = useState(false);
   const [showMoreReplies, setShowMoreReplies] = useState(false);
@@ -34,23 +34,26 @@ const CommentCard = ({ text, hasReplies, replies, onReplyPress, username, profil
   }, []);
 
   const handleLikePress = async () => {
-    console.log(postId, "postId")
-    console.log(commentId, "commentId")
     if (isLiked) {
       await handleUnlikePress();
     } else {
       try {
+
         const respLike = await axios.post(`${serverUrl}/like-comment`, {
           token: gettoken,
           postId: postId,
-          commentId: commentId
+          commentId: parentCommentId || commentId,
+          replyId: parentCommentId ? commentId : null
         });
 
         if (respLike.data.status === 'ok') {
           setIsLiked(true);
         } else {
-          console.log('Error in like respLike data:', respLike.data.data);
+          console.error('Error in like respLike data:', respLike.data.data);
         }
+
+        console.log(parentCommentId ? "like reply" : "like");
+
       } catch (error) {
         console.error('Error: ', error);
       }
@@ -59,17 +62,23 @@ const CommentCard = ({ text, hasReplies, replies, onReplyPress, username, profil
 
   const handleUnlikePress = async () => {
     try {
+
       const respUnlike = await axios.post(`${serverUrl}/unlike-comment`, {
         token: gettoken,
         postId: postId,
-        commentId: commentId
+        commentId: parentCommentId || commentId,
+        replyId: parentCommentId ? commentId : null
       });
 
       if (respUnlike.data.status === 'ok') {
         setIsLiked(false);
       } else {
-        console.log('Error in unlike respUnlike data:', respUnlike.data.data);
+        console.error('Error in like respUnlike data:', respUnlike.data.data);
       }
+
+      console.log(parentCommentId ? "unlike reply" : "unlike");
+
+
     } catch (error) {
       console.error('Error unliking post:', error.message);
     }
@@ -97,19 +106,21 @@ const CommentCard = ({ text, hasReplies, replies, onReplyPress, username, profil
           <TouchableOpacity onPress={handleProfilePress}>
             <Image
               source={
-                {uri: profilePicture} || require('../assets/profilepic.png')
+                { uri: profilePicture } || require('../assets/profilepic.png')
               }
               style={styles.profileImage}
             />
           </TouchableOpacity>
         </View>
         <View style={styles.commentContainer}>
-          <Text style={styles.username}>@{username}</Text>
+          <Text style={styles.username}>{username}</Text>
           <Text style={styles.commentText}>{text}</Text>
           <View style={styles.replyAndLikeContainer}>
-            <TouchableOpacity style={styles.replyButton} onPress={onReplyPress}>
-              <Text style={styles.replyButtonText}>Reply</Text>
-            </TouchableOpacity>
+            {parentCommentId ? <Text style={styles.replynope}></Text> :
+              <TouchableOpacity style={styles.replyButton} onPress={onReplyPress}>
+                <Text style={styles.replyButtonText}>Reply</Text>
+              </TouchableOpacity>
+            }
             <TouchableOpacity onPress={handleLikePress}>
               <MaterialCommunityIcons
                 name={isLiked ? 'heart' : 'heart-outline'}
@@ -149,6 +160,7 @@ const CommentCard = ({ text, hasReplies, replies, onReplyPress, username, profil
                       emailUser={emailUser}
                       onDeleteSuccess={onDeleteSuccess}
                       isLikedCom={reply.isLikedCom}
+                      parentCommentId={commentId}
                     />
                   </View>
                 ))}
@@ -199,6 +211,7 @@ const CommentCard = ({ text, hasReplies, replies, onReplyPress, username, profil
               allowedEmail={allowedEmail}
               emailUser={emailUser}
               onDeleteSuccess={onDeleteSuccess}
+              parentCommentId={parentCommentId}
             />
           </View>
         </Modal>
@@ -239,7 +252,7 @@ const styles = StyleSheet.create({
   },
   commentContainer: {
     flex: 1,
-    marginLeft: 60,
+    marginLeft: 58,
     marginRight: 20,
   },
   username: {
@@ -249,12 +262,16 @@ const styles = StyleSheet.create({
   },
   commentText: {
     fontSize: 15,
-    marginLeft: 5,
+    marginLeft: 4,
     color: '#000',
   },
   replyAndLikeContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  replynope: {
+    marginLeft: 4,
+    marginTop: 4
   },
   replyButton: {
     marginLeft: 5,

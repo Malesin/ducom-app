@@ -8,7 +8,8 @@ import {
   TouchableOpacity,
   Keyboard,
   RefreshControl,
-  ToastAndroid // Tambahkan import ToastAndroid
+  ToastAndroid,
+  TouchableWithoutFeedback // Tambahkan import TouchableWithoutFeedback
 } from 'react-native';
 import React, { useState, useCallback, useEffect } from 'react';
 import CommentCard from '../../components/CommentCard';
@@ -27,6 +28,7 @@ const CommentScreen = ({ route }) => {
   const [comments, setComments] = useState([]);
   const [replyToCommentId, setReplyToCommentId] = useState(null);
   const [refreshing, setRefreshing] = useState(false); // Tambahkan state refreshing
+  const [placeholder, setPlaceholder] = useState("add comments"); // Tambahkan state placeholder
 
   const fetchComments = useCallback(async () => {
     setRefreshing(true); // Set refreshing to true saat fetch dimulai
@@ -93,7 +95,6 @@ const CommentScreen = ({ route }) => {
     }
   };
 
-
   const handleTextInputContentSizeChange = event => {
     setInputHeight(event.nativeEvent.contentSize.height);
   };
@@ -111,82 +112,95 @@ const CommentScreen = ({ route }) => {
       fetchComments(); // Fetch updated comments after adding a new one
       setReplyToCommentId(null); // Reset the reply-to comment
       setComment(''); // Clear the input field
+      setPlaceholder("add comments"); // Reset placeholder setelah komentar ditambahkan
       Keyboard.dismiss(); // Hide the keyboard after sending the comment
     } catch (error) {
       console.error('Error data:', error);
     }
   };
 
-  const handleReplyPress = (commentId) => {
+  const handleReplyPress = (commentId, username) => { // Tambahkan parameter username
     setIsTyping(true);
-    setReplyToCommentId(commentId); // Set the comment/reply to reply to
+    setReplyToCommentId(commentId);
+    setPlaceholder(`add reply @${username}`); // Ubah placeholder
     if (textInputRef.current) {
       textInputRef.current.focus();
     }
   };
 
+  const handleBackgroundPress = () => {
+    setComment(''); // Reset comment
+    setPlaceholder("add comments"); // Reset placeholder
+    setReplyToCommentId(null); // Reset reply-to comment
+    setIsTyping(false); // Reset typing state
+    Keyboard.dismiss(); // Hide the keyboard
+  };
+
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView
-        style={styles.commentContainer}
-        contentContainerStyle={{ paddingBottom: 50 }}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }>
-        {comments.map(comment => (
-          <CommentCard
-            key={comment.id}
-            text={comment.text}
-            replies={comment.replies}
-            hasReplies={comment.replies.length > 0}
-            username={comment.username}
-            profilePicture={comment.profilePicture}
-            onReplyPress={() => handleReplyPress(comment.id)}
-            onAddReply={replyText => handleAddReply(comment.id, replyText)}
-            commentId={comment.id}
-            postId={postId}
-            userIdPost={comment.userIdPost}
-            idUser={idUser}
-            allowedEmail={comment.allowedEmail}
-            isLikedCom={comment.isLikedCom}
-            emailUser={emailUser} // Pastikan emailUser diteruskan
-            onDeleteSuccess={onDeleteSuccess} // Tambahkan prop onDeleteSuccess
-          />
-        ))}
-      </ScrollView>
-      <View style={[styles.inputContainer, { height: inputHeight }]}>
-        <Image
-          source={{ uri: profilePicture }}
-          style={styles.profilePicture}
-        />
-        <TextInput
-          ref={textInputRef}
-          style={[styles.inputComment, { height: inputHeight }]}
-          placeholder="add comments"
-          maxLength={500}
-          multiline={true}
-          value={comment} // Bind the state to the TextInput
-          onChangeText={handleTextInputChange}
-          onContentSizeChange={handleTextInputContentSizeChange}
-        />
-
-        {isTyping && (
-          <TouchableOpacity
-            style={styles.iconContainer}
-            onPress={() => handleAddComment()}>
-            <MaterialCommunityIcons
-              name="upload"
-              size={20}
-              color="#fff"
-              style={styles.icon}
+      <TouchableWithoutFeedback onPress={handleBackgroundPress}>
+        <View style={{ flex: 1 }}>
+          <ScrollView
+            style={styles.commentContainer}
+            contentContainerStyle={{ paddingBottom: 50 }}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }>
+            {comments.map(comment => (
+              <CommentCard
+                key={comment.id}
+                text={comment.text}
+                replies={comment.replies}
+                hasReplies={comment.replies.length > 0}
+                username={comment.username}
+                profilePicture={comment.profilePicture}
+                onReplyPress={() => handleReplyPress(comment.id, comment.username)} // Tambahkan username
+                onAddReply={replyText => handleAddReply(comment.id, replyText)}
+                commentId={comment.id}
+                postId={postId}
+                userIdPost={comment.userIdPost}
+                idUser={idUser}
+                allowedEmail={comment.allowedEmail}
+                isLikedCom={comment.isLikedCom}
+                emailUser={emailUser} 
+                onDeleteSuccess={onDeleteSuccess} 
+              />
+            ))}
+          </ScrollView>
+          <View style={[styles.inputContainer, { height: inputHeight }]}>
+            <Image
+              source={{ uri: profilePicture }}
+              style={styles.profilePicture}
             />
-          </TouchableOpacity>
-        )}
-      </View>
+            <TextInput
+              ref={textInputRef}
+              style={[styles.inputComment, { height: inputHeight }]}
+              placeholder={placeholder} // Gunakan state placeholder
+              maxLength={500}
+              multiline={true}
+              value={comment} // Bind the state to the TextInput
+              onChangeText={handleTextInputChange}
+              onContentSizeChange={handleTextInputContentSizeChange}
+            />
+
+            {isTyping && (
+              <TouchableOpacity
+                style={styles.iconContainer}
+                onPress={() => handleAddComment()}>
+                <MaterialCommunityIcons
+                  name="upload"
+                  size={20}
+                  color="#fff"
+                  style={styles.icon}
+                />
+              </TouchableOpacity>
+            )}
+          </View>
+        </View>
+      </TouchableWithoutFeedback>
     </SafeAreaView>
   );
 };
-
 
 export default CommentScreen;
 

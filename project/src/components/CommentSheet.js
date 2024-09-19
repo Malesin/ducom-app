@@ -13,16 +13,18 @@ import config from '../config';
 
 const serverUrl = config.SERVER_URL;
 
-const CommentSheet = ({ commentId, postId, token, emailUser, allowedEmail, idUser, userIdPost, onDeleteSuccess, onClose }) => {
+const CommentSheet = ({ commentId, postId, token, emailUser, allowedEmail, idUser, userIdPost, onDeleteSuccess, onClose, parentCommentId }) => {
   const [isDeleteComment, setIsDeleteComment] = useState(false);
   const [isReportComment, setIsReportComment] = useState(false);
+  console.log(parentCommentId, "parentCommentId")
 
   const deleteComment = async () => {
     try {
       const response = await axios.post(`${serverUrl}/delete-comment`, {
         token: token,
         postId: postId,
-        commentId: commentId
+        commentId: parentCommentId || commentId,
+        replyId : parentCommentId ? commentId : null
       });
 
       if (response.data.status === 'ok') {
