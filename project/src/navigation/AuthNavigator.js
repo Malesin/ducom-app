@@ -12,14 +12,15 @@ import {
   EditProfilePage,
   CreatePost,
   CommentScreen,
+  ViewPost,
   ReportScreen,
-  AccountInformation, // Tambahkan import ini
-  UpdatePassword, // Tambahkan import ini
+  AccountInformation,
+  UpdatePassword,
   BlockedAccount,
   MutedAccount,
 } from '../pages';
-import {NavigationContainer} from '@react-navigation/native';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import BottomTabNavigator from './BottomTabNavigator';
 import DrawerNavigator from './DrawerNavigator';
 import UserTopTabNavigator from './UserTopTabNavigator';
@@ -34,108 +35,113 @@ export default function MainNavigation() {
         <Stack.Screen
           name="Splash"
           component={Splashscreen}
-          options={{headerShown: false}}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name="Auths"
           component={Authscreen}
-          options={{headerShown: false}}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name="Signin"
           component={Signinscreen}
-          options={{headerShown: false}}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name="Register"
           component={Registerscreen}
-          options={{headerShown: false}}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name="Forgotpass"
           component={Forgotpassword}
-          options={{headerShown: true, title: 'Find Your Account'}}
+          options={{ headerShown: true, title: 'Find Your Account' }}
         />
         <Stack.Screen
           name="OTPScreen"
           component={OTPScreen}
-          options={{headerShown: true, title: 'Confirm Your Account'}}
+          options={{ headerShown: true, title: 'Confirm Your Account' }}
         />
         <Stack.Screen
           name="CreatePassword"
           component={CreatePassword}
-          options={{headerShown: true, title: 'Create New Password'}}
+          options={{ headerShown: true, title: 'Create New Password' }}
         />
         <Stack.Screen
           name="Termsandcondition"
           component={TermsandConditionscreen}
-          options={{headerShown: false}}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name="Home"
           component={BottomTabNavigator}
-          options={{headerShown: false}}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="ViewPost"
+          component={ViewPost}
+          options={{ headerShown: true, title: 'Post' }}
         />
         <Stack.Screen
           name="Report"
           component={ReportScreen}
-          options={{headerShown: true, title: 'Report'}}
+          options={{ headerShown: true, title: 'Report' }}
         />
         <Stack.Screen
           name="CreatePost"
           component={CreatePost}
-          options={{headerShown: true, title: 'Create Post'}}
+          options={{ headerShown: true, title: 'Create Post' }}
         />
         <Stack.Screen
           name="Comment"
           component={CommentScreen}
-          options={{headerShown: true, title: 'Comments'}}
+          options={{ headerShown: true, title: 'Comments' }}
         />
         <Stack.Screen
           name="Profile"
           component={Profilescreen}
-          options={{headerShown: false}}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name="EditProfile"
           component={EditProfilePage}
-          options={{headerShown: true, title: 'Edit Profile'}}
+          options={{ headerShown: true, title: 'Edit Profile' }}
         />
         <Stack.Screen
           name="Userprofile"
-          component={UserTopTabNavigator} // Pastikan UserTopTabNavigator diatur sebagai layar langsung
-          options={{headerShown: true, title: 'User Profile'}}
-          initialParams={{userIdPost: '', username: ''}} // Tambahkan initialParams untuk userIdPost dan username
+          component={UserTopTabNavigator}
+          options={{ headerShown: true, title: 'User Profile' }}
+          initialParams={{ userIdPost: '', username: '' }}
         />
         <Stack.Screen
           name="DrawerNavigator"
           component={DrawerNavigator}
-          options={{headerShown: false}}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name="AccountInformation"
           component={AccountInformation}
-          options={{headerShown: true, title: 'Account Information'}} // Tambahkan ini
+          options={{ headerShown: true, title: 'Account Information' }}
         />
         <Stack.Screen
           name="UpdatePassword"
           component={UpdatePassword}
-          options={{headerShown: true, title: 'Update Password'}} // Tambahkan ini
+          options={{ headerShown: true, title: 'Update Password' }}
         />
         <Stack.Screen
           name="BlockedAccount"
           component={BlockedAccount}
-          options={{headerShown: true, title: 'Blocked Accounts'}}
+          options={{ headerShown: true, title: 'Blocked Accounts' }}
         />
         <Stack.Screen
           name="MutedAccount"
           component={MutedAccount}
-          options={{headerShown: true, title: 'Muted Accounts'}}
+          options={{ headerShown: true, title: 'Muted Accounts' }}
         />
         <Stack.Screen
           name="DeactiveDeleteAccount"
           component={DeactiveDeleteAccount}
-          options={{headerShown: true, title: 'Deactivate or Delete Account'}}
+          options={{ headerShown: true, title: 'Deactivate or Delete Account' }}
         />
       </Stack.Navigator>
     </NavigationContainer>

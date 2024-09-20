@@ -27,11 +27,11 @@ const CommentScreen = ({ route }) => {
   const textInputRef = React.createRef();
   const [comments, setComments] = useState([]);
   const [replyToCommentId, setReplyToCommentId] = useState(null);
-  const [refreshing, setRefreshing] = useState(false); // Tambahkan state refreshing
+  const [refreshing, setRefreshing] = useState(false); 
   const [placeholder, setPlaceholder] = useState("add comments"); // Tambahkan state placeholder
 
   const fetchComments = useCallback(async () => {
-    setRefreshing(true); // Set refreshing to true saat fetch dimulai
+    setRefreshing(true); 
     try {
       const response = await axios.post(`${serverUrl}/comments`, { postId: postId });
       const dataComment = response.data.data;
@@ -85,9 +85,8 @@ const CommentScreen = ({ route }) => {
   };
 
   const handleTextInputChange = text => {
-    setComment(text); // Set the comment regardless of length
+    setComment(text);
 
-    // Check if text length is greater than 0
     if (text.length > 0) {
       setIsTyping(true);
     } else {
@@ -106,34 +105,34 @@ const CommentScreen = ({ route }) => {
         token: token,
         postId: postId,
         comment: comment,
-        parentCommentId: replyToCommentId // Parent comment ID is sent
+        parentCommentId: replyToCommentId
       });
 
-      fetchComments(); // Fetch updated comments after adding a new one
-      setReplyToCommentId(null); // Reset the reply-to comment
-      setComment(''); // Clear the input field
-      setPlaceholder("add comments"); // Reset placeholder setelah komentar ditambahkan
-      Keyboard.dismiss(); // Hide the keyboard after sending the comment
+      fetchComments();
+      setReplyToCommentId(null);
+      setComment('');
+      setPlaceholder("add comments");
+      Keyboard.dismiss();
     } catch (error) {
       console.error('Error data:', error);
     }
   };
 
-  const handleReplyPress = (commentId, username) => { // Tambahkan parameter username
+  const handleReplyPress = (commentId, username) => {
     setIsTyping(true);
     setReplyToCommentId(commentId);
-    setPlaceholder(`add reply @${username}`); // Ubah placeholder
+    setPlaceholder(`add reply @${username}`);
     if (textInputRef.current) {
       textInputRef.current.focus();
     }
   };
 
   const handleBackgroundPress = () => {
-    setComment(''); // Reset comment
-    setPlaceholder("add comments"); // Reset placeholder
-    setReplyToCommentId(null); // Reset reply-to comment
-    setIsTyping(false); // Reset typing state
-    Keyboard.dismiss(); // Hide the keyboard
+    setComment('');
+    setPlaceholder("add comments");
+    setReplyToCommentId(null);
+    setIsTyping(false);
+    Keyboard.dismiss()
   };
 
   return (
@@ -154,7 +153,7 @@ const CommentScreen = ({ route }) => {
                 hasReplies={comment.replies.length > 0}
                 username={comment.username}
                 profilePicture={comment.profilePicture}
-                onReplyPress={() => handleReplyPress(comment.id, comment.username)} // Tambahkan username
+                onReplyPress={() => handleReplyPress(comment.id, comment.username)} 
                 onAddReply={replyText => handleAddReply(comment.id, replyText)}
                 commentId={comment.id}
                 postId={postId}
@@ -162,8 +161,8 @@ const CommentScreen = ({ route }) => {
                 idUser={idUser}
                 allowedEmail={comment.allowedEmail}
                 isLikedCom={comment.isLikedCom}
-                emailUser={emailUser} 
-                onDeleteSuccess={onDeleteSuccess} 
+                emailUser={emailUser}
+                onDeleteSuccess={onDeleteSuccess}
               />
             ))}
           </ScrollView>
@@ -175,10 +174,10 @@ const CommentScreen = ({ route }) => {
             <TextInput
               ref={textInputRef}
               style={[styles.inputComment, { height: inputHeight }]}
-              placeholder={placeholder} // Gunakan state placeholder
+              placeholder={placeholder} 
               maxLength={500}
               multiline={true}
-              value={comment} // Bind the state to the TextInput
+              value={comment}
               onChangeText={handleTextInputChange}
               onContentSizeChange={handleTextInputContentSizeChange}
             />
