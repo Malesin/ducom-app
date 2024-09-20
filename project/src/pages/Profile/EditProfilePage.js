@@ -18,6 +18,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import ImagePicker from 'react-native-image-crop-picker';
 import axios from 'axios';
 import config from '../../config';
+import Toast from 'react-native-toast-message';
 
 const serverUrl = config.SERVER_URL;
 
@@ -36,17 +37,14 @@ export default function EditProfilePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isBannerLoading, setIsBannerLoading] = useState(true);
   const [isProfilePictureLoading, setIsProfilePictureLoading] = useState(true);
+  const [nameError, setNameError] = useState('');
   const colorScheme = useColorScheme();
   const styles = getStyles(colorScheme);
 
   async function getData() {
     try {
       const token = await AsyncStorage.getItem('token');
-      console.log('Token Retrieved Successfully');
-
       const userResponse = await axios.post(`${serverUrl}/userdata`, {token});
-      console.log('Data Retrieved Successfully');
-
       const user = userResponse.data.data;
       setUserData(user);
       setUsername(user.username);
@@ -54,16 +52,19 @@ export default function EditProfilePage() {
       if (user.bannerPicture) {
         const banner = {uri: user.bannerPicture};
         setBanner(banner);
-        console.log('Image Banner Retrieved Successfully');
       }
 
       if (user.profilePicture) {
         const profile = {uri: user.profilePicture};
         setProfilePicture(profile);
-        console.log('Image Profile Retrieved Successfully');
       }
     } catch (error) {
       console.error('Error occurred:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Failed to retrieve data',
+      });
     } finally {
       setIsLoading(false);
     }
@@ -87,40 +88,16 @@ export default function EditProfilePage() {
 
   const validateUsername = username => {
     const usernameRegex = /^[a-z0-9]{4,15}$/;
+    const specialCharRegex = /[!@#$%^&*()\-+={}[\]|\\:;"'<>,.?/~`]/;
+    if (specialCharRegex.test(username)) {
+      return false;
+    }
     return usernameRegex.test(username) && !username.includes(' ');
   };
   const validateName = name => {
     const nameRegex = /^[a-zA-Z]+( [a-zA-Z]+)*$/;
     return nameRegex.test(name) && name.length <= 40;
   };
-
-  useEffect(() => {
-    const beforeRemoveListener = navigation.addListener('beforeRemove', e => {
-      if (isSaving) {
-        return;
-      }
-
-      e.preventDefault();
-      Alert.alert('Konfirmasi', 'Apakah anda ingin membatalkan perubahan?', [
-        {
-          text: 'No',
-          style: 'cancel',
-          onPress: () => {},
-        },
-        {
-          text: 'Yes',
-          onPress: () => {
-            setUsername(userData?.username);
-            setName(userData?.name);
-            setBio(userData?.bio);
-            navigation.dispatch(e.data.action);
-          },
-        },
-      ]);
-    });
-
-    return beforeRemoveListener;
-  }, [navigation, userData, isSaving]);
 
   navigation.setOptions({
     headerRight: () => (
@@ -132,107 +109,134 @@ export default function EditProfilePage() {
 
   const handleSave = async () => {
     setIsSaving(true);
+    let hasError = false;
 
-    Alert.alert('Confirmation', 'Do you want to save the changes?', [
-      {text: 'No', style: 'cancel', onPress: () => setIsSaving(false)},
-      {
-        text: 'Yes',
-        style: 'default',
-        onPress: async () => {
-          try {
-            if (!username) {
-            } else if (!validateUsername(username)) {
-              return;
-            }
+    // Validasi username
+    if (!username) {
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Username tidak boleh kosong',
+      });
+      hasError = true;
+    } else if (!validateUsername(username)) {
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2:
+          'Must be 4-15 characters long, lowercase letters and numbers only.',
+      });
+      hasError = true;
+    }
 
-            // Only validate name if it's different from the current name
-            if (name && name !== userData?.name && !validateName(name)) {
-              return;
-            }
+    // Validasi nama
+    if (name && name !== userData?.name && !validateName(name)) {
+      setNameError(
+        'Name can only contain letters and spaces, and must be up to 40 characters long.',
+      );
+      hasError = true;
+    } else {
+      setNameError('');
+    }
 
-            const token = await AsyncStorage.getItem('token');
-            const updatedUserData = {token: token};
+    // Validasi bio
+    if (bio && bio.length > 150) {
+      hasError = true;
+    }
 
-            if (name && name !== userData?.name) {
-              updatedUserData.name = name;
-            }
+    if (hasError) {
+      setIsSaving(false);
+      return;
+    }
 
-            if (username && username !== userData?.username) {
-              const checkUsernameResponse = await axios.post(
-                `${serverUrl}/check-username`,
-                {username},
-              );
-              if (checkUsernameResponse.data.status === 'error') {
-                setIsSaving(false);
-                return;
-              }
-              updatedUserData.username = username;
-            }
+    try {
+      const token = await AsyncStorage.getItem('token');
+      const updatedUserData = {token: token};
 
-            if (bio && bio !== userData?.bio) {
-              updatedUserData.bio = bio;
-            }
+      if (name && name !== userData?.name) {
+        updatedUserData.name = name;
+      }
 
-            // Upload the new profile image if exists
-            if (newProfileImage) {
-              const profileFormData = new FormData();
-              profileFormData.append('image', {
-                uri: newProfileImage.path,
-                name: newProfileImage.filename || 'profile.jpg',
-                type: newProfileImage.mime,
-              });
-              profileFormData.append('token', token);
+      if (username && username !== userData?.username) {
+        const checkUsernameResponse = await axios.post(
+          `${serverUrl}/check-username`,
+          {username},
+        );
+        if (checkUsernameResponse.data.status === 'error') {
+          Toast.show({
+            type: 'error',
+            text1: 'Failed',
+            text2: 'User name is already taken',
+          });
+          setIsSaving(false);
+          return;
+        }
+        updatedUserData.username = username;
+      }
 
-              await axios.post(
-                `${serverUrl}/upload-image-profile`,
-                profileFormData,
-                {
-                  headers: {
-                    'Content-Type': 'multipart/form-data',
-                  },
-                },
-              );
-            }
+      if (bio && bio !== userData?.bio) {
+        updatedUserData.bio = bio;
+      }
 
-            // Upload the new banner image if exists
-            if (newBannerImage) {
-              const bannerFormData = new FormData();
-              bannerFormData.append('image', {
-                uri: newBannerImage.path,
-                name: newBannerImage.filename || 'banner.jpg',
-                type: newBannerImage.mime,
-              });
-              bannerFormData.append('token', token);
+      // Upload the new profile image if exists
+      if (newProfileImage) {
+        const profileFormData = new FormData();
+        profileFormData.append('image', {
+          uri: newProfileImage.path,
+          name: newProfileImage.filename || 'profile.jpg',
+          type: newProfileImage.mime,
+        });
+        profileFormData.append('token', token);
 
-              await axios.post(
-                `${serverUrl}/upload-image-banner`,
-                bannerFormData,
-                {
-                  headers: {
-                    'Content-Type': 'multipart/form-data',
-                  },
-                },
-              );
-            }
+        await axios.post(`${serverUrl}/upload-image-profile`, profileFormData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+      }
 
-            const response = await axios.post(
-              `${serverUrl}/update-profile`,
-              updatedUserData,
-            );
+      // Upload the new banner image if exists
+      if (newBannerImage) {
+        const bannerFormData = new FormData();
+        bannerFormData.append('image', {
+          uri: newBannerImage.path,
+          name: newBannerImage.filename || 'banner.jpg',
+          type: newBannerImage.mime,
+        });
+        bannerFormData.append('token', token);
 
-            if (response.data.status === 'update') {
-              navigation.goBack();
-            } else {
-              setIsSaving(false);
-            }
-          } catch (error) {
-            setIsSaving(false);
-            console.error('Error updating profile:', error);
-            Alert.alert('Error', 'Failed to update profile');
-          }
-        },
-      },
-    ]);
+        await axios.post(`${serverUrl}/upload-image-banner`, bannerFormData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+      }
+
+      const response = await axios.post(
+        `${serverUrl}/update-profile`,
+        updatedUserData,
+      );
+
+      if (response.data.status === 'update') {
+        console.log('Updating new data');
+        Toast.show({
+          type: 'success',
+          text1: 'Success',
+          text2: 'Updating new data',
+        });
+        setTimeout(() => {
+          navigation.goBack();
+        }, 2500);
+      }
+    } catch (error) {
+      setIsSaving(false);
+      console.error('Error updating profile:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Failed to update profile',
+      });
+    }
   };
 
   const MAX_IMAGE_SIZE_MB = 5;
@@ -251,6 +255,7 @@ export default function EditProfilePage() {
           Alert.alert('Error', 'Image size exceeds 5 MB.');
           return;
         }
+        console.log('New profile image selected:', image); // Log untuk gambar profil baru
         setNewProfileImage(image);
         setProfilePicture({uri: image.path});
       })
@@ -272,6 +277,7 @@ export default function EditProfilePage() {
           Alert.alert('Error', 'Image size exceeds 5 MB.');
           return;
         }
+        console.log('New banner image selected:', image); // Log untuk gambar banner baru
         setNewBannerImage(image);
         setBanner({uri: image.path});
       })
@@ -345,6 +351,7 @@ export default function EditProfilePage() {
                   onChangeText={text => setUsername(text)}
                   onBlur={() => setIsEditing(false)}
                   autoFocus
+                  maxLength={15}
                 />
               ) : (
                 <Text style={styles.username}> {username} </Text>
@@ -360,14 +367,18 @@ export default function EditProfilePage() {
           <View style={styles.inputContainer}>
             <TextInput
               value={name}
-              onChangeText={setName}
               style={styles.textInput}
+              onChangeText={setName}
               placeholder={userData?.name}
               placeholderTextColor={
                 colorScheme === 'dark' ? '#cccccc' : '#888888'
               }
               autoCapitalize="none"
+              maxLength={40}
             />
+            {nameError ? (
+              <Text style={styles.errorText}>{nameError}</Text>
+            ) : null}
           </View>
 
           <View style={styles.inputContainer}>
@@ -375,7 +386,7 @@ export default function EditProfilePage() {
               value={bio}
               onChangeText={setBio}
               style={styles.textInput}
-              placeholder={userData?.bio || 'Bio'}
+              placeholder={userData?.bio || ''}
               placeholderTextColor={
                 colorScheme === 'dark' ? '#cccccc' : '#888888'
               }
@@ -397,6 +408,7 @@ export default function EditProfilePage() {
           </View>
         </View>
       </ScrollView>
+      <Toast />
     </SafeAreaView>
   );
 }
@@ -493,6 +505,10 @@ const getStyles = colorScheme => {
       borderRadius: 10,
       padding: 10,
       width: '100%',
+    },
+    errorText: {
+      color: 'red',
+      marginTop: 5,
     },
     saveButton: {
       backgroundColor: '#00137F',
