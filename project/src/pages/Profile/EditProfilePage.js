@@ -18,6 +18,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import ImagePicker from 'react-native-image-crop-picker';
 import axios from 'axios';
 import config from '../../config';
+import Toast from 'react-native-toast-message';
 
 const serverUrl = config.SERVER_URL;
 
@@ -43,11 +44,7 @@ export default function EditProfilePage() {
   async function getData() {
     try {
       const token = await AsyncStorage.getItem('token');
-      console.log('Token Retrieved Successfully');
-
       const userResponse = await axios.post(`${serverUrl}/userdata`, {token});
-      console.log('Data Retrieved Successfully');
-
       const user = userResponse.data.data;
       setUserData(user);
       setUsername(user.username);
@@ -55,16 +52,19 @@ export default function EditProfilePage() {
       if (user.bannerPicture) {
         const banner = {uri: user.bannerPicture};
         setBanner(banner);
-        console.log('Image Banner Retrieved Successfully');
       }
 
       if (user.profilePicture) {
         const profile = {uri: user.profilePicture};
         setProfilePicture(profile);
-        console.log('Image Profile Retrieved Successfully');
       }
     } catch (error) {
       console.error('Error occurred:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Failed to retrieve data',
+      });
     } finally {
       setIsLoading(false);
     }
@@ -109,33 +109,44 @@ export default function EditProfilePage() {
 
   const handleSave = async () => {
     setIsSaving(true);
-    let hasError = false; // Tambahkan variabel untuk melacak error
+    let hasError = false;
 
+    // Validasi username
     if (!username) {
-        console.log('Error: Username tidak boleh kosong');
-        hasError = true; // Tandai ada error
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Username tidak boleh kosong',
+      });
+      hasError = true;
     } else if (!validateUsername(username)) {
-        console.log('Invalid username. Must be 4-15 characters long, lowercase letters and numbers only, with no spaces.');
-        hasError = true; // Tandai ada error
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2:
+          'Must be 4-15 characters long, lowercase letters and numbers only.',
+      });
+      hasError = true;
     }
 
     // Validasi nama
     if (name && name !== userData?.name && !validateName(name)) {
-        setNameError('Name can only contain letters and spaces, and must be up to 40 characters long.');
-        hasError = true; // Tandai ada error
+      setNameError(
+        'Name can only contain letters and spaces, and must be up to 40 characters long.',
+      );
+      hasError = true;
     } else {
-        setNameError(''); // Hapus error jika valid
+      setNameError('');
     }
 
     // Validasi bio
     if (bio && bio.length > 150) {
-        console.log('Error: Bio tidak boleh lebih dari 150 karakter');
-        hasError = true; // Tandai ada error
+      hasError = true;
     }
 
     if (hasError) {
-        setIsSaving(false);
-        return; // Hentikan eksekusi jika ada error
+      setIsSaving(false);
+      return;
     }
 
     try {
@@ -147,13 +158,16 @@ export default function EditProfilePage() {
       }
 
       if (username && username !== userData?.username) {
-        // Cek apakah username sudah digunakan
         const checkUsernameResponse = await axios.post(
           `${serverUrl}/check-username`,
           {username},
         );
         if (checkUsernameResponse.data.status === 'error') {
-          console.log('Error: Username sudah diambil');
+          Toast.show({
+            type: 'error',
+            text1: 'Failed',
+            text2: 'User name is already taken',
+          });
           setIsSaving(false);
           return;
         }
@@ -174,15 +188,11 @@ export default function EditProfilePage() {
         });
         profileFormData.append('token', token);
 
-        await axios.post(
-          `${serverUrl}/upload-image-profile`,
-          profileFormData,
-          {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
+        await axios.post(`${serverUrl}/upload-image-profile`, profileFormData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
           },
-        );
+        });
       }
 
       // Upload the new banner image if exists
@@ -195,15 +205,11 @@ export default function EditProfilePage() {
         });
         bannerFormData.append('token', token);
 
-        await axios.post(
-          `${serverUrl}/upload-image-banner`,
-          bannerFormData,
-          {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
+        await axios.post(`${serverUrl}/upload-image-banner`, bannerFormData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
           },
-        );
+        });
       }
 
       const response = await axios.post(
@@ -212,15 +218,24 @@ export default function EditProfilePage() {
       );
 
       if (response.data.status === 'update') {
-        console.log('Data berhasil diubah');
-        navigation.goBack();
-      } else {
-        setIsSaving(false);
+        console.log('Updating new data');
+        Toast.show({
+          type: 'success',
+          text1: 'Success',
+          text2: 'Updating new data',
+        });
+        setTimeout(() => {
+          navigation.goBack();
+        }, 2500);
       }
     } catch (error) {
       setIsSaving(false);
       console.error('Error updating profile:', error);
-      console.log('Error: Failed to update profile');
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Failed to update profile',
+      });
     }
   };
 
@@ -240,6 +255,7 @@ export default function EditProfilePage() {
           Alert.alert('Error', 'Image size exceeds 5 MB.');
           return;
         }
+        console.log('New profile image selected:', image); // Log untuk gambar profil baru
         setNewProfileImage(image);
         setProfilePicture({uri: image.path});
       })
@@ -261,6 +277,7 @@ export default function EditProfilePage() {
           Alert.alert('Error', 'Image size exceeds 5 MB.');
           return;
         }
+        console.log('New banner image selected:', image); // Log untuk gambar banner baru
         setNewBannerImage(image);
         setBanner({uri: image.path});
       })
@@ -350,8 +367,8 @@ export default function EditProfilePage() {
           <View style={styles.inputContainer}>
             <TextInput
               value={name}
-              onChangeText={setName}
               style={styles.textInput}
+              onChangeText={setName}
               placeholder={userData?.name}
               placeholderTextColor={
                 colorScheme === 'dark' ? '#cccccc' : '#888888'
@@ -369,7 +386,7 @@ export default function EditProfilePage() {
               value={bio}
               onChangeText={setBio}
               style={styles.textInput}
-              placeholder={userData?.bio || 'Bio'}
+              placeholder={userData?.bio || ''}
               placeholderTextColor={
                 colorScheme === 'dark' ? '#cccccc' : '#888888'
               }
@@ -391,6 +408,7 @@ export default function EditProfilePage() {
           </View>
         </View>
       </ScrollView>
+      <Toast />
     </SafeAreaView>
   );
 }
