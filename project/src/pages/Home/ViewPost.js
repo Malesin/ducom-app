@@ -1,16 +1,17 @@
-import { StyleSheet, SafeAreaView, ScrollView, View, Image, Text, TouchableOpacity, Alert, ToastAndroid, Share, Modal, TouchableWithoutFeedback } from 'react-native'
-import React, { useState, useEffect } from 'react'
+import { StyleSheet, SafeAreaView, ScrollView, View, Image, Text, TouchableOpacity, Alert, ToastAndroid, Share, Modal, TouchableWithoutFeedback, RefreshControl } from 'react-native'
+import React, { useState, useEffect, useCallback } from 'react'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../../config';
 import Video from 'react-native-video';
 import { createThumbnail } from 'react-native-create-thumbnail';
+import CommentCard from '../../components/CommentCard';
 
 const serverUrl = config.SERVER_URL;
 
 const ViewPost = ({ route }) => {
-    const { tweet } = route.params;
+    const { tweet, comments: initialComments, idUser, emailUser } = route?.params;
     const [liked, setLiked] = useState(tweet.isLiked);
     const [likesCount, setLikesCount] = useState(tweet.likesCount);
     const [bookmarked, setBookmarked] = useState(tweet.isBookmarked);
@@ -18,6 +19,8 @@ const ViewPost = ({ route }) => {
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedMedia, setSelectedMedia] = useState(null);
     const [thumbnails, setThumbnails] = useState({});
+    const [comments, setComments] = useState(initialComments || []);
+    const [refreshing, setRefreshing] = useState(false);
 
     useEffect(() => {
         const generateThumbnails = async () => {
@@ -172,9 +175,72 @@ const ViewPost = ({ route }) => {
         setSelectedMedia(null);
     };
 
+    const fetchComments = useCallback(async () => {
+        setRefreshing(true);
+        try {
+            const url = `${serverUrl}/comments`;
+            const params = { postId: tweet.id };
+            console.log('Fetching comments from URL:', url);
+            console.log('Dengan parameter:', params);
+
+            const response = await axios.post(url, params);
+            const dataComment = response.data.data;
+
+            console.log('Data komentar yang diterima:', dataComment);
+
+            const formattedComments = dataComment.map(comment => ({
+                id: comment._id,
+                text: comment.comment,
+                userIdPost: comment.user._id,
+                idUser: idUser,
+                email: comment.user.email,
+                isLikedCom: comment.likes.some(like => like.user === idUser),
+                replies: Array.isArray(comment.replies)
+                    ? comment.replies.map(reply => ({
+                        id: reply._id,
+                        text: reply.comment,
+                        userIdPost: reply.user._id,
+                        idUser: idUser,
+                        username: reply.user.username,
+                        email: reply.user.email,
+                        isLikedCom: reply.likes.some(like => like.user === idUser),
+                        profilePicture: reply.user.profilePicture,
+                        replies: reply.replies || [],
+                        allowedEmail: reply.allowedEmail
+                    }))
+                    : [],
+                username: comment.user.username,
+                profilePicture: comment.user.profilePicture,
+                allowedEmail: comment.allowedEmail
+            }));
+
+            setComments(formattedComments);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        } finally {
+            setRefreshing(false);
+        }
+    }, [tweet.id]);
+
+    useEffect(() => {
+        fetchComments();
+    }, [fetchComments]);
+
+    const onRefresh = useCallback(() => {
+        fetchComments();
+    }, [fetchComments]);
+
+    const onDeleteSuccess = () => {
+        ToastAndroid.show('Komentar berhasil dihapus', ToastAndroid.SHORT);
+        fetchComments();
+    };
+
     return (
         <SafeAreaView style={styles.container}>
-            <ScrollView contentContainerStyle={styles.scrollContainer}>
+            <ScrollView contentContainerStyle={styles.scrollContainer}
+                refreshControl={
+                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                }>
                 <View style={styles.postContainer}>
                     <View style={styles.headerContainer}>
                         <Image
@@ -188,8 +254,8 @@ const ViewPost = ({ route }) => {
                         <TouchableOpacity style={styles.optionsButton}>
                             <MaterialCommunityIcons
                                 name="dots-vertical"
-                                size={24}
-                                color="#657786"
+                                size={26}
+                                color="#000"
                             />
                         </TouchableOpacity>
                     </View>
@@ -251,10 +317,6 @@ const ViewPost = ({ route }) => {
                         </TouchableOpacity>
                     </View>
                 </View>
-                <View style={styles.newContainer}>
-                    {/* Konten baru di sini */}
-                    <Text>Konten baru di bawah post</Text>
-                </View>
             </ScrollView>
             {selectedMedia && (
                 <Modal
@@ -291,17 +353,19 @@ const ViewPost = ({ route }) => {
 
 export default ViewPost
 
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         paddingVertical: 10,
-        backgroundColor: '#fff'
+        backgroundColor: '#fff',
+        paddingHorizontal: 10,
     },
     scrollContainer: {
         flexGrow: 1,
     },
     postContainer: {
-        marginBottom: 20, 
+        marginBottom: 20,
     },
     headerContainer: {
         flexDirection: 'row',
@@ -327,9 +391,10 @@ const styles = StyleSheet.create({
     },
     optionsButton: {
         marginLeft: 'auto',
+        padding: 10,
     },
     postContent: {
-        fontSize: 18,
+        fontSize: 16,
         marginVertical: 10,
         color: 'black',
     },
@@ -342,15 +407,15 @@ const styles = StyleSheet.create({
         color: 'gray',
         fontSize: 14,
         marginTop: 10,
+        marginBottom: 10,
     },
     interactionsContainer: {
         flexDirection: 'row',
         justifyContent: 'flex-start',
-        marginVertical: 10,
         borderTopWidth: 1,
         borderBottomWidth: 1,
-        borderTopColor: 'black',
-        borderBottomColor: 'black',
+        borderTopColor: 'gray',
+        borderBottomColor: 'gray',
         width: '100%',
         padding: 5
     },
@@ -364,7 +429,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-around',
         borderBottomWidth: 1,
-        borderBottomColor: 'black',
+        borderBottomColor: 'gray',
         width: '100%',
     },
     actionButton: {
@@ -435,6 +500,11 @@ const styles = StyleSheet.create({
     },
     newContainer: {
         padding: 20,
-        backgroundColor: '#f0f0f0',
+        backgroundColor: 'gray',
+    },
+    newContainerTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 10,
     },
 });

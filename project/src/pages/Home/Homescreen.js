@@ -9,9 +9,8 @@ import {
   TouchableOpacity,
   RefreshControl,
   ActivityIndicator,
-  Dimensions,
   ToastAndroid,
-  Text, // Tambahkan import Text
+  Text, 
 } from 'react-native';
 import NetInfo from '@react-native-community/netinfo'; // Tambahkan import NetInfo
 import { useFocusEffect } from '@react-navigation/native';
@@ -42,7 +41,7 @@ const HomeScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [hasMore, setHasMore] = useState(true);
   const [showSkeleton, setShowSkeleton] = useState(true);
-  const [isConnected, setIsConnected] = useState(true); // Tambahkan state untuk koneksi
+  const [isConnected, setIsConnected] = useState(true); 
   const isExpanded = useSharedValue(false);
 
   useEffect(() => {
@@ -114,6 +113,28 @@ const HomeScreen = ({ navigation }) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const fetchComments = async (postId) => {
+    try {
+      const response = await axios.get(`${serverUrl}/comments`, {
+        params: { postId },
+      });
+      if (response.data.status === 'ok') {
+        return response.data.comments;
+      } else {
+        console.log('Error fetching comments:', response.data.data);
+        return [];
+      }
+    } catch (error) {
+      console.error('Error fetching comments:', error.message);
+      return [];
+    }
+  };
+
+  const handlePostPress = async (tweet) => {
+    const comments = await fetchComments(tweet.id);
+    navigation.navigate('ViewPost', { tweet, comments });
   };
 
   const onRefresh = useCallback(async () => {
@@ -363,7 +384,9 @@ const HomeScreen = ({ navigation }) => {
         ) : (
           tweets.map((tweet, index) => (
             <View key={index} style={styles.tweetContainer}>
-              <TweetCard tweet={tweet} onDeleteSuccess={onDeleteSuccess} />
+              <TouchableOpacity onPress={() => handlePostPress(tweet)}>
+                <TweetCard tweet={tweet} onDeleteSuccess={onDeleteSuccess} />
+              </TouchableOpacity>
             </View>
           ))
         )}

@@ -80,7 +80,7 @@ export default function MainNavigation() {
         <Stack.Screen
           name="ViewPost"
           component={ViewPost}
-          options={{ headerShown: false }}
+          options={{ headerShown: true, title: 'Post' }}
         />
         <Stack.Screen
           name="Report"
