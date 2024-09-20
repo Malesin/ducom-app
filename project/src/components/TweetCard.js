@@ -24,7 +24,7 @@ import axios from 'axios';
 import config from '../config';
 const serverUrl = config.SERVER_URL;
 
-const TweetCard = ({tweet, onDeleteSuccess}) => {
+const TweetCard = ({ tweet, onDeleteSuccess }) => {
   const [liked, setLiked] = useState(tweet.isLiked);
   const [likesCount, setLikesCount] = useState(tweet.likesCount);
   const [bookmarked, setBookmarked] = useState(tweet.isBookmarked);
@@ -174,11 +174,7 @@ const TweetCard = ({tweet, onDeleteSuccess}) => {
   };
 
   const handleCommentPress = () => {
-    navigator.navigate('Comment', {
-      postId: tweet.id,
-      idUser: tweet.idUser,
-      profilePicture: tweet.profilePicture,
-    });
+    navigator.navigate('Comment', { postId: tweet.id, idUser: tweet.idUser, profilePicture: tweet.profilePicture, emailUser: tweet.emailUser });
   };
 
   const openMediaPreview = uri => {
@@ -284,8 +280,6 @@ const TweetCard = ({tweet, onDeleteSuccess}) => {
     );
   };
 
-  const tweetId = tweet.userId;
-
   const handleDelete = async () => {
     const token = await AsyncStorage.getItem('token');
     try {
@@ -375,7 +369,7 @@ const TweetCard = ({tweet, onDeleteSuccess}) => {
         <FlatList
           data={tweet.media}
           renderItem={renderMediaItem}
-          keyExtractor={(item, index) => item.uri || index.toString()} // Use a unique identifier like 'uri' or fallback to 'index'
+          keyExtractor={(item, index) => item.uri || index.toString()}
           horizontal
           showsHorizontalScrollIndicator={false}
           style={styles.mediaFlatList}

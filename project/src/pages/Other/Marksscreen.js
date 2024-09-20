@@ -1,4 +1,4 @@
-import React, {useState, useCallback, useEffect} from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   StyleSheet,
   ScrollView,
@@ -50,8 +50,8 @@ const Marksscreen = ({navigation}) => {
       const token = await AsyncStorage.getItem('token');
 
       try {
-        const response = await axios.post(`${serverUrl}/userdata`, {token});
-        const {data, status} = response.data;
+        const response = await axios.post(`${serverUrl}/userdata`, { token });
+        const { data, status } = response.data;
 
         if (status === 'error') {
           Alert.alert('Error', 'Anda Telah Keluar dari Akun', [
@@ -63,7 +63,7 @@ const Marksscreen = ({navigation}) => {
         const idUser = data._id; 
         const emailUser = data.email; 
         const profilePicture = data.profilePicture;
-      
+
         const responseTweet = await axios.post(`${serverUrl}/user-bookmarks`, {
           token: token
         });
@@ -85,8 +85,8 @@ const Marksscreen = ({navigation}) => {
           likesCount: post.likes.length,
           commentsCount: post.comments.length,
           bookMarksCount: post.bookmarks.length,
-          isLiked: post.likes.some(like => like._id === idUser), 
-          isBookmarked: post.bookmarks.some(bookmark => bookmark.user === idUser), 
+          isLiked: post.likes.some(like => like._id === idUser),
+          isBookmarked: post.bookmarks.some(bookmark => bookmark.user === idUser),
           userIdPost: post.user._id,
           idUser: idUser,
           allowedEmail: post.allowedEmail,
