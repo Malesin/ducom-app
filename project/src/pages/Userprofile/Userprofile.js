@@ -91,7 +91,9 @@ const Userprofile = ({userIdPost, navigation}) => {
   };
 
   const handleDropdownItemPress = item => {
-    // Handle item press
+    if (item === 'Report') {
+      navigation.navigate('Report'); // Navigasi ke layar 'Report' seperti di BottomSheet.js
+    }
     console.log(item);
     toggleDropdown();
   };
@@ -116,6 +118,17 @@ const Userprofile = ({userIdPost, navigation}) => {
           <TouchableWithoutFeedback onPress={toggleDropdown}>
             <View style={styles.dropdownOverlay}>
               <View style={styles.dropdownMenu}>
+                <TouchableOpacity
+                  style={styles.dropdownItem}
+                  onPress={() => handleDropdownItemPress('Mute')}>
+                  <MaterialCommunityIcons
+                    name="volume-mute"
+                    size={20}
+                    color="#000"
+                    style={styles.dropdownIcon}
+                  />
+                  <Text style={styles.dropdownItemText}>Mute</Text>
+                </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.dropdownItem}
                   onPress={() => handleDropdownItemPress('Block')}>
@@ -144,6 +157,7 @@ const Userprofile = ({userIdPost, navigation}) => {
         )}
         <View style={styles.profileContainer}>
           <TouchableOpacity onPress={openModal}>
+            
             <Image
               source={profilePicture || require('../../assets/profilepic.png')}
               style={styles.profile}

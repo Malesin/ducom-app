@@ -12,13 +12,13 @@ import {
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {SafeAreaView} from 'react-native';
-import {Skeleton} from 'react-native-elements';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ImagePicker from 'react-native-image-crop-picker';
 import axios from 'axios';
 import config from '../../config';
 import Toast from 'react-native-toast-message';
+import {Skeleton} from 'react-native-elements';
 
 const serverUrl = config.SERVER_URL;
 
@@ -72,6 +72,11 @@ export default function EditProfilePage() {
 
   useEffect(() => {
     getData();
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 3000); // 3 detik
+
+    return () => clearTimeout(timer); // Bersihkan timer saat komponen unmount
   }, []);
 
   useEffect(() => {
@@ -290,11 +295,14 @@ export default function EditProfilePage() {
     <SafeAreaView style={{flex: 1}}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.bannerContainer}>
-          {isBannerLoading ? (
+          {isLoading ? (
             <Skeleton
-              containerStyle={[styles.banner, {height: 500}]}
-              animation="wave"
+              animation="pulse"
+              height={200}
+              width="100%"
             />
+          ) : isBannerLoading ? (
+            <View style={[styles.banner, {height: 500, backgroundColor: '#ccc'}]} />
           ) : (
             <TouchableOpacity onPress={selectImageBanner}>
               <ImageBackground
@@ -316,8 +324,10 @@ export default function EditProfilePage() {
         <View style={styles.contentContainer}>
           {isProfilePictureLoading ? (
             <Skeleton
-              containerStyle={[styles.profilePicture, {height: 150}]}
-              animation="wave"
+              animation="pulse"
+              height={120}
+              width={120}
+              style={{borderRadius: 60, marginBottom: 20}}
             />
           ) : (
             <TouchableOpacity onPress={selectImageProfile}>
@@ -343,10 +353,15 @@ export default function EditProfilePage() {
             <View style={styles.usernameInputContainer}>
               <Text style={styles.usernameStatic}> @</Text>
               {isLoading ? (
-                <Skeleton height={30} width={100} animation="wave" />
+                <Skeleton
+                  animation="pulse"
+                  height={30}
+                  width={100}
+                  style={{borderRadius: 5}}
+                />
               ) : isEditing ? (
                 <TextInput
-                  style={styles.usernameInput}
+                  style={[styles.usernameInput, {borderRadius: 5}]}
                   value={username}
                   onChangeText={text => setUsername(text)}
                   onBlur={() => setIsEditing(false)}
@@ -365,46 +380,73 @@ export default function EditProfilePage() {
           </View>
 
           <View style={styles.inputContainer}>
-            <TextInput
-              value={name}
-              style={styles.textInput}
-              onChangeText={setName}
-              placeholder={userData?.name}
-              placeholderTextColor={
-                colorScheme === 'dark' ? '#cccccc' : '#888888'
-              }
-              autoCapitalize="none"
-              maxLength={40}
-            />
+            {isLoading ? (
+              <Skeleton
+                animation="pulse"
+                height={40}
+                width="100%"
+                style={{borderRadius: 10}}
+              />
+            ) : (
+              <TextInput
+                value={name}
+                style={styles.textInput}
+                onChangeText={setName}
+                placeholder={userData?.name}
+                placeholderTextColor={
+                  colorScheme === 'dark' ? '#cccccc' : '#888888'
+                }
+                autoCapitalize="none"
+                maxLength={40}
+              />
+            )}
             {nameError ? (
               <Text style={styles.errorText}>{nameError}</Text>
             ) : null}
           </View>
 
           <View style={styles.inputContainer}>
-            <TextInput
-              value={bio}
-              onChangeText={setBio}
-              style={styles.textInput}
-              placeholder={userData?.bio || ''}
-              placeholderTextColor={
-                colorScheme === 'dark' ? '#cccccc' : '#888888'
-              }
-              autoCapitalize="none"
-              multiline
-              maxLength={150}
-            />
+            {isLoading ? (
+              <Skeleton
+                animation="pulse"
+                height={40}
+                width="100%"
+                style={{borderRadius: 10}}
+              />
+            ) : (
+              <TextInput
+                value={bio}
+                onChangeText={setBio}
+                style={styles.textInput}
+                placeholder={userData?.bio || ''}
+                placeholderTextColor={
+                  colorScheme === 'dark' ? '#cccccc' : '#888888'
+                }
+                autoCapitalize="none"
+                multiline
+                maxLength={150}
+              />
+            )}
           </View>
 
           <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.textInput}
-              placeholder={userData?.email}
-              placeholderTextColor={
-                colorScheme === 'dark' ? '#cccccc' : '#888888'
-              }
-              editable={false}
-            />
+            {isLoading ? (
+              <Skeleton
+                animation="pulse"
+                height={40}
+                width="100%"
+                style={{borderRadius: 10}}
+              />
+            ) : (
+              <TextInput
+                style={styles.textInput}
+                placeholder={userData?.email}
+                placeholderTextColor={
+                  colorScheme === 'dark' ? '#cccccc' : '#888888'
+                }
+                editable={false}
+              />
+            )}
           </View>
         </View>
       </ScrollView>

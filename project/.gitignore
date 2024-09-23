@@ -24,19 +24,6 @@ ios/.xcode.env.local
 
 # Android/IntelliJ
 #
-build/
-.idea
-.gradle
-local.properties
-*.iml
-*.hprof
-
-# node.js
-#
-config.js
-node_modules/
-npm-debug.log
-yarn-error.log
 
 # BUCK
 buck-out/
@@ -62,3 +49,5 @@ buck-out/
 # Ruby / CocoaPods
 /ios/Pods/
 /vendor/bundle/
+
+config.js
