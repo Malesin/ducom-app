@@ -240,28 +240,6 @@ const ViewPost = ({ route, navigation }) => {
         fetchComments();
     };
 
-    const openCommentModal = () => {
-        setCommentModalVisible(true);
-    };
-
-    const closeCommentModal = () => {
-        setCommentModalVisible(false);
-    };
-    const handleTextInputChange = text => {
-        setComment(text);
-
-        if (text.length > 0) {
-            setIsTyping(true);
-        } else {
-            setIsTyping(false);
-        }
-    };
-
-    const handleTextInputContentSizeChange = event => {
-        setInputHeight(event.nativeEvent.contentSize.height);
-    };
-
-
     return (
         <SafeAreaView style={styles.container}>
             <ScrollView contentContainerStyle={styles.scrollContainer}
@@ -329,7 +307,6 @@ const ViewPost = ({ route, navigation }) => {
                         <InteractionButton
                             icon="message-reply-outline"
                             color="#040608"
-                            onPress={openCommentModal}
                         />
                         <InteractionButton
                             icon={bookmarked ? 'bookmark' : 'bookmark-outline'}
@@ -389,33 +366,6 @@ const ViewPost = ({ route, navigation }) => {
                     </TouchableWithoutFeedback>
                 </Modal>
             )}
-            <Modal
-                visible={commentModalVisible}
-                transparent={false}
-                animationType="slide"
-                onRequestClose={closeCommentModal}
-            >
-                <SafeAreaView style={styles.modalContainer}>
-                    <View style={styles.modalHeader}>
-                        <TouchableOpacity onPress={closeCommentModal} style={styles.closeButton}>
-                            <MaterialCommunityIcons name="close" size={30} color="#000" />
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.replyButton}>
-                            <Text style={styles.replyText}>Reply</Text>
-                        </TouchableOpacity>
-                    </View>
-                    <View style={styles.modalReplyContainer}>
-                        <TextInput
-                            placeholder="Write your comment here"
-                            style={styles.textInput}
-                            multiline
-                            maxLength={300}
-                            onChangeText={handleTextInputChange}
-                            onContentSizeChange={handleTextInputContentSizeChange}
-                        />
-                    </View>
-                </SafeAreaView>
-            </Modal>
         </SafeAreaView>
     )
 }
@@ -566,41 +516,5 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    },
-    modalHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        width: '100%',
-        position: 'absolute',
-        top: 20,
-        left: 15,
-    },
-    replyButton: {
-        alignItems: 'center',
-        backgroundColor: '#001374',
-        padding: 5,
-        width: 75,
-        height: 35,
-        borderRadius: 35,
-    },
-    replyText: {
-        color: '#fff',
-        fontSize: 15,
-        fontWeight: 'bold',
-    },
-    closeButton: {
-        marginLeft: 10,
-    },
-    modalReplyContainer: {
-        width: '100%',
-        height: '75%',
-        position: 'absolute',
-    },
-    textInput: {
-        borderWidth: 1,
-        borderColor: 'transparent',
-        padding: 12,
-        borderRadius: 8,
     },
 });
