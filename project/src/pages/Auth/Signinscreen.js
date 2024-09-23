@@ -60,7 +60,6 @@ const Signinscreen = ({navigation}) => {
       axios
         .post(`${serverUrl}/login-user`, userData)
         .then(res => {
-          console.log(res.data);
           if (res.data.status === 'ok') {
             Toast.show({
               type: 'success',
