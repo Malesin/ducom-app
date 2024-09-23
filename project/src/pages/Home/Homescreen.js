@@ -9,9 +9,8 @@ import {
   TouchableOpacity,
   RefreshControl,
   ActivityIndicator,
-  Dimensions,
   ToastAndroid,
-  Text, // Tambahkan import Text
+  Text, 
 } from 'react-native';
 import NetInfo from '@react-native-community/netinfo'; // Tambahkan import NetInfo
 import { useFocusEffect } from '@react-navigation/native';
@@ -182,6 +181,28 @@ const HomeScreen = ({ navigation }) => {
       console.error('Error fetching pinned tweets:', error); // Perbaiki pesan error
       return null; // Kembalikan null jika terjadi error
     }
+  };
+
+  const fetchComments = async (postId) => {
+    try {
+      const response = await axios.get(`${serverUrl}/comments`, {
+        params: { postId },
+      });
+      if (response.data.status === 'ok') {
+        return response.data.comments;
+      } else {
+        console.log('Error fetching comments:', response.data.data);
+        return [];
+      }
+    } catch (error) {
+      console.error('Error fetching comments:', error.message);
+      return [];
+    }
+  };
+
+  const handlePostPress = async (tweet) => {
+    const comments = await fetchComments(tweet.id);
+    navigation.navigate('ViewPost', { tweet, comments });
   };
 
   const onRefresh = useCallback(async () => {
