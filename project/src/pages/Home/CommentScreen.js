@@ -9,7 +9,7 @@ import {
   Keyboard,
   RefreshControl,
   ToastAndroid,
-  TouchableWithoutFeedback // Tambahkan import TouchableWithoutFeedback
+  TouchableWithoutFeedback
 } from 'react-native';
 import React, { useState, useCallback, useEffect } from 'react';
 import CommentCard from '../../components/CommentCard';
@@ -27,11 +27,11 @@ const CommentScreen = ({ route }) => {
   const textInputRef = React.createRef();
   const [comments, setComments] = useState([]);
   const [replyToCommentId, setReplyToCommentId] = useState(null);
-  const [refreshing, setRefreshing] = useState(false); 
-  const [placeholder, setPlaceholder] = useState("add comments"); // Tambahkan state placeholder
+  const [refreshing, setRefreshing] = useState(false);
+  const [placeholder, setPlaceholder] = useState("add comments");
 
   const fetchComments = useCallback(async () => {
-    setRefreshing(true); 
+    setRefreshing(true);
     try {
       const response = await axios.post(`${serverUrl}/comments`, { postId: postId });
       const dataComment = response.data.data;
@@ -67,7 +67,7 @@ const CommentScreen = ({ route }) => {
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
-      setRefreshing(false); // Set refreshing to false saat fetch selesai
+      setRefreshing(false);
     }
   }, [postId]);
 
@@ -81,7 +81,7 @@ const CommentScreen = ({ route }) => {
 
   const onDeleteSuccess = () => {
     ToastAndroid.show('Komentar berhasil dihapus', ToastAndroid.SHORT);
-    fetchComments(); // Refresh comments after deletion
+    fetchComments();
   };
 
   const handleTextInputChange = text => {
@@ -153,7 +153,7 @@ const CommentScreen = ({ route }) => {
                 hasReplies={comment.replies.length > 0}
                 username={comment.username}
                 profilePicture={comment.profilePicture}
-                onReplyPress={() => handleReplyPress(comment.id, comment.username)} 
+                onReplyPress={() => handleReplyPress(comment.id, comment.username)}
                 onAddReply={replyText => handleAddReply(comment.id, replyText)}
                 commentId={comment.id}
                 postId={postId}
@@ -174,8 +174,8 @@ const CommentScreen = ({ route }) => {
             <TextInput
               ref={textInputRef}
               style={[styles.inputComment, { height: inputHeight }]}
-              placeholder={placeholder} 
-              maxLength={500}
+              placeholder={placeholder}
+              maxLength={300}
               multiline={true}
               value={comment}
               onChangeText={handleTextInputChange}

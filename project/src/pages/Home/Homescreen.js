@@ -80,31 +80,33 @@ const HomeScreen = ({ navigation }) => {
       });
       const dataTweet = responseTweet.data;
 
-      const formattedTweets = dataTweet.data.map(post => ({
-        id: post._id,
-        userAvatar: post.user.profilePicture,
-        userName: post.user.name,
-        userHandle: post.user.username,
-        postDate: post.created_at,
-        content: post.description,
-        media: Array.isArray(post.media)
-          ? post.media.map(mediaItem => ({
-            type: mediaItem.type,
-            uri: mediaItem.uri,
-          }))
-          : [],
-        likesCount: post.likes.length,
-        commentsCount: post.comments.length,
-        bookMarksCount: post.bookmarks.length,
-        isLiked: post.likes.some(like => like._id === idUser),
-        isBookmarked: post.bookmarks.some(bookmark => bookmark.user === idUser),
-        userIdPost: post.user._id,
-        idUser: idUser,
-        allowedEmail: post.allowedEmail,
-        userEmailPost: post.user.email,
-        emailUser: emailUser,
-        profilePicture: profilePicture
-      }));
+      const formattedTweets = dataTweet.data.map(post => {
+        const totalComments = post.comments.length + post.comments.reduce((acc, comment) => acc + comment.replies.length, 0);        return {
+          id: post._id,
+          userAvatar: post.user.profilePicture,
+          userName: post.user.name,
+          userHandle: post.user.username,
+          postDate: post.created_at,
+          content: post.description,
+          media: Array.isArray(post.media)
+            ? post.media.map(mediaItem => ({
+              type: mediaItem.type,
+              uri: mediaItem.uri,
+            }))
+            : [],
+          likesCount: post.likes.length,
+          commentsCount: totalComments, 
+          bookMarksCount: post.bookmarks.length,
+          isLiked: post.likes.some(like => like._id === idUser),
+          isBookmarked: post.bookmarks.some(bookmark => bookmark.user === idUser),
+          userIdPost: post.user._id,
+          idUser: idUser,
+          allowedEmail: post.allowedEmail,
+          userEmailPost: post.user.email,
+          emailUser: emailUser,
+          profilePicture: profilePicture
+        };
+      });
 
       return formattedTweets;
     } catch (error) {

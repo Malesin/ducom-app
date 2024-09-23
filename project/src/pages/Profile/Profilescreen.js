@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useCallback, useRef} from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   SafeAreaView,
   View,
@@ -11,11 +11,11 @@ import {
   Animated,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useNavigation, useFocusEffect} from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import config from '../../config';
-import {Skeleton} from 'react-native-elements';
+import { Skeleton } from 'react-native-elements';
 
 const serverUrl = config.SERVER_URL;
 
@@ -44,13 +44,13 @@ export default function Profilescreen() {
       setUserData(user);
 
       if (user.bannerPicture) {
-        const banner = {uri: user.bannerPicture};
+        const banner = { uri: user.bannerPicture };
         setBanner(banner);
         console.log('Image Banner Retrieved Successfully');
       }
 
       if (user.profilePicture) {
-        const profile = {uri: user.profilePicture};
+        const profile = { uri: user.profilePicture };
         setProfilePicture(profile);
         console.log('Image Profile Retrieved Successfully');
       }
@@ -79,7 +79,6 @@ export default function Profilescreen() {
     setModalImageSource(null);
   };
 
-  // Fungsi untuk membuka dan menutup dropdown dengan animasi
   const toggleDropdown = () => {
     if (dropdownVisible) {
       Animated.timing(dropdownAnimation, {
@@ -105,7 +104,6 @@ export default function Profilescreen() {
         navigation.navigate('Settings');
       }
     }
-    // Handle item press
     console.log(item);
     toggleDropdown();
   };
@@ -326,7 +324,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff', // Warna latar belakang putih
     borderRadius: 7,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.8,
     shadowRadius: 2,
     elevation: 5,
