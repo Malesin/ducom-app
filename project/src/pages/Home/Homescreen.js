@@ -10,7 +10,7 @@ import {
   RefreshControl,
   ActivityIndicator,
   ToastAndroid,
-  Text, 
+  Text,
 } from 'react-native';
 import NetInfo from '@react-native-community/netinfo'; // Tambahkan import NetInfo
 import { useFocusEffect } from '@react-navigation/native';
@@ -33,7 +33,7 @@ import { Skeleton } from 'react-native-elements';
 
 const serverUrl = config.SERVER_URL;
 
-const HomeScreen = ({ navigation }) => {
+const HomeScreen = ({ navigation, tweet }) => {
   const [tweets, setTweets] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [page, setPage] = useState(1);
@@ -41,7 +41,7 @@ const HomeScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [hasMore, setHasMore] = useState(true);
   const [showSkeleton, setShowSkeleton] = useState(true);
-  const [isConnected, setIsConnected] = useState(true); 
+  const [isConnected, setIsConnected] = useState(true);
   const isExpanded = useSharedValue(false);
 
   useEffect(() => {
@@ -53,6 +53,7 @@ const HomeScreen = ({ navigation }) => {
       unsubscribe();
     };
   }, []);
+
 
   const fetchTweets = async pageNum => {
     if (!isConnected) {
@@ -81,7 +82,7 @@ const HomeScreen = ({ navigation }) => {
       const dataTweet = responseTweet.data;
 
       const formattedTweets = dataTweet.data.map(post => {
-        const totalComments = post.comments.length + post.comments.reduce((acc, comment) => acc + comment.replies.length, 0);        return {
+        const totalComments = post.comments.length + post.comments.reduce((acc, comment) => acc + comment.replies.length, 0); return {
           id: post._id,
           userAvatar: post.user.profilePicture,
           userName: post.user.name,
@@ -95,7 +96,7 @@ const HomeScreen = ({ navigation }) => {
             }))
             : [],
           likesCount: post.likes.length,
-          commentsCount: totalComments, 
+          commentsCount: totalComments,
           bookMarksCount: post.bookmarks.length,
           isLiked: post.likes.some(like => like._id === idUser),
           isBookmarked: post.bookmarks.some(bookmark => bookmark.user === idUser),
@@ -135,6 +136,10 @@ const HomeScreen = ({ navigation }) => {
   };
 
   const handlePostPress = async (tweet) => {
+    if (!tweet || !tweet.id) {
+      console.error('Tweet data is incomplete:', tweet);
+      return;
+    }
     const comments = await fetchComments(tweet.id);
     navigation.navigate('ViewPost', { tweet, comments });
   };
@@ -236,6 +241,7 @@ const HomeScreen = ({ navigation }) => {
     });
   };
 
+
   const FloatingActionButton = ({ isExpanded, index, iconName, onPress }) => {
     const animatedStyles = useAnimatedStyle(() => {
       const moveValue = isExpanded.value ? OFFSET * index : 0;
@@ -277,6 +283,7 @@ const HomeScreen = ({ navigation }) => {
   const handlePress = () => {
     isExpanded.value = !isExpanded.value;
   };
+
 
   const plusIconStyle = useAnimatedStyle(() => {
     const moveValue = interpolate(Number(isExpanded.value), [0, 1], [0, 2]);
@@ -420,11 +427,13 @@ const HomeScreen = ({ navigation }) => {
   );
 };
 
+
 const SPRING_CONFIG = {
   duration: 1200,
   overshootClamping: true,
   dampingRatio: 0.8,
 };
+
 
 const OFFSET = 60;
 
@@ -448,6 +457,7 @@ const mainButtonStyles = StyleSheet.create({
     marginBottom: 1,
   },
 });
+
 
 const styles = StyleSheet.create({
   container: {
@@ -537,5 +547,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 });
+
 
 export default HomeScreen;
