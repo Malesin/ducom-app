@@ -1,5 +1,5 @@
-import { StyleSheet, SafeAreaView, ScrollView, View, Image, Text, TouchableOpacity, Alert, ToastAndroid, Share, Modal, TouchableWithoutFeedback, RefreshControl } from 'react-native'
-import React, { useState, useEffect, useCallback } from 'react'
+import { StyleSheet, SafeAreaView, ScrollView, View, Image, Text, TouchableOpacity, Alert, ToastAndroid, Share, Modal, TouchableWithoutFeedback, RefreshControl, TextInput, Keyboard } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
@@ -11,7 +11,7 @@ import CommentCard from '../../components/CommentCard';
 const serverUrl = config.SERVER_URL;
 
 const ViewPost = ({ route }) => {
-    const { tweet, comments: initialComments, idUser, emailUser } = route?.params;
+    const { tweet, comments: initialComments, postId, idUser, profilePicture, emailUser, focusCommentInput } = route?.params || {};
     const [liked, setLiked] = useState(tweet.isLiked);
     const [likesCount, setLikesCount] = useState(tweet.likesCount);
     const [bookmarked, setBookmarked] = useState(tweet.isBookmarked);
@@ -19,8 +19,23 @@ const ViewPost = ({ route }) => {
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedMedia, setSelectedMedia] = useState(null);
     const [thumbnails, setThumbnails] = useState({});
+    const [inputHeight, setInputHeight] = useState(null);
+    const [isTyping, setIsTyping] = useState(false);
+    const [comment, setComment] = useState('');
     const [comments, setComments] = useState(initialComments || []);
+    const [replyToCommentId, setReplyToCommentId] = useState(null);
+    const textInputRef = React.createRef();
+    const [visibleComments, setVisibleComments] = useState(3);
+    const [placeholder, setPlaceholder] = useState("add comments");
+
+
     const [refreshing, setRefreshing] = useState(false);
+
+    useEffect(() => {
+        if (focusCommentInput && textInputRef.current) {
+            textInputRef.current.focus();
+        }
+    }, [focusCommentInput]);
 
     useEffect(() => {
         const generateThumbnails = async () => {
@@ -215,6 +230,7 @@ const ViewPost = ({ route }) => {
             }));
 
             setComments(formattedComments);
+            setVisibleComments(3);
         } catch (error) {
             console.error('Error fetching data:', error);
         } finally {
@@ -235,9 +251,52 @@ const ViewPost = ({ route }) => {
         fetchComments();
     };
 
+    const handleTextInputChange = text => {
+        setComment(text);
+
+        if (text.length > 0) {
+            setIsTyping(true);
+        } else {
+            setIsTyping(false);
+        }
+    };
+
+    const handleTextInputContentSizeChange = event => {
+        setInputHeight(event.nativeEvent.contentSize.height);
+    };
+    const handleAddComment = async () => {
+        const token = await AsyncStorage.getItem('token');
+        try {
+            await axios.post(`${serverUrl}/comment-post`, {
+                token: token,
+                postId: postId,
+                comment: comment,
+                parentCommentId: replyToCommentId
+            });
+
+            fetchComments();
+            setReplyToCommentId(null);
+            setComment('');
+            setPlaceholder("add comments");
+            Keyboard.dismiss();
+        } catch (error) {
+            console.error('Error data:', error);
+        }
+    };
+
+    const handleReplyPress = (commentId, username) => {
+        setIsTyping(true);
+        setReplyToCommentId(commentId);
+        setPlaceholder(`add reply @${username}`);
+        if (textInputRef.current) {
+            textInputRef.current.focus();
+        }
+    };
+
     return (
         <SafeAreaView style={styles.container}>
-            <ScrollView contentContainerStyle={styles.scrollContainer}
+            <ScrollView style={styles.scrollContainer}
+                contentContainerStyle={{ paddingBottom: 50 }}
                 refreshControl={
                     <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
                 }>
@@ -316,8 +375,64 @@ const ViewPost = ({ route }) => {
                             />
                         </TouchableOpacity>
                     </View>
+                    <View style={styles.commentContainer}>
+                        {comments.slice(0, visibleComments).map(comment => (
+                            <CommentCard
+                                key={comment.id}
+                                text={comment.text}
+                                replies={comment.replies}
+                                hasReplies={comment.replies.length > 0}
+                                username={comment.username}
+                                profilePicture={comment.profilePicture}
+                                onReplyPress={() => handleReplyPress(comment.id, comment.username)}
+                                onAddReply={replyText => handleAddReply(comment.id, replyText)}
+                                commentId={comment.id}
+                                postId={postId}
+                                userIdPost={comment.userIdPost}
+                                idUser={idUser}
+                                allowedEmail={comment.allowedEmail}
+                                isLikedCom={comment.isLikedCom}
+                                emailUser={emailUser}
+                                onDeleteSuccess={onDeleteSuccess}
+                            />
+                        ))}
+                        {visibleComments < comments.length && (
+                            <TouchableOpacity onPress={() => setVisibleComments(prevCount => prevCount + 3)}>
+                                <Text style={styles.loadMoreText}>Load more comments</Text>
+                            </TouchableOpacity>
+                        )}
+                    </View>
                 </View>
             </ScrollView>
+            <View style={[styles.inputContainer, { height: inputHeight }]}>
+                <Image
+                    source={{ uri: profilePicture }}
+                    style={styles.profilePicture}
+                />
+                <TextInput
+                    ref={textInputRef}
+                    style={[styles.inputComment, { height: inputHeight }]}
+                    placeholder={placeholder}
+                    maxLength={300}
+                    multiline={true}
+                    value={comment}
+                    onChangeText={handleTextInputChange}
+                    onContentSizeChange={handleTextInputContentSizeChange}
+                />
+
+                {isTyping && (
+                    <TouchableOpacity
+                        style={styles.iconContainer}
+                        onPress={() => handleAddComment()}>
+                        <MaterialCommunityIcons
+                            name="upload"
+                            size={20}
+                            color="#fff"
+                            style={styles.icon}
+                        />
+                    </TouchableOpacity>
+                )}
+            </View>
             {selectedMedia && (
                 <Modal
                     visible={modalVisible}
@@ -352,7 +467,6 @@ const ViewPost = ({ route }) => {
 }
 
 export default ViewPost
-
 
 const styles = StyleSheet.create({
     container: {
@@ -435,29 +549,6 @@ const styles = StyleSheet.create({
     actionButton: {
         padding: 10,
     },
-    modalContainer: {
-        width: '90%',
-        height: '80%',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    modalImage: {
-        width: '90%',
-        height: '90%',
-        resizeMode: 'contain',
-    },
-    modalBackground: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    },
-    closeButton: {
-        position: 'absolute',
-        top: 40,
-        right: 20,
-        zIndex: 1,
-    },
     fullScreenMedia: {
         width: '100%',
         height: '100%',
@@ -502,9 +593,67 @@ const styles = StyleSheet.create({
         padding: 20,
         backgroundColor: 'gray',
     },
-    newContainerTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        marginBottom: 10,
+    commentContainer: {
+        width: '100%',
+    },
+    modalContainer: {
+        width: '90%',
+        height: '80%',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    modalImage: {
+        width: '90%',
+        height: '90%',
+        resizeMode: 'contain',
+    },
+    modalBackground: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    },
+    loadMoreText: {
+        color: '#616161',
+        textAlign: 'center',
+        marginVertical: 10,
+    },
+    inputContainer: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        padding: 14,
+        backgroundColor: '#fff',
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderColor: '#d3d3d3',
+        borderTopWidth: 1,
+    },
+    inputComment: {
+        borderWidth: 1,
+        borderColor: 'transparent',
+        padding: 18,
+        flex: 1,
+        marginLeft: 10,
+        height: null,
+        fontSize: 13,
+    },
+    profilePicture: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+    },
+    iconContainer: {
+        backgroundColor: '#001374',
+        padding: 4,
+        borderRadius: 4,
+        width: 28,
+        height: 28,
+        marginRight: 10,
+        alignItems: 'center',
+    },
+    icon: {
+        alignItems: 'center',
     },
 });

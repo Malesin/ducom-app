@@ -10,7 +10,7 @@ import {
   RefreshControl,
   ActivityIndicator,
   ToastAndroid,
-  Text, 
+  Text,
 } from 'react-native';
 import NetInfo from '@react-native-community/netinfo'; // Tambahkan import NetInfo
 import { useFocusEffect } from '@react-navigation/native';
@@ -34,7 +34,7 @@ import { Skeleton } from 'react-native-elements';
 
 const serverUrl = config.SERVER_URL;
 
-const HomeScreen = ({ navigation }) => {
+const HomeScreen = ({ navigation, tweet }) => {
   const [tweets, setTweets] = useState([]);
   const [pintweets, setPinTweets] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
@@ -56,6 +56,7 @@ const HomeScreen = ({ navigation }) => {
       unsubscribe();
     };
   }, []);
+
 
   const fetchTweets = async pageNum => {
     if (!isConnected) {
@@ -111,7 +112,6 @@ const HomeScreen = ({ navigation }) => {
           profilePicture: profilePicture
         };
       });
-  
       return formattedTweets;
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -201,6 +201,10 @@ const HomeScreen = ({ navigation }) => {
   };
 
   const handlePostPress = async (tweet) => {
+    if (!tweet || !tweet.id) {
+      console.error('Tweet data is incomplete:', tweet);
+      return;
+    }
     const comments = await fetchComments(tweet.id);
     navigation.navigate('ViewPost', { tweet, comments });
   };
@@ -319,6 +323,7 @@ const HomeScreen = ({ navigation }) => {
     });
   };
 
+
   const FloatingActionButton = ({ isExpanded, index, iconName, onPress }) => {
     const animatedStyles = useAnimatedStyle(() => {
       const moveValue = isExpanded.value ? OFFSET * index : 0;
@@ -360,6 +365,7 @@ const HomeScreen = ({ navigation }) => {
   const handlePress = () => {
     isExpanded.value = !isExpanded.value;
   };
+
 
   const plusIconStyle = useAnimatedStyle(() => {
     const moveValue = interpolate(Number(isExpanded.value), [0, 1], [0, 2]);
@@ -508,11 +514,13 @@ const HomeScreen = ({ navigation }) => {
   );
 };
 
+
 const SPRING_CONFIG = {
   duration: 1200,
   overshootClamping: true,
   dampingRatio: 0.8,
 };
+
 
 const OFFSET = 60;
 
@@ -536,6 +544,7 @@ const mainButtonStyles = StyleSheet.create({
     marginBottom: 1,
   },
 });
+
 
 const styles = StyleSheet.create({
   container: {
@@ -625,5 +634,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 });
+
 
 export default HomeScreen;

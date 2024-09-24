@@ -36,9 +36,9 @@ const CreatePost = ({ route, navigation }) => {
   const [previewMedia, setPreviewMedia] = useState(null);
   const [mediaType, setMediaType] = useState(null);
   const [profilePicture, setProfilePicture] = useState(null);
-  const [translateY] = useState(new Animated.Value(500)); // Initial position
-  const colorScheme = useColorScheme(); // Get color scheme
-  const styles = getStyles(colorScheme); // Get styles based on color scheme
+  const [translateY] = useState(new Animated.Value(500)); 
+  const colorScheme = useColorScheme(); 
+  const styles = getStyles(colorScheme); 
 
   const profilePictureUri = require('../../assets/profilepic.png');
 
@@ -81,8 +81,8 @@ const CreatePost = ({ route, navigation }) => {
   useEffect(() => {
     Animated.spring(translateY, {
       toValue: 0,
-      friction: 8, // Adjust friction for the bounciness effect
-      tension: 40, // Adjust tension for the speed of the animation
+      friction: 8, 
+      tension: 40,
       useNativeDriver: true,
     }).start();
   }, [translateY]);
@@ -119,7 +119,7 @@ const CreatePost = ({ route, navigation }) => {
             });
 
             if (uploadedMedia.length === 4) {
-              break; // Stop adding more media if the limit of 4 is reached
+              break; 
             }
           } else {
             console.error(
@@ -448,7 +448,7 @@ const CreatePost = ({ route, navigation }) => {
             maxLength={500}
             placeholderTextColor={
               colorScheme === 'dark' ? '#cccccc' : '#888888'
-            } // Adjust placeholder text color based on theme
+            } 
           />
         </View>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -545,7 +545,7 @@ const getStyles = (
       borderColor: 'transparent',
       padding: 12,
       borderRadius: 8,
-      color: colorScheme === 'dark' ? '#000000' : '#000000', // Use colorScheme parameter
+      color: colorScheme === 'dark' ? '#000000' : '#000000', 
     },
     mediaContainer: {
       position: 'relative',

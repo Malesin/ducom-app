@@ -281,9 +281,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: 'gray',
   },
-  actionButton: {
-    padding: 5,
-  },
+
   fixedActions: {
     position: 'absolute',
     right: 10,
