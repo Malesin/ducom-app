@@ -23,8 +23,6 @@ const Usermedia = ({ userIdPost, profilePicture }) => {
         userId: userIdPost,
       });
 
-      console.log(response.data, "resp")
-
       const dataTweet = response.data;
 
       const formattedTweets = dataTweet.data
