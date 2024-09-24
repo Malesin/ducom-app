@@ -26,7 +26,7 @@ import config from '../config';
 const serverUrl = config.SERVER_URL;
 const pinIcon = <Icon name="pin" size={13} color="#001374" />;
 
-const PinTweetCard = ({ tweet, onRefreshPage }) => {
+const PinTweetCard = ({ tweet, onRefreshPage, comments }) => {
   const [liked, setLiked] = useState(tweet.isLiked);
   const [likesCount, setLikesCount] = useState(tweet.likesCount);
   const [bookmarked, setBookmarked] = useState(tweet.isBookmarked);
@@ -48,6 +48,7 @@ const PinTweetCard = ({ tweet, onRefreshPage }) => {
       navigator.navigate('Userprofile', {
         userIdPost: tweet.userIdPost,
         profilePicture: tweet.profilePicture,
+        idUser: tweet.idUser
       });
     }
   };
@@ -178,7 +179,15 @@ const PinTweetCard = ({ tweet, onRefreshPage }) => {
   };
 
   const handleCommentPress = () => {
-    navigator.navigate('Comment', { postId: tweet.id, idUser: tweet.idUser, profilePicture: tweet.profilePicture, emailUser: tweet.emailUser });
+    navigator.navigate('ViewPost', {
+      tweet,
+      postId: tweet.id,
+      idUser: tweet.idUser,
+      profilePicture: tweet.profilePicture,
+      emailUser: tweet.emailUser,
+      comments,
+      focusCommentInput: true,
+    });
   };
 
   const openMediaPreview = uri => {

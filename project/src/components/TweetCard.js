@@ -44,6 +44,7 @@ const TweetCard = ({ tweet, onRefreshPage, comments }) => {
       navigator.navigate('Userprofile', {
         userIdPost: tweet.userIdPost,
         profilePicture: tweet.profilePicture,
+        idUser: tweet.idUser
       });
     }
   };

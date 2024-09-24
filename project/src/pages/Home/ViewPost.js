@@ -27,8 +27,6 @@ const ViewPost = ({ route }) => {
     const textInputRef = React.createRef();
     const [visibleComments, setVisibleComments] = useState(3);
     const [placeholder, setPlaceholder] = useState("add comments");
-
-
     const [refreshing, setRefreshing] = useState(false);
 
     useEffect(() => {
@@ -195,13 +193,8 @@ const ViewPost = ({ route }) => {
         try {
             const url = `${serverUrl}/comments`;
             const params = { postId: tweet.id };
-            console.log('Fetching comments from URL:', url);
-            console.log('Dengan parameter:', params);
-
             const response = await axios.post(url, params);
             const dataComment = response.data.data;
-
-            console.log('Data komentar yang diterima:', dataComment);
 
             const formattedComments = dataComment.map(comment => ({
                 id: comment._id,
