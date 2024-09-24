@@ -1,64 +1,45 @@
-import React, {useState} from 'react';
-import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-} from 'react-native';
+import React from 'react';
+import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import DefaultAvatar from '../assets/profilepic.png';
 
-const LikeNotification = ({tweet}) => {
-  const formatDate = dateString => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffInSeconds = Math.floor((now - date) / 1000);
+const formatDate = (dateString) => {
+  const now = new Date();
+  const date = new Date(dateString);
+  const gmt7Offset = 7 * 60 * 60 * 1000; 
+  const diffInSeconds = Math.floor((now - date - gmt7Offset) / 1000);
 
-    if (diffInSeconds < 1) {
-      return 'now';
-    }
+  if (diffInSeconds < 1) return 'now';
+  if (diffInSeconds < 60) return `${diffInSeconds}s`;
+  const diffInMinutes = Math.floor(diffInSeconds / 60);
+  if (diffInMinutes < 60) return `${diffInMinutes}m`;
+  const diffInHours = Math.floor(diffInMinutes / 60);
+  if (diffInHours < 24) return `${diffInHours}h`;
+  const diffInDays = Math.floor(diffInHours / 24);
+  if (diffInDays < 7) return `${diffInDays}d`;
+  const diffInWeeks = Math.floor(diffInDays / 7);
+  if (diffInWeeks < 52) return `${diffInWeeks}w`;
+  const diffInYears = Math.floor(diffInWeeks / 52);
+  return `${diffInYears}y`;
+};
 
-    if (diffInSeconds < 60) {
-      return `${diffInSeconds}s ago`;
-    }
-
-    const diffInMinutes = Math.floor(diffInSeconds / 60);
-    if (diffInMinutes < 60) {
-      return `${diffInMinutes}m ago`;
-    }
-
-    const diffInHours = Math.floor(diffInMinutes / 60);
-    if (diffInHours < 24) {
-      return `${diffInHours}h ago`;
-    }
-
-    const diffInDays = Math.floor(diffInHours / 24);
-    if (diffInDays < 7) {
-      return `${diffInDays}d ago`;
-    }
-
-    const diffInWeeks = Math.floor(diffInDays / 7);
-    if (diffInWeeks < 4) {
-      return `${diffInWeeks}w ago`;
-    }
-
-    return `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
+const LikeNotification = ({ notification }) => {
+  const handleNotificationPress = () => {
+    console.log('Notification pressed');
   };
 
   return (
     <View style={styles.card}>
-      <View style={styles.userInfo}>
-        <Image source={DefaultAvatar} style={styles.avatar} />
-        <View style={styles.userDetails}>
-          <Text style={styles.userName}>Mika Geshan</Text>
-          <Text style={styles.userHandle}>@pookiemay</Text>
-          <Text style={styles.postDate}>
-            {tweet?.postDate ? formatDate(tweet.postDate) : 'Unknown Date'}
-          </Text>
+      <TouchableOpacity onPress={handleNotificationPress}>
+        <View style={styles.userInfo}>
+          <Image source={notification.like.user.profilePicture ? { uri: notification.like.user.profilePicture } : DefaultAvatar} style={styles.avatar} />
+          <View style={styles.userDetails}>
+            <Text style={styles.userName}>{notification.like.user.name}</Text>
+            <Text style={styles.userHandle}>@{notification.like.user.username}</Text>
+            <Text style={styles.postDate}>{formatDate(notification.like.created_at)}</Text>
+          </View>
         </View>
-      </View>
-
-      {/* Tweet Content */}
-      <Text style={styles.tweetText}>Liked your post</Text>
+        <Text style={styles.tweetText}>Liked your post</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -69,7 +50,7 @@ const styles = StyleSheet.create({
     borderRadius: 7,
     padding: 10,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 1,
@@ -111,6 +92,11 @@ const styles = StyleSheet.create({
     fontSize: 15,
     marginVertical: 8,
     color: '#040608',
+  },
+  noNotificationText: {
+    fontSize: 15,
+    color: '#040608',
+    textAlign: 'center',
   },
   actions: {
     flexDirection: 'row',
