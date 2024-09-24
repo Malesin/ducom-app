@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Text, View, SafeAreaView } from 'react-native';
+import { Text, View, SafeAreaView, StyleSheet } from 'react-native';
 
 function Replyscreen() {
 

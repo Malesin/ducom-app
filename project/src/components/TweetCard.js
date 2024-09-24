@@ -24,7 +24,7 @@ import axios from 'axios';
 import config from '../config';
 const serverUrl = config.SERVER_URL;
 
-const TweetCard = ({ tweet, onDeleteSuccess, comments }) => {
+const TweetCard = ({ tweet, onRefreshPage, comments }) => {
   const [liked, setLiked] = useState(tweet.isLiked);
   const [likesCount, setLikesCount] = useState(tweet.likesCount || 0);
   const [bookmarked, setBookmarked] = useState(tweet.isBookmarked || false);
