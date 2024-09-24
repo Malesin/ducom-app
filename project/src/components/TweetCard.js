@@ -24,12 +24,12 @@ import axios from 'axios';
 import config from '../config';
 const serverUrl = config.SERVER_URL;
 
-const TweetCard = ({ tweet, onRefreshPage }) => {
+const TweetCard = ({ tweet, onDeleteSuccess, comments }) => {
   const [liked, setLiked] = useState(tweet.isLiked);
-  const [likesCount, setLikesCount] = useState(tweet.likesCount);
-  const [bookmarked, setBookmarked] = useState(tweet.isBookmarked);
-  const [bookMarksCount, setBookMarksCount] = useState(tweet.bookMarksCount);
-  const [commentsCount] = useState(tweet.commentsCount);
+  const [likesCount, setLikesCount] = useState(tweet.likesCount || 0);
+  const [bookmarked, setBookmarked] = useState(tweet.isBookmarked || false);
+  const [bookMarksCount, setBookMarksCount] = useState(tweet.bookMarksCount || 0);
+  const [commentsCount] = useState(tweet.commentsCount || 0);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalMediaUri, setModalMediaUri] = useState('');
   const [thumbnails, setThumbnails] = useState({});
@@ -174,7 +174,15 @@ const TweetCard = ({ tweet, onRefreshPage }) => {
   };
 
   const handleCommentPress = () => {
-    navigator.navigate('Comment', { postId: tweet.id, idUser: tweet.idUser, profilePicture: tweet.profilePicture, emailUser: tweet.emailUser });
+    navigator.navigate('ViewPost', {
+      tweet,
+      postId: tweet.id,
+      idUser: tweet.idUser,
+      profilePicture: tweet.profilePicture,
+      emailUser: tweet.emailUser,
+      comments,
+      focusCommentInput: true,
+    });
   };
 
   const openMediaPreview = uri => {

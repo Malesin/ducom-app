@@ -6,6 +6,7 @@ import {
   Alert,
   SafeAreaView,
   Text,
+  TouchableOpacity,
 } from 'react-native';
 import TweetCard from '../../components/TweetCard'; // Import TweetCard
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -21,7 +22,7 @@ function Postscreen({ navigation }) {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
-  const [isFetched, setIsFetched] = useState(false); // State to track if data is already fetched
+  const [isFetched, setIsFetched] = useState(false);
 
   const fetchTweets = useCallback(async (pageNum) => {
     const token = await AsyncStorage.getItem('token');
@@ -176,7 +177,9 @@ function Postscreen({ navigation }) {
           {Array.isArray(tweets) && tweets.length > 0 ? (
             tweets.map((tweet, index) => (
               <View key={index} style={styles.tweetContainer}>
-                <TweetCard tweet={tweet} />
+                <TouchableOpacity>
+                  <TweetCard tweet={tweet} />
+                </TouchableOpacity>
               </View>
             ))
           ) : (

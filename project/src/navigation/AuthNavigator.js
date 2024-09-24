@@ -11,7 +11,6 @@ import {
   Profilescreen,
   EditProfilePage,
   CreatePost,
-  CommentScreen,
   ViewPost,
   ReportScreen,
   AccountInformation,
@@ -91,11 +90,6 @@ export default function MainNavigation() {
           name="CreatePost"
           component={CreatePost}
           options={{ headerShown: true, title: 'Create Post' }}
-        />
-        <Stack.Screen
-          name="Comment"
-          component={CommentScreen}
-          options={{ headerShown: true, title: 'Comments' }}
         />
         <Stack.Screen
           name="Profile"
