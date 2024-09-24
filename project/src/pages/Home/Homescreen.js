@@ -15,6 +15,7 @@ import {
 import NetInfo from '@react-native-community/netinfo'; // Tambahkan import NetInfo
 import { useFocusEffect } from '@react-navigation/native';
 import TweetCard from '../../components/TweetCard';
+import PinTweetCard from '../../components/PinTweetCard';
 import Animated, {
   withDelay,
   interpolate,
@@ -35,13 +36,15 @@ const serverUrl = config.SERVER_URL;
 
 const HomeScreen = ({ navigation, tweet }) => {
   const [tweets, setTweets] = useState([]);
+  const [pintweets, setPinTweets] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [page, setPage] = useState(1);
   const [loadingMore, setLoadingMore] = useState(false);
   const [loading, setLoading] = useState(true);
   const [hasMore, setHasMore] = useState(true);
   const [showSkeleton, setShowSkeleton] = useState(true);
-  const [isConnected, setIsConnected] = useState(true);
+  const [isConnected, setIsConnected] = useState(true); // Tambahkan state untuk koneksi
+  const [pinnedTweetId, setPinnedTweetId] = useState(null); // Tambahkan state untuk ID tweet yang dipin
   const isExpanded = useSharedValue(false);
 
   useEffect(() => {
@@ -60,29 +63,30 @@ const HomeScreen = ({ navigation, tweet }) => {
       setLoading(false);
       return [];
     }
-
+  
     setLoading(true);
-    const token = await AsyncStorage.getItem('token');
     try {
-      const response = await axios.post(`${serverUrl}/userdata`, { token });
+      const token = await AsyncStorage.getItem('token');
+      const response = await axios.post(`${serverUrl}/userdata`, { token: token });
       const { data, status } = response.data;
       if (status === 'error') {
         Alert.alert('Error', 'Anda Telah Keluar dari Akun', [
           { text: 'OK', onPress: () => navigation.navigate('Auths') },
         ]);
-        return [];
+        return;
       }
-      const emailUser = data.email
-      const idUser = data._id;
-      const profilePicture = data.profilePicture
-
+      emailUser = data.email;
+      idUser = data._id;
+      profilePicture = data.profilePicture;
+  
       const responseTweet = await axios.post(`${serverUrl}/posts`, {
         page: pageNum,
       });
-      const dataTweet = responseTweet.data;
-
-      const formattedTweets = dataTweet.data.map(post => {
-        const totalComments = post.comments.length + post.comments.reduce((acc, comment) => acc + comment.replies.length, 0); return {
+      const dataTweet = responseTweet.data.data;
+  
+      const formattedTweets = dataTweet.map(post => {
+        const totalComments = post.comments.length + post.comments.reduce((acc, comment) => acc + comment.replies.length, 0);
+        return {
           id: post._id,
           userAvatar: post.user.profilePicture,
           userName: post.user.name,
@@ -96,7 +100,7 @@ const HomeScreen = ({ navigation, tweet }) => {
             }))
             : [],
           likesCount: post.likes.length,
-          commentsCount: totalComments,
+          commentsCount: totalComments, 
           bookMarksCount: post.bookmarks.length,
           isLiked: post.likes.some(like => like._id === idUser),
           isBookmarked: post.bookmarks.some(bookmark => bookmark.user === idUser),
@@ -108,13 +112,74 @@ const HomeScreen = ({ navigation, tweet }) => {
           profilePicture: profilePicture
         };
       });
-
       return formattedTweets;
     } catch (error) {
       console.error('Error fetching data:', error);
       return [];
     } finally {
       setLoading(false);
+    }
+  };
+  
+  // Tweet Pinned
+  const fetchPinTweet = async () => {
+    try {
+      const token = await AsyncStorage.getItem('token');
+      const response = await axios.post(`${serverUrl}/userdata`, { token: token });
+      const { data, status } = response.data;
+      if (status === 'error') {
+        Alert.alert('Error', 'Anda Telah Keluar dari Akun', [
+          { text: 'OK', onPress: () => navigation.navigate('Auths') },
+        ]);
+        return;
+      }
+      emailUser = data.email;
+      idUser = data._id;
+      profilePicture = data.profilePicture;
+      
+      const pinPost = await axios.post(`${serverUrl}/posts/pinned`, {
+        token: token
+      });
+
+      const pinnedBy = pinPost.data.data.pinnedBy
+      const postPin = pinPost.data.data.post;
+
+      if (!postPin) {
+        return null; // Kembalikan null jika pinPost tidak ada
+      }
+      const totalComments = postPin.comments.length + postPin.comments.reduce((acc, comment) => acc + comment.replies.length, 0);
+
+      const pinTweet = {
+        id: postPin._id,
+        userAvatar: postPin.user.profilePicture,
+        userName: postPin.user.name,
+        userHandle: postPin.user.username,
+        postDate: postPin.created_at,
+        content: postPin.description,
+        media: Array.isArray(postPin.media)
+          ? postPin.media.map(mediaItem => ({
+            type: mediaItem.type,
+            uri: mediaItem.uri,
+          }))
+          : [],
+        likesCount: postPin.likes.length,
+        commentsCount: totalComments,
+        bookMarksCount: postPin.bookmarks.length,
+        isLiked: postPin.likes.some(like => like._id === idUser),
+        isBookmarked: postPin.bookmarks.some(bookmark => bookmark.user === idUser),
+        userIdPost: postPin.user._id,
+        idUser: idUser,
+        allowedEmail: postPin.allowedEmail,
+        userEmailPost: postPin.user.email,
+        emailUser: emailUser,
+        profilePicture: profilePicture,
+        pinnedBy:pinnedBy
+      };
+
+      return pinTweet;
+    } catch (error) {
+      console.error('Error fetching pinned tweets:', error); // Perbaiki pesan error
+      return null; // Kembalikan null jika terjadi error
     }
   };
 
@@ -146,11 +211,19 @@ const HomeScreen = ({ navigation, tweet }) => {
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    setShowSkeleton(true); // Tampilkan skeleton saat refresh
-    setPage(1);
+    setShowSkeleton(true); // Tampilkan.
     setHasMore(true); // Reset hasMore to true
     const newTweets = await fetchTweets(1);
-    setTweets(newTweets.slice(0, 4)); // Only display 4 tweets
+    const newPinTweet = await fetchPinTweet();
+    if (newPinTweet) {
+      setPinTweets([newPinTweet]); // Set pintweets sebagai array dengan satu elemen
+      setPinnedTweetId(newPinTweet.id); // Simpan ID tweet yang dipin
+    } else {
+      setPinTweets([]); // Kosongkan pintweets jika tidak ada pin tweet
+      setPinnedTweetId(null); // Reset ID tweet yang dipin
+    }
+    const filteredTweets = newTweets.filter(tweet => tweet.id !== newPinTweet?.id); // Filter tweet yang dipin
+    setTweets(filteredTweets.slice(0, 4)); // Only display 4 tweets
     setRefreshing(false);
     setShowSkeleton(false); // Sembunyikan skeleton setelah refresh selesai
   }, [isConnected]);
@@ -196,7 +269,16 @@ const HomeScreen = ({ navigation, tweet }) => {
   useEffect(() => {
     const loadInitialTweets = async () => {
       const initialTweets = await fetchTweets(1);
-      setTweets(initialTweets.slice(0, 5)); // Load only 4 tweets initially
+      const initialPinTweets = await fetchPinTweet(); // Panggil fetchPinTweet saat inisialisasi
+      if (initialPinTweets) {
+        setPinTweets([initialPinTweets]); // Set pintweets sebagai array dengan satu elemen
+        setPinnedTweetId(initialPinTweets.id); // Simpan ID tweet yang dipin
+      } else {
+        setPinTweets([]); // Kosongkan pintweets jika tidak ada pin tweet
+        setPinnedTweetId(null); // Reset ID tweet yang dipin
+      }
+      const filteredTweets = initialTweets.filter(tweet => tweet.id !== initialPinTweets?.id); // Filter tweet yang dipin
+      setTweets(filteredTweets.slice(0, 5)); // Load only 4 tweets initially
       setLoading(false);
       setShowSkeleton(false); // Sembunyikan skeleton setelah data awal di-load
     };
@@ -303,7 +385,7 @@ const HomeScreen = ({ navigation, tweet }) => {
       setLoadingMore(true);
       const moreTweets = await fetchTweets(page + 1); // Load next page of tweets
       const newTweets = moreTweets.filter(
-        tweet => !tweets.some(existingTweet => existingTweet.id === tweet.id),
+        tweet => !tweets.some(existingTweet => existingTweet.id === tweet.id) && tweet.id !== pinnedTweetId, // Filter tweet yang dipin
       );
       if (newTweets.length > 0) {
         setTweets(prevTweets => [...prevTweets, ...newTweets.slice(0, 5)]); // Add only 4 new tweets
@@ -360,8 +442,7 @@ const HomeScreen = ({ navigation, tweet }) => {
     </>
   );
 
-  const onDeleteSuccess = () => {
-    ToastAndroid.show('Tweet berhasil dihapus', ToastAndroid.SHORT);
+  const onRefreshPage = () => {
     setRefreshing(true);
     onRefresh();
   };
@@ -391,13 +472,19 @@ const HomeScreen = ({ navigation, tweet }) => {
         {showSkeleton ? (
           renderSkeleton()
         ) : (
-          tweets.map((tweet, index) => (
-            <View key={index} style={styles.tweetContainer}>
-              <TouchableOpacity onPress={() => handlePostPress(tweet)}>
-                <TweetCard tweet={tweet} onDeleteSuccess={onDeleteSuccess} />
-              </TouchableOpacity>
-            </View>
-          ))
+          <>
+
+            {pintweets.map((tweet, index) => (
+              <View key={index} style={styles.tweetContainer}>
+                <PinTweetCard tweet={tweet} onRefreshPage={onRefreshPage} />
+              </View>
+            ))}
+            {tweets.map((tweet, index) => (
+              <View key={index} style={styles.tweetContainer}>
+                <TweetCard tweet={tweet} onRefreshPage={onRefreshPage} />
+              </View>
+            ))}
+          </>
         )}
         {loadingMore && <LoadingIndicator />}
       </ScrollView>

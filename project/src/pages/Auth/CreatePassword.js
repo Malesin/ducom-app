@@ -28,11 +28,16 @@ const CreatePassword = ({navigation}) => {
   const route = useRoute();
   const {email} = route.params;
 
+  const validatePassword = password => {
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,15}$/;
+    return passwordRegex.test(password);
+  };
+
   const handleContinue = async () => {
     if (!password || !confirmPassword) {
       setError('Password and Confirm Password are required.');
-    } else if (password.length < 8 || password.length > 15) {
-      setError('Password must be between 8 and 15 characters.');
+    } else if (!validatePassword(password)) {
+      setError('Password must be between 8 and 15 characters and include at least one letter and one number.');
     } else if (password !== confirmPassword) {
       setError('Passwords do not match.');
     } else if (!isCheckedPass) {

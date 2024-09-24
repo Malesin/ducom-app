@@ -1,3 +1,4 @@
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -16,26 +17,29 @@ import {
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Video from 'react-native-video';
 import { createThumbnail } from 'react-native-create-thumbnail';
-import DefaultAvatar from '../assets/avatar.png';
+import DefaultAvatar from '../assets/profilepic.png';
 import BottomSheet from './BottomSheet';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import config from '../config';
 const serverUrl = config.SERVER_URL;
+const pinIcon = <Icon name="pin" size={13} color="#001374" />;
 
-const TweetCard = ({ tweet, onDeleteSuccess, comments }) => {
+const PinTweetCard = ({ tweet, onRefreshPage }) => {
   const [liked, setLiked] = useState(tweet.isLiked);
-  const [likesCount, setLikesCount] = useState(tweet.likesCount || 0);
-  const [bookmarked, setBookmarked] = useState(tweet.isBookmarked || false);
-  const [bookMarksCount, setBookMarksCount] = useState(tweet.bookMarksCount || 0);
-  const [commentsCount] = useState(tweet.commentsCount || 0);
+  const [likesCount, setLikesCount] = useState(tweet.likesCount);
+  const [bookmarked, setBookmarked] = useState(tweet.isBookmarked);
+  const [bookMarksCount, setBookMarksCount] = useState(tweet.bookMarksCount);
+  const [commentsCount] = useState(tweet.commentsCount);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalMediaUri, setModalMediaUri] = useState('');
   const [thumbnails, setThumbnails] = useState({});
   const [showBottomSheet, setShowBottomSheet] = useState(false);
 
   const navigator = useNavigation();
+
+  const allowedEmail = 'rifzkynurman1103@gmail.com'
 
   const handleProfilePress = () => {
     if (tweet.userIdPost === tweet.idUser) {
@@ -174,15 +178,7 @@ const TweetCard = ({ tweet, onDeleteSuccess, comments }) => {
   };
 
   const handleCommentPress = () => {
-    navigator.navigate('ViewPost', {
-      tweet,
-      postId: tweet.id,
-      idUser: tweet.idUser,
-      profilePicture: tweet.profilePicture,
-      emailUser: tweet.emailUser,
-      comments,
-      focusCommentInput: true,
-    });
+    navigator.navigate('Comment', { postId: tweet.id, idUser: tweet.idUser, profilePicture: tweet.profilePicture, emailUser: tweet.emailUser });
   };
 
   const openMediaPreview = uri => {
@@ -288,13 +284,19 @@ const TweetCard = ({ tweet, onDeleteSuccess, comments }) => {
     );
   };
 
-  const onDel = async (respdel) => {
+  const handleDelete = async () => {
+    const token = await AsyncStorage.getItem('token');
     try {
-      if (respdel === 'ok') {
+      const response = await axios.post(`${serverUrl}/delete-post`, {
+        token: token,
+        postId: tweet.id,
+      });
+
+      if (response.data.status === 'ok') {
         ToastAndroid.show('Tweet Successfully Deleted', ToastAndroid.SHORT);
-        onRefreshPage();
+        onDeleteSuccess();
       } else {
-        console.log('Error in delete response data:', respdel);
+        console.log('Error in delete response data:', response.data.data);
         Alert.alert('Error', 'Failed to delete post. Please try again.');
       }
     } catch (error) {
@@ -323,6 +325,7 @@ const TweetCard = ({ tweet, onDeleteSuccess, comments }) => {
   return (
     <SafeAreaView style={styles.card}>
       {/* User Info */}
+      <Text style={styles.pin}>{pinIcon} Pinned Post</Text>
       <View style={styles.userInfo}>
         <TouchableOpacity onPress={handleProfilePress}>
           <Image
@@ -363,10 +366,9 @@ const TweetCard = ({ tweet, onDeleteSuccess, comments }) => {
           </TouchableWithoutFeedback>
           <View style={styles.bottomSheetContainer}>
             <BottomSheet
-              onCloseDel={(respdel) => {
+              onCloseDel={() => {
                 setShowBottomSheet(false);
                 onRefreshPage();
-                onDel(respdel)
               }}
               onClosePin={(resppin) => {
                 setShowBottomSheet(false);
@@ -378,10 +380,10 @@ const TweetCard = ({ tweet, onDeleteSuccess, comments }) => {
               idUser={tweet.idUser}
               userIdPost={tweet.userIdPost}
               userEmailPost={tweet.userEmailPost}
-              allowedEmail={tweet.allowedEmail}
+              allowedEmail={allowedEmail}
               emailUser={tweet.emailUser}
               onRefreshPage={onRefreshPage}
-              handlePin={false}
+              handlePin={true}
             />
           </View>
         </Modal>
@@ -503,13 +505,20 @@ const styles = StyleSheet.create({
   userInfo: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 5
   },
   avatar: {
     width: 52,
     height: 49,
     borderRadius: 24,
     marginRight: 12,
+  },
+  pin: {
+    color: '#001374',
+    fontSize: 11,
+    marginLeft: 60,
+    marginBottom: -7,
+    marginTop: 5,
+    fontWeight: '700'
   },
   userDetails: {
     flexDirection: 'row',
@@ -534,7 +543,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     marginVertical: 8,
     color: '#040608',
-    marginTop: 10
   },
   mediaFlatList: {
     marginTop: 30,
@@ -609,4 +617,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default TweetCard;
+export default PinTweetCard;
