@@ -129,7 +129,7 @@ export default function EditProfilePage() {
         onPress={isDataChanged ? handleSave : null}
         disabled={!isDataChanged}
       >
-        <Text style={[styles.saveButtonText, { color: '#000' }]}> Save </Text>
+        <Text style={[styles.saveButtonText, { color: '#fff' }]}> Save </Text>
       </TouchableOpacity>
     ),
   });
@@ -580,7 +580,7 @@ const getStyles = colorScheme => {
       marginTop: 5,
     },
     saveButton: {
-      backgroundColor: '#00137F',
+      backgroundColor: '#fff',
       paddingVertical: 7,
       paddingHorizontal: 18,
       borderRadius: 50,
