@@ -1,34 +1,56 @@
-import React from 'react';
-import {SafeAreaView, ScrollView, StyleSheet} from 'react-native';
-import MentionCard from '../../components/MentionCard';
+import React, { useState, useEffect } from 'react';
+import { SafeAreaView, ScrollView, StyleSheet, Alert, Text, RefreshControl } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import config from '../../config';
 import LikeNotification from '../../components/LikeNotification';
 
+const serverUrl = config.SERVER_URL;
+
 const Notificationscreen = () => {
-  // Example tweet data
-  const mentions = [
-    {
-      userAvatar:
-        'https://i.pinimg.com/564x/3d/22/e2/3d22e2269593b9169e7d74fe222dbab0.jpg',
-      userName: 'John Doe',
-      userHandle: 'johndoe',
-      content: 'This is a sample mention content. #example',
-      image:
-        'https://i.pinimg.com/564x/12/ee/2c/12ee2c54d0ff28cf57df7890c447abf8.jpg',
-      video: '',
-      likesCount: 10,
-      bookMarksCount: 5,
-      commentsCount: 2,
-    },
-    // Add more mentions as needed
-  ];
+  const [notifications, setNotifications] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const fetchNotifications = async () => {
+    try {
+      const token = await AsyncStorage.getItem('token');
+      const response = await axios.post(`${serverUrl}/like-notifications`, { token });
+      const { data, status } = response.data;
+      if (status === 'ok') {
+        setNotifications(data.flat().filter(notification => notification !== null));
+      } else {
+        Alert.alert('Error', 'Failed to fetch notifications');
+      }
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+      Alert.alert('Error', 'Failed to fetch notifications');
+    }
+  };
+
+  useEffect(() => {
+    fetchNotifications();
+  }, []);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchNotifications();
+    setRefreshing(false);
+  };
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView>
-        {mentions.map((mention, index) => (
-          <MentionCard key={index} tweet={mention} />
-        ))}
-        <LikeNotification />
+      <ScrollView
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+        {notifications.length === 0 ? (
+          <Text style={styles.noNotificationsText}>No notifications</Text> // Tambahkan teks "No notifications"
+        ) : (
+          notifications.map((notification, index) => (
+            <LikeNotification key={index} notification={notification} />
+          ))
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -38,6 +60,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
+  },
+  noNotificationsText: {
+    textAlign: 'center',
+    marginTop: 20,
+    fontSize: 16,
+    color: '#888',
   },
 });
 
