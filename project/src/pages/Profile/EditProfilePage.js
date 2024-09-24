@@ -40,6 +40,7 @@ export default function EditProfilePage() {
   const [nameError, setNameError] = useState('');
   const colorScheme = useColorScheme();
   const styles = getStyles(colorScheme);
+  const [isDataChanged, setIsDataChanged] = useState(false);
 
   async function getData() {
     try {
@@ -91,6 +92,20 @@ export default function EditProfilePage() {
     }
   }, [profilePicture]);
 
+  useEffect(() => {
+    const checkDataChanged = () => {
+      const dataChanged = 
+        (name && name !== userData?.name) ||
+        (username && username !== userData?.username) ||
+        (bio && bio !== userData?.bio) ||
+        newProfileImage ||
+        newBannerImage;
+      setIsDataChanged(dataChanged);
+    };
+
+    checkDataChanged();
+  }, [name, username, bio, newProfileImage, newBannerImage, userData]);
+
   const validateUsername = username => {
     const usernameRegex = /^[a-z0-9]{4,15}$/;
     const specialCharRegex = /[!@#$%^&*()\-+={}[\]|\\:;"'<>,.?/~`]/;
@@ -106,8 +121,15 @@ export default function EditProfilePage() {
 
   navigation.setOptions({
     headerRight: () => (
-      <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-        <Text style={styles.saveButtonText}> Save </Text>
+      <TouchableOpacity
+        style={[
+          styles.saveButton,
+          { backgroundColor: isDataChanged ? '#001374' : '#ccc' },
+        ]}
+        onPress={isDataChanged ? handleSave : null}
+        disabled={!isDataChanged}
+      >
+        <Text style={[styles.saveButtonText, { color: '#fff' }]}> Save </Text>
       </TouchableOpacity>
     ),
   });
@@ -117,7 +139,7 @@ export default function EditProfilePage() {
     let hasError = false;
 
     // Validasi username
-    if (!username) {
+    if (username && !validateUsername(username)) {
       Toast.show({
         type: 'error',
         text1: 'Error',
@@ -136,9 +158,7 @@ export default function EditProfilePage() {
 
     // Validasi nama
     if (name && name !== userData?.name && !validateName(name)) {
-      setNameError(
-        'Name can only contain letters and spaces, and must be up to 40 characters long.',
-      );
+      setNameError('Name can only contain letters and spaces, and must be up to 40 characters long.');
       hasError = true;
     } else {
       setNameError('');
@@ -154,6 +174,19 @@ export default function EditProfilePage() {
       return;
     }
 
+    // Cek apakah ada perubahan data
+    const isDataChanged = 
+      (name && name !== userData?.name) ||
+      (username && username !== userData?.username) ||
+      (bio && bio !== userData?.bio) ||
+      newProfileImage ||
+      newBannerImage;
+
+    if (!isDataChanged) {
+      setIsSaving(false);
+      return;
+    }
+
     try {
       const token = await AsyncStorage.getItem('token');
       const updatedUserData = {token: token};
@@ -163,10 +196,7 @@ export default function EditProfilePage() {
       }
 
       if (username && username !== userData?.username) {
-        const checkUsernameResponse = await axios.post(
-          `${serverUrl}/check-username`,
-          {username},
-        );
+        const checkUsernameResponse = await axios.post(`${serverUrl}/check-username`, {username});
         if (checkUsernameResponse.data.status === 'error') {
           Toast.show({
             type: 'error',
@@ -217,10 +247,7 @@ export default function EditProfilePage() {
         });
       }
 
-      const response = await axios.post(
-        `${serverUrl}/update-profile`,
-        updatedUserData,
-      );
+      const response = await axios.post(`${serverUrl}/update-profile`, updatedUserData);
 
       if (response.data.status === 'update') {
         console.log('Updating new data');
@@ -553,7 +580,7 @@ const getStyles = colorScheme => {
       marginTop: 5,
     },
     saveButton: {
-      backgroundColor: '#00137F',
+      backgroundColor: '#fff',
       paddingVertical: 7,
       paddingHorizontal: 18,
       borderRadius: 50,

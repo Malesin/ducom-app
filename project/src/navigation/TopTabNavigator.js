@@ -88,7 +88,7 @@ function TopTabNavigator() {
           <Tabs.ScrollView
             onScroll={handleScroll}
             scrollEventThrottle={16}
-            refreshControl={
+             refreshControl={
               <RefreshControl
                 refreshing={refreshing}
                 onRefresh={onRefresh}
