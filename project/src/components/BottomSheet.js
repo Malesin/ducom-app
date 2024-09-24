@@ -5,8 +5,8 @@ import {
   TouchableOpacity,
   SafeAreaView,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
-import React, {useEffect, useState} from 'react';
+import { useNavigation } from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -22,44 +22,87 @@ const BottomSheet = ({
   userIdPost,
   allowedEmail,
   emailUser,
-  onClose,
+  onRefreshPage,
+  onCloseDel,
+  onClosePin,
+  handlePin
 }) => {
   const navigation = useNavigation();
   const [isDeletePost, setIsDeletePost] = useState(false);
-  const [isPinnedAccount, setIsPinnedAccount] = useState(false);
   const [isOwnAccount, setIsOwnAccount] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isPin, setIsPin] = useState(false)
+  
+  useEffect(() => {
+    setIsPin(handlePin)
+  }, [])
 
   const deletePost = async () => {
     const token = await AsyncStorage.getItem('token');
     try {
-      const response = await axios.post(`${serverUrl}/delete-post`, {
+      const delPost = await axios.post(`${serverUrl}/delete-post`, {
         token: token,
         postId: postId,
       });
+      const respdel = delPost.data.status
 
-      if (response.data.status === 'ok') {
-        console.log('Postingan Berhasil Dihapus');
-        onClose();
-      }
+      onCloseDel(respdel);
     } catch (error) {
       console.error('Error: ', error);
     }
   };
 
+  const pinPost = async () => {
+    const token = await AsyncStorage.getItem('token');
+    try {
+      if (isPin === false) {
+        const pinPost = await axios.post(`${serverUrl}/posts/pin`, {
+          token: token,
+          postId: postId,
+          duration: 8
+        })
+        const resppin = pinPost.data.status
+        onClosePin(resppin)
+        onRefreshPage()
+      } else if (isPin === true) {
+        const unPinPost = await axios.post(`${serverUrl}/posts/unpin`, {
+          token: token
+        })
+        const resppin = unPinPost.data.status
+        onClosePin(resppin)
+        onRefreshPage()
+      }
+    } catch (error) {
+      console.error('Error: ', error);
+    }
+  }
+
   useEffect(() => {
-    if (emailUser === allowedEmail || idUser === userIdPost) {
-      setIsOwnAccount(true);
+    if (emailUser === allowedEmail) {
+      setIsAdmin(true)
       setIsDeletePost(true);
-      setIsPinnedAccount(true); // Hanya pemilik akun yang bisa pin
+    } else if (idUser === userIdPost) {
+      setIsDeletePost(true);
+      setIsOwnAccount(true);
     } else {
+      setIsAdmin(false)
       setIsOwnAccount(false);
       setIsDeletePost(false);
-      setIsPinnedAccount(false);
     }
   }, [idUser, userIdPost, emailUser, allowedEmail]);
 
   return (
     <SafeAreaView style={styles.container}>
+      {isAdmin && (
+        <View style={styles.optionRow}>
+            <TouchableOpacity style={styles.option} onPress={pinPost}>
+              <MaterialCommunityIcons name="pin" size={24} color="#333" />
+              <Text style={styles.optionText}>
+                {isPin ? 'Unpin' : 'Pin'} @{username}
+              </Text>
+            </TouchableOpacity>
+        </View>
+      )}
       {!isOwnAccount && (
         <View style={styles.optionRow}>
           <TouchableOpacity style={styles.option}>
@@ -68,20 +111,12 @@ const BottomSheet = ({
           </TouchableOpacity>
         </View>
       )}
-      {isOwnAccount && ( // Hanya tampilkan opsi pin jika isOwnAccount true
-        <View style={styles.optionRow}>
-          <TouchableOpacity style={styles.option}>
-            <MaterialCommunityIcons name="pin" size={24} color="#333" />
-            <Text style={styles.optionText}>Pin @{username}</Text>
-          </TouchableOpacity>
-        </View>
-      )}
       {isDeletePost && (
         <View style={styles.optionRow}>
           <TouchableOpacity style={styles.option} onPress={deletePost}>
             <MaterialIcons name="delete" size={24} color="#333" />
             <Text style={styles.optionText}>
-              Delete {isOwnAccount ? '' : `Post @${username}`}
+              Delete {isOwnAccount ? 'Post' : `Post @${username}`}
             </Text>
           </TouchableOpacity>
         </View>
