@@ -476,12 +476,16 @@ const HomeScreen = ({ navigation, tweet }) => {
 
             {pintweets.map((tweet, index) => (
               <View key={index} style={styles.tweetContainer}>
+                <TouchableOpacity onPress={() => handlePostPress(tweet)}>
                 <PinTweetCard tweet={tweet} onRefreshPage={onRefreshPage} />
+                </TouchableOpacity>
               </View>
             ))}
             {tweets.map((tweet, index) => (
               <View key={index} style={styles.tweetContainer}>
+                <TouchableOpacity onPress={() => handlePostPress(tweet)}>
                 <TweetCard tweet={tweet} onRefreshPage={onRefreshPage} />
+              </TouchableOpacity>
               </View>
             ))}
           </>

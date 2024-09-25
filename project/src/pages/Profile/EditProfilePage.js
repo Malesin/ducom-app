@@ -139,22 +139,15 @@ export default function EditProfilePage() {
     let hasError = false;
 
     // Validasi username
-    if (username && !validateUsername(username)) {
-      Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: 'Username tidak boleh kosong',
-      });
-      hasError = true;
-    } else if (!validateUsername(username)) {
-      Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2:
-          'Must be 4-15 characters long, lowercase letters and numbers only.',
-      });
-      hasError = true;
-    }
+     if (!validateUsername(username)) { // Menghapus pengkondisian username tidak boleh kosong
+    Toast.show({
+      type: 'error',
+      text1: 'Error',
+      text2:
+        'Must be 4-15 characters long, lowercase letters and numbers only.',
+    });
+    hasError = true;
+    } 
 
     // Validasi nama
     if (name && name !== userData?.name && !validateName(name)) {

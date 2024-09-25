@@ -271,6 +271,7 @@ const ViewPost = ({ route }) => {
             fetchComments();
             setReplyToCommentId(null);
             setComment('');
+            setInputHeight(null);
             setPlaceholder("add comments");
             Keyboard.dismiss();
         } catch (error) {
