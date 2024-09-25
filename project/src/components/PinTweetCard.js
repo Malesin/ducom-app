@@ -185,6 +185,7 @@ const PinTweetCard = ({ tweet, onRefreshPage, comments }) => {
       idUser: tweet.idUser,
       profilePicture: tweet.profilePicture,
       emailUser: tweet.emailUser,
+      userEmailPost: tweet.userEmailPost,
       comments,
       focusCommentInput: true,
     });

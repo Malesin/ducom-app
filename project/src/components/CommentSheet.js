@@ -13,10 +13,9 @@ import config from '../config';
 
 const serverUrl = config.SERVER_URL;
 
-const CommentSheet = ({ commentId, postId, token, emailUser, allowedEmail, idUser, userIdPost, onDeleteSuccess, onClose, parentCommentId }) => {
+const CommentSheet = ({ commentId, postId, token, emailUser, allowedEmail, idUser, userIdPost, onDeleteSuccess, onClose, parentCommentId, userEmailPost }) => {
   const [isDeleteComment, setIsDeleteComment] = useState(false);
   const [isReportComment, setIsReportComment] = useState(false);
-  console.log(parentCommentId, "parentCommentId")
 
   const deleteComment = async () => {
     try {
@@ -24,7 +23,7 @@ const CommentSheet = ({ commentId, postId, token, emailUser, allowedEmail, idUse
         token: token,
         postId: postId,
         commentId: parentCommentId || commentId,
-        replyId : parentCommentId ? commentId : null
+        replyId: parentCommentId ? commentId : null
       });
 
       if (response.data.status === 'ok') {
@@ -41,27 +40,24 @@ const CommentSheet = ({ commentId, postId, token, emailUser, allowedEmail, idUse
   };
 
   useEffect(() => {
-    if (emailUser === allowedEmail || idUser === userIdPost) {
+    if (idUser === userIdPost) {
+      // Pengguna dapat menghapus komentarnya sendiri dan melaporkan komentar orang lain / USER
       setIsDeleteComment(true);
+      setIsReportComment(false);
+    } else if (allowedEmail.includes(emailUser)) {
+      // Pengguna dengan email yang diizinkan dapat menghapus dan melaporkan semua komentar / ADMIN
+      setIsDeleteComment(true);
+      setIsReportComment(true);
+    } else if (emailUser === userEmailPost) {
+      // Pemilik akun postingan dapat menghapus dan melaporkan semua komentar / OWNER POST
+      setIsDeleteComment(true);
+      setIsReportComment(true);
     } else {
+      // Pengguna lain hanya dapat melaporkan komentar / OTHER USER
       setIsDeleteComment(false);
-      console.log("muncul")
+      setIsReportComment(true);
     }
-
-    if (emailUser !== allowedEmail) {
-      if (idUser === userIdPost) {
-        setIsReportComment(false);
-      } else {
-        setIsReportComment(true);
-      }
-    } else {
-      if (idUser === userIdPost) {
-        setIsReportComment(false);
-      } else {
-        setIsReportComment(true);
-      }
-    }
-  }, [idUser, userIdPost, emailUser, allowedEmail]);
+  }, [idUser, userIdPost, emailUser, allowedEmail, commentId]);
 
   const reportComment = async () => {
     // try {

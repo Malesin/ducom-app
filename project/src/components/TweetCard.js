@@ -34,7 +34,7 @@ const TweetCard = ({ tweet, onRefreshPage, comments }) => {
   const [modalMediaUri, setModalMediaUri] = useState('');
   const [thumbnails, setThumbnails] = useState({});
   const [showBottomSheet, setShowBottomSheet] = useState(false);
-
+  
   const navigator = useNavigation();
 
   const handleProfilePress = () => {
@@ -181,6 +181,7 @@ const TweetCard = ({ tweet, onRefreshPage, comments }) => {
       idUser: tweet.idUser,
       profilePicture: tweet.profilePicture,
       emailUser: tweet.emailUser,
+      userEmailPost: tweet.userEmailPost,
       comments,
       focusCommentInput: true,
     });

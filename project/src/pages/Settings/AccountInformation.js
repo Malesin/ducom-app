@@ -37,22 +37,40 @@ const AccountInformation = () => {
   }
 
   async function savePhone() {
-    const phoneRegex = /^[0-9]{10,15}$/;
-    if (!phoneRegex.test(phoneNumber)) {
-      ToastAndroid.show('Phone number must be between 10-15 digits and contain only numbers.', ToastAndroid.SHORT, ToastAndroid.CENTER);
+    if (phoneNumber === '') {
+      try { 
+        const token = await AsyncStorage.getItem('token');
+        await axios.post(`${serverUrl}/svPhoneNumber`, {
+          token: token,
+          phoneNumber: phoneNumber,
+        });
+        ToastAndroid.show('Phone number cleared successfully.', ToastAndroid.SHORT);
+        setIsEditing(false);
+        getData(); // Refresh data after saving
+      } catch (error) {
+        ToastAndroid.show('Error occurred while clearing phone number.', ToastAndroid.SHORT);
+        console.error('Error occurred:', error);
+      }
       return;
     }
+
+    const phoneRegex = /^[0-9]{10,15}$/;
+    if (!phoneRegex.test(phoneNumber)) {
+      ToastAndroid.show('Phone number must be between 10 and 15 digits and contain only numbers.', ToastAndroid.SHORT);
+      return;
+    }
+
     try {
       const token = await AsyncStorage.getItem('token');
       await axios.post(`${serverUrl}/svPhoneNumber`, {
         token: token,
         phoneNumber: phoneNumber,
       });
-      ToastAndroid.show('Phone number saved successfully.', ToastAndroid.SHORT, ToastAndroid.CENTER);
+      ToastAndroid.show('Phone number saved successfully.', ToastAndroid.SHORT);
       setIsEditing(false);
       getData(); // Refresh data after saving
     } catch (error) {
-      ToastAndroid.show('Error occurred while saving phone number.', ToastAndroid.SHORT, ToastAndroid.CENTER);
+      ToastAndroid.show('Error occurred while saving phone number.', ToastAndroid.SHORT);
       console.error('Error occurred:', error);
     }
   }
