@@ -11,7 +11,7 @@ import CommentCard from '../../components/CommentCard';
 const serverUrl = config.SERVER_URL;
 
 const ViewPost = ({ route }) => {
-    const { tweet, comments: initialComments, postId, idUser, profilePicture, emailUser, focusCommentInput } = route?.params || {};
+    const { tweet, comments: initialComments, postId, idUser, profilePicture, emailUser, focusCommentInput, userEmailPost } = route?.params || {};
     const [liked, setLiked] = useState(tweet.isLiked);
     const [likesCount, setLikesCount] = useState(tweet.likesCount);
     const [bookmarked, setBookmarked] = useState(tweet.isBookmarked);
@@ -219,7 +219,8 @@ const ViewPost = ({ route }) => {
                     : [],
                 username: comment.user.username,
                 profilePicture: comment.user.profilePicture,
-                allowedEmail: comment.allowedEmail
+                allowedEmail: comment.allowedEmail,
+                userEmailPost: userEmailPost
             }));
 
             setComments(formattedComments);
@@ -387,6 +388,7 @@ const ViewPost = ({ route }) => {
                                 isLikedCom={comment.isLikedCom}
                                 emailUser={emailUser}
                                 onDeleteSuccess={onDeleteSuccess}
+                                userEmailPost={userEmailPost}
                             />
                         ))}
                         {visibleComments < comments.length && (
