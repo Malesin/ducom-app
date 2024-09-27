@@ -80,6 +80,7 @@ const HomeScreen = ({ navigation, tweet }) => {
       profilePicture = data.profilePicture;
   
       const responseTweet = await axios.post(`${serverUrl}/posts`, {
+        // token:token,
         page: pageNum,
       });
       const dataTweet = responseTweet.data.data;
@@ -206,7 +207,8 @@ const HomeScreen = ({ navigation, tweet }) => {
       return;
     }
     const comments = await fetchComments(tweet.id);
-    navigation.navigate('ViewPost', { tweet, comments });
+    const postId = tweet.id;
+    navigation.navigate('ViewPost', { tweet, comments, postId });
   };
 
   const onRefresh = useCallback(async () => {

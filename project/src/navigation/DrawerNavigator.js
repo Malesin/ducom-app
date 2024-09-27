@@ -19,7 +19,7 @@ const SettingsStackNavigator = () => {
   return (
     <Stack.Navigator>
       <Stack.Screen
-        name="Settings"
+        name="SettingsScreen" // Ubah nama layar di sini
         component={Settingsscreen}
         options={{headerShown: false}}
       />

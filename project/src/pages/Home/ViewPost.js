@@ -35,7 +35,6 @@ const ViewPost = ({route}) => {
     idUser,
     emailUser,
     focusCommentInput,
-    userEmailPost,
   } = route?.params || {};
   const [liked, setLiked] = useState(tweet.isLiked);
   const [likesCount, setLikesCount] = useState(tweet.likesCount);
@@ -47,14 +46,16 @@ const ViewPost = ({route}) => {
   const [thumbnails, setThumbnails] = useState({});
   const [inputHeight, setInputHeight] = useState(null);
   const [isTyping, setIsTyping] = useState(false);
+  const [isReplying, setIsReplying] = useState(false);
   const [comment, setComment] = useState('');
   const [comments, setComments] = useState(initialComments || []);
   const [replyToCommentId, setReplyToCommentId] = useState(null);
   const textInputRef = React.createRef();
   const [visibleComments, setVisibleComments] = useState(3);
   const [placeholder, setPlaceholder] = useState('add comments');
+  const colorScheme = useColorScheme();
+
   const [refreshing, setRefreshing] = useState(false);
-  const colorScheme = useColorScheme(); // Detect light or dark mode
 
   useEffect(() => {
     if (focusCommentInput && textInputRef.current) {
@@ -233,8 +234,11 @@ const ViewPost = ({route}) => {
     try {
       const url = `${serverUrl}/comments`;
       const params = {postId: tweet.id};
+
       const response = await axios.post(url, params);
       const dataComment = response.data.data;
+
+      // console.log('Data komentar yang diterima:', dataComment);
 
       const formattedComments = dataComment.map(comment => ({
         id: comment._id,
@@ -260,7 +264,6 @@ const ViewPost = ({route}) => {
         username: comment.user.username,
         profilePicture: comment.user.profilePicture,
         allowedEmail: comment.allowedEmail,
-        userEmailPost: userEmailPost,
       }));
 
       setComments(formattedComments);
@@ -287,12 +290,7 @@ const ViewPost = ({route}) => {
 
   const handleTextInputChange = text => {
     setComment(text);
-
-    if (text.length > 0) {
-      setIsTyping(true);
-    } else {
-      setIsTyping(false);
-    }
+    setIsTyping(text.length > 0);
   };
 
   const handleTextInputContentSizeChange = event => {
@@ -305,14 +303,14 @@ const ViewPost = ({route}) => {
         token: token,
         postId: postId,
         comment: comment,
-        parentCommentId: replyToCommentId,
+        parentCommentId: replyToCommentId || null,
       });
 
       fetchComments();
       setReplyToCommentId(null);
       setComment('');
-      setInputHeight(null);
       setPlaceholder('add comments');
+      setIsTyping(false);
       Keyboard.dismiss();
     } catch (error) {
       console.error('Error data:', error);
@@ -323,6 +321,15 @@ const ViewPost = ({route}) => {
     setIsTyping(true);
     setReplyToCommentId(commentId);
     setPlaceholder(`add reply @${username}`);
+    if (textInputRef.current) {
+      textInputRef.current.focus();
+    }
+  };
+
+  const handleReplyIconPress = () => {
+    setIsReplying(true);
+    setReplyToCommentId(null);
+    setPlaceholder('add comments');
     if (textInputRef.current) {
       textInputRef.current.focus();
     }
@@ -350,14 +357,14 @@ const ViewPost = ({route}) => {
               <Text
                 style={[
                   styles.userName,
-                  {color: colorScheme === 'dark' ? '#fff' : '#000'},
+                  {color: colorScheme === 'dark' ? '#000000' : '#000'},
                 ]}>
                 {tweet.userName}
               </Text>
               <Text
                 style={[
                   styles.userHandle,
-                  {color: colorScheme === 'dark' ? '#cccccc' : '#888888'},
+                  {color: colorScheme === 'dark' ? '#ccc' : 'gray'},
                 ]}>
                 @{tweet.userHandle}
               </Text>
@@ -433,7 +440,11 @@ const ViewPost = ({route}) => {
               color={liked ? '#E0245E' : '#040608'}
               onPress={handleLike}
             />
-            <InteractionButton icon="message-reply-outline" color="#040608" />
+            <InteractionButton
+              icon="message-reply-outline"
+              color="#040608"
+              onPress={handleReplyIconPress}
+            />
             <InteractionButton
               icon={bookmarked ? 'bookmark' : 'bookmark-outline'}
               color={bookmarked ? '#00c5ff' : '#040608'}
@@ -468,7 +479,6 @@ const ViewPost = ({route}) => {
                 isLikedCom={comment.isLikedCom}
                 emailUser={emailUser}
                 onDeleteSuccess={onDeleteSuccess}
-                userEmailPost={userEmailPost}
               />
             ))}
             {visibleComments < comments.length && (
@@ -488,16 +498,16 @@ const ViewPost = ({route}) => {
             styles.inputComment,
             {
               height: inputHeight,
-              color: colorScheme === 'dark' ? '#fff' : '#000',
+              color: colorScheme === 'dark' ? '#000000' : '#000',
             },
           ]}
           placeholder={placeholder}
+          placeholderTextColor={colorScheme === 'dark' ? '#ccc' : '#888'}
           maxLength={300}
           multiline={true}
           value={comment}
           onChangeText={handleTextInputChange}
           onContentSizeChange={handleTextInputContentSizeChange}
-          placeholderTextColor={colorScheme === 'dark' ? '#cccccc' : '#888888'} // Adjust placeholder text color based on theme
         />
 
         {isTyping && (
@@ -580,6 +590,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   userHandle: {
+    color: 'gray',
     fontSize: 13,
   },
   optionsButton: {
@@ -589,6 +600,7 @@ const styles = StyleSheet.create({
   postContent: {
     fontSize: 16,
     marginVertical: 10,
+    color: 'black',
   },
   media: {
     width: 300,
@@ -596,6 +608,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   postDate: {
+    color: 'gray',
     fontSize: 14,
     marginTop: 10,
     marginBottom: 10,
