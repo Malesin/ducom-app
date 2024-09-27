@@ -133,9 +133,9 @@ const HomeScreen = ({ navigation, tweet }) => {
         ]);
         return;
       }
-      emailUser = data.email;
-      idUser = data._id;
-      profilePicture = data.profilePicture;
+      const emailUser = data.email;
+      const idUser = data._id;
+      const profilePicture = data.profilePicture;
       
       const pinPost = await axios.post(`${serverUrl}/posts/pinned`, {
         token: token

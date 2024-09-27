@@ -179,7 +179,6 @@ const TweetCard = ({ tweet, onRefreshPage, comments }) => {
       tweet,
       postId: tweet.id,
       idUser: tweet.idUser,
-      profilePicture: tweet.profilePicture,
       emailUser: tweet.emailUser,
       userEmailPost: tweet.userEmailPost,
       comments,
