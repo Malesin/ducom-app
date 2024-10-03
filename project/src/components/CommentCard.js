@@ -107,7 +107,7 @@ const CommentCard = ({ text, hasReplies, replies, onReplyPress, username, profil
           <TouchableOpacity onPress={handleProfilePress}>
             <Image
               source={
-                { uri: profilePicture } || require('../assets/profilepic.png')
+                profilePicture ? { uri: profilePicture } : require('../assets/profilepic.png')
               }
               style={styles.profileImage}
             />
