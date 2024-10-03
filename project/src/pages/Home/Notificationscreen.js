@@ -45,7 +45,7 @@ const Notificationscreen = () => {
         }
       >
         {notifications.length === 0 ? (
-          <Text style={styles.noNotificationsText}>No notifications</Text> // Tambahkan teks "No notifications"
+          <Text style={styles.noNotificationsText}>No notifications</Text>
         ) : (
           notifications.map((notification, index) => (
             <LikeNotification key={index} notification={notification} />

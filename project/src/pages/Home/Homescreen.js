@@ -34,7 +34,7 @@ import { Skeleton } from 'react-native-elements';
 
 const serverUrl = config.SERVER_URL;
 
-const HomeScreen = ({ navigation, tweet }) => {
+const HomeScreen = ({ navigation, comments }) => {
   const [tweets, setTweets] = useState([]);
   const [pintweets, setPinTweets] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
@@ -63,7 +63,7 @@ const HomeScreen = ({ navigation, tweet }) => {
       setLoading(false);
       return [];
     }
-  
+
     setLoading(true);
     try {
       const token = await AsyncStorage.getItem('token');
@@ -78,12 +78,12 @@ const HomeScreen = ({ navigation, tweet }) => {
       emailUser = data.email;
       idUser = data._id;
       profilePicture = data.profilePicture;
-  
+
       const responseTweet = await axios.post(`${serverUrl}/posts`, {
         page: pageNum,
       });
       const dataTweet = responseTweet.data.data;
-  
+
       const formattedTweets = dataTweet.map(post => {
         const totalComments = post.comments.length + post.comments.reduce((acc, comment) => acc + comment.replies.length, 0);
         return {
@@ -100,7 +100,7 @@ const HomeScreen = ({ navigation, tweet }) => {
             }))
             : [],
           likesCount: post.likes.length,
-          commentsCount: totalComments, 
+          commentsCount: totalComments,
           bookMarksCount: post.bookmarks.length,
           isLiked: post.likes.some(like => like._id === idUser),
           isBookmarked: post.bookmarks.some(bookmark => bookmark.user === idUser),
@@ -120,7 +120,7 @@ const HomeScreen = ({ navigation, tweet }) => {
       setLoading(false);
     }
   };
-  
+
   // Tweet Pinned
   const fetchPinTweet = async () => {
     try {
@@ -136,7 +136,7 @@ const HomeScreen = ({ navigation, tweet }) => {
       emailUser = data.email;
       idUser = data._id;
       profilePicture = data.profilePicture;
-      
+
       const pinPost = await axios.post(`${serverUrl}/posts/pinned`, {
         token: token
       });
@@ -173,7 +173,7 @@ const HomeScreen = ({ navigation, tweet }) => {
         userEmailPost: postPin.user.email,
         emailUser: emailUser,
         profilePicture: profilePicture,
-        pinnedBy:pinnedBy
+        pinnedBy: pinnedBy
       };
 
       return pinTweet;
@@ -476,12 +476,16 @@ const HomeScreen = ({ navigation, tweet }) => {
 
             {pintweets.map((tweet, index) => (
               <View key={index} style={styles.tweetContainer}>
-                <PinTweetCard tweet={tweet} onRefreshPage={onRefreshPage} />
+                <TouchableOpacity onPress={() => handlePostPress(tweet, comments)}>
+                  <PinTweetCard tweet={tweet} onRefreshPage={onRefreshPage} />
+                </TouchableOpacity>
               </View>
             ))}
             {tweets.map((tweet, index) => (
               <View key={index} style={styles.tweetContainer}>
-                <TweetCard tweet={tweet} onRefreshPage={onRefreshPage} />
+                <TouchableOpacity onPress={() => handlePostPress(tweet, comments)}>
+                  <TweetCard tweet={tweet} onRefreshPage={onRefreshPage} />
+                </TouchableOpacity>
               </View>
             ))}
           </>

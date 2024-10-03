@@ -36,9 +36,9 @@ const CreatePost = ({ route, navigation }) => {
   const [previewMedia, setPreviewMedia] = useState(null);
   const [mediaType, setMediaType] = useState(null);
   const [profilePicture, setProfilePicture] = useState(null);
-  const [translateY] = useState(new Animated.Value(500)); 
-  const colorScheme = useColorScheme(); 
-  const styles = getStyles(colorScheme); 
+  const [translateY] = useState(new Animated.Value(500));
+  const colorScheme = useColorScheme();
+  const styles = getStyles(colorScheme);
 
   const profilePictureUri = require('../../assets/profilepic.png');
 
@@ -81,7 +81,7 @@ const CreatePost = ({ route, navigation }) => {
   useEffect(() => {
     Animated.spring(translateY, {
       toValue: 0,
-      friction: 8, 
+      friction: 8,
       tension: 40,
       useNativeDriver: true,
     }).start();
@@ -119,7 +119,7 @@ const CreatePost = ({ route, navigation }) => {
             });
 
             if (uploadedMedia.length === 4) {
-              break; 
+              break;
             }
           } else {
             console.error(
@@ -412,7 +412,7 @@ const CreatePost = ({ route, navigation }) => {
     const keyboardDidHideListener = Keyboard.addListener(
       'keyboardDidHide',
       () => {
-        setKeyboardVisible(false); // <-- Set to false here
+        setKeyboardVisible(false);
       },
     );
 
@@ -448,7 +448,7 @@ const CreatePost = ({ route, navigation }) => {
             maxLength={500}
             placeholderTextColor={
               colorScheme === 'dark' ? '#cccccc' : '#888888'
-            } 
+            }
           />
         </View>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -456,24 +456,29 @@ const CreatePost = ({ route, navigation }) => {
         </ScrollView>
         <View style={styles.buttonContainer}>
           <Button
-            icon={<Icon name="camera" size={24} color="#000" />}
-            buttonStyle={styles.button}
-            onPress={handleOpenCamera}
+            title="Who can reply?"
+            buttonStyle={styles.buttonComments}
+            titleStyle={{ color: '#001374' }}
+            type="clear"
           />
-          <Button
-            icon={<Icon name="image-outline" size={24} color="#000" />}
-            buttonStyle={styles.button}
-            onPress={handleOpenGallery}
-          />
-          {/* {keyboardVisible &&
-            (newPostText.length > 0 || selectedMedia.length > 0) && ( */}
-          <Button
-            title="Post"
-            buttonStyle={styles.postButton}
-            onPress={handlePostSubmit}
-            disabled={selectedMedia.length === 0 && !newPostText.trim()}
-          />
-          {/* )} */}
+          <View style={{ flexDirection: 'row' }}>
+            <Button
+              icon={<Icon name="camera" size={24} color="#000" />}
+              buttonStyle={styles.button}
+              onPress={handleOpenCamera}
+            />
+            <Button
+              icon={<Icon name="image-outline" size={24} color="#000" />}
+              buttonStyle={styles.button}
+              onPress={handleOpenGallery}
+            />
+            <Button
+              title="Post"
+              buttonStyle={styles.postButton}
+              onPress={handlePostSubmit}
+              disabled={selectedMedia.length === 0 && !newPostText.trim()}
+            />
+          </View>
         </View>
       </Animated.View>
 
@@ -545,7 +550,7 @@ const getStyles = (
       borderColor: 'transparent',
       padding: 12,
       borderRadius: 8,
-      color: colorScheme === 'dark' ? '#000000' : '#000000', 
+      color: colorScheme === 'dark' ? '#000000' : '#000000',
     },
     mediaContainer: {
       position: 'relative',
@@ -559,7 +564,12 @@ const getStyles = (
     },
     buttonContainer: {
       flexDirection: 'row',
-      justifyContent: 'flex-end',
+      justifyContent: 'space-between',
+      alignItems: 'center', 
+    },
+    buttonComments: {
+      backgroundColor: 'transparent',
+      padding: 0, 
     },
     button: {
       backgroundColor: 'transparent',
