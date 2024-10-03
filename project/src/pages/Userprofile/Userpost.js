@@ -10,17 +10,19 @@ import {
 import TweetCard from '../../components/TweetCard';
 import axios from 'axios';
 import config from '../../config';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const serverUrl = config.SERVER_URL;
 
-const Userpost = ({ userIdPost, profilePicture, idUser }) => {
+const Userpost = ({ userIdPost, profilePicture }) => {
   const [tweets, setTweets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isFetched, setIsFetched] = useState(false); // State to track if data has been fetched
 
   const fetchTweets = useCallback(async () => {
+    const token = await AsyncStorage.getItem('token');
     try {
       const response = await axios.post(`${serverUrl}/userId-posts`, {
+        token:token,
         userId: userIdPost,
       });
 

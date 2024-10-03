@@ -16,7 +16,7 @@ import {
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Video from 'react-native-video';
 import { createThumbnail } from 'react-native-create-thumbnail';
-import DefaultAvatar from '../assets/avatar.png';
+import DefaultAvatar from '../assets/profilepic.png';
 import BottomSheet from './BottomSheet';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';

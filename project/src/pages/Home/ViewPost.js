@@ -24,6 +24,7 @@ import config from '../../config';
 import Video from 'react-native-video';
 import {createThumbnail} from 'react-native-create-thumbnail';
 import CommentCard from '../../components/CommentCard';
+import BottomSheet from '../../components/BottomSheet'; // Tambahkan ini jika belum ada
 
 const serverUrl = config.SERVER_URL;
 
@@ -34,7 +35,7 @@ const ViewPost = ({route}) => {
     postId,
     idUser,
     emailUser,
-    focusCommentInput,
+    focusCommentInput,allowedEmail,
   } = route?.params || {};
   const [liked, setLiked] = useState(tweet.isLiked);
   const [likesCount, setLikesCount] = useState(tweet.likesCount);
@@ -56,6 +57,7 @@ const ViewPost = ({route}) => {
   const colorScheme = useColorScheme();
 
   const [refreshing, setRefreshing] = useState(false);
+  const [showBottomSheet, setShowBottomSheet] = useState(false); // Tambahkan state ini
 
   useEffect(() => {
     if (focusCommentInput && textInputRef.current) {
@@ -369,7 +371,10 @@ const ViewPost = ({route}) => {
                 @{tweet.userHandle}
               </Text>
             </View>
-            <TouchableOpacity style={styles.optionsButton}>
+            <TouchableOpacity
+              style={styles.optionsButton}
+              onPress={() => setShowBottomSheet(true)} // Ubah ini
+            >
               <MaterialCommunityIcons
                 name="dots-vertical"
                 size={26}
@@ -552,6 +557,28 @@ const ViewPost = ({route}) => {
           </TouchableWithoutFeedback>
         </Modal>
       )}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={showBottomSheet}
+        onRequestClose={() => setShowBottomSheet(false)}
+      >
+        <TouchableWithoutFeedback onPress={() => setShowBottomSheet(false)}>
+          <View style={styles.overlay} />
+        </TouchableWithoutFeedback>
+        <View style={styles.bottomSheetContainer}>
+          <BottomSheet
+            onCloseDel={(respdel) => {
+              setShowBottomSheet(false);
+            }}
+            idUser={idUser}
+            username={tweet.userHandle}
+            allowedEmail={tweet.allowedEmail}
+            emailUser={emailUser} 
+            userIdPost={tweet.userIdPost} // Pastikan ini dikirim
+          />
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -745,5 +772,18 @@ const styles = StyleSheet.create({
   },
   icon: {
     alignItems: 'center',
+  },
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  bottomSheetContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'transparent',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
   },
 });
