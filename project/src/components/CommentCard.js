@@ -13,17 +13,18 @@ import CommentSheet from './CommentSheet';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import { useNavigation } from '@react-navigation/native';
 import config from '../config';
 
 const serverUrl = config.SERVER_URL;
 
-const CommentCard = ({ text, hasReplies, replies, onReplyPress, username, profilePicture, onAddReply, commentId, postId, userIdPost, idUser, allowedEmail, emailUser, onDeleteSuccess, isLikedCom, parentCommentId }) => {
+const CommentCard = ({ text, hasReplies, replies, onReplyPress, username, profilePicture, onAddReply, commentId, postId, userIdPost, idUser, allowedEmail, emailUser, onDeleteSuccess, isLikedCom, parentCommentId, userEmailPost }) => {
   const [isLiked, setIsLiked] = useState(isLikedCom);
   const [showReplies, setShowReplies] = useState(false);
   const [showMoreReplies, setShowMoreReplies] = useState(false);
   const [showCommentSheet, setShowCommentSheet] = useState(false);
   const [gettoken, setGetToken] = useState();
-
+  const navigation = useNavigation();
   const tokenconst = async () => {
     const token = await AsyncStorage.getItem('token');
     setGetToken(token);
@@ -161,6 +162,7 @@ const CommentCard = ({ text, hasReplies, replies, onReplyPress, username, profil
                       onDeleteSuccess={onDeleteSuccess}
                       isLikedCom={reply.isLikedCom}
                       parentCommentId={commentId}
+                      userEmailPost={userEmailPost}
                     />
                   </View>
                 ))}
@@ -212,6 +214,7 @@ const CommentCard = ({ text, hasReplies, replies, onReplyPress, username, profil
               emailUser={emailUser}
               onDeleteSuccess={onDeleteSuccess}
               parentCommentId={parentCommentId}
+              userEmailPost={userEmailPost}
             />
           </View>
         </Modal>

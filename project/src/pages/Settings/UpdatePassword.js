@@ -10,6 +10,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import config from '../../config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useColorScheme } from 'react-native';
 
 const serverUrl = config.SERVER_URL;
 
@@ -19,6 +21,10 @@ const UpdatePassword = ({ navigation }) => {
   const [verifyNewPassword, setVerifyNewPassword] = useState('');
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [showOldPassword, setShowOldPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showVerifyNewPassword, setShowVerifyNewPassword] = useState(false);
+  const colorScheme = useColorScheme();
 
   const validatePassword = password => {
     const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,15}$/;
@@ -63,33 +69,72 @@ const UpdatePassword = ({ navigation }) => {
     <SafeAreaView style={styles.container}>
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Old Password</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Please enter current password"
-          secureTextEntry
-          value={oldPassword}
-          onChangeText={setOldPassword}
-        />
+        <View style={styles.passwordContainer}>
+          <TextInput
+            style={styles.passwordInput}
+            placeholder="Please enter current password"
+            secureTextEntry={!showOldPassword}
+            value={oldPassword}
+            onChangeText={setOldPassword}
+            placeholderTextColor={colorScheme === 'dark' ? '#cccccc' : '#888888'}
+          />
+          <TouchableOpacity
+            style={styles.eyeIcon}
+            onPress={() => setShowOldPassword(!showOldPassword)}
+          >
+            <Icon
+              name={showOldPassword ? 'eye' : 'eye-off'}
+              size={18}
+              color="#000000"
+            />
+          </TouchableOpacity>
+        </View>
       </View>
       <View style={styles.inputContainer}>
         <Text style={styles.label}>New Password</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Please enter new password"
-          secureTextEntry
-          value={newPassword}
-          onChangeText={setNewPassword}
-        />
+        <View style={styles.passwordContainer}>
+          <TextInput
+            style={styles.passwordInput}
+            placeholder="Please enter new password"
+            secureTextEntry={!showNewPassword}
+            value={newPassword}
+            onChangeText={setNewPassword}
+            placeholderTextColor={colorScheme === 'dark' ? '#cccccc' : '#888888'}
+          />
+          <TouchableOpacity
+            style={styles.eyeIcon}
+            onPress={() => setShowNewPassword(!showNewPassword)}
+          >
+            <Icon
+              name={showNewPassword ? 'eye' : 'eye-off'}
+              size={18}
+              color="#000000"
+            />
+          </TouchableOpacity>
+        </View>
       </View>
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Verify New Password</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Please verify new password"
-          secureTextEntry
-          value={verifyNewPassword}
-          onChangeText={setVerifyNewPassword}
-        />
+        <View style={styles.passwordContainer}>
+          <TextInput
+            style={styles.passwordInput}
+            placeholder="Please verify new password"
+            secureTextEntry={!showVerifyNewPassword}
+            value={verifyNewPassword}
+            onChangeText={setVerifyNewPassword}
+            placeholderTextColor={colorScheme === 'dark' ? '#cccccc' : '#888888'}
+          />
+          <TouchableOpacity
+            style={styles.eyeIcon}
+            onPress={() => setShowVerifyNewPassword(!showVerifyNewPassword)}
+          >
+            <Icon
+              name={showVerifyNewPassword ? 'eye' : 'eye-off'}
+              size={18}
+              color="#000000"
+            />
+          </TouchableOpacity>
+        </View>
       </View>
       {error ? <Text style={styles.error}>{error}</Text> : null}
       {successMessage ? <Text style={styles.success}>{successMessage}</Text> : null}
@@ -165,5 +210,20 @@ const styles = StyleSheet.create({
     textAlign: 'left',
     fontWeight: 'bold',
     marginBottom: 10,
+  },
+  eyeIcon: {
+    marginRight: 10,
+  },
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderColor: '#000',
+    borderRadius: 5,
+    padding: 10,
+    fontSize: 16,
+  },
+  passwordInput: {
+    flex: 1,
   },
 });

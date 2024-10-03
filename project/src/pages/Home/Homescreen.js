@@ -80,6 +80,7 @@ const HomeScreen = ({ navigation, comments }) => {
       profilePicture = data.profilePicture;
 
       const responseTweet = await axios.post(`${serverUrl}/posts`, {
+        // token:token,
         page: pageNum,
       });
       const dataTweet = responseTweet.data.data;
@@ -133,10 +134,10 @@ const HomeScreen = ({ navigation, comments }) => {
         ]);
         return;
       }
-      emailUser = data.email;
-      idUser = data._id;
-      profilePicture = data.profilePicture;
-
+      const emailUser = data.email;
+      const idUser = data._id;
+      const profilePicture = data.profilePicture;
+      
       const pinPost = await axios.post(`${serverUrl}/posts/pinned`, {
         token: token
       });
@@ -206,7 +207,8 @@ const HomeScreen = ({ navigation, comments }) => {
       return;
     }
     const comments = await fetchComments(tweet.id);
-    navigation.navigate('ViewPost', { tweet, comments });
+    const postId = tweet.id;
+    navigation.navigate('ViewPost', { tweet, comments, postId });
   };
 
   const onRefresh = useCallback(async () => {
@@ -476,16 +478,16 @@ const HomeScreen = ({ navigation, comments }) => {
 
             {pintweets.map((tweet, index) => (
               <View key={index} style={styles.tweetContainer}>
-                <TouchableOpacity onPress={() => handlePostPress(tweet, comments)}>
-                  <PinTweetCard tweet={tweet} onRefreshPage={onRefreshPage} />
+                <TouchableOpacity onPress={() => handlePostPress(tweet)}>
+                <PinTweetCard tweet={tweet} onRefreshPage={onRefreshPage} />
                 </TouchableOpacity>
               </View>
             ))}
             {tweets.map((tweet, index) => (
               <View key={index} style={styles.tweetContainer}>
-                <TouchableOpacity onPress={() => handlePostPress(tweet, comments)}>
-                  <TweetCard tweet={tweet} onRefreshPage={onRefreshPage} />
-                </TouchableOpacity>
+                <TouchableOpacity onPress={() => handlePostPress(tweet)}>
+                <TweetCard tweet={tweet} onRefreshPage={onRefreshPage} />
+              </TouchableOpacity>
               </View>
             ))}
           </>

@@ -20,7 +20,7 @@ const serverUrl = config.SERVER_URL;
 const Forgotpassword = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
-  const [setIsButtonDisabled] = useState(false);
+  const [isButtonDisabled, setIsButtonDisabled] = useState(false); // Perbaikan deklarasi useState
 
   const handleContinue = async () => {
     setIsButtonDisabled(true); // Disable the button immediately

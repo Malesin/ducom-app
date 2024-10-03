@@ -34,7 +34,7 @@ const TweetCard = ({ tweet, onRefreshPage, comments }) => {
   const [modalMediaUri, setModalMediaUri] = useState('');
   const [thumbnails, setThumbnails] = useState({});
   const [showBottomSheet, setShowBottomSheet] = useState(false);
-
+  
   const navigator = useNavigation();
 
   const handleProfilePress = () => {
@@ -44,6 +44,7 @@ const TweetCard = ({ tweet, onRefreshPage, comments }) => {
       navigator.navigate('Userprofile', {
         userIdPost: tweet.userIdPost,
         profilePicture: tweet.profilePicture,
+        idUser: tweet.idUser
       });
     }
   };
@@ -178,8 +179,8 @@ const TweetCard = ({ tweet, onRefreshPage, comments }) => {
       tweet,
       postId: tweet.id,
       idUser: tweet.idUser,
-      profilePicture: tweet.profilePicture,
       emailUser: tweet.emailUser,
+      userEmailPost: tweet.userEmailPost,
       comments,
       focusCommentInput: true,
     });

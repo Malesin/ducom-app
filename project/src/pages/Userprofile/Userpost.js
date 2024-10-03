@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useFocusEffect } from 'react';
 import {
   StyleSheet,
   ScrollView,
@@ -13,9 +13,10 @@ import config from '../../config';
 
 const serverUrl = config.SERVER_URL;
 
-const Userpost = ({ userIdPost, profilePicture }) => {
+const Userpost = ({ userIdPost, profilePicture, idUser }) => {
   const [tweets, setTweets] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isFetched, setIsFetched] = useState(false); // State to track if data has been fetched
 
   const fetchTweets = useCallback(async () => {
     try {
@@ -24,6 +25,7 @@ const Userpost = ({ userIdPost, profilePicture }) => {
       });
 
       const dataTweet = response.data;
+      console.log(dataTweet.data[0].likes, "ppp")
 
       const formattedTweets = dataTweet.data.map(post => ({
         id: post._id,
@@ -41,7 +43,7 @@ const Userpost = ({ userIdPost, profilePicture }) => {
         likesCount: post.likes.length,
         commentsCount: post.comments.length,
         bookMarksCount: post.bookmarks.length,
-        isLiked: post.likes.some(like => like._id === userIdPost),
+        isLiked: post.likes.some(like => like._id === idUser),
         isBookmarked: post.bookmarks.some(
           bookmark => bookmark.user === userIdPost,
         ),
@@ -51,17 +53,27 @@ const Userpost = ({ userIdPost, profilePicture }) => {
         userEmailPost: post.user.email,
       }));
 
-      setTweets(formattedTweets);
+      return formattedTweets;
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
       setLoading(false);
     }
-  }, [userIdPost]);
+  }, [userIdPost, profilePicture]);
 
   useEffect(() => {
-    fetchTweets();
-  }, [fetchTweets]);
+    const fetchData = async () => {
+      if (!isFetched) {
+        const newTweets = await fetchTweets();
+        setTweets(newTweets);
+        setIsFetched(true);
+      }
+    };
+  
+    fetchData();
+  }, [fetchTweets, isFetched]);
+  
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -85,6 +97,7 @@ const Userpost = ({ userIdPost, profilePicture }) => {
     </SafeAreaView>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {
