@@ -17,6 +17,7 @@ import {
   UpdatePassword,
   BlockedAccount,
   MutedAccount,
+  VerifyAccount,
 } from '../pages';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -137,6 +138,12 @@ export default function MainNavigation() {
           component={DeactiveDeleteAccount}
           options={{ headerShown: true, title: 'Deactivate or Delete Account' }}
         />
+        <Stack.Screen
+          name="VerifyAccount"
+          component={VerifyAccount}
+          options={{
+            headerShown: true, title: 'Deactivate or Delete Account' }}
+              />
       </Stack.Navigator>
     </NavigationContainer>
   );

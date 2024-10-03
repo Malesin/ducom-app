@@ -564,12 +564,12 @@ const getStyles = (
     },
     buttonContainer: {
       flexDirection: 'row',
-      justifyContent: 'space-between', // Ubah dari 'flex-end' menjadi 'space-between'
-      alignItems: 'center', // Tambahkan ini untuk perataan vertikal
+      justifyContent: 'space-between',
+      alignItems: 'center', 
     },
     buttonComments: {
       backgroundColor: 'transparent',
-      padding: 0, // Tambahkan ini untuk menghilangkan padding bawaan
+      padding: 0, 
     },
     button: {
       backgroundColor: 'transparent',
