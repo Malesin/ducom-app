@@ -1,7 +1,7 @@
 import React from 'react';
-import {createDrawerNavigator} from '@react-navigation/drawer';
-import {createStackNavigator} from '@react-navigation/stack';
-import {Image, StyleSheet, View, SafeAreaView} from 'react-native';
+import { createDrawerNavigator } from '@react-navigation/drawer';
+import { createStackNavigator } from '@react-navigation/stack';
+import { Image, StyleSheet, View, SafeAreaView } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {
   Homescreen,
@@ -21,7 +21,7 @@ const SettingsStackNavigator = () => {
       <Stack.Screen
         name="Settings"
         component={Settingsscreen}
-        options={{headerShown: false}}
+        options={{ headerShown: false }}
       />
     </Stack.Navigator>
   );
@@ -29,7 +29,7 @@ const SettingsStackNavigator = () => {
 
 const DrawerNavigator = () => {
   return (
-    <SafeAreaView style={{flex: 1}}>
+    <SafeAreaView style={{ flex: 1 }}>
       <Drawer.Navigator
         initialRouteName="Home" // Set Home as the initial route
         screenOptions={{
@@ -53,7 +53,7 @@ const DrawerNavigator = () => {
           drawerItemStyle: {
             color: 'black',
           },
-          drawerIcon: ({color, size, focused}) => ({
+          drawerIcon: ({ color, size, focused }) => ({
             color: 'black',
           }),
         }}>
@@ -62,7 +62,7 @@ const DrawerNavigator = () => {
           component={Homescreen}
           options={{
             drawerLabel: 'Home',
-            drawerIcon: ({color}) => (
+            drawerIcon: ({ color }) => (
               <MaterialIcons name="home" size={24} color={color} />
             ),
           }}
@@ -72,7 +72,7 @@ const DrawerNavigator = () => {
           component={FAQscreen}
           options={{
             drawerLabel: 'FAQ',
-            drawerIcon: ({color}) => (
+            drawerIcon: ({ color }) => (
               <MaterialIcons name="help-outline" size={24} color={color} />
             ),
           }}
@@ -82,17 +82,17 @@ const DrawerNavigator = () => {
           component={Marksscreen}
           options={{
             drawerLabel: 'Bookmarks',
-            drawerIcon: ({color}) => (
+            drawerIcon: ({ color }) => (
               <MaterialIcons name="bookmark" size={24} color={color} />
             ),
           }}
         />
         <Drawer.Screen
           name="Settings"
-          component={SettingsStackNavigator} 
+          component={SettingsStackNavigator}
           options={{
             drawerLabel: 'Settings',
-            drawerIcon: ({color}) => (
+            drawerIcon: ({ color }) => (
               <MaterialIcons name="settings" size={24} color={color} />
             ),
           }}

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { SafeAreaView, StyleSheet, Text, View, Pressable, TouchableOpacity } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const DeactiveDeleteAccount = () => {
+const DeactiveDeleteAccount = ({ navigation }) => {
   const [selectedOption, setSelectedOption] = useState(null); // null for no option selected
 
   // Handler for selecting "Deactivate Account"
@@ -77,6 +77,7 @@ const DeactiveDeleteAccount = () => {
             { backgroundColor: selectedOption ? '#001374' : '#ccc' }
           ]}
           disabled={!selectedOption}
+          onPress={() => navigation.navigate('VerifyAccount')}
         >
           <Text style={[
             styles.buttonText,
