@@ -29,6 +29,7 @@ import Usermedia from './Userprofile/Usermedia';
 import BlockedAccount from './Settings/BlockedAccount';
 import MutedAccount from './Settings/MutedAccount';
 import DeactiveDeleteAccount from './Settings/DeactiveDeleteAccount';
+import VerifyAccount from './Settings/VerifyAccount';
 
 export {
   Splashscreen,
@@ -62,4 +63,5 @@ export {
   BlockedAccount,
   MutedAccount,
   DeactiveDeleteAccount,
+  VerifyAccount
 };

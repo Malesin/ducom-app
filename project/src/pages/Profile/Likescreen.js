@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
     StyleSheet,
     ScrollView,
@@ -6,14 +6,13 @@ import {
     Alert,
     SafeAreaView,
     Text,
-    ActivityIndicator,
 } from 'react-native';
-import TweetCard from '../../components/TweetCard'; // Import TweetCard
+import TweetCard from '../../components/TweetCard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 import axios from 'axios';
 import config from '../../config';
-import { Skeleton } from 'react-native-elements'; // Import Skeleton
+import { Skeleton } from 'react-native-elements';
 
 const serverUrl = config.SERVER_URL;
 
@@ -22,7 +21,7 @@ function Likescreen({ navigation }) {
     const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(true);
     const [loadingMore, setLoadingMore] = useState(false);
-    const [isFetched, setIsFetched] = useState(false); // State to track if data is already fetched
+    const [isFetched, setIsFetched] = useState(false);
 
     const fetchTweets = useCallback(async (pageNum) => {
         const token = await AsyncStorage.getItem('token');
@@ -100,7 +99,6 @@ function Likescreen({ navigation }) {
             setPage(newPage);
             const newTweets = await fetchTweets(newPage);
             setTweets(prevTweets => {
-                // Filter to avoid duplicate tweets
                 const uniqueTweets = newTweets.filter(
                     newTweet => !prevTweets.some(tweet => tweet.id === newTweet.id)
                 );
