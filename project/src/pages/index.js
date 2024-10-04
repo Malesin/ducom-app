@@ -30,6 +30,7 @@ import BlockedAccount from './Settings/BlockedAccount';
 import MutedAccount from './Settings/MutedAccount';
 import DeactiveDeleteAccount from './Settings/DeactiveDeleteAccount';
 import VerifyAccount from './Settings/VerifyAccount';
+import formatNotification from './Home/formatNotification';
 
 export {
   Splashscreen,
@@ -63,5 +64,6 @@ export {
   BlockedAccount,
   MutedAccount,
   DeactiveDeleteAccount,
-  VerifyAccount
+  VerifyAccount,
+  formatNotification
 };
