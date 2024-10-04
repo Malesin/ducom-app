@@ -24,7 +24,7 @@ import config from '../../config';
 import Video from 'react-native-video';
 import {createThumbnail} from 'react-native-create-thumbnail';
 import CommentCard from '../../components/CommentCard';
-import BottomSheet from '../../components/BottomSheet'; // Tambahkan ini jika belum ada
+import BottomSheet from '../../components/BottomSheet';
 
 const serverUrl = config.SERVER_URL;
 
@@ -58,6 +58,8 @@ const ViewPost = ({route}) => {
 
   const [refreshing, setRefreshing] = useState(false);
   const [showBottomSheet, setShowBottomSheet] = useState(false); // Tambahkan state ini
+
+  console.log("tweet:", tweet.comments)
 
   useEffect(() => {
     if (focusCommentInput && textInputRef.current) {
@@ -276,7 +278,7 @@ const ViewPost = ({route}) => {
       setRefreshing(false);
     }
   }, [tweet.id]);
-
+  
   useEffect(() => {
     fetchComments();
   }, [fetchComments]);
@@ -385,7 +387,7 @@ const ViewPost = ({route}) => {
           <View>
             <Text style={styles.postContent}>{tweet.content}</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              {tweet.media.map((mediaItem, index) => (
+              {(tweet.media || []).map((mediaItem, index) => (
                 <TouchableOpacity
                   key={index}
                   onPress={() => handleMediaPress(mediaItem.uri)}>

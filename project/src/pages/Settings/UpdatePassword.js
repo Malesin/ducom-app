@@ -24,6 +24,7 @@ const UpdatePassword = ({ navigation }) => {
   const [showOldPassword, setShowOldPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showVerifyNewPassword, setShowVerifyNewPassword] = useState(false);
+  const [isButtonDisabled, setIsButtonDisabled] = useState(true); // Tambahkan state ini
   const colorScheme = useColorScheme();
 
   const validatePassword = password => {
@@ -64,6 +65,15 @@ const UpdatePassword = ({ navigation }) => {
       }
     }
   };
+
+  useEffect(() => {
+    // Periksa apakah semua input sudah terisi
+    if (oldPassword && newPassword && verifyNewPassword) {
+      setIsButtonDisabled(false);
+    } else {
+      setIsButtonDisabled(true);
+    }
+  }, [oldPassword, newPassword, verifyNewPassword]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -139,7 +149,11 @@ const UpdatePassword = ({ navigation }) => {
       {error ? <Text style={styles.error}>{error}</Text> : null}
       {successMessage ? <Text style={styles.success}>{successMessage}</Text> : null}
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={handleUpdatePassword}>
+        <TouchableOpacity
+          style={[styles.button, isButtonDisabled && styles.disabledButton]} // Tambahkan gaya untuk tombol yang dinonaktifkan
+          onPress={handleUpdatePassword}
+          disabled={isButtonDisabled} // Nonaktifkan tombol jika isButtonDisabled true
+        >
           <Text style={styles.buttonText}>Update</Text>
         </TouchableOpacity>
       </View>
@@ -225,5 +239,8 @@ const styles = StyleSheet.create({
   },
   passwordInput: {
     flex: 1,
+  },
+  disabledButton: {
+    backgroundColor: '#cccccc', // Warna abu-abu untuk tombol yang dinonaktifkan
   },
 });
