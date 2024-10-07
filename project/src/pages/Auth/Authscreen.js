@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: '50%',
     height: '100%',
-    backgroundColor: '#0a3e99',
+    backgroundColor: '#001374', // Ubah warna biru di sini
     borderRadius: 30,
   },
   buttonLogin: {

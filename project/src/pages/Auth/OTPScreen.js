@@ -6,6 +6,7 @@ import {
   SafeAreaView,
   TouchableOpacity,
   Alert,
+  useColorScheme,
 } from 'react-native';
 import Toast from 'react-native-toast-message';
 import React, {useState, useEffect} from 'react';
@@ -28,6 +29,7 @@ const Capthcascreen = ({navigation}) => {
   const [timer, setTimer] = useState(60);
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [attemptsLeft, setAttemptsLeft] = useState(3);
+  const colorScheme = useColorScheme(); // Detect light or dark mode
 
   const handleVerifyOtp = async () => {
     console.log('Verifying OTP:', otp);
@@ -132,13 +134,18 @@ const Capthcascreen = ({navigation}) => {
             account
           </Text>
           <TextInput
-            style={[styles.input, error ? styles.inputError : null]} // Apply error style conditionally
+            style={[
+              styles.input,
+              error ? styles.inputError : null,
+              { color: colorScheme === 'dark' ? '#000000' : '#000000' } // Adjust text color based on theme
+            ]}
             onChangeText={setOtp}
             value={otp}
             placeholder="Enter Code"
             keyboardType="numeric"
             autoCapitalize="none"
             maxLength={6}
+            placeholderTextColor={colorScheme === 'dark' ? '#cccccc' : '#888888'} // Adjust placeholder text color based on theme
           />
           {error ? <Text style={styles.error}>{error}</Text> : null}
           <TouchableOpacity
