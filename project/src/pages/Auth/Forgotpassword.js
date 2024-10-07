@@ -5,6 +5,7 @@ import {
   TextInput,
   SafeAreaView,
   TouchableOpacity,
+  useColorScheme,
 } from 'react-native';
 import {
   ALERT_TYPE,
@@ -21,6 +22,7 @@ const Forgotpassword = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const [isButtonDisabled, setIsButtonDisabled] = useState(false); // Perbaikan deklarasi useState
+  const colorScheme = useColorScheme(); // Tambahkan useColorScheme
 
   const handleContinue = async () => {
     setIsButtonDisabled(true); // Disable the button immediately
@@ -84,21 +86,28 @@ const Forgotpassword = ({navigation}) => {
         <View style={styles.innerContainer}>
           <Text style={styles.title}>Enter your Email</Text>
           <TextInput
-            style={[styles.email, error ? styles.emailError : null]}
+            style={[
+              styles.email,
+              error ? styles.emailError : null,
+              { color: colorScheme === 'dark' ? '#000000' : '#000000' } // Sesuaikan warna teks berdasarkan tema
+            ]}
             onChangeText={setEmail}
             value={email}
             placeholder="Enter your Email Address"
             keyboardType="email-address"
             autoCapitalize="none"
+            placeholderTextColor={colorScheme === 'dark' ? '#cccccc' : '#888888'} // Sesuaikan warna placeholder berdasarkan tema
           />
           {error ? <Text style={styles.error}>{error}</Text> : null}
           <Text style={styles.subtitle}>
             You may receive Gmail notifications from us for security
           </Text>
           <TouchableOpacity
-            style={styles.buttonForgot}
-            onPress={handleContinue}>
-            <Text style={styles.textForgot}>Continue</Text>
+            style={[styles.buttonForgot, isButtonDisabled && styles.disabledButton]} // Tambahkan gaya disabled
+            onPress={handleContinue}
+            disabled={isButtonDisabled} // Nonaktifkan tombol saat isButtonDisabled true
+          >
+            <Text style={[styles.textForgot, isButtonDisabled && styles.disabledText]}>Continue</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -162,5 +171,8 @@ const styles = StyleSheet.create({
     color: 'red',
     width: '90%',
     textAlign: 'left',
+  },
+  disabledButton: {
+    backgroundColor: '#cccccc', // Ubah warna latar belakang untuk menunjukkan status nonaktif
   },
 });
