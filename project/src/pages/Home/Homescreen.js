@@ -75,9 +75,10 @@ const HomeScreen = ({ navigation, comments }) => {
         ]);
         return;
       }
-      emailUser = data.email;
-      idUser = data._id;
-      profilePicture = data.profilePicture;
+      const emailUser = data.email;
+      const idUser = data._id;
+      const profilePicture = data.profilePicture;
+      const amIAdmin = data.isAdmin
 
       const responseTweet = await axios.post(`${serverUrl}/posts`, {
         // token:token,
@@ -107,10 +108,11 @@ const HomeScreen = ({ navigation, comments }) => {
           isBookmarked: post.bookmarks.some(bookmark => bookmark.user === idUser),
           userIdPost: post.user._id,
           idUser: idUser,
-          allowedEmail: post.allowedEmail,
           userEmailPost: post.user.email,
           emailUser: emailUser,
-          profilePicture: profilePicture
+          profilePicture: profilePicture,
+          isAdmin: post.user.isAdmin,
+          amIAdmin: amIAdmin
         };
       });
       return formattedTweets;
@@ -137,7 +139,8 @@ const HomeScreen = ({ navigation, comments }) => {
       const emailUser = data.email;
       const idUser = data._id;
       const profilePicture = data.profilePicture;
-      
+      const amIAdmin = data.isAdmin
+
       const pinPost = await axios.post(`${serverUrl}/posts/pinned`, {
         token: token
       });
@@ -170,11 +173,12 @@ const HomeScreen = ({ navigation, comments }) => {
         isBookmarked: postPin.bookmarks.some(bookmark => bookmark.user === idUser),
         userIdPost: postPin.user._id,
         idUser: idUser,
-        allowedEmail: postPin.allowedEmail,
         userEmailPost: postPin.user.email,
         emailUser: emailUser,
         profilePicture: profilePicture,
-        pinnedBy: pinnedBy
+        pinnedBy: pinnedBy,
+        isAdmin: postPin.user.isAdmin,
+        amIAdmin: amIAdmin
       };
 
       return pinTweet;
@@ -187,6 +191,7 @@ const HomeScreen = ({ navigation, comments }) => {
   const fetchComments = async (postId) => {
     try {
       const response = await axios.get(`${serverUrl}/comments`, {
+        // token: token,
         params: { postId },
       });
       if (response.data.status === 'ok') {
@@ -208,7 +213,11 @@ const HomeScreen = ({ navigation, comments }) => {
     }
     const comments = await fetchComments(tweet.id);
     const postId = tweet.id;
-    navigation.navigate('ViewPost', { tweet, comments, postId });
+    const idUser = tweet.idUser
+    const emailUser = tweet.emailUser
+    const userEmailPost = tweet.userEmailPost
+    const focusCommentInput = true
+    navigation.navigate('ViewPost', { tweet, comments, postId, idUser, userEmailPost, emailUser, focusCommentInput });
   };
 
   const onRefresh = useCallback(async () => {
@@ -475,19 +484,18 @@ const HomeScreen = ({ navigation, comments }) => {
           renderSkeleton()
         ) : (
           <>
-
             {pintweets.map((tweet, index) => (
               <View key={index} style={styles.tweetContainer}>
                 <TouchableOpacity onPress={() => handlePostPress(tweet)}>
-                <PinTweetCard tweet={tweet} onRefreshPage={onRefreshPage} />
+                  <PinTweetCard tweet={tweet} onRefreshPage={onRefreshPage} isUserProfile={false} />
                 </TouchableOpacity>
               </View>
             ))}
             {tweets.map((tweet, index) => (
               <View key={index} style={styles.tweetContainer}>
                 <TouchableOpacity onPress={() => handlePostPress(tweet)}>
-                <TweetCard tweet={tweet} onRefreshPage={onRefreshPage} />
-              </TouchableOpacity>
+                  <TweetCard tweet={tweet} onRefreshPage={onRefreshPage} isUserProfile={false} />
+                </TouchableOpacity>
               </View>
             ))}
           </>

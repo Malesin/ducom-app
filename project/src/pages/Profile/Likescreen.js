@@ -65,8 +65,8 @@ function Likescreen({ navigation }) {
                 allowedEmail: post.allowedEmail,
                 userEmailPost: post.user.email,
                 emailUser: emailUser,
-                profilePicture: profilePicture
-
+                profilePicture: profilePicture,
+                isAdmin: post.user.isAdmin
             }));
 
             return formattedTweets;

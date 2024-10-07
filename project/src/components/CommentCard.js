@@ -15,10 +15,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
 import config from '../config';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+const verifiedIcon = <Icon name="verified" size={14} color="#699BF7" />;
 
 const serverUrl = config.SERVER_URL;
 
-const CommentCard = ({ text, hasReplies, replies, onReplyPress, username, profilePicture, onAddReply, commentId, postId, userIdPost, idUser, allowedEmail, emailUser, onDeleteSuccess, isLikedCom, parentCommentId, userEmailPost }) => {
+const CommentCard = ({ text, hasReplies, replies, onReplyPress, username, profilePicture, onAddReply, commentId, postId, userIdPost, idUser, allowedEmail, emailUser, onDeleteSuccess, isLikedCom, parentCommentId, userEmailPost, isAdmin, amIAdmin }) => {
   const [isLiked, setIsLiked] = useState(isLikedCom);
   const [showReplies, setShowReplies] = useState(false);
   const [showMoreReplies, setShowMoreReplies] = useState(false);
@@ -29,7 +31,7 @@ const CommentCard = ({ text, hasReplies, replies, onReplyPress, username, profil
     const token = await AsyncStorage.getItem('token');
     setGetToken(token);
   };
-
+  // console.log("isAdmin", isAdmin)
   useEffect(() => {
     tokenconst();
   }, []);
@@ -114,7 +116,10 @@ const CommentCard = ({ text, hasReplies, replies, onReplyPress, username, profil
           </TouchableOpacity>
         </View>
         <View style={styles.commentContainer}>
-          <Text style={styles.username}>{username}</Text>
+          <View style={styles.usernameContainer}>
+            <Text style={styles.username}>{username}</Text>
+            {isAdmin ? (<Text style={styles.verifiedIcon}>{verifiedIcon}</Text>) : null}
+          </View>
           <Text style={styles.commentText}>{text}</Text>
           <View style={styles.replyAndLikeContainer}>
             {parentCommentId ? <Text style={styles.replynope}></Text> :
@@ -163,6 +168,8 @@ const CommentCard = ({ text, hasReplies, replies, onReplyPress, username, profil
                       isLikedCom={reply.isLikedCom}
                       parentCommentId={commentId}
                       userEmailPost={userEmailPost}
+                      isAdmin={isAdmin}
+                      amIAdmin={amIAdmin}
                     />
                   </View>
                 ))}
@@ -215,6 +222,8 @@ const CommentCard = ({ text, hasReplies, replies, onReplyPress, username, profil
               onDeleteSuccess={onDeleteSuccess}
               parentCommentId={parentCommentId}
               userEmailPost={userEmailPost}
+              isAdmin={isAdmin}
+              amIAdmin={amIAdmin}
             />
           </View>
         </Modal>
@@ -258,10 +267,17 @@ const styles = StyleSheet.create({
     marginLeft: 58,
     marginRight: 20,
   },
+  usernameContainer: {
+    flexDirection: 'row', // Tambahkan ini untuk mengatur elemen dalam satu baris
+    alignItems: 'center', // Tambahkan ini untuk menyelaraskan elemen secara vertikal
+  },
   username: {
     fontWeight: 'bold',
     marginLeft: 5,
     color: '#000',
+  },
+  verifiedIcon: {
+    marginLeft: 5, // Pastikan ini ada untuk memberikan jarak
   },
   commentText: {
     fontSize: 15,

@@ -3,7 +3,7 @@ import { SafeAreaView, ScrollView, StyleSheet, Alert, Text, RefreshControl, View
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../../config';
-import LikeNotification from '../../components/LikeNotification';
+import LikeNotification from '../../components/Notification/LikeNotification';
 import { Skeleton } from 'react-native-elements'; // Tambahkan import Skeleton
 
 const serverUrl = config.SERVER_URL;

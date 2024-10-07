@@ -16,6 +16,8 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import config from '../../config';
 import { Skeleton } from 'react-native-elements';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+const verifiedIcon = <Icon name="verified" size={20} color="#699BF7" />;
 
 const serverUrl = config.SERVER_URL;
 
@@ -187,7 +189,14 @@ export default function Profilescreen() {
               </>
             ) : (
               <>
-                <Text style={styles.name}>{userData?.name}</Text>
+                <View style={styles.nameContainer}>
+
+                  <Text style={styles.name}>
+                    {userData?.name}
+                  </Text>
+                  {userData?.isAdmin ? (<Text style={styles.verifiedIcon}>{verifiedIcon}</Text>) : null}
+                </View>
+
                 <Text style={styles.username}>@{userData?.username}</Text>
                 <Text style={styles.description}>
                   {userData?.bio || 'No Description'}
@@ -260,10 +269,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     minHeight: 150,
   },
+  nameContainer: {
+    flexDirection: 'row', // Tambahkan ini untuk mengatur elemen dalam satu baris
+    alignItems: 'center', // Tambahkan ini untuk menyelaraskan elemen secara vertikal
+  },
   name: {
     fontSize: 20,
     fontWeight: 'bold',
     color: '#000',
+  },
+  verifiedIcon: {
+    marginLeft: 5, 
+    marginTop: 3
   },
   username: {
     fontSize: 14,

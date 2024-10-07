@@ -50,6 +50,7 @@ const Usermedia = ({ userIdPost, profilePicture }) => {
           profilePicture: profilePicture,
           allowedEmail: post.allowedEmail,
           userEmailPost: post.user.email,
+          isAdmin: post.user.isAdmin
         }))
         .filter(post => post.media.length > 0); // Filter hanya tweet yang memiliki media
 

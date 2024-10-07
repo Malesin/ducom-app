@@ -13,7 +13,7 @@ import config from '../config';
 
 const serverUrl = config.SERVER_URL;
 
-const CommentSheet = ({ commentId, postId, token, emailUser, allowedEmail, idUser, userIdPost, onDeleteSuccess, onClose, parentCommentId, userEmailPost }) => {
+const CommentSheet = ({ commentId, postId, token, emailUser, idUser, userIdPost, onDeleteSuccess, onClose, parentCommentId, userEmailPost, isAdmin, amIAdmin }) => {
   const [isDeleteComment, setIsDeleteComment] = useState(false);
   const [isReportComment, setIsReportComment] = useState(false);
 
@@ -44,12 +44,12 @@ const CommentSheet = ({ commentId, postId, token, emailUser, allowedEmail, idUse
       // Pengguna dapat menghapus komentarnya sendiri dan melaporkan komentar orang lain / USER
       setIsDeleteComment(true);
       setIsReportComment(false);
-    } else if (allowedEmail.includes(emailUser)) {
-      // Pengguna dengan email yang diizinkan dapat menghapus dan melaporkan semua komentar / ADMIN
-      setIsDeleteComment(true);
-      setIsReportComment(true);
     } else if (emailUser === userEmailPost) {
       // Pemilik akun postingan dapat menghapus dan melaporkan semua komentar / OWNER POST
+      setIsDeleteComment(true);
+      setIsReportComment(true);
+    } else if (amIAdmin) {
+      // Pengguna dengan email yang diizinkan dapat menghapus dan melaporkan semua komentar / ADMIN
       setIsDeleteComment(true);
       setIsReportComment(true);
     } else {
@@ -57,7 +57,14 @@ const CommentSheet = ({ commentId, postId, token, emailUser, allowedEmail, idUse
       setIsDeleteComment(false);
       setIsReportComment(true);
     }
-  }, [idUser, userIdPost, emailUser, allowedEmail, commentId]);
+    console.log("idUser: ", idUser)
+    console.log("userIdPost: ", userIdPost)
+    console.log("emailUser: ", emailUser)
+    console.log("amIAdmin: ", amIAdmin)
+    console.log("isAdmin: ", isAdmin)
+    console.log("userEmailPost: ", userEmailPost)
+    console.log("=================================")
+  }, [idUser, userIdPost, emailUser, amIAdmin, isAdmin, userEmailPost]);
 
   const reportComment = async () => {
     // try {
