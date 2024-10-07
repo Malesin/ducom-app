@@ -44,9 +44,9 @@ function Mediascreen({ navigation }) {
         const responseTweet = await axios.post(`${serverUrl}/my-posts`, {
           token: token,
         });
-        const dataTweet = responseTweet.data;
+        const dataTweet = responseTweet.data.data;
 
-        const formattedTweets = dataTweet.data
+        const formattedTweets = dataTweet
           .filter(post => Array.isArray(post.media) && post.media.length > 0) // Filter posts with media
           .map(post => ({
             id: post._id,
@@ -68,8 +68,8 @@ function Mediascreen({ navigation }) {
             allowedEmail: post.allowedEmail,
             userEmailPost: post.user.email,
             emailUser: emailUser,
-            profilePicture: profilePicture
-
+            profilePicture: profilePicture,
+            isAdmin: post.user.isAdmin
           }));
 
         return formattedTweets;

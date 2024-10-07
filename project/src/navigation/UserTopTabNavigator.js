@@ -10,7 +10,7 @@ const { height } = Dimensions.get('window');
 function UserTopTabNavigator({ route, navigation }) {
   const [refreshing, setRefreshing] = useState(false);
   const [isScrollTop, setIsScrollTop] = useState(true);
-  const { userIdPost, profilePicture, username, idUser } = route.params;
+  const { userIdPost, profilePicture, username, idUser, isAdmin, amIAdmin, isUserProfile } = route.params;
 
   useEffect(() => {
     if (username) {
@@ -32,7 +32,7 @@ function UserTopTabNavigator({ route, navigation }) {
 
   const Header = () => (
     <View style={styles.profileWrapper}>
-      <Userprofile userIdPost={userIdPost} navigation={navigation} />
+      <Userprofile userIdPost={userIdPost} navigation={navigation} isAdmin={isAdmin} />
     </View>
   );
 
@@ -107,7 +107,7 @@ function UserTopTabNavigator({ route, navigation }) {
               renderSkeleton()
             ) : (
               <Userpost
-                userIdPost={userIdPost} profilePicture={profilePicture} idUser={idUser} navigation={navigation}
+                userIdPost={userIdPost} profilePicture={profilePicture} idUser={idUser} navigation={navigation} amIAdmin={amIAdmin} isUserProfile={isUserProfile}
               />
             )}
           </Tabs.ScrollView>

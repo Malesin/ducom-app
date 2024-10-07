@@ -1,3 +1,4 @@
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -23,8 +24,9 @@ import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import config from '../config';
 const serverUrl = config.SERVER_URL;
+const verifiedIcon = <Icon name="verified" size={16} color="#699BF7" />;
 
-const TweetCard = ({ tweet, onRefreshPage, comments }) => {
+const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
   const [liked, setLiked] = useState(tweet.isLiked);
   const [likesCount, setLikesCount] = useState(tweet.likesCount || 0);
   const [bookmarked, setBookmarked] = useState(tweet.isBookmarked || false);
@@ -34,7 +36,7 @@ const TweetCard = ({ tweet, onRefreshPage, comments }) => {
   const [modalMediaUri, setModalMediaUri] = useState('');
   const [thumbnails, setThumbnails] = useState({});
   const [showBottomSheet, setShowBottomSheet] = useState(false);
-  
+
   const navigator = useNavigation();
 
   const handleProfilePress = () => {
@@ -44,7 +46,10 @@ const TweetCard = ({ tweet, onRefreshPage, comments }) => {
       navigator.navigate('Userprofile', {
         userIdPost: tweet.userIdPost,
         profilePicture: tweet.profilePicture,
-        idUser: tweet.idUser
+        idUser: tweet.idUser,
+        isAdmin: tweet.isAdmin,
+        amIAdmin: tweet.amIAdmin,
+        isUserProfile: isUserProfile
       });
     }
   };
@@ -321,6 +326,23 @@ const TweetCard = ({ tweet, onRefreshPage, comments }) => {
     }
   };
 
+  const onPinUser = async (resppin) => {
+    try {
+      if (resppin === 'okpin') {
+        ToastAndroid.show('Tweet Successfully Pinned', ToastAndroid.SHORT);
+      } else if (resppin === 'okunpin') {
+        ToastAndroid.show('Tweet Successfully Unpinned', ToastAndroid.SHORT);
+      }
+      else {
+        console.log('Error in pin response data:', resppin);
+        Alert.alert('Error', 'Failed to pin post. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error pinning post:', error.message);
+      Alert.alert('Error', 'Failed to pin post. Please try again.');
+    }
+  };
+
   return (
     <SafeAreaView style={styles.card}>
       {/* User Info */}
@@ -338,6 +360,7 @@ const TweetCard = ({ tweet, onRefreshPage, comments }) => {
           <TouchableOpacity onPress={handleProfilePress}>
             <Text style={styles.userHandle}>@{tweet.userHandle}</Text>
           </TouchableOpacity>
+          {tweet.isAdmin ? (<Text style={styles.verifiedIcon}>{verifiedIcon}</Text>) : null}
           <Text style={styles.postDate}>{formatDate(tweet.postDate)}</Text>
         </View>
 
@@ -374,15 +397,16 @@ const TweetCard = ({ tweet, onRefreshPage, comments }) => {
                 onRefreshPage();
                 onPin(resppin)
               }}
-              username={tweet.userHandle}
-              postId={tweet.id}
-              idUser={tweet.idUser}
-              userIdPost={tweet.userIdPost}
-              userEmailPost={tweet.userEmailPost}
-              allowedEmail={tweet.allowedEmail}
-              emailUser={tweet.emailUser}
+              onClosePinUser={(resppin) => {
+                setShowBottomSheet(false);
+                onRefreshPage();
+                onPinUser(resppin)
+              }}
+              tweet={tweet}
               onRefreshPage={onRefreshPage}
               handlePin={false}
+              handlePinUser={false}
+              isUserProfile={isUserProfile}
             />
           </View>
         </Modal>
@@ -455,7 +479,6 @@ const TweetCard = ({ tweet, onRefreshPage, comments }) => {
                     source={{ uri: modalMediaUri }}
                     style={styles.modalImage}
                     controls
-                    resizeMode="contain"
                   />
                 )
               ) : null}
@@ -526,6 +549,11 @@ const styles = StyleSheet.create({
     color: '#718096',
     fontWeight: '700',
     marginRight: 7,
+  },
+  verifiedIcon: {
+    marginLeft: -3,
+    marginRight: 6,
+    marginTop: 2
   },
   postDate: {
     color: '#718096',

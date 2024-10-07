@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import DefaultAvatar from '../assets/profilepic.png';
+import DefaultAvatar from '../../assets/profilepic.png';
 
 const LikeNotification = ({ notification }) => {
   const handleNotificationPress = () => {

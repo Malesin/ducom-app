@@ -16,27 +16,30 @@ import {
   Keyboard,
   useColorScheme,
 } from 'react-native';
-import React, {useState, useEffect, useCallback} from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../../config';
 import Video from 'react-native-video';
-import {createThumbnail} from 'react-native-create-thumbnail';
+import { createThumbnail } from 'react-native-create-thumbnail';
 import CommentCard from '../../components/CommentCard';
 import BottomSheet from '../../components/BottomSheet'; // Tambahkan ini jika belum ada
+import Icon from 'react-native-vector-icons/MaterialIcons';
+const verifiedIcon = <Icon name="verified" size={16} color="#699BF7" />;
 
 const serverUrl = config.SERVER_URL;
 
-const ViewPost = ({route}) => {
+const ViewPost = ({ route }) => {
   const {
     tweet,
     comments: initialComments,
     postId,
     idUser,
     emailUser,
-    focusCommentInput,allowedEmail,
+    focusCommentInput,
   } = route?.params || {};
+
   const [liked, setLiked] = useState(tweet.isLiked);
   const [likesCount, setLikesCount] = useState(tweet.likesCount);
   const [bookmarked, setBookmarked] = useState(tweet.isBookmarked);
@@ -71,7 +74,7 @@ const ViewPost = ({route}) => {
       for (const media of tweet.media || []) {
         if (media.type === 'video' && media.uri) {
           try {
-            const {path} = await createThumbnail({url: media.uri});
+            const { path } = await createThumbnail({ url: media.uri });
             newThumbnails[media.uri] = path;
           } catch (error) {
             console.log('Error generating thumbnail:', error);
@@ -215,12 +218,12 @@ const ViewPost = ({route}) => {
     return `${hours}:${minutes} ${day} ${month} ${year}`;
   };
 
-  const InteractionButton = ({icon, color, onPress}) => (
+  const InteractionButton = ({ icon, color, onPress }) => (
     <TouchableOpacity style={styles.actionButton} onPress={onPress}>
       <MaterialCommunityIcons name={icon} size={20} color={color} />
     </TouchableOpacity>
   );
-
+  console.log(tweet.isAdmin)
   const handleMediaPress = mediaItem => {
     setSelectedMedia(mediaItem);
     setModalVisible(true);
@@ -235,12 +238,10 @@ const ViewPost = ({route}) => {
     setRefreshing(true);
     try {
       const url = `${serverUrl}/comments`;
-      const params = {postId: tweet.id};
+      const params = { postId: tweet.id };
 
       const response = await axios.post(url, params);
       const dataComment = response.data.data;
-
-      // console.log('Data komentar yang diterima:', dataComment);
 
       const formattedComments = dataComment.map(comment => ({
         id: comment._id,
@@ -251,21 +252,22 @@ const ViewPost = ({route}) => {
         isLikedCom: comment.likes.some(like => like.user === idUser),
         replies: Array.isArray(comment.replies)
           ? comment.replies.map(reply => ({
-              id: reply._id,
-              text: reply.comment,
-              userIdPost: reply.user._id,
-              idUser: idUser,
-              username: reply.user.username,
-              email: reply.user.email,
-              isLikedCom: reply.likes.some(like => like.user === idUser),
-              profilePicture: reply.user.profilePicture,
-              replies: reply.replies || [],
-              allowedEmail: reply.allowedEmail,
-            }))
+            id: reply._id,
+            text: reply.comment,
+            userIdPost: reply.user._id,
+            idUser: idUser,
+            username: reply.user.username,
+            email: reply.user.email,
+            isLikedCom: reply.likes.some(like => like.user === idUser),
+            profilePicture: reply.user.profilePicture,
+            replies: reply.replies || [],
+            allowedEmail: reply.allowedEmail,
+          }))
           : [],
         username: comment.user.username,
         profilePicture: comment.user.profilePicture,
         allowedEmail: comment.allowedEmail,
+        isAdmin: comment.user.isAdmin
       }));
 
       setComments(formattedComments);
@@ -341,7 +343,7 @@ const ViewPost = ({route}) => {
     <SafeAreaView style={styles.container}>
       <ScrollView
         style={styles.scrollContainer}
-        contentContainerStyle={{paddingBottom: 50}}
+        contentContainerStyle={{ paddingBottom: 50 }}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }>
@@ -350,23 +352,27 @@ const ViewPost = ({route}) => {
             <Image
               source={
                 tweet.userAvatar
-                  ? {uri: tweet.userAvatar}
+                  ? { uri: tweet.userAvatar }
                   : require('../../assets/profilepic.png')
               }
               style={styles.avatar}
             />
             <View style={styles.userInfo}>
-              <Text
-                style={[
-                  styles.userName,
-                  {color: colorScheme === 'dark' ? '#000000' : '#000'},
-                ]}>
-                {tweet.userName}
-              </Text>
+              <View style={styles.usernameContainer}>
+                <Text
+                  style={[
+                    styles.userName,
+                    { color: colorScheme === 'dark' ? '#000000' : '#000' },
+                  ]}>
+                  {tweet.userName}
+                </Text>
+                {tweet.isAdmin ? (<Text style={styles.verifiedIcon}>{verifiedIcon}</Text>) : null}
+              </View>
+
               <Text
                 style={[
                   styles.userHandle,
-                  {color: colorScheme === 'dark' ? '#ccc' : 'gray'},
+                  { color: colorScheme === 'dark' ? '#ccc' : 'gray' },
                 ]}>
                 @{tweet.userHandle}
               </Text>
@@ -391,7 +397,7 @@ const ViewPost = ({route}) => {
                   onPress={() => handleMediaPress(mediaItem.uri)}>
                   {mediaItem.type === 'image' ? (
                     <Image
-                      source={{uri: mediaItem.uri}}
+                      source={{ uri: mediaItem.uri }}
                       style={
                         tweet.media.length === 1
                           ? styles.singleMediaImage
@@ -404,7 +410,7 @@ const ViewPost = ({route}) => {
                       onPress={() => handleMediaPress(mediaItem.uri)}
                       style={styles.videoContainer}>
                       <Image
-                        source={{uri: thumbnails[mediaItem.uri]}}
+                        source={{ uri: thumbnails[mediaItem.uri] }}
                         style={
                           tweet.media.length === 1
                             ? styles.singleMediaVideo
@@ -483,6 +489,9 @@ const ViewPost = ({route}) => {
                 allowedEmail={comment.allowedEmail}
                 isLikedCom={comment.isLikedCom}
                 emailUser={emailUser}
+                isAdmin={comment.isAdmin}
+                amIAdmin={tweet.amIAdmin}
+                userEmailPost={tweet.userEmailPost}
                 onDeleteSuccess={onDeleteSuccess}
               />
             ))}
@@ -495,8 +504,8 @@ const ViewPost = ({route}) => {
           </View>
         </View>
       </ScrollView>
-      <View style={[styles.inputContainer, {height: inputHeight}]}>
-        <Image source={{uri: profilePicture}} style={styles.profilePicture} />
+      <View style={[styles.inputContainer, { height: inputHeight }]}>
+        <Image source={{ uri: profilePicture }} style={styles.profilePicture} />
         <TextInput
           ref={textInputRef}
           style={[
@@ -538,15 +547,15 @@ const ViewPost = ({route}) => {
             <View style={styles.modalBackground}>
               <View style={styles.modalContainer}>
                 {selectedMedia.endsWith('.jpg') ||
-                selectedMedia.endsWith('.png') ? (
+                  selectedMedia.endsWith('.png') ? (
                   <Image
-                    source={{uri: selectedMedia}}
+                    source={{ uri: selectedMedia }}
                     style={styles.modalImage}
                     onError={() => console.log('Failed to load image')}
                   />
                 ) : (
                   <Video
-                    source={{uri: selectedMedia}}
+                    source={{ uri: selectedMedia }}
                     style={styles.modalImage}
                     controls
                     resizeMode="contain"
@@ -574,7 +583,7 @@ const ViewPost = ({route}) => {
             idUser={idUser}
             username={tweet.userHandle}
             allowedEmail={tweet.allowedEmail}
-            emailUser={emailUser} 
+            emailUser={emailUser}
             userIdPost={tweet.userIdPost} // Pastikan ini dikirim
           />
         </View>
@@ -611,6 +620,14 @@ const styles = StyleSheet.create({
   },
   userInfo: {
     flexDirection: 'column',
+  },
+  usernameContainer: {
+    flexDirection: 'row', // Tambahkan ini untuk mengatur elemen dalam satu baris
+    alignItems: 'center', // Tambahkan ini untuk menyelaraskan elemen secara vertikal
+  },
+  verifiedIcon: {
+    marginLeft: 4,
+    marginTop: 2
   },
   userName: {
     fontWeight: 'bold',

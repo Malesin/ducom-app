@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useCallback} from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   SafeAreaView,
   View,
@@ -10,13 +10,15 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useNavigation, useFocusEffect} from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import axios from 'axios';
 import config from '../../config';
+import { Skeleton } from 'react-native-elements';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+const verifiedIcon = <Icon name="verified" size={18} color="#699BF7" />;
 const serverUrl = config.SERVER_URL;
-import {Skeleton} from 'react-native-elements';
 
-const Userprofile = ({userIdPost, navigation}) => {
+const Userprofile = ({ userIdPost, navigation, isAdmin }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [banner, setBanner] = useState(false);
   const [profilePicture, setProfilePicture] = useState(false);
@@ -25,7 +27,7 @@ const Userprofile = ({userIdPost, navigation}) => {
   const [dropdownVisible, setDropdownVisible] = useState(false);
 
   useEffect(() => {
-    navigation.setOptions({title: ''});
+    navigation.setOptions({ title: '' });
   }, [navigation]);
 
   async function getData() {
@@ -42,17 +44,17 @@ const Userprofile = ({userIdPost, navigation}) => {
       setUserData(user);
 
       if (user.username) {
-        navigation.setOptions({title: `@${user.username}`}); // Set judul berdasarkan username
+        navigation.setOptions({ title: `@${user.username}` }); // Set judul berdasarkan username
       }
 
       if (user.bannerPicture) {
-        const banner = {uri: user.bannerPicture};
+        const banner = { uri: user.bannerPicture };
         setBanner(banner);
         console.log('Banner Berhasil Diambil');
       }
 
       if (user.profilePicture) {
-        const profile = {uri: user.profilePicture};
+        const profile = { uri: user.profilePicture };
         setProfilePicture(profile);
         console.log('Foto Profil Berhasil Diambil');
       }
@@ -157,7 +159,6 @@ const Userprofile = ({userIdPost, navigation}) => {
         )}
         <View style={styles.profileContainer}>
           <TouchableOpacity onPress={openModal}>
-            
             <Image
               source={profilePicture || require('../../assets/profilepic.png')}
               style={styles.profile}
@@ -193,7 +194,10 @@ const Userprofile = ({userIdPost, navigation}) => {
               </>
             ) : (
               <>
-                <Text style={styles.name}>{userData?.name}</Text>
+                <View style={styles.nameContainer}>
+                  <Text style={styles.name}>{userData?.name}</Text>
+                  {userData?.isAdmin ? (<Text style={styles.verifiedIcon}>{verifiedIcon}</Text>) : null}
+                </View>
                 <Text style={styles.username}>@{userData?.username}</Text>
                 <Text style={styles.description}>
                   {userData?.bio || 'No Description'}
@@ -260,10 +264,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     minHeight: 150, // Set minimum height to avoid layout shift
   },
+  nameContainer: {
+    flexDirection: 'row', // Tambahkan ini untuk mengatur elemen dalam satu baris
+    alignItems: 'center', // Tambahkan ini untuk menyelaraskan elemen secara vertikal
+  },
   name: {
     fontSize: 20,
     fontWeight: 'bold',
     color: '#000',
+  },
+  verifiedIcon: {
+    marginLeft: 5, // Pastikan ini ada untuk memberikan jarak
+    marginTop: 3
   },
   username: {
     fontSize: 14,
@@ -310,7 +322,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff', // Warna latar belakang putih
     borderRadius: 7,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.8,
     shadowRadius: 2,
     elevation: 5,
