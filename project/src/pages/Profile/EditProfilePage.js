@@ -20,7 +20,10 @@ import config from '../../config';
 import Toast from 'react-native-toast-message';
 import {Skeleton} from 'react-native-elements';
 
+// Impor gambar profilepic.png
 const serverUrl = config.SERVER_URL;
+const defaultBanner = require('../../assets/banner.png');
+const defaultProfilePicture = require('../../assets/profilepic.png'); // Ubah di sini
 
 export default function EditProfilePage() {
   const navigation = useNavigation();
@@ -58,6 +61,8 @@ export default function EditProfilePage() {
       if (user.profilePicture) {
         const profile = {uri: user.profilePicture};
         setProfilePicture(profile);
+      } else {
+        setProfilePicture(defaultProfilePicture); // Set default profile picture
       }
     } catch (error) {
       console.error('Error occurred:', error);
@@ -79,6 +84,7 @@ export default function EditProfilePage() {
 
     return () => clearTimeout(timer); // Bersihkan timer saat komponen unmount
   }, []);
+
 
   useEffect(() => {
     if (banner) {
@@ -119,6 +125,7 @@ export default function EditProfilePage() {
     return nameRegex.test(name) && name.length <= 40;
   };
 
+
   navigation.setOptions({
     headerRight: () => (
       <TouchableOpacity
@@ -133,6 +140,7 @@ export default function EditProfilePage() {
       </TouchableOpacity>
     ),
   });
+
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -289,6 +297,7 @@ export default function EditProfilePage() {
       });
   };
 
+
   const selectImageBanner = () => {
     ImagePicker.openPicker({
       width: 1600,
@@ -321,12 +330,10 @@ export default function EditProfilePage() {
               height={200}
               width="100%"
             />
-          ) : isBannerLoading ? (
-            <View style={[styles.banner, {height: 500, backgroundColor: '#ccc'}]} />
           ) : (
             <TouchableOpacity onPress={selectImageBanner}>
               <ImageBackground
-                source={banner || require('../../assets/banner.png')}
+                source={banner.uri ? banner : defaultBanner}
                 style={styles.banner}
                 resizeMode="cover">
                 <View style={styles.overlay}>
@@ -352,9 +359,7 @@ export default function EditProfilePage() {
           ) : (
             <TouchableOpacity onPress={selectImageProfile}>
               <ImageBackground
-                source={
-                  profilePicture || require('../../assets/profilepic.png')
-                }
+                source={profilePicture.uri ? profilePicture : defaultProfilePicture}
                 style={styles.profilePicture}
                 imageStyle={styles.profileImage}
                 resizeMode="cover">
@@ -381,12 +386,13 @@ export default function EditProfilePage() {
                 />
               ) : isEditing ? (
                 <TextInput
-                  style={[styles.usernameInput, {borderRadius: 5}]}
+                  style={[styles.usernameInput, {borderRadius: 5, color: colorScheme === 'dark' ? '#000000' : '#000000'}]} // Adjust text color based on theme
                   value={username}
                   onChangeText={text => setUsername(text)}
                   onBlur={() => setIsEditing(false)}
                   autoFocus
                   maxLength={15}
+                  placeholderTextColor={colorScheme === 'dark' ? '#cccccc' : '#888888'} // Adjust placeholder text color based on theme
                 />
               ) : (
                 <Text style={styles.username}> {username} </Text>
@@ -410,7 +416,7 @@ export default function EditProfilePage() {
             ) : (
               <TextInput
                 value={name}
-                style={styles.textInput}
+                style={[styles.textInput, {color: colorScheme === 'dark' ? '#000000' : '#000000'}]} // Adjust text color based on theme
                 onChangeText={setName}
                 placeholder={userData?.name}
                 placeholderTextColor={
@@ -435,16 +441,14 @@ export default function EditProfilePage() {
               />
             ) : (
               <TextInput
-                value={bio}
-                onChangeText={setBio}
-                style={styles.textInput}
-                placeholder={userData?.bio || ''}
-                placeholderTextColor={
-                  colorScheme === 'dark' ? '#cccccc' : '#888888'
-                }
-                autoCapitalize="none"
-                multiline
-                maxLength={150}
+              value={bio}
+              onChangeText={setBio}
+              style={[styles.textInput, {color: colorScheme === 'dark' ? '#000000' : '#000000'}]} // Adjust text color based on theme
+              placeholder={userData?.bio || 'Bio'}
+              placeholderTextColor={colorScheme === 'dark' ? '#cccccc' : '#888888'} // Adjust placeholder text color based on theme
+              autoCapitalize="none"
+              multiline
+              maxLength={150}
               />
             )}
           </View>
@@ -459,7 +463,7 @@ export default function EditProfilePage() {
               />
             ) : (
               <TextInput
-                style={styles.textInput}
+                style={[styles.textInput, {color: colorScheme === 'dark' ? '#000000' : '#000000'}]} // Adjust text color based on theme
                 placeholder={userData?.email}
                 placeholderTextColor={
                   colorScheme === 'dark' ? '#cccccc' : '#888888'
@@ -475,6 +479,7 @@ export default function EditProfilePage() {
   );
 }
 
+
 const getStyles = colorScheme => {
   const currentTextColor = colorScheme === 'dark' ? '#888888' : '#888888';
   return StyleSheet.create({
@@ -482,6 +487,7 @@ const getStyles = colorScheme => {
       flexGrow: 1,
       alignItems: 'center',
       backgroundColor: '#fff',
+      paddingBottom: 20, // Tambahkan padding bawah untuk menghindari konten terpotong
     },
     bannerContainer: {
       width: '100%',
@@ -518,6 +524,7 @@ const getStyles = colorScheme => {
       alignItems: 'center',
       backgroundColor: 'rgba(0, 0, 0, 0.5)',
       borderRadius: 60,
+      zIndex: 1, // Ensure overlay is above the image
     },
     contentContainer: {
       width: '100%',

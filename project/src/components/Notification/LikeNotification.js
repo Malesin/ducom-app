@@ -1,14 +1,33 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import DefaultAvatar from '../../assets/profilepic.png';
+import DefaultAvatar from '../assets/profilepic.png';
+import { useNavigation } from '@react-navigation/native';
+import { formatNotification } from '../pages/Home/formatNotification';
 
 const LikeNotification = ({ notification }) => {
-  const handleNotificationPress = () => {
-    console.log('Notification pressed');
+  const navigation = useNavigation();
+  
+  const handleNotificationPress = async () => {
+    const formattedTweet = await formatNotification(notification);
+    if (formattedTweet) {
+      navigation.navigate('ViewPost', {
+        tweet: formattedTweet,
+        postId: formattedTweet.id,
+        idUser: formattedTweet.idUser,
+        emailUser: formattedTweet.emailUser,
+        comments: formattedTweet.comments || [],
+        userAvatar: formattedTweet.userAvatar, // Pastikan ini dikirim
+        userName: formattedTweet.userName, // Pastikan ini dikirim
+        userHandle: formattedTweet.userHandle, // Pastikan ini dikirim
+      });
+    }
   };
+
+  console.log(notification.post)
+
   const formatDate = dateString => {
-    const date = new Date(dateString);
+    const date = new Date(dateString);  
     const now = new Date();
     const diffInSeconds = Math.floor((now - date) / 1000);
 

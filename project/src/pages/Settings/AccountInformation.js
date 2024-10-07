@@ -100,6 +100,7 @@ const AccountInformation = () => {
                 onChangeText={setPhoneNumber}
                 keyboardType="phone-pad"
                 placeholder={phoneNumber}
+                autoFocus={true} // Tambahkan properti ini
               />
             </>
           ) : (
@@ -169,12 +170,12 @@ const styles = StyleSheet.create({
   },
   saveButtonText: {
     color: '#fff',
-    fontSize: 14,
+    fontWeight: 'bold',
   },
   saveButtonInline: {
-    backgroundColor: '#007bff',
-    padding: 5,
-    borderRadius: 5,
-    marginLeft: 10,
+    backgroundColor: '#001374',
+    paddingHorizontal: 18,
+    borderRadius: 50,
+    paddingVertical: 7,
   },
 });

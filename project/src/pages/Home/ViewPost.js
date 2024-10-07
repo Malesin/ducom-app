@@ -62,6 +62,8 @@ const ViewPost = ({ route }) => {
   const [refreshing, setRefreshing] = useState(false);
   const [showBottomSheet, setShowBottomSheet] = useState(false); // Tambahkan state ini
 
+  console.log("tweet:", tweet.comments)
+
   useEffect(() => {
     if (focusCommentInput && textInputRef.current) {
       textInputRef.current.focus();
@@ -278,7 +280,7 @@ const ViewPost = ({ route }) => {
       setRefreshing(false);
     }
   }, [tweet.id]);
-
+  
   useEffect(() => {
     fetchComments();
   }, [fetchComments]);
@@ -391,7 +393,7 @@ const ViewPost = ({ route }) => {
           <View>
             <Text style={styles.postContent}>{tweet.content}</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              {tweet.media.map((mediaItem, index) => (
+              {(tweet.media || []).map((mediaItem, index) => (
                 <TouchableOpacity
                   key={index}
                   onPress={() => handleMediaPress(mediaItem.uri)}>

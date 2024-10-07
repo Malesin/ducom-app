@@ -5,6 +5,7 @@ import {
   TextInput,
   SafeAreaView,
   TouchableOpacity,
+  useColorScheme,
 } from 'react-native';
 import React, {useState} from 'react';
 import {
@@ -25,8 +26,10 @@ const CreatePassword = ({navigation}) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isCheckedPass, setIsCheckedPass] = useState(false); // State for checkbox
+  const [isButtonDisabled, setIsButtonDisabled] = useState(false); // Perbaikan deklarasi useState
   const route = useRoute();
   const {email} = route.params;
+  const colorScheme = useColorScheme(); // Detect light or dark mode
 
   const validatePassword = password => {
     const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,15}$/;
@@ -34,14 +37,19 @@ const CreatePassword = ({navigation}) => {
   };
 
   const handleContinue = async () => {
+    setIsButtonDisabled(true); // Disable the button immediately
     if (!password || !confirmPassword) {
       setError('Password and Confirm Password are required.');
+      setIsButtonDisabled(false); // Re-enable the button if validation fails
     } else if (!validatePassword(password)) {
       setError('Password must be between 8 and 15 characters and include at least one letter and one number.');
+      setIsButtonDisabled(false); // Re-enable the button if validation fails
     } else if (password !== confirmPassword) {
       setError('Passwords do not match.');
+      setIsButtonDisabled(false); // Re-enable the button if validation fails
     } else if (!isCheckedPass) {
       setError('You must confirm the password change.');
+      setIsButtonDisabled(false); // Re-enable the button if validation fails
     } else {
       setError('');
       try {
@@ -67,11 +75,14 @@ const CreatePassword = ({navigation}) => {
           }, 3000); // Duration to show the dialog
         } else if (response.data.status === 'errorPassSame') {
           setError('New password cannot be same as old password');
+          setIsButtonDisabled(false); // Re-enable the button if validation fails
         } else {
           setError(response.data.data);
+          setIsButtonDisabled(false); // Re-enable the button if validation fails
         }
       } catch (error) {
         setError('Failed to update password. Please try again.');
+        setIsButtonDisabled(false); // Re-enable the button if there is an error
       }
     }
   };
@@ -86,12 +97,16 @@ const CreatePassword = ({navigation}) => {
           </Text>
           <View style={styles.inputContainer}>
             <TextInput
-              style={styles.input}
+              style={[
+                styles.input,
+                { color: colorScheme === 'dark' ? '#000000' : '#000000' } // Adjust text color based on theme
+              ]}
               onChangeText={setPassword}
               value={password}
               placeholder="New Password"
               secureTextEntry={!showPassword}
               autoCapitalize="none"
+              placeholderTextColor={colorScheme === 'dark' ? '#cccccc' : '#888888'} // Adjust placeholder text color based on theme
             />
             <TouchableOpacity
               style={styles.eyeIcon}
@@ -105,12 +120,16 @@ const CreatePassword = ({navigation}) => {
           </View>
           <View style={styles.inputContainer}>
             <TextInput
-              style={styles.input}
+              style={[
+                styles.input,
+                { color: colorScheme === 'dark' ? '#000000' : '#000000' } // Adjust text color based on theme
+              ]}
               onChangeText={setConfirmPassword}
               value={confirmPassword}
               placeholder="Confirm Password"
               secureTextEntry={!showConfirmPassword}
               autoCapitalize="none"
+              placeholderTextColor={colorScheme === 'dark' ? '#cccccc' : '#888888'} // Adjust placeholder text color based on theme
             />
             <TouchableOpacity
               style={styles.eyeIcon}
@@ -138,10 +157,18 @@ const CreatePassword = ({navigation}) => {
             </Text>
           </View>
           <TouchableOpacity
-            style={[styles.buttonForgot, {opacity: isCheckedPass ? 1 : 0.5}]}
+            style={[
+              styles.buttonForgot,
+              (isButtonDisabled || !isCheckedPass) && styles.disabledButton, // Add disabled style
+            ]}
             onPress={handleContinue}
-            disabled={!isCheckedPass}>
-            <Text style={styles.textForgot}>Continue</Text>
+            disabled={isButtonDisabled || !isCheckedPass}>
+            <Text style={[
+              styles.textForgot,
+              (isButtonDisabled || !isCheckedPass) && styles.disabledText, // Add disabled text style
+            ]}>
+              Continue
+            </Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -215,5 +242,11 @@ const styles = StyleSheet.create({
     color: 'red',
     width: '90%',
     textAlign: 'left',
+  },
+  disabledText: {
+    opacity: 0.5, // Reduce the opacity to visually indicate disabled state
+  },
+  disabledButton: {
+    backgroundColor: '#cccccc', // Change background color to indicate disabled state
   },
 });
