@@ -248,6 +248,7 @@ const ViewPost = ({ route }) => {
       const formattedComments = dataComment.map(comment => ({
         id: comment._id,
         text: comment.comment,
+
         userIdPost: comment.user._id,
         idUser: idUser,
         email: comment.user.email,
@@ -488,6 +489,7 @@ const ViewPost = ({ route }) => {
                 postId={postId}
                 userIdPost={comment.userIdPost}
                 idUser={idUser}
+                tweet={tweet}
                 allowedEmail={comment.allowedEmail}
                 isLikedCom={comment.isLikedCom}
                 emailUser={emailUser}
