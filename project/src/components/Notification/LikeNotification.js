@@ -5,11 +5,13 @@ import DefaultAvatar from '../../assets/profilepic.png';
 import { useNavigation } from '@react-navigation/native';
 import { formatNotification } from '../../pages/Home/formatNotification';
 
-const LikeNotification = ({ notification }) => {
+const LikeNotification = ({ likeNotification }) => {
   const navigation = useNavigation();
+  console.log("formattedTweet: ", likeNotification )
 
-  const handleNotificationPress = async () => {
-    const formattedTweet = await formatNotification(notification);
+  const handleLikeNotificationPress = async () => {
+    const formattedTweet = await formatNotification(likeNotification);
+
     if (formattedTweet) {
       navigation.navigate('ViewPost', {
         tweet: formattedTweet,
@@ -62,16 +64,16 @@ const LikeNotification = ({ notification }) => {
 
   return (
     <SafeAreaView style={styles.card}>
-      <TouchableOpacity onPress={handleNotificationPress}>
+      <TouchableOpacity onPress={handleLikeNotificationPress}>
         <View style={styles.notificationRow}>
           <MaterialCommunityIcons name="heart" size={30} color="#E0245E" style={styles.heartIcon} />
-          <Image source={notification.like.user.profilePicture ? { uri: notification.like.user.profilePicture } : DefaultAvatar} style={styles.avatar} />
+          <Image source={likeNotification.like.user.profilePicture ? { uri: likeNotification.like.user.profilePicture } : DefaultAvatar} style={styles.avatar} />
           <Text style={styles.userNameAt}>
-            @{notification.like.user.username}
+            @{likeNotification.like.user.username}
           </Text>
           <Text style={styles.userName}>
             liked your post.</Text>
-          <Text style={styles.date}> {formatDate(notification.like.created_at)} </Text>
+          <Text style={styles.date}> {formatDate(likeNotification.like.created_at)} </Text>
         </View>
       </TouchableOpacity>
     </SafeAreaView>

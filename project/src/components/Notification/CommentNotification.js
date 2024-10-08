@@ -5,11 +5,12 @@ import DefaultAvatar from '../../assets/profilepic.png';
 import { useNavigation } from '@react-navigation/native';
 import { formatNotification } from '../../pages/Home/formatNotification';
 
-const CommentNotification = ({ notification }) => {
+const CommentNotification = ({ commentNotification }) => {
   const navigation = useNavigation();
 
-  const handleNotificationPress = async () => {
-    const formattedTweet = await formatNotification(notification);
+  const handleCommentNotification = async () => {
+    const formattedTweet = await formatNotification(commentNotification);
+    // console.log(formattedTweet)
     if (formattedTweet) {
       navigation.navigate('ViewPost', {
         tweet: formattedTweet,
@@ -62,16 +63,16 @@ const CommentNotification = ({ notification }) => {
 
   return (
     <SafeAreaView style={styles.card}>
-      <TouchableOpacity onPress={handleNotificationPress}>
+      <TouchableOpacity onPress={handleCommentNotification}>
         <View style={styles.notificationRow}>
-          <MaterialCommunityIcons name="heart" size={30} color="#E0245E" style={styles.heartIcon} />
-          <Image source={notification.like.user.profilePicture ? { uri: notification.like.user.profilePicture } : DefaultAvatar} style={styles.avatar} />
+          <MaterialCommunityIcons name="comment-text-outline" size={30} style={styles.heartIcon} />
+          <Image source={commentNotification.comment.user.profilePicture ? { uri: commentNotification.comment.user.profilePicture } : DefaultAvatar} style={styles.avatar} />
           <Text style={styles.userNameAt}>
-            @{notification.like.user.username}
+            @{commentNotification.comment.user.username}
           </Text>
           <Text style={styles.userName}>
-            liked your post.</Text>
-          <Text style={styles.date}> {formatDate(notification.like.created_at)} </Text>
+            comment your post.</Text>
+          <Text style={styles.date}> {formatDate(commentNotification.comment.created_at)} </Text>
         </View>
       </TouchableOpacity>
     </SafeAreaView>
