@@ -33,7 +33,6 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
       });
 
       const postPin = pinPost.data.data;
-      console.log(postPin)
       if (!postPin) {
         return null; // Kembalikan null jika pinPost tidak ada
       }

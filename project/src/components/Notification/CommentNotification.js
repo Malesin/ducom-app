@@ -2,11 +2,29 @@ import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import DefaultAvatar from '../../assets/profilepic.png';
+import { useNavigation } from '@react-navigation/native';
+import { formatNotification } from '../../pages/Home/formatNotification';
 
-const CommentNotification = ({ notification }) => {
-  const handleNotificationPress = () => {
-    console.log('Notification pressed');
+const CommentNotification = ({ commentNotification }) => {
+  const navigation = useNavigation();
+
+  const handleCommentNotification = async () => {
+    const formattedTweet = await formatNotification(commentNotification);
+    // console.log(formattedTweet)
+    if (formattedTweet) {
+      navigation.navigate('ViewPost', {
+        tweet: formattedTweet,
+        postId: formattedTweet.id,
+        idUser: formattedTweet.idUser,
+        emailUser: formattedTweet.emailUser,
+        comments: formattedTweet.comments || [],
+        userAvatar: formattedTweet.userAvatar, // Pastikan ini dikirim
+        userName: formattedTweet.userName, // Pastikan ini dikirim
+        userHandle: formattedTweet.userHandle, // Pastikan ini dikirim
+      });
+    }
   };
+
   const formatDate = dateString => {
     const date = new Date(dateString);
     const now = new Date();
@@ -45,12 +63,16 @@ const CommentNotification = ({ notification }) => {
 
   return (
     <SafeAreaView style={styles.card}>
-      <TouchableOpacity onPress={handleNotificationPress}>
+      <TouchableOpacity onPress={handleCommentNotification}>
         <View style={styles.notificationRow}>
-          <MaterialCommunityIcons name="heart" size={30} color="#E0245E" style={styles.heartIcon} />
-          <Image source={notification.like.user.profilePicture ? { uri: notification.like.user.profilePicture } : DefaultAvatar} style={styles.avatar} />
-          <Text style={styles.userName}>@{notification.like.user.username} liked your post.</Text>
-          <Text style={styles.date}> {formatDate(notification.like.created_at)} </Text>
+          <MaterialCommunityIcons name="comment-text-outline" size={30} style={styles.heartIcon} />
+          <Image source={commentNotification.comment.user.profilePicture ? { uri: commentNotification.comment.user.profilePicture } : DefaultAvatar} style={styles.avatar} />
+          <Text style={styles.userNameAt}>
+            @{commentNotification.comment.user.username}
+          </Text>
+          <Text style={styles.userName}>
+            comment your post.</Text>
+          <Text style={styles.date}> {formatDate(commentNotification.comment.created_at)} </Text>
         </View>
       </TouchableOpacity>
     </SafeAreaView>
@@ -85,8 +107,13 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   userName: {
+    fontSize: 15,
+    color: '#000',
+  },
+  userNameAt: {
     fontSize: 16,
     fontWeight: 'bold',
+    marginRight: 5,
     color: '#000',
   },
 });

@@ -1,15 +1,17 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import DefaultAvatar from '../assets/profilepic.png';
+import DefaultAvatar from '../../assets/profilepic.png';
 import { useNavigation } from '@react-navigation/native';
-import { formatNotification } from '../pages/Home/formatNotification';
+import { formatNotification } from '../../pages/Home/formatNotification';
 
-const LikeNotification = ({ notification }) => {
+const LikeNotification = ({ likeNotification }) => {
   const navigation = useNavigation();
-  
-  const handleNotificationPress = async () => {
-    const formattedTweet = await formatNotification(notification);
+  console.log("formattedTweet: ", likeNotification )
+
+  const handleLikeNotificationPress = async () => {
+    const formattedTweet = await formatNotification(likeNotification);
+
     if (formattedTweet) {
       navigation.navigate('ViewPost', {
         tweet: formattedTweet,
@@ -24,10 +26,8 @@ const LikeNotification = ({ notification }) => {
     }
   };
 
-  console.log(notification.post)
-
   const formatDate = dateString => {
-    const date = new Date(dateString);  
+    const date = new Date(dateString);
     const now = new Date();
     const diffInSeconds = Math.floor((now - date) / 1000);
 
@@ -64,12 +64,16 @@ const LikeNotification = ({ notification }) => {
 
   return (
     <SafeAreaView style={styles.card}>
-      <TouchableOpacity onPress={handleNotificationPress}>
+      <TouchableOpacity onPress={handleLikeNotificationPress}>
         <View style={styles.notificationRow}>
           <MaterialCommunityIcons name="heart" size={30} color="#E0245E" style={styles.heartIcon} />
-          <Image source={notification.like.user.profilePicture ? { uri: notification.like.user.profilePicture } : DefaultAvatar} style={styles.avatar} />
-          <Text style={styles.userName}>@{notification.like.user.username} liked your post.</Text>
-          <Text style={styles.date}> {formatDate(notification.like.created_at)} </Text>
+          <Image source={likeNotification.like.user.profilePicture ? { uri: likeNotification.like.user.profilePicture } : DefaultAvatar} style={styles.avatar} />
+          <Text style={styles.userNameAt}>
+            @{likeNotification.like.user.username}
+          </Text>
+          <Text style={styles.userName}>
+            liked your post.</Text>
+          <Text style={styles.date}> {formatDate(likeNotification.like.created_at)} </Text>
         </View>
       </TouchableOpacity>
     </SafeAreaView>
@@ -104,8 +108,13 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   userName: {
+    fontSize: 15,
+    color: '#000',
+  },
+  userNameAt: {
     fontSize: 16,
     fontWeight: 'bold',
+    marginRight: 5,
     color: '#000',
   },
 });
