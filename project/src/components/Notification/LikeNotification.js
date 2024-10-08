@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import DefaultAvatar from '../assets/profilepic.png';
+import DefaultAvatar from '../../assets/profilepic.png';
 import { useNavigation } from '@react-navigation/native';
-import { formatNotification } from '../pages/Home/formatNotification';
+import { formatNotification } from '../../pages/Home/formatNotification';
 
 const LikeNotification = ({ notification }) => {
   const navigation = useNavigation();

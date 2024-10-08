@@ -96,10 +96,14 @@ const CommentCard = ({ text, hasReplies, replies, onReplyPress, username, profil
   };
 
   const handleProfilePress = () => {
-    navigation.navigate('Userprofile', {
-      userIdPost: userIdPost,
-      profilePicture: profilePicture,
-    });
+    if (userIdPost === idUser) {
+      navigation.navigate('Profile');
+    } else {
+      navigation.navigate('Userprofile', {
+        userIdPost: userIdPost,
+        profilePicture: profilePicture,
+      });
+    }
   };
 
   return (
