@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -13,20 +13,40 @@ import CommentSheet from './CommentSheet';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-import { useNavigation } from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 import config from '../config';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 const verifiedIcon = <Icon name="verified" size={14} color="#699BF7" />;
 
 const serverUrl = config.SERVER_URL;
 
-const CommentCard = ({ text, hasReplies, replies, onReplyPress, username, profilePicture, onAddReply, commentId, postId, userIdPost, idUser, allowedEmail, emailUser, onDeleteSuccess, isLikedCom, parentCommentId, userEmailPost, isAdmin, amIAdmin }) => {
+const CommentCard = ({
+  text,
+  hasReplies,
+  replies,
+  onReplyPress,
+  username,
+  profilePicture,
+  onAddReply,
+  commentId,
+  postId,
+  userIdPost,
+  idUser,
+  allowedEmail,
+  emailUser,
+  onDeleteSuccess,
+  isLikedCom,
+  parentCommentId,
+  userEmailPost,
+  isAdmin,
+  amIAdmin,
+}) => {
   const [isLiked, setIsLiked] = useState(isLikedCom);
   const [showReplies, setShowReplies] = useState(false);
   const [showMoreReplies, setShowMoreReplies] = useState(false);
   const [showCommentSheet, setShowCommentSheet] = useState(false);
   const [gettoken, setGetToken] = useState();
-  const navigation = useNavigation();
+  const navigator = useNavigation(); // Ganti nama dari navigation ke navigator
   const tokenconst = async () => {
     const token = await AsyncStorage.getItem('token');
     setGetToken(token);
@@ -41,12 +61,11 @@ const CommentCard = ({ text, hasReplies, replies, onReplyPress, username, profil
       await handleUnlikePress();
     } else {
       try {
-
         const respLike = await axios.post(`${serverUrl}/like-comment`, {
           token: gettoken,
           postId: postId,
           commentId: parentCommentId || commentId,
-          replyId: parentCommentId ? commentId : null
+          replyId: parentCommentId ? commentId : null,
         });
 
         if (respLike.data.status === 'ok') {
@@ -55,22 +74,20 @@ const CommentCard = ({ text, hasReplies, replies, onReplyPress, username, profil
           console.error('Error in like respLike data:', respLike.data.data);
         }
 
-        console.log(parentCommentId ? "like reply" : "like");
-
+        console.log(parentCommentId ? 'like reply' : 'like');
       } catch (error) {
         console.error('Error: ', error);
       }
-    };
-  }
+    }
+  };
 
   const handleUnlikePress = async () => {
     try {
-
       const respUnlike = await axios.post(`${serverUrl}/unlike-comment`, {
         token: gettoken,
         postId: postId,
         commentId: parentCommentId || commentId,
-        replyId: parentCommentId ? commentId : null
+        replyId: parentCommentId ? commentId : null,
       });
 
       if (respUnlike.data.status === 'ok') {
@@ -79,9 +96,7 @@ const CommentCard = ({ text, hasReplies, replies, onReplyPress, username, profil
         console.error('Error in like respUnlike data:', respUnlike.data.data);
       }
 
-      console.log(parentCommentId ? "unlike reply" : "unlike");
-
-
+      console.log(parentCommentId ? 'unlike reply' : 'unlike');
     } catch (error) {
       console.error('Error unliking post:', error.message);
     }
@@ -97,9 +112,9 @@ const CommentCard = ({ text, hasReplies, replies, onReplyPress, username, profil
 
   const handleProfilePress = () => {
     if (userIdPost === idUser) {
-      navigation.navigate('Profile');
+      navigator.navigate('Profile');
     } else {
-      navigation.navigate('Userprofile', {
+      navigator.navigate('Userprofile', {
         userIdPost: userIdPost,
         profilePicture: profilePicture,
       });
@@ -113,7 +128,9 @@ const CommentCard = ({ text, hasReplies, replies, onReplyPress, username, profil
           <TouchableOpacity onPress={handleProfilePress}>
             <Image
               source={
-                profilePicture ? { uri: profilePicture } : require('../assets/profilepic.png')
+                profilePicture
+                  ? {uri: profilePicture}
+                  : require('../assets/profilepic.png')
               }
               style={styles.profileImage}
             />
@@ -122,15 +139,21 @@ const CommentCard = ({ text, hasReplies, replies, onReplyPress, username, profil
         <View style={styles.commentContainer}>
           <View style={styles.usernameContainer}>
             <Text style={styles.username}>{username}</Text>
-            {isAdmin ? (<Text style={styles.verifiedIcon}>{verifiedIcon}</Text>) : null}
+            {isAdmin ? (
+              <Text style={styles.verifiedIcon}>{verifiedIcon}</Text>
+            ) : null}
           </View>
           <Text style={styles.commentText}>{text}</Text>
           <View style={styles.replyAndLikeContainer}>
-            {parentCommentId ? <Text style={styles.replynope}></Text> :
-              <TouchableOpacity style={styles.replyButton} onPress={onReplyPress}>
+            {parentCommentId ? (
+              <Text style={styles.replynope}></Text>
+            ) : (
+              <TouchableOpacity
+                style={styles.replyButton}
+                onPress={onReplyPress}>
                 <Text style={styles.replyButtonText}>Reply</Text>
               </TouchableOpacity>
-            }
+            )}
             <TouchableOpacity onPress={handleLikePress}>
               <MaterialCommunityIcons
                 name={isLiked ? 'heart' : 'heart-outline'}
@@ -234,7 +257,6 @@ const CommentCard = ({ text, hasReplies, replies, onReplyPress, username, profil
       </View>
     </SafeAreaView>
   );
-
 };
 
 export default CommentCard;
@@ -294,7 +316,7 @@ const styles = StyleSheet.create({
   },
   replynope: {
     marginLeft: 4,
-    marginTop: 4
+    marginTop: 4,
   },
   replyButton: {
     marginLeft: 5,
