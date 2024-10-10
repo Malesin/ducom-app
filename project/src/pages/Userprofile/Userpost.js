@@ -14,6 +14,8 @@ import { useFocusEffect } from '@react-navigation/native';
 import axios from 'axios';
 import config from '../../config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Skeleton } from 'react-native-elements'; // Import Skeleton
+
 const serverUrl = config.SERVER_URL;
 
 const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile }) => {
@@ -68,9 +70,8 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
     } catch (error) {
       console.error('Error fetching data:', error);
       return null
-    } finally {
-      setLoading(false);
-    }
+    } 
+    // Hapus setLoading(false) di sini
   }, [userIdPost, profilePicture]);
 
   const fetchTweets = useCallback(async () => {
@@ -115,10 +116,76 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
       return formattedTweets;
     } catch (error) {
       console.error('Error fetching data:', error);
-    } finally {
-      setLoading(false);
-    }
+    } 
+    // Hapus setLoading(false) di sini
   }, [userIdPost, profilePicture]);
+
+  const renderSkeleton = () => (
+    <>
+      {[...Array(5)].map((_, index) => (
+        <View key={index} style={styles.skeletonContainer}>
+          <View style={styles.skeletonHeader}>
+            <Skeleton
+              animation="pulse"
+              circle
+              height={40}
+              width={40}
+              style={styles.skeletonAvatar}
+            />
+            <View style={styles.skeletonTextContainer}>
+              <Skeleton
+                animation="pulse"
+                height={20}
+                width={100}
+                style={styles.skeleton}
+              />
+              <Skeleton
+                animation="pulse"
+                height={14}
+                width={60}
+                style={styles.skeleton}
+              />
+            </View>
+          </View>
+          <Skeleton
+            animation="pulse"
+            height={20}
+            width={200}
+            style={styles.skeleton}
+          />
+          <Skeleton
+            animation="pulse"
+            height={150}
+            width={'100%'}
+            style={styles.skeleton}
+          />
+        </View>
+      ))}
+    </>
+  );
+
+  const onRefreshPage = () => {
+    setLoading(true);
+    setIsFetched(false);
+    setPage(1);
+    setTweets([]);
+    setPinTweets([]);
+    (async () => {
+      const newTweets = await fetchTweets(1);
+      const initialPinTweets = await fetchPinTweet();
+      if (initialPinTweets) {
+        setPinTweets([initialPinTweets]);
+        setPinnedTweetId(initialPinTweets.id);
+      } else {
+        setPinTweets([]);
+        setPinnedTweetId(null);
+      }
+      const filteredTweets = newTweets.filter(tweet => tweet.id !== initialPinTweets?.id);
+      setTweets(filteredTweets.slice(0, 5));
+      setIsFetched(true);
+      setLoading(false);
+    })();
+  };
 
   useFocusEffect(
     useCallback(() => {
@@ -137,7 +204,7 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
           const filteredTweets = newTweets.filter(tweet => tweet.id !== initialPinTweets?.id); // Filter tweet yang dipin
           setTweets(filteredTweets.slice(0, 5)); // Load only 4 tweets initially
           setIsFetched(true);
-          setLoading(false);
+          setLoading(false); // Hapus setLoading(false) di sini
         })();
       }
     }, [fetchTweets, page, isFetched]),
@@ -150,22 +217,33 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
   return (
     <SafeAreaView style={styles.container}>
       {loading ? (
-        <View style={styles.loadingIndicator}>
-          <ActivityIndicator size="large" color="#000" />
-        </View>
+        renderSkeleton()
       ) : (
-        <ScrollView contentContainerStyle={styles.contentContainer}>
+        <ScrollView
+          contentContainerStyle={styles.contentContainer}
+          onScroll={({ nativeEvent }) => {
+            const { contentOffset, layoutMeasurement, contentSize } = nativeEvent;
+            const contentHeight = contentSize.height;
+            const viewportHeight = layoutMeasurement.height;
+            const scrollPosition = contentOffset.y + viewportHeight;
+
+            if (scrollPosition >= contentHeight - 100) {
+              handleLoadMore();
+            }
+          }}>
           {pintweets.map((tweet, index) => (
             <View key={index} style={styles.tweetContainer}>
               <TouchableOpacity onPress={() => handlePostPress(tweet)}>
-                <PinTweetCard tweet={tweet} isUserProfile={isUserProfile} />
+                <PinTweetCard tweet={tweet} onRefreshPage={onRefreshPage} isUserProfile={isUserProfile}/>
               </TouchableOpacity>
             </View>
           ))}
           {Array.isArray(tweets) && tweets.length > 0 ? (
             tweets.map((tweet, index) => (
               <View key={index} style={styles.tweetContainer}>
-                <TweetCard tweet={tweet} isUserProfile={isUserProfile} />
+                <TouchableOpacity onPress={() => handlePostPress(tweet)}>
+                  <TweetCard tweet={tweet} onRefreshPage={onRefreshPage} isUserProfile={isUserProfile}/>
+                </TouchableOpacity>
               </View>
             ))
           ) : (
@@ -200,6 +278,23 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  skeletonContainer: {
+    padding: 20,
+  },
+  skeletonHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  skeletonAvatar: {
+    marginRight: 10,
+  },
+  skeletonTextContainer: {
+    flex: 1,
+  },
+  skeleton: {
+    marginBottom: 10,
   },
 });
 

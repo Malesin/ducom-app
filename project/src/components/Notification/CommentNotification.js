@@ -75,7 +75,8 @@ const CommentNotification = ({ commentNotification }) => {
               <Text style={styles.date}>{formatDate(commentNotification.comment.created_at)}</Text>
             </View>
             <Text style={styles.comment}>
-              Commented on your post: {commentNotification.post.description}
+              Commented on your post: {commentNotification.post.description.slice(0, 20)}
+              {commentNotification.post.description.length > 20 ? '...' : ''}
             </Text>
           </View>
           <View>
