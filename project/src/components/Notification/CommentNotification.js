@@ -10,7 +10,6 @@ const CommentNotification = ({ commentNotification }) => {
 
   const handleCommentNotification = async () => {
     const formattedTweet = await formatNotification(commentNotification);
-    // console.log(formattedTweet)
     if (formattedTweet) {
       navigation.navigate('ViewPost', {
         tweet: formattedTweet,
@@ -18,9 +17,9 @@ const CommentNotification = ({ commentNotification }) => {
         idUser: formattedTweet.idUser,
         emailUser: formattedTweet.emailUser,
         comments: formattedTweet.comments || [],
-        userAvatar: formattedTweet.userAvatar, // Pastikan ini dikirim
-        userName: formattedTweet.userName, // Pastikan ini dikirim
-        userHandle: formattedTweet.userHandle, // Pastikan ini dikirim
+        userAvatar: formattedTweet.userAvatar,
+        userName: formattedTweet.userName,
+        userHandle: formattedTweet.userHandle,
       });
     }
   };
@@ -65,14 +64,23 @@ const CommentNotification = ({ commentNotification }) => {
     <SafeAreaView style={styles.card}>
       <TouchableOpacity onPress={handleCommentNotification}>
         <View style={styles.notificationRow}>
-          <MaterialCommunityIcons name="comment-text-outline" size={30} style={styles.heartIcon} />
+          <MaterialCommunityIcons name="comment-text-outline" size={15} style={styles.icon} />
           <Image source={commentNotification.comment.user.profilePicture ? { uri: commentNotification.comment.user.profilePicture } : DefaultAvatar} style={styles.avatar} />
-          <Text style={styles.userNameAt}>
-            @{commentNotification.comment.user.username}
-          </Text>
-          <Text style={styles.userName}>
-            comment your post.</Text>
-          <Text style={styles.date}> {formatDate(commentNotification.comment.created_at)} </Text>
+          <View style={styles.textContainer}>
+            <View style={styles.nameRow}>
+              <Text style={styles.nameAt}>{commentNotification.comment.user.name}</Text>
+              <Text style={styles.dot}> • </Text>
+              <Text style={styles.userNameAt}>@{commentNotification.comment.user.username}</Text>
+              <Text style={styles.dot}> • </Text>
+              <Text style={styles.date}>{formatDate(commentNotification.comment.created_at)}</Text>
+            </View>
+            <Text style={styles.comment}>
+              Commented on your post: {commentNotification.post.description}
+            </Text>
+          </View>
+          <View>
+            <Image source={commentNotification.post.content} style={styles.avatar} />
+          </View>
         </View>
       </TouchableOpacity>
     </SafeAreaView>
@@ -97,7 +105,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  heartIcon: {
+  icon: {
     marginRight: 10,
   },
   avatar: {
@@ -106,15 +114,38 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     marginRight: 12,
   },
-  userName: {
+  textContainer: {
+    flex: 1,
+    flexDirection: 'column',
+  },
+  nameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 2,
+  },
+  nameAt: {
     fontSize: 15,
+    fontWeight: 'bold',
     color: '#000',
   },
   userNameAt: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginRight: 5,
+    fontSize: 15,
+    color: '#657786',
+    marginLeft: 5,
+  },
+  dot: {
+    fontSize: 15,
+    color: '#657786',
+    marginHorizontal: 5,
+  },
+  comment: {
+    fontSize: 15,
     color: '#000',
+  },
+  date: {
+    fontSize: 12,
+    color: '#657786',
+    marginLeft: 5,
   },
 });
 
