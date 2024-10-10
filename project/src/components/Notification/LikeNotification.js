@@ -7,7 +7,6 @@ import { formatNotification } from '../../pages/Home/formatNotification';
 
 const LikeNotification = ({ likeNotification }) => {
   const navigation = useNavigation();
-  console.log("formattedTweet: ", likeNotification )
 
   const handleLikeNotificationPress = async () => {
     const formattedTweet = await formatNotification(likeNotification);
@@ -19,9 +18,9 @@ const LikeNotification = ({ likeNotification }) => {
         idUser: formattedTweet.idUser,
         emailUser: formattedTweet.emailUser,
         comments: formattedTweet.comments || [],
-        userAvatar: formattedTweet.userAvatar, // Pastikan ini dikirim
-        userName: formattedTweet.userName, // Pastikan ini dikirim
-        userHandle: formattedTweet.userHandle, // Pastikan ini dikirim
+        userAvatar: formattedTweet.userAvatar,
+        userName: formattedTweet.userName,
+        userHandle: formattedTweet.userHandle,
       });
     }
   };
@@ -66,14 +65,20 @@ const LikeNotification = ({ likeNotification }) => {
     <SafeAreaView style={styles.card}>
       <TouchableOpacity onPress={handleLikeNotificationPress}>
         <View style={styles.notificationRow}>
-          <MaterialCommunityIcons name="heart" size={30} color="#E0245E" style={styles.heartIcon} />
-          <Image source={likeNotification.like.user.profilePicture ? { uri: likeNotification.like.user.profilePicture } : DefaultAvatar} style={styles.avatar} />
-          <Text style={styles.userNameAt}>
-            @{likeNotification.like.user.username}
-          </Text>
-          <Text style={styles.userName}>
-            liked your post.</Text>
-          <Text style={styles.date}> {formatDate(likeNotification.like.created_at)} </Text>
+          <MaterialCommunityIcons name="heart" size={15} color="#E0245E" style={[styles.heartIcon, { marginRight: 8 }]} />
+          <Image
+            source={likeNotification.like.user.profilePicture ? { uri: likeNotification.like.user.profilePicture } : DefaultAvatar}
+            style={styles.avatar}
+          />
+          <View style={styles.textContainer}>
+            <View style={styles.nameRow}>
+              <Text style={styles.userName}>{likeNotification.like.user.name}</Text>
+              <Text style={styles.userNameAt}>@{likeNotification.like.user.username}</Text>
+              <Text style={styles.dot}>•</Text>
+              <Text style={styles.date}>{formatDate(likeNotification.like.created_at)}</Text>
+            </View>
+            <Text style={styles.notificationText}>Liked your post</Text>
+          </View>
         </View>
       </TouchableOpacity>
     </SafeAreaView>
@@ -83,7 +88,8 @@ const LikeNotification = ({ likeNotification }) => {
 const styles = StyleSheet.create({
   card: {
     backgroundColor: '#fff',
-    padding: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -93,13 +99,11 @@ const styles = StyleSheet.create({
     maxWidth: 800,
     borderColor: '#E1E8ED',
     borderWidth: 1,
+    borderRadius: 8,
   },
   notificationRow: {
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  heartIcon: {
-    marginRight: 10,
   },
   avatar: {
     width: 40,
@@ -107,15 +111,37 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     marginRight: 12,
   },
+  textContainer: {
+    flex: 1,
+  },
+  nameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 2,
+  },
   userName: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    color: '#000',
+    marginRight: 5,
+  },
+  userNameAt: {
+    fontSize: 15,
+    color: '#657786',
+    marginRight: 5,
+  },
+  dot: {
+    fontSize: 15,
+    color: '#657786',
+    marginHorizontal: 5,
+  },
+  notificationText: {
     fontSize: 15,
     color: '#000',
   },
-  userNameAt: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginRight: 5,
-    color: '#000',
+  date: {
+    fontSize: 13,
+    color: '#657786',
   },
 });
 

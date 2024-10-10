@@ -81,7 +81,7 @@ const HomeScreen = ({ navigation, comments }) => {
       const amIAdmin = data.isAdmin
 
       const responseTweet = await axios.post(`${serverUrl}/posts`, {
-        // token:token,
+        token:token,  
         page: pageNum,
       });
       const dataTweet = responseTweet.data.data;
