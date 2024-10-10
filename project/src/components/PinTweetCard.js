@@ -421,6 +421,7 @@ const PinTweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
               handlePin={true}
               handlePinUser={true}
               isUserProfile={isUserProfile}
+              isPinPost={true}
             />
           </View>
         </Modal>

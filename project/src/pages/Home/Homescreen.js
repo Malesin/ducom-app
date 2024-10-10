@@ -9,7 +9,6 @@ import {
   TouchableOpacity,
   RefreshControl,
   ActivityIndicator,
-  ToastAndroid,
   Text,
 } from 'react-native';
 import NetInfo from '@react-native-community/netinfo'; // Tambahkan import NetInfo
@@ -34,7 +33,7 @@ import { Skeleton } from 'react-native-elements';
 
 const serverUrl = config.SERVER_URL;
 
-const HomeScreen = ({ navigation, comments }) => {
+const HomeScreen = ({ navigation }) => {
   const [tweets, setTweets] = useState([]);
   const [pintweets, setPinTweets] = useState([]);
   const [refreshing, setRefreshing] = useState(false);

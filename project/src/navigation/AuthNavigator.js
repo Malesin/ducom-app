@@ -25,6 +25,7 @@ import BottomTabNavigator from './BottomTabNavigator';
 import DrawerNavigator from './DrawerNavigator';
 import UserTopTabNavigator from './UserTopTabNavigator';
 import DeactiveDeleteAccount from '../pages/Settings/DeactiveDeleteAccount';
+import AdminSettings from '../pages/Settings/AdminSettings';
 
 const Stack = createNativeStackNavigator();
 
@@ -139,11 +140,17 @@ export default function MainNavigation() {
           options={{ headerShown: true, title: 'Deactivate or Delete Account' }}
         />
         <Stack.Screen
+          name="AdminSettings"
+          component={AdminSettings}
+          options={{ headerShown: true, title: 'Admin Settings' }}
+        />
+        <Stack.Screen
           name="VerifyAccount"
           component={VerifyAccount}
           options={{
-            headerShown: true, title: 'Deactivate or Delete Account' }}
-              />
+            headerShown: true, title: 'Deactivate or Delete Account'
+          }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
