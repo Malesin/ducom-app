@@ -42,8 +42,8 @@ const HomeScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [hasMore, setHasMore] = useState(true);
   const [showSkeleton, setShowSkeleton] = useState(true);
-  const [isConnected, setIsConnected] = useState(true); // Tambahkan state untuk koneksi
-  const [pinnedTweetId, setPinnedTweetId] = useState(null); // Tambahkan state untuk ID tweet yang dipin
+  const [isConnected, setIsConnected] = useState(true); 
+  const [pinnedTweetId, setPinnedTweetId] = useState(null); 
   const isExpanded = useSharedValue(false);
 
   useEffect(() => {

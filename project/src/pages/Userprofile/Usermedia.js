@@ -10,6 +10,7 @@ import {
 import TweetCard from '../../components/TweetCard';
 import axios from 'axios';
 import config from '../../config';
+import { Skeleton } from 'react-native-elements'; // Import Skeleton
 
 const serverUrl = config.SERVER_URL;
 
@@ -23,42 +24,41 @@ const Usermedia = ({ userIdPost, profilePicture }) => {
         userId: userIdPost,
       });
 
-      const dataTweet = response.data;
+      const dataTweet = response.data.data;
+      console.log('Fetched tweets:', dataTweet); // Tambahkan log untuk memeriksa data
 
-      const formattedTweets = dataTweet.data
-        .map(post => ({
-          id: post._id,
-          userAvatar: post.user.profilePicture,
-          userName: post.user.name,
-          userHandle: post.user.username,
-          postDate: post.created_at,
-          content: post.description,
-          media: Array.isArray(post.media)
-            ? post.media.map(mediaItem => ({
+      const formattedTweets = dataTweet.map(post => ({
+        id: post._id,
+        userAvatar: post.user.profilePicture,
+        userName: post.user.name,
+        userHandle: post.user.username,
+        postDate: post.created_at,
+        content: post.description,
+        media: Array.isArray(post.media)
+          ? post.media.map(mediaItem => ({
               type: mediaItem.type,
               uri: mediaItem.uri,
             }))
-            : [],
-          likesCount: post.likes.length,
-          commentsCount: post.comments.length,
-          bookMarksCount: post.bookmarks.length,
-          isLiked: post.likes.some(like => like._id === userIdPost),
-          isBookmarked: post.bookmarks.some(
-            bookmark => bookmark.user === userIdPost,
-          ),
-          userIdPost: post.user._id,
-          profilePicture: profilePicture,
-          allowedEmail: post.allowedEmail,
-          userEmailPost: post.user.email,
-          isAdmin: post.user.isAdmin
-        }))
-        .filter(post => post.media.length > 0); // Filter hanya tweet yang memiliki media
+          : [],
+        likesCount: post.likes.length,
+        commentsCount: post.comments.length,
+        bookMarksCount: post.bookmarks.length,
+        isLiked: post.likes.some(like => like._id === userIdPost),
+        isBookmarked: post.bookmarks.some(
+          bookmark => bookmark.user === userIdPost,
+        ),
+        userIdPost: post.user._id,
+        profilePicture: profilePicture,
+        allowedEmail: post.allowedEmail,
+        userEmailPost: post.user.email,
+        isAdmin: post.user.isAdmin
+      }));
 
       setTweets(formattedTweets);
+      setLoading(false); // Pastikan setLoading(false) dipanggil di sini
     } catch (error) {
       console.error('Error fetching data:', error);
-    } finally {
-      setLoading(false);
+      setLoading(false); // Pastikan setLoading(false) dipanggil di sini juga
     }
   }, [userIdPost]);
 
@@ -66,12 +66,63 @@ const Usermedia = ({ userIdPost, profilePicture }) => {
     fetchTweets();
   }, [fetchTweets]);
 
+  const renderSkeleton = () => (
+    <>
+      {[...Array(5)].map((_, index) => (
+        <View key={index} style={styles.skeletonContainer}>
+          <View style={styles.skeletonHeader}>
+            <Skeleton
+              animation="pulse"
+              circle
+              height={40}
+              width={40}
+              style={styles.skeletonAvatar}
+            />
+            <View style={styles.skeletonTextContainer}>
+              <Skeleton
+                animation="pulse"
+                height={20}
+                width={100}
+                style={styles.skeleton}
+              />
+              <Skeleton
+                animation="pulse"
+                height={14}
+                width={60}
+                style={styles.skeleton}
+              />
+            </View>
+          </View>
+          <Skeleton
+            animation="pulse"
+            height={20}
+            width={200}
+            style={styles.skeleton}
+          />
+          <Skeleton
+            animation="pulse"
+            height={150}
+            width={'100%'}
+            style={styles.skeleton}
+          />
+        </View>
+      ))}
+    </>
+  );
+
+  const onRefreshPage = () => {
+    setLoading(true);
+    setTweets([]);
+    (async () => {
+      await fetchTweets();
+      setLoading(false);
+    })();
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       {loading ? (
-        <View style={styles.loadingIndicator}>
-          <ActivityIndicator size="large" color="#000" />
-        </View>
+        renderSkeleton()
       ) : (
         <ScrollView contentContainerStyle={styles.contentContainer}>
           {tweets.length > 0 ? (
@@ -111,6 +162,23 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  skeletonContainer: {
+    padding: 20,
+  },
+  skeletonHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  skeletonAvatar: {
+    marginRight: 10,
+  },
+  skeletonTextContainer: {
+    flex: 1,
+  },
+  skeleton: {
+    marginBottom: 10,
   },
 });
 

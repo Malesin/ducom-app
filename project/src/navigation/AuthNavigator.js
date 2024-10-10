@@ -24,6 +24,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import BottomTabNavigator from './BottomTabNavigator';
 import DrawerNavigator from './DrawerNavigator';
 import UserTopTabNavigator from './UserTopTabNavigator';
+import TopTabNavigator from './TopTabNavigator';
 import DeactiveDeleteAccount from '../pages/Settings/DeactiveDeleteAccount';
 import AdminSettings from '../pages/Settings/AdminSettings';
 
@@ -95,8 +96,8 @@ export default function MainNavigation() {
         />
         <Stack.Screen
           name="Profile"
-          component={Profilescreen}
-          options={{ headerShown: false }}
+          component={TopTabNavigator}
+          options={{ headerShown: true }}
         />
         <Stack.Screen
           name="EditProfile"
@@ -107,7 +108,7 @@ export default function MainNavigation() {
           name="Userprofile"
           component={UserTopTabNavigator}
           options={{ headerShown: true, title: 'User Profile' }}
-          initialParams={{ userIdPost: '', username: '' }}
+          initialParams={{ userIdPost: '', username: '' }}  
         />
         <Stack.Screen
           name="DrawerNavigator"
