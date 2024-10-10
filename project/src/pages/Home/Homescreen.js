@@ -78,9 +78,10 @@ const HomeScreen = ({ navigation }) => {
       const idUser = data._id;
       const profilePicture = data.profilePicture;
       const amIAdmin = data.isAdmin
+      const isMuteds = data.mutedUsers
 
       const responseTweet = await axios.post(`${serverUrl}/posts`, {
-        // token:token,
+        token:token,
         page: pageNum,
       });
       const dataTweet = responseTweet.data.data;
@@ -105,6 +106,7 @@ const HomeScreen = ({ navigation }) => {
           bookMarksCount: post.bookmarks.length,
           isLiked: post.likes.some(like => like._id === idUser),
           isBookmarked: post.bookmarks.some(bookmark => bookmark.user === idUser),
+          isMuted: isMuteds.some(isMuted => isMuted === post.user._id),
           userIdPost: post.user._id,
           idUser: idUser,
           userEmailPost: post.user.email,
@@ -139,12 +141,13 @@ const HomeScreen = ({ navigation }) => {
       const idUser = data._id;
       const profilePicture = data.profilePicture;
       const amIAdmin = data.isAdmin
+      const isMuteds = data.mutedUsers
 
       const pinPost = await axios.post(`${serverUrl}/posts/pinned`, {
         token: token
       });
 
-      const pinnedBy = pinPost.data.data.pinnedBy
+      const pinnedBy = pinPost.data.data.pinnedBy || ''
       const postPin = pinPost.data.data.post;
 
       if (!postPin) {
@@ -170,6 +173,7 @@ const HomeScreen = ({ navigation }) => {
         bookMarksCount: postPin.bookmarks.length,
         isLiked: postPin.likes.some(like => like._id === idUser),
         isBookmarked: postPin.bookmarks.some(bookmark => bookmark.user === idUser),
+        isMuted: isMuteds.some(isMuted => isMuted === postPin.user._id),
         userIdPost: postPin.user._id,
         idUser: idUser,
         userEmailPost: postPin.user.email,

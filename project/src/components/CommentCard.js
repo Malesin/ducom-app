@@ -20,7 +20,7 @@ const verifiedIcon = <Icon name="verified" size={14} color="#699BF7" />;
 
 const serverUrl = config.SERVER_URL;
 
-const CommentCard = ({ text, hasReplies, replies, onReplyPress, username, profilePicture, onAddReply, commentId, postId, userIdPost, idUser, allowedEmail, emailUser, onDeleteSuccess, isLikedCom, parentCommentId, userEmailPost, isAdmin, amIAdmin }) => {
+const CommentCard = ({ text, hasReplies, tweet, replies, onReplyPress, username, profilePicture, onAddReply, commentId, postId, userIdPost, idUser, allowedEmail, emailUser, onDeleteSuccess, isLikedCom, parentCommentId, userEmailPost, isAdmin, amIAdmin }) => {
   const [isLiked, setIsLiked] = useState(isLikedCom);
   const [showReplies, setShowReplies] = useState(false);
   const [showMoreReplies, setShowMoreReplies] = useState(false);

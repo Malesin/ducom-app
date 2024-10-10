@@ -18,7 +18,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 const verifiedIcon = <Icon name="verified" size={18} color="#699BF7" />;
 const serverUrl = config.SERVER_URL;
 
-const Userprofile = ({ userIdPost, navigation, isAdmin }) => {
+const Userprofile = ({ userIdPost, navigation, tweet }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [banner, setBanner] = useState(false);
   const [profilePicture, setProfilePicture] = useState(false);

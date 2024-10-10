@@ -317,39 +317,22 @@ const PinTweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
     }
   };
 
-  const onPin = async (resppin) => {
+  const onResp = async (resp) => {
+    console.log(resp)
     try {
-      if (resppin === 'okpin') {
-        ToastAndroid.show('Tweet Successfully Pinned', ToastAndroid.SHORT);
-      } else if (resppin === 'okunpin') {
-        ToastAndroid.show('Tweet Successfully Unpinned', ToastAndroid.SHORT);
-      }
-      else {
-        console.log('Error in pin response data:', resppin);
-        Alert.alert('Error', 'Failed to pin post. Please try again.');
+      if (resp.status == `ok${resp.type}`) {
+        ToastAndroid.show(`Tweet Successfully ${resp.typed}`, ToastAndroid.SHORT);
+      } else if (resp.status == `okUn${resp.type}`) {
+        ToastAndroid.show(`Tweet Successfully Un${resp.typed}`, ToastAndroid.SHORT);
+      } else {
+        console.error(`Error in ${resp.typing} response data:`, resp.status);
+        Alert.alert('Error', `Failed to ${resp.type} post. Please try again.`);
       }
     } catch (error) {
-      console.error('Error pinning post:', error.message);
-      Alert.alert('Error', 'Failed to pin post. Please try again.');
+      console.error(`Error ${resp.type}:`, error.message);
+      Alert.alert('Error', `Failed to ${resp.type}. Please try again.`);
     }
-  };
-
-  const onPinUser = async (resppin) => {
-    try {
-      if (resppin === 'okpin') {
-        ToastAndroid.show('Tweet Successfully Pinned', ToastAndroid.SHORT);
-      } else if (resppin === 'okunpin') {
-        ToastAndroid.show('Tweet Successfully Unpinned', ToastAndroid.SHORT);
-      }
-      else {
-        console.log('Error in pin response data:', resppin);
-        Alert.alert('Error', 'Failed to pin post. Please try again.');
-      }
-    } catch (error) {
-      console.error('Error pinning post:', error.message);
-      Alert.alert('Error', 'Failed to pin post. Please try again.');
-    }
-  };
+  }
 
   return (
     <SafeAreaView style={styles.card}>
@@ -406,21 +389,16 @@ const PinTweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
                 setShowBottomSheet(false);
                 onRefreshPage();
               }}
-              onClosePin={(resppin) => {
+              onCloseResp={(resp) => {
                 setShowBottomSheet(false);
                 onRefreshPage();
-                onPin(resppin)
-              }}
-              onClosePinUser={(resppin) => {
-                setShowBottomSheet(false);
-                onRefreshPage();
-                onPinUser(resppin)
+                onResp(resp)
               }}
               tweet={tweet}
               onRefreshPage={onRefreshPage}
+              isUserProfile={isUserProfile}
               handlePin={true}
               handlePinUser={true}
-              isUserProfile={isUserProfile}
               isPinPost={true}
             />
           </View>

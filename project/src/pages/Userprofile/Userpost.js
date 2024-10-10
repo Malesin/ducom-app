@@ -27,6 +27,9 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
   const fetchPinTweet = useCallback(async () => {
     const token = await AsyncStorage.getItem('token');
     try {
+      const respMyData = await axios.post(`${serverUrl}/userdata`, { token: token });
+      const { data } = respMyData.data;
+      const isMuted = data.mutedUsers
       const pinPost = await axios.post(`${serverUrl}/showPinPost-byId`, {
         token: token,
         userId: userIdPost,
@@ -56,6 +59,7 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
         bookMarksCount: postPin.bookmarks.length,
         isLiked: postPin.likes.some(like => like._id === idUser),
         isBookmarked: postPin.bookmarks.some(bookmark => bookmark.user === idUser),
+        isMuted: isMuted.some(isMuteds => isMuteds === postPin.user._id),
         userIdPost: postPin.user._id,
         idUser: idUser,
         userEmailPost: postPin.user.email,
@@ -76,13 +80,15 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
   const fetchTweets = useCallback(async () => {
     const token = await AsyncStorage.getItem('token');
     try {
+      const respMyData = await axios.post(`${serverUrl}/userdata`, { token: token });
+      const { data } = respMyData.data;
+      const isMuted = data.mutedUsers
       const response = await axios.post(`${serverUrl}/userId-posts`, {
         token: token,
         userId: userIdPost,
       });
 
       const dataTweet = response.data.data;
-      // console.log(dataTweet[0].user)
 
       const formattedTweets = dataTweet.map(post => ({
         id: post._id,
@@ -104,6 +110,7 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
         isBookmarked: post.bookmarks.some(
           bookmark => bookmark.user === userIdPost,
         ),
+        isMuted: isMuted.some(isMuteds => isMuteds === post.user._id),
         userIdPost: post.user._id,
         profilePicture: profilePicture,
         allowedEmail: post.allowedEmail,

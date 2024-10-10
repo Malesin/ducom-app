@@ -476,6 +476,7 @@ const ViewPost = ({ route }) => {
               <CommentCard
                 key={comment.id}
                 text={comment.text}
+                tweet={tweet}
                 replies={comment.replies}
                 hasReplies={comment.replies.length > 0}
                 username={comment.username}

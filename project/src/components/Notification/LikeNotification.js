@@ -7,7 +7,6 @@ import { formatNotification } from '../../pages/Home/formatNotification';
 
 const LikeNotification = ({ likeNotification }) => {
   const navigation = useNavigation();
-  console.log("formattedTweet: ", likeNotification )
 
   const handleLikeNotificationPress = async () => {
     const formattedTweet = await formatNotification(likeNotification);

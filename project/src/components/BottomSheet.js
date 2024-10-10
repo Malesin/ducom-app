@@ -19,8 +19,7 @@ const BottomSheet = ({
   tweet,
   onRefreshPage,
   onCloseDel,
-  onClosePin,
-  onClosePinUser,
+  onCloseResp,
   handlePin,
   handlePinUser,
   isUserProfile
@@ -56,21 +55,32 @@ const BottomSheet = ({
   const pinPost = async () => {
     const token = await AsyncStorage.getItem('token');
     try {
-      if (isPin === false) {
+      const type = 'Pin'
+      const typing = 'pinning'
+      const typed = 'Pinned'
+      if (!isPinUser) {
         const pinPost = await axios.post(`${serverUrl}/posts/pin`, {
           token: token,
           postId: tweet.id,
           duration: 8
         })
-        const resppin = pinPost.data.status
-        onClosePin(resppin)
+        onCloseResp({
+          status: pinPost.data.status,
+          type: type,
+          typing: typing,
+          typed: typed
+        })
         onRefreshPage()
-      } else if (isPin === true) {
+      } else if (isPinUser) {
         const unPinPost = await axios.post(`${serverUrl}/posts/unpin`, {
           token: token
         })
-        const resppin = unPinPost.data.status
-        onClosePin(resppin)
+        onCloseResp({
+          status: unPinPost.data.status,
+          type: type,
+          typing: typing,
+          typed: typed
+        })
         onRefreshPage()
       }
     } catch (error) {
@@ -83,20 +93,31 @@ const BottomSheet = ({
   const pinPostUser = async () => {
     const token = await AsyncStorage.getItem('token');
     try {
-      if (isPinUser === false) {
+      const type = 'PinUser'
+      const typing = 'pinning user'
+      const typed = 'Pinned User'
+      if (!isPinUser) {
         const pinPost = await axios.post(`${serverUrl}/pin-post`, {
           token: token,
           postId: tweet.id,
         })
-        const resppin = pinPost.data.status
-        onClosePinUser(resppin)
+        onCloseResp({
+          status: pinPost.data.status,
+          type: type,
+          typing: typing,
+          typed: typed
+        })
         onRefreshPage()
-      } else if (isPinUser === true) {
+      } else if (isPinUser) {
         const unPinPost = await axios.post(`${serverUrl}/unpin-post`, {
           token: token
         })
-        const resppin = unPinPost.data.status
-        onClosePinUser(resppin)
+        onCloseResp({
+          status: unPinPost.data.status,
+          type: type,
+          typing: typing,
+          typed: typed
+        })
         onRefreshPage()
       }
     } catch (error) {
@@ -104,6 +125,43 @@ const BottomSheet = ({
     }
   }
   {/* PIN POST AT POSTSCREEN  */ }
+
+  console.log(tweet.isMuted)
+  const muteUser = async () => {
+    const token = await AsyncStorage.getItem('token');
+    try {
+      const type = 'Mute'
+      const typing = 'muted'
+      const typed = 'Muted'
+      if (!tweet.isMuted) {
+        const mute = await axios.post(`${serverUrl}/mute-user`, {
+          token: token,
+          muteUserId: tweet.userIdPost
+        })
+        onCloseResp({
+          status: mute.data.status,
+          type: type,
+          typing: typing,
+          typed: typed
+        })
+        onRefreshPage()
+      } else if (tweet.isMuted) {
+        const unmute = await axios.post(`${serverUrl}/unmute-user`, {
+          token: token,
+          unmuteUserId: tweet.userIdPost
+        })
+        onCloseResp({
+          status: unmute.data.status,
+          type: type,
+          typing: typing,
+          typed: typed
+        })
+        onRefreshPage()
+      }
+    } catch (error) {
+      console.error('Error: ', error);
+    }
+  }
 
   useEffect(() => {
     if (tweet.amIAdmin) {
@@ -140,9 +198,13 @@ const BottomSheet = ({
           )}
           {!isOwnAccount && (
             <View style={styles.optionRow}>
-              <TouchableOpacity style={styles.option}>
-                <MaterialIcons name="volume-off" size={24} color="#333" />
-                <Text style={styles.optionText}>Mute @{tweet.userName}</Text>
+              <TouchableOpacity style={styles.option} onPress={muteUser}>
+                {tweet.isMuted ? (
+                  <MaterialIcons name="volume-up" size={24} color="#333" />
+                ) : (
+                  <MaterialIcons name="volume-off" size={24} color="#333" />
+                )}
+                <Text style={styles.optionText}>{tweet.isMuted ? 'Unmute' : 'Mute'} @{tweet.userName}</Text>
               </TouchableOpacity>
             </View>
           )}
