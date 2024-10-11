@@ -126,7 +126,6 @@ const BottomSheet = ({
   }
   {/* PIN POST AT POSTSCREEN  */ }
 
-  console.log(tweet.isMuted)
   const muteUser = async () => {
     const token = await AsyncStorage.getItem('token');
     try {

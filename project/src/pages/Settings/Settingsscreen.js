@@ -98,7 +98,7 @@ const Settingsscreen = ({ navigation }) => {
             <MaterialCommunityIcons name="cancel" size={25} color="#000" />
             <Text style={styles.buttonText}>Blocked Accounts</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('MutedAccount')}>
+          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('MutedUsers')}>
             <MaterialCommunityIcons name="volume-off" size={25} color="#000" />
             <Text style={styles.buttonText}>Muted Accounts</Text>
           </TouchableOpacity>

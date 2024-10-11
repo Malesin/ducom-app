@@ -27,7 +27,7 @@ import Userpost from './Userprofile/Userpost';
 import Userreply from './Userprofile/Userreply';
 import Usermedia from './Userprofile/Usermedia';
 import BlockedAccount from './Settings/BlockedAccount';
-import MutedAccount from './Settings/MutedAccount';
+import MutedUsers from './Settings/MutedUsers';
 import DeactiveDeleteAccount from './Settings/DeactiveDeleteAccount';
 import VerifyAccount from './Settings/VerifyAccount';
 import formatNotification from './Home/formatNotification';
@@ -62,7 +62,7 @@ export {
   Userreply,
   Usermedia,
   BlockedAccount,
-  MutedAccount,
+  MutedUsers,
   DeactiveDeleteAccount,
   VerifyAccount,
   formatNotification

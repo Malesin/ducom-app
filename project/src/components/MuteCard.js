@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {
   View,
   Text,
@@ -11,14 +11,16 @@ import {
 import DefaultAvatar from '../assets/iya.png';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const MuteCard = ({ mutedAccount, onUnmute }) => {
-  const handleUnmutePress = () => {
+const MuteCard = ({ muteUsers, onUnmute }) => {
+
+  
+  const handleUnmutePress = (muteUsersData) => {
     Alert.alert(
-      "Konfirmasi",
-      "Apakah anda ingin men-unmute akun ini?",
+      "Confirm",
+      "Do you want to unmute this user?",
       [
-        { text: "Tidak", style: "cancel" },
-        { text: "Ya", onPress: onUnmute }
+        { text: "No", style: "cancel" },
+        { text: "Yes", onPress: () => onUnmute(muteUsersData) }
       ]
     );
   };
@@ -28,17 +30,17 @@ const MuteCard = ({ mutedAccount, onUnmute }) => {
       <TouchableOpacity onPress={() => console.log('halo')}>
         <View style={styles.mutedRow}>
           <Image
-            source={mutedAccount.profilePicture ? { uri: mutedAccount.profilePicture } : DefaultAvatar}
+            source={muteUsers.profilePicture ? { uri: muteUsers.profilePicture } : DefaultAvatar}
             style={styles.avatar}
           />
           <View style={styles.textContainer}>
             <View style={styles.nameRow}>
-              <Text style={styles.userName}>{mutedAccount.name}</Text>
-              <Text style={styles.userNameAt}>@{mutedAccount.username}</Text>
+              <Text style={styles.userName}>{muteUsers.name}</Text>
+              <Text style={styles.userNameAt}>@{muteUsers.username}</Text>
             </View>
             <Text style={styles.notificationText}>Muted</Text>
           </View>
-          <TouchableOpacity onPress={handleUnmutePress}>
+          <TouchableOpacity onPress={() => handleUnmutePress(muteUsers)}>
             <MaterialCommunityIcons name="volume-off" size={30} color="#657786" style={styles.unmuteIcon} />
           </TouchableOpacity>
         </View>

@@ -16,7 +16,7 @@ import {
   AccountInformation,
   UpdatePassword,
   BlockedAccount,
-  MutedAccount,
+  MutedUsers,
   VerifyAccount,
 } from '../pages';
 import { NavigationContainer } from '@react-navigation/native';
@@ -131,8 +131,8 @@ export default function MainNavigation() {
           options={{ headerShown: true, title: 'Blocked Accounts' }}
         />
         <Stack.Screen
-          name="MutedAccount"
-          component={MutedAccount}
+          name="MutedUsers"
+          component={MutedUsers}
           options={{ headerShown: true, title: 'Muted Accounts' }}
         />
         <Stack.Screen

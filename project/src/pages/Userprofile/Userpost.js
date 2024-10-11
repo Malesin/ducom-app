@@ -11,10 +11,10 @@ import {
 import TweetCard from '../../components/TweetCard';
 import PinTweetCard from '../../components/PinTweetCard';
 import { useFocusEffect } from '@react-navigation/native';
+import { Skeleton } from 'react-native-elements'; // Import Skeleton
 import axios from 'axios';
 import config from '../../config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Skeleton } from 'react-native-elements'; // Import Skeleton
 
 const serverUrl = config.SERVER_URL;
 
