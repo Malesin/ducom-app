@@ -31,7 +31,8 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
     try {
       const respMyData = await axios.post(`${serverUrl}/userdata`, { token: token });
       const { data } = respMyData.data;
-      const isMuted = data.mutedUsers
+      const isMuteds = data.mutedUsers
+      const isBlockeds = data.blockedUsers
       const pinPost = await axios.post(`${serverUrl}/showPinPost-byId`, {
         token: token,
         userId: userIdPost,
@@ -61,7 +62,8 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
         bookMarksCount: postPin.bookmarks.length,
         isLiked: postPin.likes.some(like => like._id === idUser),
         isBookmarked: postPin.bookmarks.some(bookmark => bookmark.user === idUser),
-        isMuted: isMuted.some(isMuteds => isMuteds === postPin.user._id),
+        isMuted: isMuteds.some(isMuted => isMuted === postPin.user._id),
+        isBlocked: isBlockeds.some(isBlocked => isBlocked === postPin.user._id),
         userIdPost: postPin.user._id,
         idUser: idUser,
         userEmailPost: postPin.user.email,
@@ -74,7 +76,7 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
     } catch (error) {
       console.error('Error fetching data:', error);
       return null
-    } 
+    }
     // Hapus setLoading(false) di sini
   }, [userIdPost, profilePicture]);
 
@@ -83,7 +85,8 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
     try {
       const respMyData = await axios.post(`${serverUrl}/userdata`, { token: token });
       const { data } = respMyData.data;
-      const isMuted = data.mutedUsers
+      const isMuteds = data.mutedUsers
+      const isBlockeds = data.blockedUsers
       const response = await axios.post(`${serverUrl}/userId-posts`, {
         token: token,
         userId: userIdPost,
@@ -111,8 +114,8 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
         isBookmarked: post.bookmarks.some(
           bookmark => bookmark.user === userIdPost,
         ),
-        isMuted: isMuted.some(isMuteds => isMuteds === post.user._id),
-        userIdPost: post.user._id,
+        isMuted: isMuteds.some(isMuted => isMuted === post.user._id),
+        isBlocked: isBlockeds.some(isBlocked => isBlocked === post.user._id), userIdPost: post.user._id,
         profilePicture: profilePicture,
         allowedEmail: post.allowedEmail,
         userEmailPost: post.user.email,
@@ -123,7 +126,7 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
       return formattedTweets;
     } catch (error) {
       console.error('Error fetching data:', error);
-    } 
+    }
     // Hapus setLoading(false) di sini
   }, [userIdPost, profilePicture]);
 
@@ -241,7 +244,7 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
           {pintweets.map((tweet, index) => (
             <View key={index} style={styles.tweetContainer}>
               <TouchableOpacity onPress={() => handlePostPress(tweet)}>
-                <PinTweetCard tweet={tweet} onRefreshPage={onRefreshPage} isUserProfile={isUserProfile}/>
+                <PinTweetCard tweet={tweet} onRefreshPage={onRefreshPage} isUserProfile={isUserProfile} />
               </TouchableOpacity>
             </View>
           ))}
@@ -249,7 +252,7 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
             tweets.map((tweet, index) => (
               <View key={index} style={styles.tweetContainer}>
                 <TouchableOpacity onPress={() => handlePostPress(tweet)}>
-                  <TweetCard tweet={tweet} onRefreshPage={onRefreshPage} isUserProfile={isUserProfile}/>
+                  <TweetCard tweet={tweet} onRefreshPage={onRefreshPage} isUserProfile={isUserProfile} />
                 </TouchableOpacity>
               </View>
             ))

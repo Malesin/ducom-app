@@ -17,6 +17,7 @@ import { Skeleton } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 const verifiedIcon = <Icon name="verified" size={18} color="#699BF7" />;
 const serverUrl = config.SERVER_URL;
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Userprofile = ({ userIdPost, navigation, tweet }) => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -32,10 +33,11 @@ const Userprofile = ({ userIdPost, navigation, tweet }) => {
 
   async function getData() {
     try {
+      const token = await AsyncStorage.getItem('token');
       console.log('Token Berhasil Diambil');
 
-      // Ambil data pengguna lain
-      const userResponse = await axios.post(`${serverUrl}/findUserId/`, {
+      const userResponse = await axios.post(`${serverUrl}/userId-posts/`, {
+        token: token,
         userId: userIdPost,
       });
       console.log('Data Berhasil Diambil');

@@ -36,7 +36,7 @@ const MuteUsers = () => {
           name: mute.name,
           username: mute.username,
           profilePicture: mute.profilePicture,
-          token: token
+          myToken: token
         };
       });
       setShowSkeleton(false); // Tambahkan baris ini untuk menyembunyikan skeleton
@@ -65,9 +65,9 @@ const MuteUsers = () => {
     setRefreshing(false);
   }, []);
 
-  const handleUnmute = async (muteUsersData) => {
+  const handleUnmute = async (muteUserData) => {
     try {
-      const respUnmute = await axios.post(`${serverUrl}/unmute-user`, { token: muteUsersData.token, unmuteUserId: muteUsersData.id })
+      const respUnmute = await axios.post(`${serverUrl}/unmute-user`, { token: muteUserData.myToken, unmuteUserId: muteUserData.id })
       console.log(respUnmute)
       await onRefresh();
     } catch (error) {
@@ -128,7 +128,7 @@ const MuteUsers = () => {
             <Text style={styles.noMuteUsersText}>No muted accounts</Text>
           ) : (
             muteUsers.map((mute, index) => (
-              <MuteCard key={index} muteUsers={mute} onUnmute={handleUnmute} />
+              <MuteCard key={index} muteUser={mute} onUnmute={handleUnmute} />
             ))
           )
         )}

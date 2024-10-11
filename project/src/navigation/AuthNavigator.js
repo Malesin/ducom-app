@@ -15,7 +15,7 @@ import {
   ReportScreen,
   AccountInformation,
   UpdatePassword,
-  BlockedAccount,
+  BlockedUsers,
   MutedUsers,
   VerifyAccount,
 } from '../pages';
@@ -126,8 +126,8 @@ export default function MainNavigation() {
           options={{ headerShown: true, title: 'Update Password' }}
         />
         <Stack.Screen
-          name="BlockedAccount"
-          component={BlockedAccount}
+          name="BlockedUsers"
+          component={BlockedUsers}
           options={{ headerShown: true, title: 'Blocked Accounts' }}
         />
         <Stack.Screen

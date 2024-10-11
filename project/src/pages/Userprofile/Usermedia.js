@@ -11,6 +11,7 @@ import TweetCard from '../../components/TweetCard';
 import axios from 'axios';
 import config from '../../config';
 import { Skeleton } from 'react-native-elements'; // Import Skeleton
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const serverUrl = config.SERVER_URL;
 
@@ -20,9 +21,14 @@ const Usermedia = ({ userIdPost, profilePicture }) => {
 
   const fetchTweets = useCallback(async () => {
     try {
-      const response = await axios.post(`${serverUrl}/userId-posts`, {
+      const token = await AsyncStorage.getItem('token');
+      console.log('Token Berhasil Diambil');
+
+      const userResponse = await axios.post(`${serverUrl}/userId-posts/`, {
+        token: token,
         userId: userIdPost,
       });
+      console.log('Data Berhasil Diambil');
 
       const dataTweet = response.data.data;
       console.log('Fetched tweets:', dataTweet); // Tambahkan log untuk memeriksa data

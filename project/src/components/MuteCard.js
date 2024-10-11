@@ -11,36 +11,35 @@ import {
 import DefaultAvatar from '../assets/iya.png';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const MuteCard = ({ muteUsers, onUnmute }) => {
+const MuteCard = ({ muteUser, onUnmute }) => {
 
-  
-  const handleUnmutePress = (muteUsersData) => {
+  const handleUnmutePress = (muteUserData) => {
     Alert.alert(
       "Confirm",
       "Do you want to unmute this user?",
       [
         { text: "No", style: "cancel" },
-        { text: "Yes", onPress: () => onUnmute(muteUsersData) }
+        { text: "Yes", onPress: () => onUnmute(muteUserData) }
       ]
     );
   };
 
   return (
     <SafeAreaView style={styles.card}>
-      <TouchableOpacity onPress={() => console.log('halo')}>
+      <TouchableOpacity onPress={() => console.log('Muted user pressed')}>
         <View style={styles.mutedRow}>
           <Image
-            source={muteUsers.profilePicture ? { uri: muteUsers.profilePicture } : DefaultAvatar}
+            source={muteUser.profilePicture ? { uri: muteUser.profilePicture } : DefaultAvatar}
             style={styles.avatar}
           />
           <View style={styles.textContainer}>
             <View style={styles.nameRow}>
-              <Text style={styles.userName}>{muteUsers.name}</Text>
-              <Text style={styles.userNameAt}>@{muteUsers.username}</Text>
+              <Text style={styles.userName}>{muteUser.name}</Text>
+              <Text style={styles.userNameAt}>@{muteUser.username}</Text>
             </View>
             <Text style={styles.notificationText}>Muted</Text>
           </View>
-          <TouchableOpacity onPress={() => handleUnmutePress(muteUsers)}>
+          <TouchableOpacity onPress={() => handleUnmutePress(muteUser)}>
             <MaterialCommunityIcons name="volume-off" size={30} color="#657786" style={styles.unmuteIcon} />
           </TouchableOpacity>
         </View>

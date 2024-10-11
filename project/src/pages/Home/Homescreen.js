@@ -42,8 +42,8 @@ const HomeScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [hasMore, setHasMore] = useState(true);
   const [showSkeleton, setShowSkeleton] = useState(true);
-  const [isConnected, setIsConnected] = useState(true); 
-  const [pinnedTweetId, setPinnedTweetId] = useState(null); 
+  const [isConnected, setIsConnected] = useState(true);
+  const [pinnedTweetId, setPinnedTweetId] = useState(null);
   const isExpanded = useSharedValue(false);
 
   useEffect(() => {
@@ -79,9 +79,10 @@ const HomeScreen = ({ navigation }) => {
       const profilePicture = data.profilePicture;
       const amIAdmin = data.isAdmin
       const isMuteds = data.mutedUsers
+      const isBlockeds = data.blockedUsers
 
       const responseTweet = await axios.post(`${serverUrl}/posts`, {
-        token:token,
+        token: token,
         page: pageNum,
       });
       const dataTweet = responseTweet.data.data;
@@ -107,6 +108,7 @@ const HomeScreen = ({ navigation }) => {
           isLiked: post.likes.some(like => like._id === idUser),
           isBookmarked: post.bookmarks.some(bookmark => bookmark.user === idUser),
           isMuted: isMuteds.some(isMuted => isMuted === post.user._id),
+          isBlocked: isBlockeds.some(isBlocked => isBlocked === post.user._id),
           userIdPost: post.user._id,
           idUser: idUser,
           userEmailPost: post.user.email,
@@ -142,6 +144,7 @@ const HomeScreen = ({ navigation }) => {
       const profilePicture = data.profilePicture;
       const amIAdmin = data.isAdmin
       const isMuteds = data.mutedUsers
+      const isBlockeds = data.blockedUsers
 
       const pinPost = await axios.post(`${serverUrl}/posts/pinned`, {
         token: token
@@ -174,6 +177,7 @@ const HomeScreen = ({ navigation }) => {
         isLiked: postPin.likes.some(like => like._id === idUser),
         isBookmarked: postPin.bookmarks.some(bookmark => bookmark.user === idUser),
         isMuted: isMuteds.some(isMuted => isMuted === postPin.user._id),
+        isBlocked: isBlockeds.some(isBlocked => isBlocked === postPin.user._id),
         userIdPost: postPin.user._id,
         idUser: idUser,
         userEmailPost: postPin.user.email,

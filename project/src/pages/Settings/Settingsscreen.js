@@ -94,13 +94,13 @@ const Settingsscreen = ({ navigation }) => {
         <View style={styles.separator} />
         <View style={styles.section}>
           <Text style={styles.title}>Privacy and Interactions</Text>
-          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('BlockedAccount')}>
+          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('BlockedUsers')}>
             <MaterialCommunityIcons name="cancel" size={25} color="#000" />
-            <Text style={styles.buttonText}>Blocked Accounts</Text>
+            <Text style={styles.buttonText}>Blocked Users</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('MutedUsers')}>
             <MaterialCommunityIcons name="volume-off" size={25} color="#000" />
-            <Text style={styles.buttonText}>Muted Accounts</Text>
+            <Text style={styles.buttonText}>Muted Users</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.separator} />

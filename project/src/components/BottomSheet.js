@@ -25,10 +25,9 @@ const BottomSheet = ({
   isUserProfile
 }) => {
   const navigation = useNavigation();
-  const [isDeletePost, setIsDeletePost] = useState(false);
-  const [isOwnAccount, setIsOwnAccount] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
   const [isPin, setIsPin] = useState(false)
+  const [isOwn, setIsOwn] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(tweet.amIAdmin)
   const [isPinUser, setIsPinUser] = useState(false)
 
   useEffect(() => {
@@ -162,19 +161,50 @@ const BottomSheet = ({
     }
   }
 
+  const blockUser = async () => {
+    const token = await AsyncStorage.getItem('token');
+    try {
+      const type = 'Block'
+      const typing = 'blocked'
+      const typed = 'Blocked'
+      if (!tweet.isBlocked) {
+        const block = await axios.post(`${serverUrl}/block-user`, {
+          token: token,
+          blockUserId: tweet.userIdPost
+        })
+        onCloseResp({
+          status: block.data.status,
+          type: type,
+          typing: typing,
+          typed: typed
+        })
+        onRefreshPage()
+      } else if (tweet.isBlocked) {
+        const unblock = await axios.post(`${serverUrl}/unblock-user`, {
+          token: token,
+          unblockUserId: tweet.userIdPost
+        })
+        onCloseResp({
+          status: unblock.data.status,
+          type: type,
+          typing: typing,
+          typed: typed
+        })
+        onRefreshPage()
+      }
+    } catch (error) {
+      console.error('Error: ', error);
+    }
+  }
+
   useEffect(() => {
-    if (tweet.amIAdmin) {
+    if (tweet.idUser === tweet.userIdPost) {
+      setIsOwn(true)
+      console.log("1 OWNER")
+    } else if (tweet.amIAdmin) {
       setIsAdmin(true)
-      setIsDeletePost(true);
-      console.log("1 ADMIN")
-    } else if (tweet.idUser === tweet.userIdPost) {
-      setIsDeletePost(true);
-      setIsOwnAccount(true);
-      console.log("2 OWNER")
+      console.log("2.ADMIN")
     } else {
-      setIsAdmin(false)
-      setIsOwnAccount(false);
-      setIsDeletePost(false);
       console.log("3 USER")
     }
   }, [tweet.idUser, tweet.userIdPost, isUserProfile]);
@@ -182,95 +212,72 @@ const BottomSheet = ({
   return (
     <SafeAreaView style={styles.container}>
 
-      {!isUserProfile ? (
-        <>
-          {isAdmin && (
-            <View style={styles.optionRow}>
-              {/* PIN POST AT HOMESCREEN */}
-              <TouchableOpacity style={styles.option} onPress={pinPost}>
-                <MaterialCommunityIcons name="pin" size={24} color="#333" />
-                <Text style={styles.optionText}>
-                  {isPin ? 'Unpin' : 'Pin'} @{tweet.userName}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          )}
-          {!isOwnAccount && (
-            <View style={styles.optionRow}>
-              <TouchableOpacity style={styles.option} onPress={muteUser}>
-                {tweet.isMuted ? (
-                  <MaterialIcons name="volume-up" size={24} color="#333" />
-                ) : (
-                  <MaterialIcons name="volume-off" size={24} color="#333" />
-                )}
-                <Text style={styles.optionText}>{tweet.isMuted ? 'Unmute' : 'Mute'} @{tweet.userName}</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-        </>
-      ) : null}
+      {isAdmin ? (<>
+        <View style={styles.optionRow}>
+          {/* PIN POST AT HOMESCREEN */}
+          <TouchableOpacity style={styles.option} onPress={pinPost}>
+            <MaterialCommunityIcons name="pin" size={24} color="#333" />
+            <Text style={styles.optionText}>
+              {isPin ? 'Unpin' : 'Pin'} @{tweet.userName}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </>) : null}
 
-      {isDeletePost && (
-        <>
-          {isUserProfile ? (
-            <>
-              <View style={styles.optionRow}>
-                {/* PIN POST AT POSTSCREEN  */}
-                <TouchableOpacity style={styles.option} onPress={pinPostUser}>
-                  <MaterialCommunityIcons name="pin" size={24} color="#333" />
-                  <Text style={styles.optionText}>
-                    {isPinUser ? 'Unpin' : 'Pin'} Post
-                  </Text>
-                </TouchableOpacity>
-              </View>
-              <View style={styles.optionRow}>
-                <TouchableOpacity style={styles.option} onPress={deletePost}>
-                  <MaterialIcons name="delete" size={24} color="#333" />
-                  <Text style={styles.optionText}>
-                    Delete Post
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </>
-          ) : null}
+      {!isOwn ? (<>
+        <View style={styles.optionRow}>
+          <TouchableOpacity style={styles.option} onPress={muteUser}>
+            {tweet.isMuted ? (
+              <MaterialIcons name="volume-up" size={24} color="#333" />
+            ) : (
+              <MaterialIcons name="volume-off" size={24} color="#333" />
+            )}
+            <Text style={styles.optionText}>{tweet.isMuted ? 'Unmute' : 'Mute'} @{tweet.userName}</Text>
+          </TouchableOpacity>
+        </View>
+      </>) : null}
 
-          {!isUserProfile ? (
-            <>
-              <View style={styles.optionRow}>
-                <TouchableOpacity style={styles.option} onPress={deletePost}>
-                  <MaterialIcons name="delete" size={24} color="#333" />
-                  <Text style={styles.optionText}>
-                    Delete {isOwnAccount ? 'Post' : `Post @${tweet.userName}`}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </>
-          ) : null}
-        </>
-      )}
+      {isUserProfile ? (<>
+        <View style={styles.optionRow}>
+          {/* PIN POST AT POSTSCREEN  */}
+          <TouchableOpacity style={styles.option} onPress={pinPostUser}>
+            <MaterialCommunityIcons name="pin" size={24} color="#333" />
+            <Text style={styles.optionText}>
+              {isPinUser ? 'Unpin' : 'Pin'} Post
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </>) : null}
 
-      {!isUserProfile ? (
-        <>
-          {!isOwnAccount && (
-            <>
-              <View style={styles.optionRow}>
-                <TouchableOpacity style={styles.option}>
-                  <MaterialIcons name="block" size={24} color="#333" />
-                  <Text style={styles.optionText}>Block @{tweet.userName}</Text>
-                </TouchableOpacity>
-              </View>
-              <View style={styles.optionRow}>
-                <TouchableOpacity
-                  style={styles.option}
-                  onPress={() => navigation.navigate('Report')}>
-                  <MaterialIcons name="report" size={24} color="#D60000" />
-                  <Text style={styles.optionTextReport}>Report @{tweet.userName}</Text>
-                </TouchableOpacity>
-              </View>
-            </>
-          )}
-        </>
-      ) : null}
+      {isAdmin || isOwn ? (<>
+        <View style={styles.optionRow}>
+          <TouchableOpacity style={styles.option} onPress={deletePost}>
+            <MaterialIcons name="delete" size={24} color="#333" />
+            <Text style={styles.optionText}>
+              Delete {isAdmin && !isOwn ? `Post @${tweet.userName}` : 'Post'}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </>) : null}
+
+      {!isOwn ? (<>
+        <View style={styles.optionRow}>
+          <TouchableOpacity style={styles.option} onPress={blockUser}>
+            <MaterialIcons name="block" size={24} color="#333" />
+            <Text style={styles.optionText}>Block @{tweet.userName}</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.optionRow}>
+          <TouchableOpacity
+            style={styles.option}
+            onPress={() => navigation.navigate('Report')}>
+            <MaterialIcons name="report" size={24} color="#D60000" />
+            <Text style={styles.optionTextReport}>Report @{tweet.userName}</Text>
+          </TouchableOpacity>
+        </View>
+      </>) : null}
+
     </SafeAreaView>
   );
 };
