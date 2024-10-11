@@ -26,10 +26,10 @@ import Animated, {
 } from 'react-native-reanimated';
 import * as ImagePicker from 'react-native-image-picker';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { Skeleton } from 'react-native-elements';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../../config';
-import { Skeleton } from 'react-native-elements';
 
 const serverUrl = config.SERVER_URL;
 
@@ -68,12 +68,12 @@ const HomeScreen = ({ navigation }) => {
       const token = await AsyncStorage.getItem('token');
       const response = await axios.post(`${serverUrl}/userdata`, { token: token });
       const { data, status } = response.data;
-      if (status === 'error') {
-        Alert.alert('Error', 'Anda Telah Keluar dari Akun', [
-          { text: 'OK', onPress: () => navigation.navigate('Auths') },
-        ]);
-        return;
-      }
+      // if (status === 'error') {
+      //   Alert.alert('Error', 'Anda Telah Keluar dari Akun', [
+      //     { text: 'OK', onPress: () => navigation.navigate('Auths') },
+      //   ]);
+      //   return;
+      // }
       const emailUser = data.email;
       const idUser = data._id;
       const profilePicture = data.profilePicture;
@@ -133,12 +133,12 @@ const HomeScreen = ({ navigation }) => {
       const token = await AsyncStorage.getItem('token');
       const response = await axios.post(`${serverUrl}/userdata`, { token: token });
       const { data, status } = response.data;
-      if (status === 'error') {
-        Alert.alert('Error', 'Anda Telah Keluar dari Akun', [
-          { text: 'OK', onPress: () => navigation.navigate('Auths') },
-        ]);
-        return;
-      }
+      // if (status === 'error') {
+      //   Alert.alert('Error', 'Anda Telah Keluar dari Akun', [
+      //     { text: 'OK', onPress: () => navigation.navigate('Auths') },
+      //   ]);
+      //   return;
+      // }
       const emailUser = data.email;
       const idUser = data._id;
       const profilePicture = data.profilePicture;

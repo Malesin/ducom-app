@@ -6,15 +6,16 @@ import {
   TouchableOpacity,
   useColorScheme,
 } from 'react-native';
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import axios from 'axios';
 import Toast from 'react-native-toast-message';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import config from '../../config';
 const serverUrl = config.SERVER_URL;
+import { Alert } from 'react-native';
 
-const Signinscreen = ({navigation}) => {
+const Signinscreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isChecked, setIsChecked] = useState(false);
@@ -95,6 +96,59 @@ const Signinscreen = ({navigation}) => {
                 }, 1000);
               },
             });
+          } else if (res.data.status === 'errorDeactivated') {
+            Alert.alert('Your account is deactivated', 'Do you want to Reactivate Account?', [
+              {
+                text: 'Cancel',
+                onPress: () => null,
+                style: 'cancel',
+              },
+              {
+                text: 'Reactivate',
+                onPress: async () => {
+                  try {
+                    const resp = await axios.post(`${serverUrl}/reactivate-account`, userData)
+                    console.log(resp.data)
+                    if (resp.data.status == 'ok') {
+                      Toast.show({
+                        type: 'success',
+                        text1: 'Success',
+                        text2: 'Reactivate Successfully!!',
+                        onHide: () => {
+                          setTimeout(() => {
+                            navigation.navigate('Auths');
+                          }, 1000);
+                        },
+                      })
+                    } else if (resp.data.status === 'error') {
+                      Toast.show({
+                        type: 'error',
+                        text1: 'Error',
+                        text2: "Email or User Doesn't Exist!!",
+                        onHide: () => {
+                          setTimeout(() => {
+                            navigation.navigate('Signin');
+                          }, 1000);
+                        },
+                      });
+                    } else if (resp.data.status === 'errorPass') {
+                      Toast.show({
+                        type: 'error',
+                        text1: 'Error',
+                        text2: 'Incorrect Password',
+                        onHide: () => {
+                          setTimeout(() => {
+                            navigation.navigate('Signin');
+                          }, 1000);
+                        },
+                      });
+                    }
+                  } catch (error) {
+                    console.error(error)
+                  }
+                },
+              },
+            ]);
           }
         })
         .catch(e => {

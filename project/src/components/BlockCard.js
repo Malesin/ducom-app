@@ -8,7 +8,7 @@ import {
   SafeAreaView,
   Alert,
 } from 'react-native';
-import DefaultAvatar from '../assets/iya.png';
+import DefaultAvatar from '../assets/profilepic.png';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const BlockCard = ({ blockUser, onUnblock }) => {

@@ -110,7 +110,6 @@ function Postscreen({ }) {
       });
 
       const postPin = pinPost.data.data;
-      console.log(postPin)
       if (!postPin) {
         return null; // Kembalikan null jika pinPost tidak ada
       }
@@ -159,7 +158,7 @@ function Postscreen({ }) {
       if (response.data.status === 'ok') {
         return response.data.comments;
       } else {
-        console.log('Error fetching comments:', response.data.data);
+        console.error('Error fetching comments:', response.data.data);
         return [];
       }
     } catch (error) {
