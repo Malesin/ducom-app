@@ -38,6 +38,8 @@ const ViewPost = ({ route }) => {
     idUser,
     emailUser,
     focusCommentInput,
+    onRefreshPage,
+    isUserProfile
   } = route?.params || {};
 
   const [liked, setLiked] = useState(tweet.isLiked);
@@ -490,7 +492,6 @@ const ViewPost = ({ route }) => {
                 postId={postId}
                 userIdPost={comment.userIdPost}
                 idUser={idUser}
-                tweet={tweet}
                 allowedEmail={comment.allowedEmail}
                 isLikedCom={comment.isLikedCom}
                 emailUser={emailUser}
@@ -582,14 +583,21 @@ const ViewPost = ({ route }) => {
         </TouchableWithoutFeedback>
         <View style={styles.bottomSheetContainer}>
           <BottomSheet
-            onCloseDel={(respdel) => {
-              setShowBottomSheet(false);
-            }}
-            idUser={idUser}
-            username={tweet.userHandle}
-            allowedEmail={tweet.allowedEmail}
-            emailUser={emailUser}
-            userIdPost={tweet.userIdPost} // Pastikan ini dikirim
+              onCloseDel={(respdel) => {
+                setShowBottomSheet(false);
+                onRefreshPage();
+                onDel(respdel)
+              }}
+              onCloseResp={(resp) => {
+                setShowBottomSheet(false);
+                onRefreshPage();
+                onResp(resp)
+              }}
+              tweet={tweet}
+              onRefreshPage={onRefreshPage}
+              isUserProfile={isUserProfile}
+              handlePin={false}
+              handlePinUser={false}
           />
         </View>
       </Modal>
