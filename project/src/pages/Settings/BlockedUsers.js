@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -8,53 +8,72 @@ import {
   View,
 } from 'react-native';
 import { Skeleton } from 'react-native-elements';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import config from '../../config';
 import BlockCard from '../../components/BlockCard';
 
-const BlockedAccount = () => {
-  const [blockedAccounts, setBlockedAccounts] = useState([]);
+const serverUrl = config.SERVER_URL;
+
+const BlockedUsers = () => {
+  const [blockUsers, setBlockUsers] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [showSkeleton, setShowSkeleton] = useState(true);
 
   useEffect(() => {
-    fetchBlockedAccounts();
+    fetchBlockUsers();
   }, []);
 
-  const fetchBlockedAccounts = () => {
+  const fetchBlockUsers = async () => {
     setShowSkeleton(true);
-    setTimeout(() => {
-      setBlockedAccounts([
-        {
-          id: '1',
-          name: 'Jane Doe',
-          username: 'janedoe',
-          profilePicture: null,
-        },
-        {
-          id: '2',
-          name: 'Alice Smith',
-          username: 'alicesmith',
-          profilePicture: null,
-        },
-        {
-          id: '3',
-          name: 'Bob Johnson',
-          username: 'bobjohnson',
-          profilePicture: null,
-        },
-      ]);
-      setShowSkeleton(false);
-    }, 2000);
+    const token = await AsyncStorage.getItem('token');
+    try {
+      const resp = await axios.post(`${serverUrl}/show-blockedUsers`, { token: token })
+      const respBlocked = resp.data.data
+      const formattedBlocked = respBlocked.map(block => {
+        return {
+          id: block._id,
+          name: block.name,
+          username: block.username,
+          profilePicture: block.profilePicture,
+          myToken: token
+        };
+      });
+      setShowSkeleton(false); // Tambahkan baris ini untuk menyembunyikan skeleton
+      return formattedBlocked;
+    } catch (error) {
+      setShowSkeleton(false); // Tambahkan baris ini untuk menyembunyikan skeleton
+      console.error(error)
+    }
   };
 
-  const onRefresh = () => {
+  useEffect(() => {
+    const loadBlocked = async () => {
+      setRefreshing(true);
+      const newBlocked = await fetchBlockUsers();
+      setBlockUsers(newBlocked)
+      setRefreshing(false);
+    };
+    loadBlocked();
+  }, []);
+
+
+  const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    fetchBlockedAccounts();
+    const newBlocked = await fetchBlockUsers();
+    setBlockUsers(newBlocked)
     setRefreshing(false);
-  };
+  }, []);
 
-  const handleUnblock = () => {
-    // Logika untuk unblock akun
-    onRefresh();
+
+  const handleUnblock = async (blockUserData) => {
+    try {
+      const respUnblock = await axios.post(`${serverUrl}/unblock-user`, { token: blockUserData.myToken, unblockUserId: blockUserData.id })
+      console.log(respUnblock)
+      await onRefresh();
+    } catch (error) {
+      console.error(error)
+    }
   };
 
   const renderSkeleton = () => (
@@ -105,11 +124,11 @@ const BlockedAccount = () => {
         {showSkeleton ? (
           renderSkeleton()
         ) : (
-          blockedAccounts.length === 0 ? (
-            <Text style={styles.noBlockedAccountsText}>No blocked accounts</Text>
+          blockUsers.length === 0 ? (
+            <Text style={styles.noBlockUsersText}>No blocked users</Text>
           ) : (
-            blockedAccounts.map((account) => (
-              <BlockCard key={account.id} blockedAccount={account} onUnblock={handleUnblock} />
+            blockUsers.map((block, index) => (
+              <BlockCard key={index} blockUser={block} onUnblock={handleUnblock} />
             ))
           )
         )}
@@ -123,7 +142,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f5f5f5',
   },
-  noBlockedAccountsText: {
+  noBlockUsersText: {
     textAlign: 'center',
     marginTop: 20,
     fontSize: 16,
@@ -150,4 +169,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default BlockedAccount;
+export default BlockedUsers;

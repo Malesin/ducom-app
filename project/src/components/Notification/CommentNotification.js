@@ -60,6 +60,8 @@ const CommentNotification = ({ commentNotification }) => {
     return `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
   };
 
+  console.log(commentNotification)
+
   return (
     <SafeAreaView style={styles.card}>
       <TouchableOpacity onPress={handleCommentNotification}>

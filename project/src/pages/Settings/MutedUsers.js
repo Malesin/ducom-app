@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -7,54 +7,72 @@ import {
   RefreshControl,
   View,
 } from 'react-native';
-import { Skeleton } from 'react-native-elements'; 
+import { Skeleton } from 'react-native-elements';
 import MuteCard from '../../components/MuteCard';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import config from '../../config';
 
-const MutedAccount = () => {
-  const [mutedAccounts, setMutedAccounts] = useState([]);
+const serverUrl = config.SERVER_URL;
+
+const MuteUsers = () => {
+  const [muteUsers, setMuteUsers] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [showSkeleton, setShowSkeleton] = useState(true);
 
   useEffect(() => {
-    fetchMutedAccounts();
+    fetchMuteUsers();
   }, []);
 
-  const fetchMutedAccounts = () => {
+  const fetchMuteUsers = async () => {
     setShowSkeleton(true);
-    setTimeout(() => {
-      setMutedAccounts([
-        {
-          id: '1',
-          name: 'John Doe',
-          username: 'johndoe',
-          profilePicture: null,
-        },
-        {
-          id: '2',
-          name: 'Jane Doe',
-          username: 'janedoe',
-          profilePicture: null,
-        },
-        {
-          id: '3',
-          name: 'Alice Smith',
-          username: 'alicesmith',
-          profilePicture: null,
-        },
-      ]);
-      setShowSkeleton(false);
-    }, 2000);
+    const token = await AsyncStorage.getItem('token');
+    try {
+      const resp = await axios.post(`${serverUrl}/show-mutedUsers`, { token: token })
+      const respMuted = resp.data.data
+      const formattedMuted = respMuted.map(mute => {
+        return {
+          id: mute._id,
+          name: mute.name,
+          username: mute.username,
+          profilePicture: mute.profilePicture,
+          myToken: token
+        };
+      });
+      setShowSkeleton(false); // Tambahkan baris ini untuk menyembunyikan skeleton
+      return formattedMuted;
+    } catch (error) {
+      setShowSkeleton(false); // Tambahkan baris ini untuk menyembunyikan skeleton
+      console.error(error)
+    }
   };
 
-  const onRefresh = () => {
+  useEffect(() => {
+    const loadMuted = async () => {
+      setRefreshing(true);
+      const newMuted = await fetchMuteUsers();
+      setMuteUsers(newMuted)
+      setRefreshing(false);
+    };
+    loadMuted();
+  }, []);
+
+
+  const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    fetchMutedAccounts();
+    const newMuted = await fetchMuteUsers();
+    setMuteUsers(newMuted)
     setRefreshing(false);
-  };
+  }, []);
 
-  const handleUnmute = () => {
-    // Logika untuk unmute akun
-    onRefresh();
+  const handleUnmute = async (muteUserData) => {
+    try {
+      const respUnmute = await axios.post(`${serverUrl}/unmute-user`, { token: muteUserData.myToken, unmuteUserId: muteUserData.id })
+      console.log(respUnmute)
+      await onRefresh();
+    } catch (error) {
+      console.error(error)
+    }
   };
 
   const renderSkeleton = () => (
@@ -95,6 +113,7 @@ const MutedAccount = () => {
     </>
   );
 
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
@@ -105,11 +124,11 @@ const MutedAccount = () => {
         {showSkeleton ? (
           renderSkeleton()
         ) : (
-          mutedAccounts.length === 0 ? (
-            <Text style={styles.noMutedAccountsText}>No muted accounts</Text>
+          muteUsers && muteUsers.length === 0 ? (
+            <Text style={styles.noMuteUsersText}>No muted accounts</Text>
           ) : (
-            mutedAccounts.map((account) => (
-              <MuteCard key={account.id} mutedAccount={account} onUnmute={handleUnmute} />
+            muteUsers.map((mute, index) => (
+              <MuteCard key={index} muteUser={mute} onUnmute={handleUnmute} />
             ))
           )
         )}
@@ -123,7 +142,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f5f5f5',
   },
-  noMutedAccountsText: {
+  noMuteUsersText: {
     textAlign: 'center',
     marginTop: 20,
     fontSize: 16,
@@ -150,4 +169,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MutedAccount;
+export default MuteUsers;

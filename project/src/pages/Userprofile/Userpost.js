@@ -11,10 +11,10 @@ import {
 import TweetCard from '../../components/TweetCard';
 import PinTweetCard from '../../components/PinTweetCard';
 import { useFocusEffect } from '@react-navigation/native';
+import { Skeleton } from 'react-native-elements'; // Import Skeleton
 import axios from 'axios';
 import config from '../../config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Skeleton } from 'react-native-elements'; // Import Skeleton
 
 const serverUrl = config.SERVER_URL;
 
@@ -29,6 +29,10 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
   const fetchPinTweet = useCallback(async () => {
     const token = await AsyncStorage.getItem('token');
     try {
+      const respMyData = await axios.post(`${serverUrl}/userdata`, { token: token });
+      const { data } = respMyData.data;
+      const isMuteds = data.mutedUsers
+      const isBlockeds = data.blockedUsers
       const pinPost = await axios.post(`${serverUrl}/showPinPost-byId`, {
         token: token,
         userId: userIdPost,
@@ -58,6 +62,8 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
         bookMarksCount: postPin.bookmarks.length,
         isLiked: postPin.likes.some(like => like._id === idUser),
         isBookmarked: postPin.bookmarks.some(bookmark => bookmark.user === idUser),
+        isMuted: isMuteds.some(isMuted => isMuted === postPin.user._id),
+        isBlocked: isBlockeds.some(isBlocked => isBlocked === postPin.user._id),
         userIdPost: postPin.user._id,
         idUser: idUser,
         userEmailPost: postPin.user.email,
@@ -70,20 +76,23 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
     } catch (error) {
       console.error('Error fetching data:', error);
       return null
-    } 
+    }
     // Hapus setLoading(false) di sini
   }, [userIdPost, profilePicture]);
 
   const fetchTweets = useCallback(async () => {
     const token = await AsyncStorage.getItem('token');
     try {
+      const respMyData = await axios.post(`${serverUrl}/userdata`, { token: token });
+      const { data } = respMyData.data;
+      const isMuteds = data.mutedUsers
+      const isBlockeds = data.blockedUsers
       const response = await axios.post(`${serverUrl}/userId-posts`, {
         token: token,
         userId: userIdPost,
       });
 
       const dataTweet = response.data.data;
-      // console.log(dataTweet[0].user)
 
       const formattedTweets = dataTweet.map(post => ({
         id: post._id,
@@ -105,7 +114,8 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
         isBookmarked: post.bookmarks.some(
           bookmark => bookmark.user === userIdPost,
         ),
-        userIdPost: post.user._id,
+        isMuted: isMuteds.some(isMuted => isMuted === post.user._id),
+        isBlocked: isBlockeds.some(isBlocked => isBlocked === post.user._id), userIdPost: post.user._id,
         profilePicture: profilePicture,
         allowedEmail: post.allowedEmail,
         userEmailPost: post.user.email,
@@ -116,7 +126,7 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
       return formattedTweets;
     } catch (error) {
       console.error('Error fetching data:', error);
-    } 
+    }
     // Hapus setLoading(false) di sini
   }, [userIdPost, profilePicture]);
 
@@ -234,7 +244,7 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
           {pintweets.map((tweet, index) => (
             <View key={index} style={styles.tweetContainer}>
               <TouchableOpacity onPress={() => handlePostPress(tweet)}>
-                <PinTweetCard tweet={tweet} onRefreshPage={onRefreshPage} isUserProfile={isUserProfile}/>
+                <PinTweetCard tweet={tweet} onRefreshPage={onRefreshPage} isUserProfile={isUserProfile} />
               </TouchableOpacity>
             </View>
           ))}
@@ -242,7 +252,7 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
             tweets.map((tweet, index) => (
               <View key={index} style={styles.tweetContainer}>
                 <TouchableOpacity onPress={() => handlePostPress(tweet)}>
-                  <TweetCard tweet={tweet} onRefreshPage={onRefreshPage} isUserProfile={isUserProfile}/>
+                  <TweetCard tweet={tweet} onRefreshPage={onRefreshPage} isUserProfile={isUserProfile} />
                 </TouchableOpacity>
               </View>
             ))

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {
   View,
   Text,
@@ -8,37 +8,38 @@ import {
   SafeAreaView,
   Alert,
 } from 'react-native';
-import DefaultAvatar from '../assets/iya.png';
+import DefaultAvatar from '../assets/profilepic.png';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const MuteCard = ({ mutedAccount, onUnmute }) => {
-  const handleUnmutePress = () => {
+const MuteCard = ({ muteUser, onUnmute }) => {
+
+  const handleUnmutePress = (muteUserData) => {
     Alert.alert(
-      "Konfirmasi",
-      "Apakah anda ingin men-unmute akun ini?",
+      "Confirm",
+      "Do you want to unmute this user?",
       [
-        { text: "Tidak", style: "cancel" },
-        { text: "Ya", onPress: onUnmute }
+        { text: "No", style: "cancel" },
+        { text: "Yes", onPress: () => onUnmute(muteUserData) }
       ]
     );
   };
 
   return (
     <SafeAreaView style={styles.card}>
-      <TouchableOpacity onPress={() => console.log('halo')}>
+      <TouchableOpacity onPress={() => console.log('Muted user pressed')}>
         <View style={styles.mutedRow}>
           <Image
-            source={mutedAccount.profilePicture ? { uri: mutedAccount.profilePicture } : DefaultAvatar}
+            source={muteUser.profilePicture ? { uri: muteUser.profilePicture } : DefaultAvatar}
             style={styles.avatar}
           />
           <View style={styles.textContainer}>
             <View style={styles.nameRow}>
-              <Text style={styles.userName}>{mutedAccount.name}</Text>
-              <Text style={styles.userNameAt}>@{mutedAccount.username}</Text>
+              <Text style={styles.userName}>{muteUser.name}</Text>
+              <Text style={styles.userNameAt}>@{muteUser.username}</Text>
             </View>
             <Text style={styles.notificationText}>Muted</Text>
           </View>
-          <TouchableOpacity onPress={handleUnmutePress}>
+          <TouchableOpacity onPress={() => handleUnmutePress(muteUser)}>
             <MaterialCommunityIcons name="volume-off" size={30} color="#657786" style={styles.unmuteIcon} />
           </TouchableOpacity>
         </View>

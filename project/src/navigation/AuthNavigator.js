@@ -15,8 +15,8 @@ import {
   ReportScreen,
   AccountInformation,
   UpdatePassword,
-  BlockedAccount,
-  MutedAccount,
+  BlockedUsers,
+  MutedUsers,
   VerifyAccount,
 } from '../pages';
 import { NavigationContainer } from '@react-navigation/native';
@@ -26,6 +26,7 @@ import DrawerNavigator from './DrawerNavigator';
 import UserTopTabNavigator from './UserTopTabNavigator';
 import TopTabNavigator from './TopTabNavigator';
 import DeactiveDeleteAccount from '../pages/Settings/DeactiveDeleteAccount';
+import AdminSettings from '../pages/Settings/AdminSettings';
 
 const Stack = createNativeStackNavigator();
 
@@ -125,13 +126,13 @@ export default function MainNavigation() {
           options={{ headerShown: true, title: 'Update Password' }}
         />
         <Stack.Screen
-          name="BlockedAccount"
-          component={BlockedAccount}
+          name="BlockedUsers"
+          component={BlockedUsers}
           options={{ headerShown: true, title: 'Blocked Accounts' }}
         />
         <Stack.Screen
-          name="MutedAccount"
-          component={MutedAccount}
+          name="MutedUsers"
+          component={MutedUsers}
           options={{ headerShown: true, title: 'Muted Accounts' }}
         />
         <Stack.Screen
@@ -140,11 +141,17 @@ export default function MainNavigation() {
           options={{ headerShown: true, title: 'Deactivate or Delete Account' }}
         />
         <Stack.Screen
+          name="AdminSettings"
+          component={AdminSettings}
+          options={{ headerShown: true, title: 'Admin Settings' }}
+        />
+        <Stack.Screen
           name="VerifyAccount"
           component={VerifyAccount}
           options={{
-            headerShown: true, title: 'Deactivate or Delete Account' }}
-              />
+            headerShown: true, title: 'Deactivate or Delete Account'
+          }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

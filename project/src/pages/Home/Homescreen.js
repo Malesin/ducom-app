@@ -9,7 +9,6 @@ import {
   TouchableOpacity,
   RefreshControl,
   ActivityIndicator,
-  ToastAndroid,
   Text,
 } from 'react-native';
 import NetInfo from '@react-native-community/netinfo'; // Tambahkan import NetInfo
@@ -27,14 +26,14 @@ import Animated, {
 } from 'react-native-reanimated';
 import * as ImagePicker from 'react-native-image-picker';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { Skeleton } from 'react-native-elements';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../../config';
-import { Skeleton } from 'react-native-elements';
 
 const serverUrl = config.SERVER_URL;
 
-const HomeScreen = ({ navigation, comments }) => {
+const HomeScreen = ({ navigation }) => {
   const [tweets, setTweets] = useState([]);
   const [pintweets, setPinTweets] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
@@ -43,8 +42,8 @@ const HomeScreen = ({ navigation, comments }) => {
   const [loading, setLoading] = useState(true);
   const [hasMore, setHasMore] = useState(true);
   const [showSkeleton, setShowSkeleton] = useState(true);
-  const [isConnected, setIsConnected] = useState(true); 
-  const [pinnedTweetId, setPinnedTweetId] = useState(null); 
+  const [isConnected, setIsConnected] = useState(true);
+  const [pinnedTweetId, setPinnedTweetId] = useState(null);
   const isExpanded = useSharedValue(false);
 
   useEffect(() => {
@@ -69,19 +68,21 @@ const HomeScreen = ({ navigation, comments }) => {
       const token = await AsyncStorage.getItem('token');
       const response = await axios.post(`${serverUrl}/userdata`, { token: token });
       const { data, status } = response.data;
-      if (status === 'error') {
-        Alert.alert('Error', 'Anda Telah Keluar dari Akun', [
-          { text: 'OK', onPress: () => navigation.navigate('Auths') },
-        ]);
-        return;
-      }
+      // if (status === 'error') {
+      //   Alert.alert('Error', 'Anda Telah Keluar dari Akun', [
+      //     { text: 'OK', onPress: () => navigation.navigate('Auths') },
+      //   ]);
+      //   return;
+      // }
       const emailUser = data.email;
       const idUser = data._id;
       const profilePicture = data.profilePicture;
       const amIAdmin = data.isAdmin
+      const isMuteds = data.mutedUsers
+      const isBlockeds = data.blockedUsers
 
       const responseTweet = await axios.post(`${serverUrl}/posts`, {
-        token:token,  
+        token: token,
         page: pageNum,
       });
       const dataTweet = responseTweet.data.data;
@@ -106,6 +107,8 @@ const HomeScreen = ({ navigation, comments }) => {
           bookMarksCount: post.bookmarks.length,
           isLiked: post.likes.some(like => like._id === idUser),
           isBookmarked: post.bookmarks.some(bookmark => bookmark.user === idUser),
+          isMuted: isMuteds.some(isMuted => isMuted === post.user._id),
+          isBlocked: isBlockeds.some(isBlocked => isBlocked === post.user._id),
           userIdPost: post.user._id,
           idUser: idUser,
           userEmailPost: post.user.email,
@@ -130,22 +133,24 @@ const HomeScreen = ({ navigation, comments }) => {
       const token = await AsyncStorage.getItem('token');
       const response = await axios.post(`${serverUrl}/userdata`, { token: token });
       const { data, status } = response.data;
-      if (status === 'error') {
-        Alert.alert('Error', 'Anda Telah Keluar dari Akun', [
-          { text: 'OK', onPress: () => navigation.navigate('Auths') },
-        ]);
-        return;
-      }
+      // if (status === 'error') {
+      //   Alert.alert('Error', 'Anda Telah Keluar dari Akun', [
+      //     { text: 'OK', onPress: () => navigation.navigate('Auths') },
+      //   ]);
+      //   return;
+      // }
       const emailUser = data.email;
       const idUser = data._id;
       const profilePicture = data.profilePicture;
       const amIAdmin = data.isAdmin
+      const isMuteds = data.mutedUsers
+      const isBlockeds = data.blockedUsers
 
       const pinPost = await axios.post(`${serverUrl}/posts/pinned`, {
         token: token
       });
 
-      const pinnedBy = pinPost.data.data.pinnedBy
+      const pinnedBy = pinPost.data.data.pinnedBy || ''
       const postPin = pinPost.data.data.post;
 
       if (!postPin) {
@@ -171,6 +176,8 @@ const HomeScreen = ({ navigation, comments }) => {
         bookMarksCount: postPin.bookmarks.length,
         isLiked: postPin.likes.some(like => like._id === idUser),
         isBookmarked: postPin.bookmarks.some(bookmark => bookmark.user === idUser),
+        isMuted: isMuteds.some(isMuted => isMuted === postPin.user._id),
+        isBlocked: isBlockeds.some(isBlocked => isBlocked === postPin.user._id),
         userIdPost: postPin.user._id,
         idUser: idUser,
         userEmailPost: postPin.user.email,

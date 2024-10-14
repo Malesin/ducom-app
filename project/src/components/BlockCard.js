@@ -8,37 +8,38 @@ import {
   SafeAreaView,
   Alert,
 } from 'react-native';
-import DefaultAvatar from '../assets/iya.png';
+import DefaultAvatar from '../assets/profilepic.png';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const BlockCard = ({ blockedAccount, onUnblock }) => {
-  const handleUnblockPress = () => {
+const BlockCard = ({ blockUser, onUnblock }) => {
+
+  const handleUnblockPress = (blockUserData) => {
     Alert.alert(
-      "Konfirmasi",
-      "Apakah anda ingin men-unblock akun ini?",
+      "Confirm",
+      "Do you want to unblock this user?",
       [
-        { text: "Tidak", style: "cancel" },
-        { text: "Ya", onPress: onUnblock }
+        { text: "No", style: "cancel" },
+        { text: "Yes", onPress: () => onUnblock(blockUserData) }
       ]
     );
   };
 
   return (
     <SafeAreaView style={styles.card}>
-      <TouchableOpacity onPress={() => console.log('Blocked account pressed')}>
+      <TouchableOpacity onPress={() => console.log('Blocked user pressed')}>
         <View style={styles.blockedRow}>
           <Image
-            source={blockedAccount.profilePicture ? { uri: blockedAccount.profilePicture } : DefaultAvatar}
+            source={blockUser.profilePicture ? { uri: blockUser.profilePicture } : DefaultAvatar}
             style={styles.avatar}
           />
           <View style={styles.textContainer}>
             <View style={styles.nameRow}>
-              <Text style={styles.userName}>{blockedAccount.name}</Text>
-              <Text style={styles.userNameAt}>@{blockedAccount.username}</Text>
+              <Text style={styles.userName}>{blockUser.name}</Text>
+              <Text style={styles.userNameAt}>@{blockUser.username}</Text>
             </View>
             <Text style={styles.notificationText}>Blocked</Text>
           </View>
-          <TouchableOpacity onPress={handleUnblockPress}>
+          <TouchableOpacity onPress={() => handleUnblockPress(blockUser)}>
             <MaterialCommunityIcons name="block-helper" size={24} color="#657786" style={styles.unblockIcon} />
           </TouchableOpacity>
         </View>
