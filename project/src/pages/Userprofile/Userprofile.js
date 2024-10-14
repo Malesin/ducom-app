@@ -40,8 +40,6 @@ const Userprofile = ({ userIdPost, navigation, tweet }) => {
         token: token,
         userId: userIdPost,
       });
-      console.log('Data Berhasil Diambil');
-
       const user = userResponse.data.data;
       setUserData(user);
 

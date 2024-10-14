@@ -25,7 +25,6 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
   const [isFetched, setIsFetched] = useState(false); // State to track if data has been fetched
   const [pintweets, setPinTweets] = useState([]);
   const [pinnedTweetId, setPinnedTweetId] = useState(null);
-
   const fetchPinTweet = useCallback(async () => {
     const token = await AsyncStorage.getItem('token');
     try {
@@ -87,12 +86,12 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
       const { data } = respMyData.data;
       const isMuteds = data.mutedUsers
       const isBlockeds = data.blockedUsers
-      const response = await axios.post(`${serverUrl}/userId-posts`, {
+      const respTweet = await axios.post(`${serverUrl}/userId-posts`, {
         token: token,
         userId: userIdPost,
       });
 
-      const dataTweet = response.data.data;
+      const dataTweet = respTweet.data.data;
 
       const formattedTweets = dataTweet.map(post => ({
         id: post._id,
