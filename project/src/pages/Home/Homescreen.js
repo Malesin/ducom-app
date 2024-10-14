@@ -224,7 +224,8 @@ const HomeScreen = ({ navigation }) => {
     const emailUser = tweet.emailUser
     const userEmailPost = tweet.userEmailPost
     const focusCommentInput = true
-    navigation.navigate('ViewPost', { tweet, comments, postId, idUser, userEmailPost, emailUser, focusCommentInput });
+    const isUserProfile = false
+    navigation.navigate('ViewPost', { tweet, comments, postId, idUser, userEmailPost, emailUser, focusCommentInput, onRefreshPage, isUserProfile });
   };
 
   const onRefresh = useCallback(async () => {

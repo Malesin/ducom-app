@@ -36,7 +36,7 @@ const Userprofile = ({ userIdPost, navigation, tweet }) => {
       const token = await AsyncStorage.getItem('token');
       console.log('Token Berhasil Diambil');
 
-      const userResponse = await axios.post(`${serverUrl}/userId-posts/`, {
+      const userResponse = await axios.post(`${serverUrl}/findUserId/`, {
         token: token,
         userId: userIdPost,
       });
