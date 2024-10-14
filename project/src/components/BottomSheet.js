@@ -29,6 +29,7 @@ const BottomSheet = ({
   const [isOwn, setIsOwn] = useState(false)
   const [isAdmin, setIsAdmin] = useState(tweet?.amIAdmin)
   const [isPinUser, setIsPinUser] = useState(false)
+  const [isCommentDisabled, setIsCommentDisabled] = useState(false); // Tambahkan state ini
 
   useEffect(() => {
     setIsPin(handlePin)
@@ -209,9 +210,13 @@ const BottomSheet = ({
     }
   }, [tweet.idUser, tweet.userIdPost, isUserProfile]);
 
+  const toggleComment = () => {
+    setIsCommentDisabled(!isCommentDisabled);
+    // Hapus setIsClosed(); jika tidak diperlukan
+  };
+
   return (
     <SafeAreaView style={styles.container}>
-
       {isAdmin ? (<>
         <View style={styles.optionRow}>
           {/* PIN POST AT HOMESCREEN */}
@@ -255,6 +260,15 @@ const BottomSheet = ({
             <MaterialIcons name="delete" size={24} color="#333" />
             <Text style={styles.optionText}>
               Delete {isAdmin && !isOwn ? `Post @${tweet.userName}` : 'Post'}
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.optionRow}>
+          <TouchableOpacity style={styles.option} onPress={toggleComment}>
+            <MaterialCommunityIcons name={isCommentDisabled ? "comment-off" : "comment"} size={24} color="#333" />
+            <Text style={styles.optionText}>
+              {isCommentDisabled ? 'Enable Comments' : 'Disable Comments'}
             </Text>
           </TouchableOpacity>
         </View>
