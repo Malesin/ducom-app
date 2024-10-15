@@ -25,6 +25,7 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
   const [isFetched, setIsFetched] = useState(false); // State to track if data has been fetched
   const [pintweets, setPinTweets] = useState([]);
   const [pinnedTweetId, setPinnedTweetId] = useState(null);
+
   const fetchPinTweet = useCallback(async () => {
     const token = await AsyncStorage.getItem('token');
     try {
@@ -65,7 +66,6 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
         isBlocked: isBlockeds.some(isBlocked => isBlocked === postPin.user._id),
         userIdPost: postPin.user._id,
         idUser: idUser,
-        userEmailPost: postPin.user.email,
         profilePicture: profilePicture,
         isAdmin: postPin.user.isAdmin,
         amIAdmin: amIAdmin
@@ -73,10 +73,15 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
 
       return pinTweet;
     } catch (error) {
+      if (error.response && error.response.status === 403) {
+        console.log("lo diblokir")
+        setLoading(false)
+        return "You are blocked by this user"; // Return text if status code is 403
+      }
+      setLoading(false)
       console.error('Error fetching data:', error);
-      return null
+      return null;
     }
-    // Hapus setLoading(false) di sini
   }, [userIdPost, profilePicture]);
 
   const fetchTweets = useCallback(async () => {
@@ -116,17 +121,27 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
         isMuted: isMuteds.some(isMuted => isMuted === post.user._id),
         isBlocked: isBlockeds.some(isBlocked => isBlocked === post.user._id), userIdPost: post.user._id,
         profilePicture: profilePicture,
-        allowedEmail: post.allowedEmail,
-        userEmailPost: post.user.email,
         isAdmin: post.user.isAdmin,
         amIAdmin: amIAdmin
       }));
 
       return formattedTweets;
     } catch (error) {
+      if (error.response && error.response.data === 'youBlockedBy') {
+        console.log("lo diblokir")
+        setLoading(false)
+        return "You are blocked by this user";
+      } else if (error.response && error.response.data === 'youBlockedThis') {
+        console.log("lo ngeblokir")
+        setLoading(false)
+        return "You have blocked this user";
+      } else {
+        console.error("Error fetching tweets:", error);
+      }
+      setLoading(false)
       console.error('Error fetching data:', error);
+      return null;
     }
-    // Hapus setLoading(false) di sini
   }, [userIdPost, profilePicture]);
 
   const renderSkeleton = () => (
@@ -182,6 +197,17 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
     (async () => {
       const newTweets = await fetchTweets(1);
       const initialPinTweets = await fetchPinTweet();
+
+      if (newTweets === "You are blocked by this user" || initialPinTweets === "You are blocked by this user") {
+        setTweets("You are blocked by this user");
+        setLoading(false);
+        return;
+      } else if (newTweets === "You have blocked this user" || initialPinTweets === "You have blocked this user") {
+        setTweets("You have blocked this user");
+        setLoading(false);
+        return;
+      }
+
       if (initialPinTweets) {
         setPinTweets([initialPinTweets]);
         setPinnedTweetId(initialPinTweets.id);
@@ -189,6 +215,7 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
         setPinTweets([]);
         setPinnedTweetId(null);
       }
+
       const filteredTweets = newTweets.filter(tweet => tweet.id !== initialPinTweets?.id);
       setTweets(filteredTweets.slice(0, 5));
       setIsFetched(true);
@@ -202,22 +229,34 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
         (async () => {
           setLoading(true);
           const newTweets = await fetchTweets(page);
-          const initialPinTweets = await fetchPinTweet(); // Panggil fetchPinTweet saat inisialisasi
-          if (initialPinTweets) {
-            setPinTweets([initialPinTweets]); // Set pintweets sebagai array dengan satu elemen
-            setPinnedTweetId(initialPinTweets.id); // Simpan ID tweet yang dipin
-          } else {
-            setPinTweets([]); // Kosongkan pintweets jika tidak ada pin tweet
-            setPinnedTweetId(null); // Reset ID tweet yang dipin
+          const initialPinTweets = await fetchPinTweet();
+
+          if (newTweets === "You are blocked by this user" || initialPinTweets === "You are blocked by this user") {
+            setTweets("You are blocked by this user");
+            setLoading(false);
+            return;
+          } else if (newTweets === "You have blocked this user" || initialPinTweets === "You have blocked this user") {
+            setTweets("You have blocked this user");
+            setLoading(false);
+            return;
           }
-          const filteredTweets = newTweets.filter(tweet => tweet.id !== initialPinTweets?.id); // Filter tweet yang dipin
-          setTweets(filteredTweets.slice(0, 5)); // Load only 4 tweets initially
+
+          if (initialPinTweets) {
+            setPinTweets([initialPinTweets]);
+            setPinnedTweetId(initialPinTweets.id);
+          } else {
+            setPinTweets([]);
+            setPinnedTweetId(null);
+          }
+
+          const filteredTweets = newTweets.filter(tweet => tweet.id !== initialPinTweets?.id);
+          setTweets(filteredTweets.slice(0, 5));
           setIsFetched(true);
-          setLoading(false); // Hapus setLoading(false) di sini
+          setLoading(false);
         })();
       }
     }, [fetchTweets, page, isFetched]),
-  )
+  );
 
   const handlePostPress = (tweet) => {
     console.log("Clicked Post Press")
@@ -256,7 +295,12 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
               </View>
             ))
           ) : (
-            <Text style={styles.noTweetsText}>No tweets available</Text>
+            <Text style={styles.noTweetsText}>
+              {tweets === "You are blocked by this user" ? "You are blocked by this user" : (<>
+                {tweets === "You have blocked this user" ? "You have blocked this user" : "No Tweets Available"}
+              </>)}
+
+            </Text>
           )}
         </ScrollView>
       )}
@@ -280,8 +324,8 @@ const styles = StyleSheet.create({
   },
   noTweetsText: {
     textAlign: 'center',
-    color: '#888',
-    marginTop: 20,
+    color: '#000',
+    marginTop: 25,
   },
   loadingIndicator: {
     flex: 1,
@@ -307,4 +351,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Userpost;
+export default Userpost;  

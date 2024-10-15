@@ -59,7 +59,7 @@ const Userprofile = ({ userIdPost, navigation, tweet }) => {
         console.log('Foto Profil Berhasil Diambil');
       }
     } catch (error) {
-      console.error('Terjadi Kesalahan:', error);
+      console.error('Error:', error);
     }
   }
 

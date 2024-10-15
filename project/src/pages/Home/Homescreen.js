@@ -68,13 +68,12 @@ const HomeScreen = ({ navigation }) => {
       const token = await AsyncStorage.getItem('token');
       const response = await axios.post(`${serverUrl}/userdata`, { token: token });
       const { data, status } = response.data;
-      // if (status === 'error') {
-      //   Alert.alert('Error', 'Anda Telah Keluar dari Akun', [
-      //     { text: 'OK', onPress: () => navigation.navigate('Auths') },
-      //   ]);
-      //   return;
-      // }
-      const emailUser = data.email;
+      if (status === 'error') {
+        Alert.alert('Error', 'Anda Telah Keluar dari Akun', [
+          { text: 'OK', onPress: () => navigation.navigate('Auths') },
+        ]);
+        return;
+      }
       const idUser = data._id;
       const profilePicture = data.profilePicture;
       const amIAdmin = data.isAdmin
@@ -111,9 +110,8 @@ const HomeScreen = ({ navigation }) => {
           isBlocked: isBlockeds.some(isBlocked => isBlocked === post.user._id),
           userIdPost: post.user._id,
           idUser: idUser,
-          userEmailPost: post.user.email,
-          emailUser: emailUser,
           profilePicture: profilePicture,
+          commentsEnabled: post.commentsEnabled,
           isAdmin: post.user.isAdmin,
           amIAdmin: amIAdmin
         };
@@ -139,7 +137,6 @@ const HomeScreen = ({ navigation }) => {
       //   ]);
       //   return;
       // }
-      const emailUser = data.email;
       const idUser = data._id;
       const profilePicture = data.profilePicture;
       const amIAdmin = data.isAdmin
@@ -180,9 +177,8 @@ const HomeScreen = ({ navigation }) => {
         isBlocked: isBlockeds.some(isBlocked => isBlocked === postPin.user._id),
         userIdPost: postPin.user._id,
         idUser: idUser,
-        userEmailPost: postPin.user.email,
-        emailUser: emailUser,
         profilePicture: profilePicture,
+        commentsEnabled: postPin.commentsEnabled,
         pinnedBy: pinnedBy,
         isAdmin: postPin.user.isAdmin,
         amIAdmin: amIAdmin
@@ -219,13 +215,9 @@ const HomeScreen = ({ navigation }) => {
       return;
     }
     const comments = await fetchComments(tweet.id);
-    const postId = tweet.id;
-    const idUser = tweet.idUser
-    const emailUser = tweet.emailUser
-    const userEmailPost = tweet.userEmailPost
     const focusCommentInput = true
     const isUserProfile = false
-    navigation.navigate('ViewPost', { tweet, comments, postId, idUser, userEmailPost, emailUser, focusCommentInput, onRefreshPage, isUserProfile });
+    navigation.navigate('ViewPost', { tweet, comments, focusCommentInput, isUserProfile });
   };
 
   const onRefresh = useCallback(async () => {

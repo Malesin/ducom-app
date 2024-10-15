@@ -15,7 +15,6 @@ const CommentNotification = ({ commentNotification }) => {
         tweet: formattedTweet,
         postId: formattedTweet.id,
         idUser: formattedTweet.idUser,
-        emailUser: formattedTweet.emailUser,
         comments: formattedTweet.comments || [],
         userAvatar: formattedTweet.userAvatar,
         userName: formattedTweet.userName,

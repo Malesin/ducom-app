@@ -11,7 +11,6 @@ export const formatNotification = async notification => {
     const {data} = response.data;
 
     const idUser = data._id;
-    const emailUser = data.email;
     const profilePicture = data.profilePicture;
     const post = notification.post;
 
@@ -39,9 +38,6 @@ export const formatNotification = async notification => {
       isBookmarked: post.bookmarks.some(bookmark => bookmark.user === idUser),
       userIdPost: post.user._id,
       idUser: idUser,
-      allowedEmail: post.allowedEmail,
-      userEmailPost: post.user.email,
-      emailUser: emailUser,
       profilePicture: profilePicture,
     };
   } catch (error) {

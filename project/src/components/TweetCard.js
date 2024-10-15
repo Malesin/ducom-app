@@ -182,10 +182,6 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
   const handleCommentPress = () => {
     navigator.navigate('ViewPost', {
       tweet,
-      postId: tweet.id,
-      idUser: tweet.idUser,
-      emailUser: tweet.emailUser,
-      userEmailPost: tweet.userEmailPost,
       comments,
       focusCommentInput: true,
     });
@@ -414,7 +410,7 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
         />
 
         <InteractionButton
-          icon="message-reply-outline"
+          icon={tweet.commentsEnabled ? "message-reply-outline" : "message-off-outline"}
           color="#040608"
           count={commentsCount}
           onPress={() => handleCommentPress()}
