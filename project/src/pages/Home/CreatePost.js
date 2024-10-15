@@ -25,6 +25,7 @@ import config from '../../config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ImageResizer from 'react-native-image-resizer';
 import VideoCompressor from 'react-native-video-compressor';
+import PostSheet from '../../components/PostSheet';
 
 const serverUrl = config.SERVER_URL;
 
@@ -37,9 +38,12 @@ const CreatePost = ({ route, navigation }) => {
   const [mediaType, setMediaType] = useState(null);
   const [profilePicture, setProfilePicture] = useState(null);
   const [translateY] = useState(new Animated.Value(500));
+  const [UploadProgress, setUploadProgress] = useState(0);
+  const [IsUploading, SetIsUploading] = useState(false);
+  const [isPostSheetVisible, setIsPostSheetVisible] = useState(false);
+  const closePostSheet = () => setIsPostSheetVisible(false);
   const colorScheme = useColorScheme();
   const styles = getStyles(colorScheme);
-
   const profilePictureUri = require('../../assets/profilepic.png');
 
   async function getData() {
@@ -89,8 +93,7 @@ const CreatePost = ({ route, navigation }) => {
 
   console.log(selectedMedia, 'Selected Media');
 
-  const [UploadProgress, setUploadProgress] = useState(0);
-  const [IsUploading, SetIsUploading] = useState(false);
+
   const handlePostSubmit = async () => {
     SetIsUploading(true);
     const token = await AsyncStorage.getItem('token');
@@ -214,7 +217,7 @@ const CreatePost = ({ route, navigation }) => {
         return resizedUri;
       } catch (error) {
         console.error('Error resizing HEIF image:', error);
-        return uri; // Return original URI if resizing fails
+        return uri;
       }
     } else if (mediaType === 'image/png' || mediaType === 'image/jpeg') {
       try {
@@ -232,7 +235,7 @@ const CreatePost = ({ route, navigation }) => {
         return resizedUri;
       } catch (error) {
         console.error('Error resizing image:', error);
-        return uri; // Return original URI if resizing fails
+        return uri;
       }
     }
     if (mediaType === 'video/mp4') {
@@ -257,15 +260,15 @@ const CreatePost = ({ route, navigation }) => {
           return finalCompressedUri;
         } else {
           console.log('Compression did not return a string:', compressedUri);
-          return uri; // Return original URI if compression fails
+          return uri;
         }
       } catch (error) {
         console.error('Error compressing video:', error);
-        return uri; // Return original URI if compression fails
+        return uri;
       }
     } else {
       console.error('Unsupported media type:', mediaType);
-      return uri; // Return original URI if media type is unsuppo rted
+      return uri;
     }
   };
 
@@ -455,13 +458,11 @@ const CreatePost = ({ route, navigation }) => {
           {selectedMedia.map((media, index) => renderMedia(media, index))}
         </ScrollView>
         <View style={styles.buttonContainer}>
-          <Button
-            title="Who can reply?"
-            buttonStyle={styles.buttonComments}
-            titleStyle={{ color: '#001374' }}
-            type="clear"
-          />
           <View style={{ flexDirection: 'row' }}>
+            <PostSheet
+              isPostSheetVisible={isPostSheetVisible}
+              closePostSheet={closePostSheet}
+            />
             <Button
               icon={<Icon name="camera" size={24} color="#000" />}
               buttonStyle={styles.button}
@@ -513,7 +514,7 @@ const CreatePost = ({ route, navigation }) => {
 };
 
 const getStyles = (
-  colorScheme, // <-- Add colorScheme parameter
+  colorScheme,
 ) =>
   StyleSheet.create({
     container: {
@@ -565,11 +566,11 @@ const getStyles = (
     buttonContainer: {
       flexDirection: 'row',
       justifyContent: 'space-between',
-      alignItems: 'center', 
+      alignItems: 'center',
     },
     buttonComments: {
       backgroundColor: 'transparent',
-      padding: 0, 
+      padding: 0,
     },
     button: {
       backgroundColor: 'transparent',
