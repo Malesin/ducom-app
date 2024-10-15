@@ -46,7 +46,7 @@ const BottomSheet = ({
     try {
       const delPost = await axios.post(`${serverUrl}/delete-post`, {
         token: token,
-        postId: tweet.id
+        postId: tweet?.id
       });
       const respdel = delPost.data.status
 
@@ -66,7 +66,7 @@ const BottomSheet = ({
       if (!isPinUser) {
         const pinPost = await axios.post(`${serverUrl}/posts/pin`, {
           token: token,
-          postId: tweet.id,
+          postId: tweet?.id,
           duration: 8
         })
         onCloseResp({
@@ -104,7 +104,7 @@ const BottomSheet = ({
       if (!isPinUser) {
         const pinPost = await axios.post(`${serverUrl}/pin-post`, {
           token: token,
-          postId: tweet.id,
+          postId: tweet?.id,
         })
         onCloseResp({
           status: pinPost.data.status,
@@ -140,7 +140,7 @@ const BottomSheet = ({
       if (!tweet.isMuted) {
         const mute = await axios.post(`${serverUrl}/mute-user`, {
           token: token,
-          muteUserId: tweet.userIdPost
+          muteUserId: tweet?.userIdPost
         })
         onCloseResp({
           status: mute.data.status,
@@ -152,7 +152,7 @@ const BottomSheet = ({
       } else if (tweet.isMuted) {
         const unmute = await axios.post(`${serverUrl}/unmute-user`, {
           token: token,
-          unmuteUserId: tweet.userIdPost
+          unmuteUserId: tweet?.userIdPost
         })
         onCloseResp({
           status: unmute.data.status,
@@ -176,7 +176,7 @@ const BottomSheet = ({
       if (!tweet.isBlocked) {
         const block = await axios.post(`${serverUrl}/block-user`, {
           token: token,
-          blockUserId: tweet.userIdPost
+          blockUserId: tweet?.userIdPost
         })
         onCloseResp({
           status: block.data.status,
@@ -188,7 +188,7 @@ const BottomSheet = ({
       } else if (tweet.isBlocked) {
         const unblock = await axios.post(`${serverUrl}/unblock-user`, {
           token: token,
-          unblockUserId: tweet.userIdPost
+          unblockUserId: tweet?.userIdPost
         })
         onCloseResp({
           status: unblock.data.status,
@@ -204,7 +204,7 @@ const BottomSheet = ({
   }
 
   useEffect(() => {
-    if (tweet.idUser === tweet.userIdPost) {
+    if (tweet?.idUser === tweet?.userIdPost) {
       setIsOwn(true)
       console.log("1 OWNER")
     } else if (isAdmin) {
@@ -213,7 +213,7 @@ const BottomSheet = ({
     } else {
       console.log("3 USER")
     }
-  }, [tweet.idUser, tweet.userIdPost, isUserProfile]);
+  }, [tweet?.idUser, tweet?.userIdPost, isUserProfile]);
 
   const toggleComment = async () => {
     const token = await AsyncStorage.getItem('token');
@@ -320,7 +320,6 @@ const BottomSheet = ({
           </View>
         </>) : null}
       </>)}
-
 
     </SafeAreaView>
   );

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { StyleSheet, View, Dimensions, RefreshControl } from 'react-native';
-import { Usermedia, Userpost, Replyscreen, Userprofile } from '../pages'; // Ganti Postscreen dengan Userpost
+import { Usermedia, Userpost, Replyscreen, Userprofile, Repostscreen } from '../pages'; // Ganti Postscreen dengan Userpost
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Tabs, MaterialTabBar } from 'react-native-collapsible-tab-view';
 import { Skeleton } from 'react-native-elements';
@@ -112,7 +112,7 @@ function UserTopTabNavigator({ route, navigation }) {
             )}
           </Tabs.ScrollView>
         </Tabs.Tab>
-        <Tabs.Tab name="Replies">
+        <Tabs.Tab name="Reposts">
           <Tabs.ScrollView
             onScroll={handleScroll}
             scrollEventThrottle={16}
@@ -123,7 +123,7 @@ function UserTopTabNavigator({ route, navigation }) {
                 enabled={isScrollTop}
               />
             }>
-            {refreshing ? renderSkeleton() : <Replyscreen />}
+            {refreshing ? renderSkeleton() : <Repostscreen />}
           </Tabs.ScrollView>
         </Tabs.Tab>
         <Tabs.Tab name="Media">

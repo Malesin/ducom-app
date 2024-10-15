@@ -27,11 +27,13 @@ const serverUrl = config.SERVER_URL;
 const verifiedIcon = <Icon name="verified" size={16} color="#699BF7" />;
 
 const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
-  const [liked, setLiked] = useState(tweet.isLiked);
-  const [likesCount, setLikesCount] = useState(tweet.likesCount || 0);
-  const [bookmarked, setBookmarked] = useState(tweet.isBookmarked || false);
-  const [bookMarksCount, setBookMarksCount] = useState(tweet.bookMarksCount || 0);
-  const [commentsCount] = useState(tweet.commentsCount || 0);
+  const [liked, setLiked] = useState(tweet?.isLiked || false);
+  const [likesCount, setLikesCount] = useState(tweet?.likesCount || 0);
+  const [bookmarked, setBookmarked] = useState(tweet?.isBookmarked || false);
+  const [bookMarksCount, setBookMarksCount] = useState(tweet?.bookMarksCount || 0);
+  const [reposted, setReposted] = useState(false);
+  const [repostsCount, setRepostsCount] = useState(0);
+  const [commentsCount] = useState(tweet?.commentsCount || 0);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalMediaUri, setModalMediaUri] = useState('');
   const [thumbnails, setThumbnails] = useState({});
@@ -40,15 +42,15 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
   const navigator = useNavigation();
 
   const handleProfilePress = () => {
-    if (tweet.userIdPost === tweet.idUser) {
+    if (tweet?.userIdPost === tweet?.idUser) {
       navigator.navigate('Profile');
     } else {
       navigator.navigate('Userprofile', {
-        userIdPost: tweet.userIdPost,
-        profilePicture: tweet.profilePicture,
-        idUser: tweet.idUser,
-        isAdmin: tweet.isAdmin,
-        amIAdmin: tweet.amIAdmin,
+        userIdPost: tweet?.userIdPost,
+        profilePicture: tweet?.profilePicture,
+        idUser: tweet?.idUser,
+        isAdmin: tweet?.isAdmin,
+        amIAdmin: tweet?.amIAdmin,
         isUserProfile: isUserProfile
       });
     }
@@ -57,7 +59,7 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
   useEffect(() => {
     const generateThumbnails = async () => {
       const newThumbnails = {};
-      for (const media of tweet.media || []) {
+      for (const media of tweet?.media || []) {
         if (media.type === 'video' && media.uri) {
           try {
             const { path } = await createThumbnail({ url: media.uri });
@@ -71,7 +73,7 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
     };
 
     generateThumbnails();
-  }, [tweet.media]);
+  }, [tweet?.media]);
 
   const handleLike = async () => {
     const token = await AsyncStorage.getItem('token');
@@ -179,6 +181,16 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
     }
   };
 
+  const handleRepost = () => {
+    if (reposted) {
+      setReposted(false);
+      setRepostsCount(prevRepostsCount => prevRepostsCount - 1);
+    } else {
+      setReposted(true);
+      setRepostsCount(prevRepostsCount => prevRepostsCount + 1);
+    }
+  };
+
   const handleCommentPress = () => {
     navigator.navigate('ViewPost', {
       tweet,
@@ -255,7 +267,7 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
     }
 
     const mediaStyle =
-      tweet.media.length === 1
+      tweet?.media?.length === 1
         ? item.type === 'video'
           ? styles.singleMediaVideo
           : styles.singleMediaImage
@@ -327,19 +339,19 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
       <View style={styles.userInfo}>
         <TouchableOpacity onPress={handleProfilePress}>
           <Image
-            source={tweet.userAvatar ? { uri: tweet.userAvatar } : DefaultAvatar}
+            source={tweet?.userAvatar ? { uri: tweet?.userAvatar } : DefaultAvatar}
             style={styles.avatar}
           />
         </TouchableOpacity>
         <View style={styles.userDetails}>
           <TouchableOpacity onPress={handleProfilePress}>
-            <Text style={styles.userName}>{tweet.userName}</Text>
+            <Text style={styles.userName}>{tweet?.userName}</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={handleProfilePress}>
-            <Text style={styles.userHandle}>@{tweet.userHandle}</Text>
+            <Text style={styles.userHandle}>@{tweet?.userHandle}</Text>
           </TouchableOpacity>
-          {tweet.isAdmin ? (<Text style={styles.verifiedIcon}>{verifiedIcon}</Text>) : null}
-          <Text style={styles.postDate}>{formatDate(tweet.postDate)}</Text>
+          {tweet?.isAdmin ? (<Text style={styles.verifiedIcon}>{verifiedIcon}</Text>) : null}
+          <Text style={styles.postDate}>{formatDate(tweet?.postDate)}</Text>
         </View>
 
         {/* Options Button */}
@@ -386,12 +398,12 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
       </View>
 
       {/* Tweet Content */}
-      {tweet.content ? <Text style={styles.tweetText}>{tweet.content}</Text> : null}
+      {tweet?.content ? <Text style={styles.tweetText}>{tweet?.content}</Text> : null}
 
       {/* Tweet Media with Horizontal Scroll */}
-      {tweet.media && tweet.media.length > 0 ? (
+      {tweet?.media && tweet?.media?.length > 0 ? (
         <FlatList
-          data={tweet.media}
+          data={tweet?.media}
           renderItem={renderMediaItem}
           keyExtractor={(item, index) => item.uri || index.toString()}
           horizontal
@@ -408,7 +420,6 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
           count={likesCount}
           onPress={handleLike}
         />
-
         <InteractionButton
           icon={tweet.commentsEnabled ? "message-reply-outline" : "message-off-outline"}
           color="#040608"
@@ -420,6 +431,12 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
           color={bookmarked ? '#00c5ff' : '#040608'}
           count={bookMarksCount}
           onPress={handleBookmark}
+        />
+        <InteractionButton
+          icon="repeat-variant"
+          color={reposted ? '#097969' : '#040608'}
+          count={repostsCount}
+          onPress={handleRepost}
         />
         <TouchableOpacity style={styles.actionButton} onPress={handleShare}>
           <MaterialCommunityIcons

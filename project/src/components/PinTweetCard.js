@@ -33,6 +33,8 @@ const PinTweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
   const [bookmarked, setBookmarked] = useState(tweet.isBookmarked);
   const [bookMarksCount, setBookMarksCount] = useState(tweet.bookMarksCount);
   const [commentsCount] = useState(tweet.commentsCount);
+  const [reposted, setReposted] = useState(false);
+  const [repostsCount, setRepostsCount] = useState(0);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalMediaUri, setModalMediaUri] = useState('');
   const [thumbnails, setThumbnails] = useState({});
@@ -187,7 +189,15 @@ const PinTweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
       focusCommentInput: true,
     });
   };
-
+  const handleRepost = () => {
+    if (reposted) {
+      setReposted(false);
+      setRepostsCount(prevRepostsCount => prevRepostsCount - 1);
+    } else {
+      setReposted(true);
+      setRepostsCount(prevRepostsCount => prevRepostsCount + 1);
+    }
+  };
   const openMediaPreview = uri => {
     setModalMediaUri(uri);
     setIsModalVisible(true);
@@ -435,6 +445,12 @@ const PinTweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
           color={bookmarked ? '#00c5ff' : '#040608'}
           count={bookMarksCount}
           onPress={handleBookmark}
+        />
+        <InteractionButton
+          icon="repeat-variant"
+          color={reposted ? '#097969' : '#040608'}
+          count={repostsCount}
+          onPress={handleRepost}
         />
         <TouchableOpacity style={styles.actionButton} onPress={handleShare}>
           <MaterialCommunityIcons
