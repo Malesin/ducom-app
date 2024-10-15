@@ -490,7 +490,6 @@ const ViewPost = ({ route }) => {
                 postId={postId}
                 userIdPost={comment.userIdPost}
                 idUser={idUser}
-                tweet={tweet}
                 allowedEmail={comment.allowedEmail}
                 isLikedCom={comment.isLikedCom}
                 emailUser={emailUser}

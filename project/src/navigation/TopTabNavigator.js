@@ -1,6 +1,6 @@
 import React, {useState, useCallback} from 'react';
 import {StyleSheet, View, RefreshControl} from 'react-native';
-import {Likescreen, Mediascreen, Postscreen, Replyscreen} from '../pages';
+import {Likescreen, Mediascreen, Postscreen, Replyscreen, Repostscreen} from '../pages';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {Tabs, MaterialTabBar} from 'react-native-collapsible-tab-view';
 import Profilescreen from '../pages/Profile/Profilescreen';
@@ -98,7 +98,7 @@ function TopTabNavigator() {
             {refreshing ? renderSkeleton() : <Postscreen />}
           </Tabs.ScrollView>
         </Tabs.Tab>
-        <Tabs.Tab name="Replies">
+        <Tabs.Tab name="Reposts">
           <Tabs.ScrollView
             onScroll={handleScroll}
             scrollEventThrottle={16}
@@ -109,7 +109,7 @@ function TopTabNavigator() {
                 enabled={isScrollTop}
               />
             }>
-            {refreshing ? renderSkeleton() : <Replyscreen />}
+            {refreshing ? renderSkeleton() : <Repostscreen />}
           </Tabs.ScrollView>
         </Tabs.Tab>
         <Tabs.Tab name="Likes">
