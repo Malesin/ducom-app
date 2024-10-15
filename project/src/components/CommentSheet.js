@@ -13,9 +13,31 @@ import config from '../config';
 
 const serverUrl = config.SERVER_URL;
 
-const CommentSheet = ({ commentId, postId, token, emailUser, idUser, userIdPost, onDeleteSuccess, onClose, parentCommentId, userEmailPost, isAdmin, amIAdmin }) => {
-  const [isDeleteComment, setIsDeleteComment] = useState(false);
-  const [isReportComment, setIsReportComment] = useState(false);
+const CommentSheet = ({ commentId, postId, token, idUser, userIdPost, onDeleteSuccess, onClose, parentCommentId, amIAdmin }) => {
+
+  const [isOwn, setIsOwn] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(amIAdmin)
+
+  useEffect(() => {
+
+    if (idUser == userIdPost) {
+      console.log("own")
+      setIsOwn(true)
+    } else if (amIAdmin) {
+      console.log("admin")
+      setIsAdmin(true)
+    } else {
+      console.log("user")
+      setIsOwn(false)
+    }
+
+    console.log("idUser: ", idUser)
+    console.log("userIdPost: ", userIdPost)
+    console.log("amIAdmin: ", amIAdmin)
+    console.log("commentId: ", commentId)
+    console.log("commentId: ", commentId)
+    console.log("=================================")
+  }, [idUser, userIdPost, amIAdmin]);
 
   const deleteComment = async () => {
     try {
@@ -38,33 +60,6 @@ const CommentSheet = ({ commentId, postId, token, emailUser, idUser, userIdPost,
       console.error('Error: ', error);
     }
   };
-
-  useEffect(() => {
-    if (idUser === userIdPost) {
-      // Pengguna dapat menghapus komentarnya sendiri dan melaporkan komentar orang lain / USER
-      setIsDeleteComment(true);
-      setIsReportComment(false);
-    } else if (emailUser === userEmailPost) {
-      // Pemilik akun postingan dapat menghapus dan melaporkan semua komentar / OWNER POST
-      setIsDeleteComment(true);
-      setIsReportComment(true);
-    } else if (amIAdmin) {
-      // Pengguna dengan email yang diizinkan dapat menghapus dan melaporkan semua komentar / ADMIN
-      setIsDeleteComment(true);
-      setIsReportComment(true);
-    } else {
-      // Pengguna lain hanya dapat melaporkan komentar / OTHER USER
-      setIsDeleteComment(false);
-      setIsReportComment(true);
-    }
-    console.log("idUser: ", idUser)
-    console.log("userIdPost: ", userIdPost)
-    console.log("emailUser: ", emailUser)
-    console.log("amIAdmin: ", amIAdmin)
-    console.log("isAdmin: ", isAdmin)
-    console.log("userEmailPost: ", userEmailPost)
-    console.log("=================================")
-  }, [idUser, userIdPost, emailUser, amIAdmin, isAdmin, userEmailPost]);
 
   const reportComment = async () => {
     // try {
@@ -89,22 +84,24 @@ const CommentSheet = ({ commentId, postId, token, emailUser, idUser, userIdPost,
 
   return (
     <SafeAreaView>
-      <View style={styles.optionRow}>
-        {isDeleteComment ? (
+      {isOwn || isAdmin ? (<>
+        <View style={styles.optionRow}>
           <TouchableOpacity style={styles.option} onPress={deleteComment}>
             <MaterialIcons name="delete" size={24} color="#333" />
             <Text style={styles.optionText}>Delete Comment</Text>
           </TouchableOpacity>
-        ) : null}
-      </View>
-      {isReportComment ? (
+        </View>
+      </>) : null}
+
+      {!isOwn ? (<>
         <View style={styles.optionRow}>
           <TouchableOpacity style={styles.option} onPress={reportComment}>
             <MaterialIcons name="report" size={24} color="#D60000" />
             <Text style={styles.optionTextReport}>Report Comment</Text>
           </TouchableOpacity>
         </View>
-      ) : null}
+      </>) : null}
+
     </SafeAreaView>
   );
 };

@@ -185,11 +185,6 @@ const PinTweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
   const handleCommentPress = () => {
     navigator.navigate('ViewPost', {
       tweet,
-      postId: tweet.id,
-      idUser: tweet.idUser,
-      profilePicture: tweet.profilePicture,
-      emailUser: tweet.emailUser,
-      userEmailPost: tweet.userEmailPost,
       comments,
       focusCommentInput: true,
     });

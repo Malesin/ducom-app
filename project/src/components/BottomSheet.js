@@ -20,21 +20,26 @@ const BottomSheet = ({
   onRefreshPage,
   onCloseDel,
   onCloseResp,
+  isUserProfile,
+  isEnabledComm,
+  viewPost,
   handlePin,
   handlePinUser,
-  isUserProfile
 }) => {
   const navigation = useNavigation();
   const [isPin, setIsPin] = useState(false)
   const [isOwn, setIsOwn] = useState(false)
   const [isAdmin, setIsAdmin] = useState(tweet?.amIAdmin)
   const [isPinUser, setIsPinUser] = useState(false)
-  const [isCommentDisabled, setIsCommentDisabled] = useState(false); // Tambahkan state ini
+  const [isCommentDisabled, setIsCommentDisabled] = useState(false);
+  const [isViewPost, setIsViewPost] = useState(false);
 
   useEffect(() => {
     setIsPin(handlePin)
     setIsPinUser(handlePinUser)
-  }, [])
+    setIsViewPost(viewPost || false)
+    isViewPost ? setIsCommentDisabled(!isEnabledComm) : setIsCommentDisabled(!tweet.commentsEnabled)
+  }, [isViewPost, setIsCommentDisabled])
 
   const deletePost = async () => {
     const token = await AsyncStorage.getItem('token');
@@ -202,7 +207,7 @@ const BottomSheet = ({
     if (tweet?.idUser === tweet?.userIdPost) {
       setIsOwn(true)
       console.log("1 OWNER")
-    } else if (tweet?.amIAdmin) {
+    } else if (isAdmin) {
       setIsAdmin(true)
       console.log("2.ADMIN")
     } else {
@@ -210,87 +215,111 @@ const BottomSheet = ({
     }
   }, [tweet?.idUser, tweet?.userIdPost, isUserProfile]);
 
-  const toggleComment = () => {
-    setIsCommentDisabled(!isCommentDisabled);
-    // Hapus setIsClosed(); jika tidak diperlukan
+  const toggleComment = async () => {
+    const token = await AsyncStorage.getItem('token');
+    try {
+      const respCom = await axios.post(`${serverUrl}/toggle-comments`, {
+        token: token,
+        postId: tweet.id,
+        enableComments: isCommentDisabled
+      })
+      console.log(respCom.data)
+      onRefreshPage()
+    } catch (error) {
+      console.error(error)
+    }
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      {isAdmin ? (<>
-        <View style={styles.optionRow}>
-          {/* PIN POST AT HOMESCREEN */}
-          <TouchableOpacity style={styles.option} onPress={pinPost}>
-            <MaterialCommunityIcons name="pin" size={24} color="#333" />
-            <Text style={styles.optionText}>
-              {isPin ? 'Unpin' : 'Pin'} @{tweet?.userName}
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </>) : null}
 
-      {!isOwn ? (<>
-        <View style={styles.optionRow}>
-          <TouchableOpacity style={styles.option} onPress={muteUser}>
-            {tweet?.isMuted ? (
-              <MaterialIcons name="volume-up" size={24} color="#333" />
-            ) : (
-              <MaterialIcons name="volume-off" size={24} color="#333" />
-            )}
-            <Text style={styles.optionText}>{tweet?.isMuted ? 'Unmute' : 'Mute'} @{tweet?.userName}</Text>
-          </TouchableOpacity>
-        </View>
-      </>) : null}
+      {!isViewPost ? (<>
+        {isAdmin ? (<>
+          <View style={styles.optionRow}>
+            {/* PIN POST AT HOMESCREEN */}
+            <TouchableOpacity style={styles.option} onPress={pinPost}>
+              <MaterialCommunityIcons name="pin" size={24} color="#333" />
+              <Text style={styles.optionText}>
+                {isPin ? 'Unpin' : 'Pin'} @{tweet.userName}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </>) : null}
 
-      {isUserProfile ? (<>
-        <View style={styles.optionRow}>
-          {/* PIN POST AT POSTSCREEN  */}
-          <TouchableOpacity style={styles.option} onPress={pinPostUser}>
-            <MaterialCommunityIcons name="pin" size={24} color="#333" />
-            <Text style={styles.optionText}>
-              {isPinUser ? 'Unpin' : 'Pin'} Post
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </>) : null}
+        {!isOwn ? (<>
+          <View style={styles.optionRow}>
+            <TouchableOpacity style={styles.option} onPress={muteUser}>
+              {tweet.isMuted ? (
+                <MaterialIcons name="volume-up" size={24} color="#333" />
+              ) : (
+                <MaterialIcons name="volume-off" size={24} color="#333" />
+              )}
+              <Text style={styles.optionText}>{tweet.isMuted ? 'Unmute' : 'Mute'} @{tweet.userName}</Text>
+            </TouchableOpacity>
+          </View>
+        </>) : null}
 
-      {isAdmin || isOwn ? (<>
-        <View style={styles.optionRow}>
-          <TouchableOpacity style={styles.option} onPress={deletePost}>
-            <MaterialIcons name="delete" size={24} color="#333" />
-            <Text style={styles.optionText}>
-              Delete {isAdmin && !isOwn ? `Post @${tweet?.userName}` : 'Post'}
-            </Text>
-          </TouchableOpacity>
-        </View>
+        {isUserProfile ? (<>
+          <View style={styles.optionRow}>
+            {/* PIN POST AT POSTSCREEN  */}
+            <TouchableOpacity style={styles.option} onPress={pinPostUser}>
+              <MaterialCommunityIcons name="pin" size={24} color="#333" />
+              <Text style={styles.optionText}>
+                {isPinUser ? 'Unpin' : 'Pin'} Post
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </>) : null}
 
-        <View style={styles.optionRow}>
-          <TouchableOpacity style={styles.option} onPress={toggleComment}>
-            <MaterialCommunityIcons name={isCommentDisabled ? "comment-off" : "comment"} size={24} color="#333" />
-            <Text style={styles.optionText}>
-              {isCommentDisabled ? 'Enable Comments' : 'Disable Comments'}
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </>) : null}
+        {isAdmin || isOwn ? (<>
+          <View style={styles.optionRow}>
+            <TouchableOpacity style={styles.option} onPress={deletePost}>
+              <MaterialIcons name="delete" size={24} color="#333" />
+              <Text style={styles.optionText}>
+                Delete {isAdmin && !isOwn ? `Post @${tweet.userName}` : 'Post'}
+              </Text>
+            </TouchableOpacity>
+          </View>
 
-      {!isOwn ? (<>
-        <View style={styles.optionRow}>
-          <TouchableOpacity style={styles.option} onPress={blockUser}>
-            <MaterialIcons name="block" size={24} color="#333" />
-            <Text style={styles.optionText}>Block @{tweet?.userName}</Text>
-          </TouchableOpacity>
-        </View>
+          <View style={styles.optionRow}>
+            <TouchableOpacity style={styles.option} onPress={toggleComment}>
+              <MaterialCommunityIcons name={!isCommentDisabled ? "comment-off" : "comment"} size={24} color="#333" />
+              <Text style={styles.optionText}>
+                {isCommentDisabled ? 'Enable Comments' : 'Disable Comments'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </>) : null}
 
-        <View style={styles.optionRow}>
-          <TouchableOpacity
-            style={styles.option}
-            onPress={() => navigation.navigate('Report')}>
-            <MaterialIcons name="report" size={24} color="#D60000" />
-            <Text style={styles.optionTextReport}>Report @{tweet?.userName}</Text>
-          </TouchableOpacity>
-        </View>
-      </>) : null}
+        {!isOwn ? (<>
+          <View style={styles.optionRow}>
+            <TouchableOpacity style={styles.option} onPress={blockUser}>
+              <MaterialIcons name="block" size={24} color="#333" />
+              <Text style={styles.optionText}>Block @{tweet.userName}</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.optionRow}>
+            <TouchableOpacity
+              style={styles.option}
+              onPress={() => navigation.navigate('Report')}>
+              <MaterialIcons name="report" size={24} color="#D60000" />
+              <Text style={styles.optionTextReport}>Report @{tweet.userName}</Text>
+            </TouchableOpacity>
+          </View>
+        </>) : null}
+      </>) : (<>
+        {isAdmin || isOwn ? (<>
+          <View style={styles.optionRow}>
+            <TouchableOpacity style={styles.option} onPress={toggleComment}>
+              <MaterialCommunityIcons name={!isCommentDisabled ? "comment-off" : "comment"} size={24} color="#333" />
+              <Text style={styles.optionText}>
+                {isCommentDisabled ? 'Enable Comments' : 'Disable Comments'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </>) : null}
+      </>)}
 
     </SafeAreaView>
   );
@@ -305,7 +334,7 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 2,  
+      height: 2,
     },
     shadowOpacity: 0.25,
     shadowRadius: 4,
