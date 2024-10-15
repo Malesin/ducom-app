@@ -20,7 +20,7 @@ import TermsandConditionscreen from './Settings/TermsandConditionscreen';
 import Likescreen from './Profile/Likescreen';
 import Mediascreen from './Profile/Mediascreen';
 import Postscreen from './Profile/Postscreen';
-import Replyscreen from './Profile/Replyscreen';
+import Repostscreen from './Profile/Repostscreen';
 import EditProfilePage from './Profile/EditProfilePage';
 import Userprofile from './Userprofile/Userprofile';
 import Userpost from './Userprofile/Userpost';
@@ -55,7 +55,7 @@ export {
   Likescreen,
   Postscreen,
   Mediascreen,
-  Replyscreen,
+  Repostscreen,
   EditProfilePage,
   Userprofile,
   Userpost,

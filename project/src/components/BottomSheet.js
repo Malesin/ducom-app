@@ -41,7 +41,7 @@ const BottomSheet = ({
     try {
       const delPost = await axios.post(`${serverUrl}/delete-post`, {
         token: token,
-        postId: tweet.id
+        postId: tweet?.id
       });
       const respdel = delPost.data.status
 
@@ -61,7 +61,7 @@ const BottomSheet = ({
       if (!isPinUser) {
         const pinPost = await axios.post(`${serverUrl}/posts/pin`, {
           token: token,
-          postId: tweet.id,
+          postId: tweet?.id,
           duration: 8
         })
         onCloseResp({
@@ -99,7 +99,7 @@ const BottomSheet = ({
       if (!isPinUser) {
         const pinPost = await axios.post(`${serverUrl}/pin-post`, {
           token: token,
-          postId: tweet.id,
+          postId: tweet?.id,
         })
         onCloseResp({
           status: pinPost.data.status,
@@ -135,7 +135,7 @@ const BottomSheet = ({
       if (!tweet.isMuted) {
         const mute = await axios.post(`${serverUrl}/mute-user`, {
           token: token,
-          muteUserId: tweet.userIdPost
+          muteUserId: tweet?.userIdPost
         })
         onCloseResp({
           status: mute.data.status,
@@ -147,7 +147,7 @@ const BottomSheet = ({
       } else if (tweet.isMuted) {
         const unmute = await axios.post(`${serverUrl}/unmute-user`, {
           token: token,
-          unmuteUserId: tweet.userIdPost
+          unmuteUserId: tweet?.userIdPost
         })
         onCloseResp({
           status: unmute.data.status,
@@ -171,7 +171,7 @@ const BottomSheet = ({
       if (!tweet.isBlocked) {
         const block = await axios.post(`${serverUrl}/block-user`, {
           token: token,
-          blockUserId: tweet.userIdPost
+          blockUserId: tweet?.userIdPost
         })
         onCloseResp({
           status: block.data.status,
@@ -183,7 +183,7 @@ const BottomSheet = ({
       } else if (tweet.isBlocked) {
         const unblock = await axios.post(`${serverUrl}/unblock-user`, {
           token: token,
-          unblockUserId: tweet.userIdPost
+          unblockUserId: tweet?.userIdPost
         })
         onCloseResp({
           status: unblock.data.status,
@@ -199,16 +199,16 @@ const BottomSheet = ({
   }
 
   useEffect(() => {
-    if (tweet.idUser === tweet.userIdPost) {
+    if (tweet?.idUser === tweet?.userIdPost) {
       setIsOwn(true)
       console.log("1 OWNER")
-    } else if (tweet.amIAdmin) {
+    } else if (tweet?.amIAdmin) {
       setIsAdmin(true)
       console.log("2.ADMIN")
     } else {
       console.log("3 USER")
     }
-  }, [tweet.idUser, tweet.userIdPost, isUserProfile]);
+  }, [tweet?.idUser, tweet?.userIdPost, isUserProfile]);
 
   const toggleComment = () => {
     setIsCommentDisabled(!isCommentDisabled);
@@ -223,7 +223,7 @@ const BottomSheet = ({
           <TouchableOpacity style={styles.option} onPress={pinPost}>
             <MaterialCommunityIcons name="pin" size={24} color="#333" />
             <Text style={styles.optionText}>
-              {isPin ? 'Unpin' : 'Pin'} @{tweet.userName}
+              {isPin ? 'Unpin' : 'Pin'} @{tweet?.userName}
             </Text>
           </TouchableOpacity>
         </View>
@@ -232,12 +232,12 @@ const BottomSheet = ({
       {!isOwn ? (<>
         <View style={styles.optionRow}>
           <TouchableOpacity style={styles.option} onPress={muteUser}>
-            {tweet.isMuted ? (
+            {tweet?.isMuted ? (
               <MaterialIcons name="volume-up" size={24} color="#333" />
             ) : (
               <MaterialIcons name="volume-off" size={24} color="#333" />
             )}
-            <Text style={styles.optionText}>{tweet.isMuted ? 'Unmute' : 'Mute'} @{tweet.userName}</Text>
+            <Text style={styles.optionText}>{tweet?.isMuted ? 'Unmute' : 'Mute'} @{tweet?.userName}</Text>
           </TouchableOpacity>
         </View>
       </>) : null}
@@ -259,7 +259,7 @@ const BottomSheet = ({
           <TouchableOpacity style={styles.option} onPress={deletePost}>
             <MaterialIcons name="delete" size={24} color="#333" />
             <Text style={styles.optionText}>
-              Delete {isAdmin && !isOwn ? `Post @${tweet.userName}` : 'Post'}
+              Delete {isAdmin && !isOwn ? `Post @${tweet?.userName}` : 'Post'}
             </Text>
           </TouchableOpacity>
         </View>
@@ -278,7 +278,7 @@ const BottomSheet = ({
         <View style={styles.optionRow}>
           <TouchableOpacity style={styles.option} onPress={blockUser}>
             <MaterialIcons name="block" size={24} color="#333" />
-            <Text style={styles.optionText}>Block @{tweet.userName}</Text>
+            <Text style={styles.optionText}>Block @{tweet?.userName}</Text>
           </TouchableOpacity>
         </View>
 
@@ -287,7 +287,7 @@ const BottomSheet = ({
             style={styles.option}
             onPress={() => navigation.navigate('Report')}>
             <MaterialIcons name="report" size={24} color="#D60000" />
-            <Text style={styles.optionTextReport}>Report @{tweet.userName}</Text>
+            <Text style={styles.optionTextReport}>Report @{tweet?.userName}</Text>
           </TouchableOpacity>
         </View>
       </>) : null}
