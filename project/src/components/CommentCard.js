@@ -32,12 +32,9 @@ const CommentCard = ({
   postId,
   userIdPost,
   idUser,
-  allowedEmail,
-  emailUser,
   onDeleteSuccess,
   isLikedCom,
   parentCommentId,
-  userEmailPost,
   isAdmin,
   amIAdmin,
 }) => {
@@ -51,7 +48,6 @@ const CommentCard = ({
     const token = await AsyncStorage.getItem('token');
     setGetToken(token);
   };
-  // console.log("isAdmin", isAdmin)
   useEffect(() => {
     tokenconst();
   }, []);
@@ -189,12 +185,9 @@ const CommentCard = ({
                       postId={postId}
                       userIdPost={reply.userIdPost}
                       idUser={idUser}
-                      allowedEmail={allowedEmail}
-                      emailUser={emailUser}
                       onDeleteSuccess={onDeleteSuccess}
                       isLikedCom={reply.isLikedCom}
                       parentCommentId={commentId}
-                      userEmailPost={userEmailPost}
                       isAdmin={isAdmin}
                       amIAdmin={amIAdmin}
                     />
@@ -244,11 +237,8 @@ const CommentCard = ({
               token={gettoken}
               userIdPost={userIdPost}
               idUser={idUser}
-              allowedEmail={allowedEmail}
-              emailUser={emailUser}
               onDeleteSuccess={onDeleteSuccess}
               parentCommentId={parentCommentId}
-              userEmailPost={userEmailPost}
               isAdmin={isAdmin}
               amIAdmin={amIAdmin}
             />

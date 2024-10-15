@@ -61,7 +61,6 @@ const Marksscreen = ({navigation}) => {
         }
 
         const idUser = data._id; 
-        const emailUser = data.email; 
         const profilePicture = data.profilePicture;
 
         const responseTweet = await axios.post(`${serverUrl}/user-bookmarks`, {
@@ -89,9 +88,6 @@ const Marksscreen = ({navigation}) => {
           isBookmarked: post.bookmarks.some(bookmark => bookmark.user === idUser),
           userIdPost: post.user._id,
           idUser: idUser,
-          allowedEmail: post.allowedEmail,
-          userEmailPost: post.user.email,
-          emailUser : emailUser,
           profilePicture: profilePicture
         }));
 

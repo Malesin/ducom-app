@@ -34,10 +34,8 @@ const ViewPost = ({ route }) => {
   const {
     tweet,
     comments: initialComments,
-    postId,
-    idUser,
-    emailUser,
     focusCommentInput,
+    isUserProfile
   } = route?.params || {};
 
   const [liked, setLiked] = useState(tweet.isLiked);
@@ -56,13 +54,12 @@ const ViewPost = ({ route }) => {
   const [replyToCommentId, setReplyToCommentId] = useState(null);
   const textInputRef = React.createRef();
   const [visibleComments, setVisibleComments] = useState(3);
-  const [placeholder, setPlaceholder] = useState('add comments');
+  const [placeholder, setPlaceholder] = useState('Add Comments');
   const colorScheme = useColorScheme();
 
   const [refreshing, setRefreshing] = useState(false);
-  const [showBottomSheet, setShowBottomSheet] = useState(false); // Tambahkan state ini
-
-  console.log("tweet:", tweet.comments)
+  const [showBottomSheet, setShowBottomSheet] = useState(false);
+  const [isEnabledComm, setIsEnabledComm] = useState(true);
 
   useEffect(() => {
     if (focusCommentInput && textInputRef.current) {
@@ -88,6 +85,8 @@ const ViewPost = ({ route }) => {
 
     generateThumbnails();
   }, [tweet.media]);
+
+
 
   const handleLike = async () => {
     const token = await AsyncStorage.getItem('token');
@@ -225,7 +224,6 @@ const ViewPost = ({ route }) => {
       <MaterialCommunityIcons name={icon} size={20} color={color} />
     </TouchableOpacity>
   );
-  console.log(tweet.isAdmin)
   const handleMediaPress = mediaItem => {
     setSelectedMedia(mediaItem);
     setModalVisible(true);
@@ -248,32 +246,26 @@ const ViewPost = ({ route }) => {
       const formattedComments = dataComment.map(comment => ({
         id: comment._id,
         text: comment.comment,
-
         userIdPost: comment.user._id,
-        idUser: idUser,
-        email: comment.user.email,
-        isLikedCom: comment.likes.some(like => like.user === idUser),
+        idUser: tweet.idUser,
+        isLikedCom: comment.likes.some(like => like.user === tweet.idUser),
         replies: Array.isArray(comment.replies)
           ? comment.replies.map(reply => ({
             id: reply._id,
             text: reply.comment,
             userIdPost: reply.user._id,
-            idUser: idUser,
+            idUser: tweet.idUser,
             username: reply.user.username,
-            email: reply.user.email,
-            isLikedCom: reply.likes.some(like => like.user === idUser),
+            isLikedCom: reply.likes.some(like => like.user === tweet.idUser),
             profilePicture: reply.user.profilePicture,
             replies: reply.replies || [],
-            allowedEmail: reply.allowedEmail,
           }))
           : [],
         username: comment.user.username,
         profilePicture: comment.user.profilePicture,
-        allowedEmail: comment.allowedEmail,
         isAdmin: comment.user.isAdmin
       }));
-
-      setComments(formattedComments);
+      setComments(formattedComments || []);
       setVisibleComments(3);
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -281,13 +273,30 @@ const ViewPost = ({ route }) => {
       setRefreshing(false);
     }
   }, [tweet.id]);
-  
+
+  const isEnabledComment = useCallback(async () => {
+    const token = await AsyncStorage.getItem('token')
+    try {
+      const response = await axios.post(`${serverUrl}/isenabled-comments`, {
+        token: token,
+        postId: tweet.id
+      })
+      setIsEnabledComm(response.data.data.commentsEnabled)
+    } catch (error) {
+      console.error(error)
+    }
+  }, [])
+
+
   useEffect(() => {
     fetchComments();
+    isEnabledComment()
   }, [fetchComments]);
 
-  const onRefresh = useCallback(() => {
+  const onRefresh = useCallback(async () => {
     fetchComments();
+    isEnabledComment()
+    setShowBottomSheet(false)
   }, [fetchComments]);
 
   const onDeleteSuccess = () => {
@@ -303,12 +312,13 @@ const ViewPost = ({ route }) => {
   const handleTextInputContentSizeChange = event => {
     setInputHeight(event.nativeEvent.contentSize.height);
   };
+
   const handleAddComment = async () => {
     const token = await AsyncStorage.getItem('token');
     try {
       await axios.post(`${serverUrl}/comment-post`, {
         token: token,
-        postId: postId,
+        postId: tweet.id,
         comment: comment,
         parentCommentId: replyToCommentId || null,
       });
@@ -316,7 +326,7 @@ const ViewPost = ({ route }) => {
       fetchComments();
       setReplyToCommentId(null);
       setComment('');
-      setPlaceholder('add comments');
+      setPlaceholder('Add Comments');
       setIsTyping(false);
       Keyboard.dismiss();
     } catch (error) {
@@ -334,13 +344,20 @@ const ViewPost = ({ route }) => {
   };
 
   const handleReplyIconPress = () => {
-    setIsReplying(true);
+    setIsReplying(true)
     setReplyToCommentId(null);
-    setPlaceholder('add comments');
+    setPlaceholder('Add Comments');
     if (textInputRef.current) {
       textInputRef.current.focus();
     }
   };
+
+  const onRefreshPage = () => {
+    setRefreshing(true);
+    setShowBottomSheet(false)
+    onRefresh();
+  };
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -455,7 +472,7 @@ const ViewPost = ({ route }) => {
               onPress={handleLike}
             />
             <InteractionButton
-              icon="message-reply-outline"
+              icon={isEnabledComm ? "message-reply-outline" : "message-off-outline"}
               color="#040608"
               onPress={handleReplyIconPress}
             />
@@ -487,15 +504,12 @@ const ViewPost = ({ route }) => {
                 }
                 onAddReply={replyText => handleAddReply(comment.id, replyText)}
                 commentId={comment.id}
-                postId={postId}
+                postId={tweet.id}
                 userIdPost={comment.userIdPost}
-                idUser={idUser}
-                allowedEmail={comment.allowedEmail}
+                idUser={tweet.idUser}
                 isLikedCom={comment.isLikedCom}
-                emailUser={emailUser}
                 isAdmin={comment.isAdmin}
                 amIAdmin={tweet.amIAdmin}
-                userEmailPost={tweet.userEmailPost}
                 onDeleteSuccess={onDeleteSuccess}
               />
             ))}
@@ -510,36 +524,46 @@ const ViewPost = ({ route }) => {
       </ScrollView>
       <View style={[styles.inputContainer, { height: inputHeight }]}>
         <Image source={{ uri: profilePicture }} style={styles.profilePicture} />
-        <TextInput
-          ref={textInputRef}
-          style={[
-            styles.inputComment,
-            {
-              height: inputHeight,
-              color: colorScheme === 'dark' ? '#000000' : '#000',
-            },
-          ]}
-          placeholder={placeholder}
-          placeholderTextColor={colorScheme === 'dark' ? '#ccc' : '#888'}
-          maxLength={300}
-          multiline={true}
-          value={comment}
-          onChangeText={handleTextInputChange}
-          onContentSizeChange={handleTextInputContentSizeChange}
-        />
 
-        {isTyping && (
-          <TouchableOpacity
-            style={styles.iconContainer}
-            onPress={() => handleAddComment()}>
-            <MaterialCommunityIcons
-              name="upload"
-              size={20}
-              color="#fff"
-              style={styles.icon}
-            />
-          </TouchableOpacity>
-        )}
+        {isEnabledComm ? (<>
+          <TextInput
+            ref={textInputRef}
+            style={[
+              styles.inputComment,
+              {
+                height: inputHeight,
+                color: colorScheme === 'dark' ? '#000000' : '#000',
+              },
+            ]}
+            placeholder={placeholder}
+            placeholderTextColor={colorScheme === 'dark' ? '#ccc' : '#888'}
+            maxLength={300}
+            multiline={true}
+            value={comment}
+            onChangeText={handleTextInputChange}
+            onContentSizeChange={handleTextInputContentSizeChange}
+          />
+
+          {isTyping && (
+            <TouchableOpacity
+              style={styles.iconContainer}
+              onPress={() => handleAddComment()}>
+              <MaterialCommunityIcons
+                name="upload"
+                size={20}
+                color="#fff"
+                style={styles.icon}
+              />
+            </TouchableOpacity>
+          )}
+        </>) : (<>
+          <Text
+            style={styles.commentDisabled}
+          >
+            Comments Disabled
+          </Text>
+        </>)}
+
       </View>
       {selectedMedia && (
         <Modal
@@ -583,12 +607,21 @@ const ViewPost = ({ route }) => {
           <BottomSheet
             onCloseDel={(respdel) => {
               setShowBottomSheet(false);
+              onRefreshPage();
+              onDel(respdel)
             }}
-            idUser={idUser}
-            username={tweet.userHandle}
-            allowedEmail={tweet.allowedEmail}
-            emailUser={emailUser}
-            userIdPost={tweet.userIdPost} // Pastikan ini dikirim
+            onCloseResp={(resp) => {
+              setShowBottomSheet(false);
+              onRefreshPage();
+              onResp(resp)
+            }}
+            tweet={tweet}
+            onRefreshPage={onRefreshPage}
+            isUserProfile={isUserProfile}
+            isEnabledComm={isEnabledComm}
+            viewPost={true}
+            handlePin={false}
+            handlePinUser={false}
           />
         </View>
       </Modal>
@@ -773,7 +806,7 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
     padding: 18,
     flex: 1,
-    marginLeft: 10,
+    marginLeft: 1,
     height: null,
     fontSize: 13,
   },
@@ -790,6 +823,9 @@ const styles = StyleSheet.create({
     height: 28,
     marginRight: 10,
     alignItems: 'center',
+  },
+  commentDisabled:{
+    marginLeft: 15
   },
   icon: {
     alignItems: 'center',

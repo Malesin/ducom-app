@@ -36,7 +36,6 @@ function Likescreen({ navigation }) {
             }
 
             const idUser = data._id;
-            const emailUser = data.email;
             const profilePicture = data.profilePicture
 
             const responseTweet = await axios.post(`${serverUrl}/liked-posts`, { token });
@@ -62,9 +61,6 @@ function Likescreen({ navigation }) {
                 isBookmarked: post.bookmarks.some(bookmark => bookmark.user === idUser),
                 userIdPost: post.user._id,
                 idUser: idUser,
-                allowedEmail: post.allowedEmail,
-                userEmailPost: post.user.email,
-                emailUser: emailUser,
                 profilePicture: profilePicture,
                 isAdmin: post.user.isAdmin
             }));

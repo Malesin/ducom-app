@@ -30,7 +30,7 @@ const Usermedia = ({ userIdPost, profilePicture }) => {
       });
       console.log('Data Berhasil Diambil');
 
-      const dataTweet = response.data.data;
+      const dataTweet = userResponse.data.data;
       console.log('Fetched tweets:', dataTweet); // Tambahkan log untuk memeriksa data
 
       const formattedTweets = dataTweet.map(post => ({
@@ -42,9 +42,9 @@ const Usermedia = ({ userIdPost, profilePicture }) => {
         content: post.description,
         media: Array.isArray(post.media)
           ? post.media.map(mediaItem => ({
-              type: mediaItem.type,
-              uri: mediaItem.uri,
-            }))
+            type: mediaItem.type,
+            uri: mediaItem.uri,
+          }))
           : [],
         likesCount: post.likes.length,
         commentsCount: post.comments.length,
@@ -55,16 +55,22 @@ const Usermedia = ({ userIdPost, profilePicture }) => {
         ),
         userIdPost: post.user._id,
         profilePicture: profilePicture,
-        allowedEmail: post.allowedEmail,
-        userEmailPost: post.user.email,
         isAdmin: post.user.isAdmin
       }));
 
       setTweets(formattedTweets);
-      setLoading(false); // Pastikan setLoading(false) dipanggil di sini
     } catch (error) {
-      console.error('Error fetching data:', error);
-      setLoading(false); // Pastikan setLoading(false) dipanggil di sini juga
+      if (error.response && error.response.data === 'youBlockedBy') {
+        console.log("lo diblokir")
+        setTweets("You are blocked by this user");
+      } else if (error.response && error.response.data === 'youBlockedThis') {
+        console.log("lo ngeblokir")
+        setTweets("You have blocked this user");
+      } else {
+        console.error("Error fetching tweets:", error);
+      }
+    } finally {
+      setLoading(false); // Pastikan setLoading(false) dipanggil di sini
     }
   }, [userIdPost]);
 
@@ -116,14 +122,7 @@ const Usermedia = ({ userIdPost, profilePicture }) => {
     </>
   );
 
-  const onRefreshPage = () => {
-    setLoading(true);
-    setTweets([]);
-    (async () => {
-      await fetchTweets();
-      setLoading(false);
-    })();
-  };
+  console.log(tweets)
 
   return (
     <SafeAreaView style={styles.container}>
@@ -131,14 +130,18 @@ const Usermedia = ({ userIdPost, profilePicture }) => {
         renderSkeleton()
       ) : (
         <ScrollView contentContainerStyle={styles.contentContainer}>
-          {tweets.length > 0 ? (
+          {Array.isArray(tweets) && tweets.length > 0 ? (
             tweets.map((tweet, index) => (
               <View key={index} style={styles.tweetContainer}>
                 <TweetCard tweet={tweet} />
               </View>
             ))
           ) : (
-            <Text style={styles.noTweetsText}>No tweets available</Text>
+            <Text style={styles.noTweetsText}>
+              {tweets === "You are blocked by this user" ? "You are blocked by this user" : (<>
+                {tweets === "You have blocked this user" ? "You have blocked this user" : "No Tweets Available"}
+              </>)}
+            </Text>
           )}
         </ScrollView>
       )}
@@ -161,8 +164,8 @@ const styles = StyleSheet.create({
   },
   noTweetsText: {
     textAlign: 'center',
-    color: '#888',
-    marginTop: 20,
+    color: '#000',
+    marginTop: 25,
   },
   loadingIndicator: {
     flex: 1,

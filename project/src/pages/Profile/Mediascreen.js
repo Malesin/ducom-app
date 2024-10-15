@@ -38,7 +38,6 @@ function Mediascreen({ navigation }) {
         }
 
         const idUser = data._id;
-        const emailUser = data.email;
         const profilePicture = data.profilePicture
 
         const responseTweet = await axios.post(`${serverUrl}/my-posts`, {
@@ -65,9 +64,6 @@ function Mediascreen({ navigation }) {
             isLiked: post.likes.some(like => like._id === idUser),
             userIdPost: post.user._id,
             idUser: idUser,
-            allowedEmail: post.allowedEmail,
-            userEmailPost: post.user.email,
-            emailUser: emailUser,
             profilePicture: profilePicture,
             isAdmin: post.user.isAdmin
           }));

@@ -42,7 +42,6 @@ function Postscreen({ }) {
       }
 
       const idUser = data._id;
-      const emailUser = data.email;
       const profilePicture = data.profilePicture
 
       const responseTweet = await axios.post(`${serverUrl}/my-posts`, {
@@ -71,9 +70,6 @@ function Postscreen({ }) {
         isBookmarked: post.bookmarks.some(bookmark => bookmark.user === idUser),
         userIdPost: post.user._id,
         idUser: idUser,
-        allowedEmail: post.allowedEmail,
-        userEmailPost: post.user.email,
-        emailUser: emailUser,
         profilePicture: profilePicture,
         isAdmin: post.user.isAdmin
       }));
@@ -100,7 +96,6 @@ function Postscreen({ }) {
         ]);
         return;
       }
-      const emailUser = data.email;
       const idUser = data._id;
       const profilePicture = data.profilePicture;
       const amIAdmin = data.isAdmin
@@ -135,8 +130,6 @@ function Postscreen({ }) {
         isBookmarked: postPin.bookmarks.some(bookmark => bookmark.user === idUser),
         userIdPost: postPin.user._id,
         idUser: idUser,
-        userEmailPost: postPin.user.email,
-        emailUser: emailUser,
         profilePicture: profilePicture,
         isAdmin: postPin.user.isAdmin,
         amIAdmin: amIAdmin
@@ -175,10 +168,7 @@ function Postscreen({ }) {
     const comments = await fetchComments(tweet.id);
     const postId = tweet.id;
     const idUser = tweet.idUser;
-    const emailUser = tweet.emailUser;
-    const userEmailPost = tweet.userEmailPost;
     const focusCommentInput = true;
-    navigation.navigate('ViewPost', { tweet, comments, postId, idUser, userEmailPost, emailUser, focusCommentInput });
   };
 
   const onRefreshPage = () => {
