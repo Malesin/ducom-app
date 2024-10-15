@@ -103,17 +103,18 @@ const CreatePost = ({ route, navigation }) => {
         let uploadedMedia = [];
 
         for (const media of selectedMedia) {
+          const mediaType = media.type || 'image/jpeg'; // Default ke 'image/jpeg' jika null
           const compressedUri = await compressMedia(media.uri, mediaType);
 
           if (typeof compressedUri === 'string') {
             const fileType = compressedUri.endsWith('.mp4')
               ? 'video/mp4'
-              : 'image/jpeg';
+              : mediaType; // Gunakan mediaType asli
 
             formData.append('media', {
               uri: compressedUri,
               type: fileType,
-              name: `media.${compressedUri.endsWith('.mp4') ? 'mp4' : 'jpg'}`,
+              name: `media.${compressedUri.endsWith('.mp4') ? 'mp4' : 'png'}`, // Pastikan nama file sesuai
             });
 
             uploadedMedia.push({
@@ -219,7 +220,7 @@ const CreatePost = ({ route, navigation }) => {
         console.error('Error resizing HEIF image:', error);
         return uri;
       }
-    } else if (mediaType === 'image/png' || mediaType === 'image/jpeg') {
+    } else if (mediaType === 'image/png' || mediaType === 'image/jpeg' || mediaType === 'image/jpg') {
       try {
         const uriWithPrefix = uri.startsWith('file://') ? uri : `file://${uri}`;
 
@@ -288,22 +289,21 @@ const CreatePost = ({ route, navigation }) => {
         const { mediaType, assets } = response;
         if (assets && assets.length > 0) {
           const uri = assets[0].uri;
-          setMediaType(assets[0].type);
-          if (mediaType === 'video') {
+          const type = assets[0].type || mediaType; // Pastikan type diatur
+          setMediaType(type);
+          if (type === 'video') {
             try {
               await checkVideoDuration(uri);
               const thumbnailUri = await generateThumbnail(uri);
               setSelectedMedia(prevMedia => [
                 ...prevMedia,
-                { uri, thumbnailUri },
+                { uri, thumbnailUri, type },
               ]);
-              setMediaType(mediaType);
             } catch (error) {
               Alert.alert('Video Upload Error', error.message);
             }
           } else {
-            setSelectedMedia(prevMedia => [...prevMedia, { uri }]);
-            setMediaType(mediaType);
+            setSelectedMedia(prevMedia => [...prevMedia, { uri, type }]);
           }
         }
       }
@@ -334,10 +334,11 @@ const CreatePost = ({ route, navigation }) => {
           }
 
           const newMedia = await Promise.all(assets.map(async asset => {
-            const thumbnail = asset.type === 'video' ? (await createThumbnail({ url: asset.uri, timeStamp: 1000 })).path : null;
+            const type = asset.type || 'image/jpeg'; // Default ke 'image/jpeg' jika null
+            const thumbnail = type === 'video' ? (await createThumbnail({ url: asset.uri, timeStamp: 1000 })).path : null;
             return {
               uri: asset.uri,
-              type: asset.type,
+              type,
               thumbnail,
             };
           }));
