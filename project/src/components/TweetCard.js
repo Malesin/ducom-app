@@ -421,7 +421,7 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
           onPress={handleLike}
         />
         <InteractionButton
-          icon={tweet.commentsEnabled ? "message-reply-outline" : "message-off-outline"}
+          icon={tweet?.commentsEnabled ? "message-reply-outline" : "message-off-outline"}
           color="#040608"
           count={commentsCount}
           onPress={() => handleCommentPress()}
@@ -429,7 +429,7 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
         <InteractionButton
           icon={bookmarked ? 'bookmark' : 'bookmark-outline'}
           color={bookmarked ? '#00c5ff' : '#040608'}
-          count={bookMarksCount}
+          count={bookMarksCount} 
           onPress={handleBookmark}
         />
         <InteractionButton
