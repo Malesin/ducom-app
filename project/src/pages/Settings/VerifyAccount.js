@@ -14,7 +14,7 @@ const VerifyAccount = ({navigation}) => {
     const [profilePicture, setProfilePicture] = useState(null);
     const [username, setUsername] = useState(null);
     const [password, setPassword] = useState('');
-    const [myToken, setMyToken] = useState('');
+    // const [myToken, setMyToken] = useState('');
     const [error, setError] = useState(''); // Tambahkan state untuk error
 
     async function myData() {
@@ -164,7 +164,7 @@ const VerifyAccount = ({navigation}) => {
                 </TouchableOpacity>
 
                 <TouchableOpacity>
-                    <Text style={styles.forgotPassword}>Forgot Password?</Text>
+                    <Text style={styles.forgotPassword} onPress={() => navigation.navigate('Forgotpass')}>Forgot Password?</Text>
                 </TouchableOpacity>
             </View>
         </SafeAreaView>

@@ -394,16 +394,16 @@ const HomeScreen = ({ navigation }) => {
   const handleLoadMore = async () => {
     if (!loadingMore && hasMore) {
       setLoadingMore(true);
-      const moreTweets = await fetchTweets(page + 1); // Load next page of tweets
+      const moreTweets = await fetchTweets(page + 1);
       const newTweets = moreTweets.filter(
-        tweet => !tweets.some(existingTweet => existingTweet.id === tweet.id) && tweet.id !== pinnedTweetId, // Filter tweet yang dipin
+        tweet => !tweets.some(existingTweet => existingTweet.id === tweet.id) && tweet.id !== pinnedTweetId,
       );
       if (newTweets.length > 0) {
-        setTweets(prevTweets => [...prevTweets, ...newTweets.slice(0, 5)]); // Add only 4 new tweets
-        setPage(prevPage => prevPage + 1); // Increment page number
+        setTweets(prevTweets => [...prevTweets, ...newTweets.slice(0, 5)]); 
+        setPage(prevPage => prevPage + 1); 
       }
       setLoadingMore(false);
-      if (newTweets.length < 4) { // Check if less than 4 tweets are returned
+      if (newTweets.length < 4) {
         setHasMore(false);
       }
     }
