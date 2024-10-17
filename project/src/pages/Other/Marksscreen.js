@@ -88,7 +88,8 @@ const Marksscreen = ({navigation}) => {
           isBookmarked: post.bookmarks.some(bookmark => bookmark.user === idUser),
           userIdPost: post.user._id,
           idUser: idUser,
-          profilePicture: profilePicture
+          profilePicture: profilePicture,
+          commentsEnabled: post.commentsEnabled
         }));
 
         return formattedTweets;

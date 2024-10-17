@@ -11,7 +11,7 @@ import {
   ActivityIndicator,
   Text,
 } from 'react-native';
-import NetInfo from '@react-native-community/netinfo'; // Tambahkan import NetInfo
+import NetInfo from '@react-native-community/netinfo'; 
 import { useFocusEffect } from '@react-navigation/native';
 import TweetCard from '../../components/TweetCard';
 import PinTweetCard from '../../components/PinTweetCard';
@@ -68,12 +68,13 @@ const HomeScreen = ({ navigation }) => {
       const token = await AsyncStorage.getItem('token');
       const response = await axios.post(`${serverUrl}/userdata`, { token: token });
       const { data, status } = response.data;
-      if (status === 'error') {
-        Alert.alert('Error', 'Anda Telah Keluar dari Akun', [
-          { text: 'OK', onPress: () => navigation.navigate('Auths') },
-        ]);
-        return;
-      }
+      // if (status === 'error') {
+      //   Alert.alert('Error', 'Anda Telah Keluar dari Akun', [
+      //     { text: 'OK', onPress: () => navigation.navigate('Auths') },
+      //   ]);
+      //   return;
+      // }
+      const emailUser = data.email;
       const idUser = data._id;
       const profilePicture = data.profilePicture;
       const amIAdmin = data.isAdmin
@@ -110,6 +111,8 @@ const HomeScreen = ({ navigation }) => {
           isBlocked: isBlockeds.some(isBlocked => isBlocked === post.user._id),
           userIdPost: post.user._id,
           idUser: idUser,
+          userEmailPost: post.user.email,
+          emailUser: emailUser,
           profilePicture: profilePicture,
           commentsEnabled: post.commentsEnabled,
           isAdmin: post.user.isAdmin,
@@ -137,6 +140,7 @@ const HomeScreen = ({ navigation }) => {
       //   ]);
       //   return;
       // }
+      const emailUser = data.email;
       const idUser = data._id;
       const profilePicture = data.profilePicture;
       const amIAdmin = data.isAdmin
@@ -147,7 +151,13 @@ const HomeScreen = ({ navigation }) => {
         token: token
       });
 
-      const pinnedBy = pinPost.data.data.pinnedBy || ''
+      // Tambahkan pengecekan null
+      if (!pinPost.data.data) {
+        console.error('Pinned post data is null');
+        return null;
+      }
+
+      const pinnedBy = pinPost.data.data.pinnedBy || '';
       const postPin = pinPost.data.data.post;
 
       if (!postPin) {
@@ -177,6 +187,8 @@ const HomeScreen = ({ navigation }) => {
         isBlocked: isBlockeds.some(isBlocked => isBlocked === postPin.user._id),
         userIdPost: postPin.user._id,
         idUser: idUser,
+        userEmailPost: postPin.user.email,
+        emailUser: emailUser,
         profilePicture: profilePicture,
         commentsEnabled: postPin.commentsEnabled,
         pinnedBy: pinnedBy,
@@ -215,9 +227,12 @@ const HomeScreen = ({ navigation }) => {
       return;
     }
     const comments = await fetchComments(tweet.id);
+    const postId = tweet.id;
+    const idUser = tweet.idUser
+    const emailUser = tweet.emailUser
+    const userEmailPost = tweet.userEmailPost
     const focusCommentInput = true
-    const isUserProfile = false
-    navigation.navigate('ViewPost', { tweet, comments, focusCommentInput, isUserProfile });
+    navigation.navigate('ViewPost', { tweet, comments, postId, idUser, userEmailPost, emailUser, focusCommentInput });
   };
 
   const onRefresh = useCallback(async () => {
@@ -394,16 +409,16 @@ const HomeScreen = ({ navigation }) => {
   const handleLoadMore = async () => {
     if (!loadingMore && hasMore) {
       setLoadingMore(true);
-      const moreTweets = await fetchTweets(page + 1);
+      const moreTweets = await fetchTweets(page + 1); // Load next page of tweets
       const newTweets = moreTweets.filter(
-        tweet => !tweets.some(existingTweet => existingTweet.id === tweet.id) && tweet.id !== pinnedTweetId,
+        tweet => !tweets.some(existingTweet => existingTweet.id === tweet.id) && tweet.id !== pinnedTweetId, // Filter tweet yang dipin
       );
       if (newTweets.length > 0) {
-        setTweets(prevTweets => [...prevTweets, ...newTweets.slice(0, 5)]); 
-        setPage(prevPage => prevPage + 1); 
+        setTweets(prevTweets => [...prevTweets, ...newTweets.slice(0, 5)]); // Add only 4 new tweets
+        setPage(prevPage => prevPage + 1); // Increment page number
       }
       setLoadingMore(false);
-      if (newTweets.length < 4) {
+      if (newTweets.length < 4) { // Check if less than 4 tweets are returned
         setHasMore(false);
       }
     }

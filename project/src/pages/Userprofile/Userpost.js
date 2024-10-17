@@ -67,6 +67,7 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
         userIdPost: postPin.user._id,
         idUser: idUser,
         profilePicture: profilePicture,
+        commentsEnabled: postPin.commentsEnabled,
         isAdmin: postPin.user.isAdmin,
         amIAdmin: amIAdmin
       };
@@ -121,6 +122,7 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
         isMuted: isMuteds.some(isMuted => isMuted === post.user._id),
         isBlocked: isBlockeds.some(isBlocked => isBlocked === post.user._id), userIdPost: post.user._id,
         profilePicture: profilePicture,
+        commentsEnabled: post.commentsEnabled,
         isAdmin: post.user.isAdmin,
         amIAdmin: amIAdmin
       }));
