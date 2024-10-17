@@ -55,6 +55,7 @@ const Usermedia = ({ userIdPost, profilePicture }) => {
         ),
         userIdPost: post.user._id,
         profilePicture: profilePicture,
+        commentsEnabled: post.commentsEnabled,
         isAdmin: post.user.isAdmin
       }));
 

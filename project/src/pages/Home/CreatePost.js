@@ -31,7 +31,6 @@ const serverUrl = config.SERVER_URL;
 
 const CreatePost = ({ route, navigation }) => {
   const [newPostText, setNewPostText] = useState('');
-  const [keyboardVisible, setKeyboardVisible] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState([]);
   const [previewVisible, setPreviewVisible] = useState(false);
   const [previewMedia, setPreviewMedia] = useState(null);
@@ -103,13 +102,13 @@ const CreatePost = ({ route, navigation }) => {
         let uploadedMedia = [];
 
         for (const media of selectedMedia) {
-          const mediaType = media.type || 'image/jpeg'; 
+          const mediaType = media.type || 'image/jpeg';
           const compressedUri = await compressMedia(media.uri, mediaType);
 
           if (typeof compressedUri === 'string') {
             const fileType = compressedUri.endsWith('.mp4')
               ? 'video/mp4'
-              : mediaType; 
+              : mediaType;
 
             formData.append('media', {
               uri: compressedUri,
@@ -410,13 +409,13 @@ const CreatePost = ({ route, navigation }) => {
     const keyboardDidShowListener = Keyboard.addListener(
       'keyboardDidShow',
       () => {
-        setKeyboardVisible(true);
+        // setKeyboardVisible(true);
       },
     );
     const keyboardDidHideListener = Keyboard.addListener(
       'keyboardDidHide',
       () => {
-        setKeyboardVisible(false);
+        // setKeyboardVisible(false);
       },
     );
 

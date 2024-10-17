@@ -71,6 +71,7 @@ function Postscreen({ }) {
         userIdPost: post.user._id,
         idUser: idUser,
         profilePicture: profilePicture,
+        commentsEnabled: post.commentsEnabled,
         isAdmin: post.user.isAdmin
       }));
 
@@ -131,6 +132,7 @@ function Postscreen({ }) {
         userIdPost: postPin.user._id,
         idUser: idUser,
         profilePicture: profilePicture,
+        commentsEnabled: postPin.commentsEnabled,
         isAdmin: postPin.user.isAdmin,
         amIAdmin: amIAdmin
       };

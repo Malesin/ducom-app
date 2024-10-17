@@ -65,6 +65,7 @@ function Mediascreen({ navigation }) {
             userIdPost: post.user._id,
             idUser: idUser,
             profilePicture: profilePicture,
+            commentsEnabled: post.commentsEnabled,
             isAdmin: post.user.isAdmin
           }));
 
