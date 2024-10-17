@@ -5,30 +5,31 @@ import {
   TouchableOpacity,
   Alert,
   SafeAreaView,
-  ScrollView
+  ScrollView,
 } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import config from '../../config';
 const serverUrl = config.SERVER_URL;
 const verifiedIcon = <Icon name="verified" size={25} color="#699BF7" />;
 
-const Settingsscreen = ({ navigation }) => {
+const Settingsscreen = ({navigation}) => {
   const [amIAdmin, setAmIAdmin] = useState(null);
 
   const getData = async () => {
     try {
       const token = await AsyncStorage.getItem('token');
-      const response = await axios.post(`${serverUrl}/userdata`, { token: token });
-      const { data, status } = response.data;
+      const response = await axios.post(`${serverUrl}/userdata`, {
+        token: token,
+      });
+      const {data, status} = response.data;
 
       const routeAmIAdmin = data.isAdmin;
 
       setAmIAdmin(routeAmIAdmin);
-
     } catch (error) {
       console.error(error);
     }
@@ -52,7 +53,7 @@ const Settingsscreen = ({ navigation }) => {
           await AsyncStorage.clear();
           navigation.reset({
             index: 0,
-            routes: [{ name: 'Auths' }],
+            routes: [{name: 'Auths'}],
           });
           console.log('Logout successfully');
         },
@@ -62,6 +63,7 @@ const Settingsscreen = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollViewContent}>
         <View style={styles.section}>
           <Text style={styles.title}>Your Account and Profile</Text>
           <TouchableOpacity
@@ -76,7 +78,9 @@ const Settingsscreen = ({ navigation }) => {
             <MaterialCommunityIcons name="key-outline" size={25} color="#000" />
             <Text style={styles.buttonText}>Password</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('DeactiveDeleteAccount')}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => navigation.navigate('DeactiveDeleteAccount')}>
             <MaterialCommunityIcons
               name="account-cancel"
               size={25}
@@ -94,11 +98,15 @@ const Settingsscreen = ({ navigation }) => {
         <View style={styles.separator} />
         <View style={styles.section}>
           <Text style={styles.title}>Privacy and Interactions</Text>
-          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('BlockedUsers')}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => navigation.navigate('BlockedUsers')}>
             <MaterialCommunityIcons name="cancel" size={25} color="#000" />
             <Text style={styles.buttonText}>Blocked Users</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('MutedUsers')}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => navigation.navigate('MutedUsers')}>
             <MaterialCommunityIcons name="volume-off" size={25} color="#000" />
             <Text style={styles.buttonText}>Muted Users</Text>
           </TouchableOpacity>
@@ -106,7 +114,9 @@ const Settingsscreen = ({ navigation }) => {
         <View style={styles.separator} />
         <View style={styles.section}>
           <Text style={styles.title}>Support</Text>
-          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('FAQ')}>
+          <TouchableOpacity
+            style={styles.button}
+            onPress={() => navigation.navigate('FAQ')}>
             <MaterialCommunityIcons
               name="help-circle-outline"
               size={25}
@@ -123,6 +133,7 @@ const Settingsscreen = ({ navigation }) => {
             <Text style={styles.buttonText}>Log out</Text>
           </TouchableOpacity>
         </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };
@@ -132,10 +143,13 @@ export default Settingsscreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#fff',
+  },
+  scrollViewContent: {
+    flexGrow: 1,
     justifyContent: 'flex-start',
     alignItems: 'flex-start',
     padding: 25,
-    backgroundColor: '#fff',
   },
   section: {
     width: '100%',

@@ -16,13 +16,13 @@ import {
   Keyboard,
   useColorScheme,
 } from 'react-native';
-import React, { useState, useEffect, useCallback } from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../../config';
 import Video from 'react-native-video';
-import { createThumbnail } from 'react-native-create-thumbnail';
+import {createThumbnail} from 'react-native-create-thumbnail';
 import CommentCard from '../../components/CommentCard';
 import BottomSheet from '../../components/BottomSheet'; // Tambahkan ini jika belum ada
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -30,12 +30,12 @@ const verifiedIcon = <Icon name="verified" size={16} color="#699BF7" />;
 
 const serverUrl = config.SERVER_URL;
 
-const ViewPost = ({ route }) => {
+const ViewPost = ({route}) => {
   const {
     tweet,
     comments: initialComments,
     focusCommentInput,
-    isUserProfile
+    isUserProfile,
   } = route?.params || {};
 
   const [liked, setLiked] = useState(tweet.isLiked);
@@ -73,7 +73,7 @@ const ViewPost = ({ route }) => {
       for (const media of tweet.media || []) {
         if (media.type === 'video' && media.uri) {
           try {
-            const { path } = await createThumbnail({ url: media.uri });
+            const {path} = await createThumbnail({url: media.uri});
             newThumbnails[media.uri] = path;
           } catch (error) {
             console.log('Error generating thumbnail:', error);
@@ -85,8 +85,6 @@ const ViewPost = ({ route }) => {
 
     generateThumbnails();
   }, [tweet.media]);
-
-
 
   const handleLike = async () => {
     const token = await AsyncStorage.getItem('token');
@@ -219,7 +217,7 @@ const ViewPost = ({ route }) => {
     return `${hours}:${minutes} ${day} ${month} ${year}`;
   };
 
-  const InteractionButton = ({ icon, color, onPress }) => (
+  const InteractionButton = ({icon, color, onPress}) => (
     <TouchableOpacity style={styles.actionButton} onPress={onPress}>
       <MaterialCommunityIcons name={icon} size={20} color={color} />
     </TouchableOpacity>
@@ -238,7 +236,7 @@ const ViewPost = ({ route }) => {
     setRefreshing(true);
     try {
       const url = `${serverUrl}/comments`;
-      const params = { postId: tweet.id };
+      const params = {postId: tweet.id};
 
       const response = await axios.post(url, params);
       const dataComment = response.data.data;
@@ -251,19 +249,19 @@ const ViewPost = ({ route }) => {
         isLikedCom: comment.likes.some(like => like.user === tweet.idUser),
         replies: Array.isArray(comment.replies)
           ? comment.replies.map(reply => ({
-            id: reply._id,
-            text: reply.comment,
-            userIdPost: reply.user._id,
-            idUser: tweet.idUser,
-            username: reply.user.username,
-            isLikedCom: reply.likes.some(like => like.user === tweet.idUser),
-            profilePicture: reply.user.profilePicture,
-            replies: reply.replies || [],
-          }))
+              id: reply._id,
+              text: reply.comment,
+              userIdPost: reply.user._id,
+              idUser: tweet.idUser,
+              username: reply.user.username,
+              isLikedCom: reply.likes.some(like => like.user === tweet.idUser),
+              profilePicture: reply.user.profilePicture,
+              replies: reply.replies || [],
+            }))
           : [],
         username: comment.user.username,
         profilePicture: comment.user.profilePicture,
-        isAdmin: comment.user.isAdmin
+        isAdmin: comment.user.isAdmin,
       }));
       setComments(formattedComments || []);
       setVisibleComments(3);
@@ -275,28 +273,27 @@ const ViewPost = ({ route }) => {
   }, [tweet.id]);
 
   const isEnabledComment = useCallback(async () => {
-    const token = await AsyncStorage.getItem('token')
+    const token = await AsyncStorage.getItem('token');
     try {
       const response = await axios.post(`${serverUrl}/isenabled-comments`, {
         token: token,
-        postId: tweet.id
-      })
-      setIsEnabledComm(response.data.data.commentsEnabled)
+        postId: tweet.id,
+      });
+      setIsEnabledComm(response.data.data.commentsEnabled);
     } catch (error) {
-      console.error(error)
+      console.error(error);
     }
-  }, [])
-
+  }, []);
 
   useEffect(() => {
     fetchComments();
-    isEnabledComment()
+    isEnabledComment();
   }, [fetchComments]);
 
   const onRefresh = useCallback(async () => {
     fetchComments();
-    isEnabledComment()
-    setShowBottomSheet(false)
+    isEnabledComment();
+    setShowBottomSheet(false);
   }, [fetchComments]);
 
   const onDeleteSuccess = () => {
@@ -344,7 +341,7 @@ const ViewPost = ({ route }) => {
   };
 
   const handleReplyIconPress = () => {
-    setIsReplying(true)
+    setIsReplying(true);
     setReplyToCommentId(null);
     setPlaceholder('Add Comments');
     if (textInputRef.current) {
@@ -354,16 +351,15 @@ const ViewPost = ({ route }) => {
 
   const onRefreshPage = () => {
     setRefreshing(true);
-    setShowBottomSheet(false)
+    setShowBottomSheet(false);
     onRefresh();
   };
-
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
         style={styles.scrollContainer}
-        contentContainerStyle={{ paddingBottom: 50 }}
+        contentContainerStyle={{paddingBottom: 50}}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }>
@@ -372,7 +368,7 @@ const ViewPost = ({ route }) => {
             <Image
               source={
                 tweet.userAvatar
-                  ? { uri: tweet.userAvatar }
+                  ? {uri: tweet.userAvatar}
                   : require('../../assets/profilepic.png')
               }
               style={styles.avatar}
@@ -382,17 +378,19 @@ const ViewPost = ({ route }) => {
                 <Text
                   style={[
                     styles.userName,
-                    { color: colorScheme === 'dark' ? '#000000' : '#000' },
+                    {color: colorScheme === 'dark' ? '#000000' : '#000'},
                   ]}>
                   {tweet.userName}
                 </Text>
-                {tweet.isAdmin ? (<Text style={styles.verifiedIcon}>{verifiedIcon}</Text>) : null}
+                {tweet.isAdmin ? (
+                  <Text style={styles.verifiedIcon}>{verifiedIcon}</Text>
+                ) : null}
               </View>
 
               <Text
                 style={[
                   styles.userHandle,
-                  { color: colorScheme === 'dark' ? '#ccc' : 'gray' },
+                  {color: colorScheme === 'dark' ? '#ccc' : 'gray'},
                 ]}>
                 @{tweet.userHandle}
               </Text>
@@ -417,7 +415,7 @@ const ViewPost = ({ route }) => {
                   onPress={() => handleMediaPress(mediaItem.uri)}>
                   {mediaItem.type === 'image' ? (
                     <Image
-                      source={{ uri: mediaItem.uri }}
+                      source={{uri: mediaItem.uri}}
                       style={
                         tweet.media.length === 1
                           ? styles.singleMediaImage
@@ -430,7 +428,7 @@ const ViewPost = ({ route }) => {
                       onPress={() => handleMediaPress(mediaItem.uri)}
                       style={styles.videoContainer}>
                       <Image
-                        source={{ uri: thumbnails[mediaItem.uri] }}
+                        source={{uri: thumbnails[mediaItem.uri]}}
                         style={
                           tweet.media.length === 1
                             ? styles.singleMediaVideo
@@ -472,7 +470,9 @@ const ViewPost = ({ route }) => {
               onPress={handleLike}
             />
             <InteractionButton
-              icon={isEnabledComm ? "message-reply-outline" : "message-off-outline"}
+              icon={
+                isEnabledComm ? 'message-reply-outline' : 'message-off-outline'
+              }
               color="#040608"
               onPress={handleReplyIconPress}
             />
@@ -522,48 +522,53 @@ const ViewPost = ({ route }) => {
           </View>
         </View>
       </ScrollView>
-      <View style={[styles.inputContainer, { height: inputHeight }]}>
-        <Image source={{ uri: profilePicture }} style={styles.profilePicture} />
+      <View style={[styles.inputContainer, {height: inputHeight}]}>
+        <Image source={{uri: profilePicture}} style={styles.profilePicture} />
 
-        {isEnabledComm ? (<>
-          <TextInput
-            ref={textInputRef}
-            style={[
-              styles.inputComment,
-              {
-                height: inputHeight,
-                color: colorScheme === 'dark' ? '#000000' : '#000',
-              },
-            ]}
-            placeholder={placeholder}
-            placeholderTextColor={colorScheme === 'dark' ? '#ccc' : '#888'}
-            maxLength={300}
-            multiline={true}
-            value={comment}
-            onChangeText={handleTextInputChange}
-            onContentSizeChange={handleTextInputContentSizeChange}
-          />
+        {isEnabledComm ? (
+          <>
+            <TextInput
+              ref={textInputRef}
+              style={[
+                styles.inputComment,
+                {
+                  height: inputHeight,
+                  color: colorScheme === 'dark' ? '#000000' : '#000',
+                },
+              ]}
+              placeholder={placeholder}
+              placeholderTextColor={colorScheme === 'dark' ? '#ccc' : '#888'}
+              maxLength={300}
+              multiline={true}
+              value={comment}
+              onChangeText={handleTextInputChange}
+              onContentSizeChange={handleTextInputContentSizeChange}
+            />
 
-          {isTyping && (
-            <TouchableOpacity
-              style={styles.iconContainer}
-              onPress={() => handleAddComment()}>
-              <MaterialCommunityIcons
-                name="upload"
-                size={20}
-                color="#fff"
-                style={styles.icon}
-              />
-            </TouchableOpacity>
-          )}
-        </>) : (<>
-          <Text
-            style={styles.commentDisabled}
-          >
-            Comments Disabled
-          </Text>
-        </>)}
-
+            {isTyping && (
+              <TouchableOpacity
+                style={styles.iconContainer}
+                onPress={() => handleAddComment()}>
+                <MaterialCommunityIcons
+                  name="upload"
+                  size={20}
+                  color="#fff"
+                  style={styles.icon}
+                />
+              </TouchableOpacity>
+            )}
+          </>
+        ) : (
+          <>
+            <Text
+              style={[
+                styles.commentDisabled,
+                {color: colorScheme === 'dark' ? '#ccc' : '#888'},
+              ]}>
+              Comments Disabled
+            </Text>
+          </>
+        )}
       </View>
       {selectedMedia && (
         <Modal
@@ -575,15 +580,15 @@ const ViewPost = ({ route }) => {
             <View style={styles.modalBackground}>
               <View style={styles.modalContainer}>
                 {selectedMedia.endsWith('.jpg') ||
-                  selectedMedia.endsWith('.png') ? (
+                selectedMedia.endsWith('.png') ? (
                   <Image
-                    source={{ uri: selectedMedia }}
+                    source={{uri: selectedMedia}}
                     style={styles.modalImage}
                     onError={() => console.log('Failed to load image')}
                   />
                 ) : (
                   <Video
-                    source={{ uri: selectedMedia }}
+                    source={{uri: selectedMedia}}
                     style={styles.modalImage}
                     controls
                     resizeMode="contain"
@@ -598,22 +603,21 @@ const ViewPost = ({ route }) => {
         animationType="slide"
         transparent={true}
         visible={showBottomSheet}
-        onRequestClose={() => setShowBottomSheet(false)}
-      >
+        onRequestClose={() => setShowBottomSheet(false)}>
         <TouchableWithoutFeedback onPress={() => setShowBottomSheet(false)}>
           <View style={styles.overlay} />
         </TouchableWithoutFeedback>
         <View style={styles.bottomSheetContainer}>
           <BottomSheet
-            onCloseDel={(respdel) => {
+            onCloseDel={respdel => {
               setShowBottomSheet(false);
               onRefreshPage();
-              onDel(respdel)
+              onDel(respdel);
             }}
-            onCloseResp={(resp) => {
+            onCloseResp={resp => {
               setShowBottomSheet(false);
               onRefreshPage();
-              onResp(resp)
+              onResp(resp);
             }}
             tweet={tweet}
             onRefreshPage={onRefreshPage}
@@ -664,7 +668,7 @@ const styles = StyleSheet.create({
   },
   verifiedIcon: {
     marginLeft: 4,
-    marginTop: 2
+    marginTop: 2,
   },
   userName: {
     fontWeight: 'bold',
@@ -824,8 +828,8 @@ const styles = StyleSheet.create({
     marginRight: 10,
     alignItems: 'center',
   },
-  commentDisabled:{
-    marginLeft: 15
+  commentDisabled: {
+    marginLeft: 15,
   },
   icon: {
     alignItems: 'center',

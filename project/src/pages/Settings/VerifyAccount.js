@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, StyleSheet, Text, View, Image, TextInput, TouchableOpacity } from 'react-native';
+import { SafeAreaView, StyleSheet, Text, View, Image, TextInput, TouchableOpacity, useColorScheme } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
@@ -10,6 +10,7 @@ import { Alert } from 'react-native';
 const serverUrl = config.SERVER_URL;
 
 const VerifyAccount = ({navigation}) => {
+    const colorScheme = useColorScheme(); // Dapatkan mode tema saat ini
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
     const [profilePicture, setProfilePicture] = useState(null);
     const [username, setUsername] = useState(null);
@@ -104,6 +105,80 @@ const VerifyAccount = ({navigation}) => {
         }
     };
 
+    const styles = StyleSheet.create({
+        container: {
+            flex: 1,
+            backgroundColor: colorScheme === 'dark' ? 'white' : 'white', // Sesuaikan warna latar belakang
+        },
+        content: {
+            alignItems: 'center',
+            padding: 20,
+        },
+        profile: {
+            width: 100,
+            height: 100,
+            borderRadius: 50,
+            marginBottom: 20,
+        },
+        username: {
+            fontSize: 18,
+            fontWeight: 'bold',
+            marginBottom: 20,
+            color: colorScheme === 'dark' ? 'black' : 'black', // Sesuaikan warna teks
+        },
+        instruction: {
+            textAlign: 'center',
+            marginBottom: 20,
+            color: colorScheme === 'dark' ? 'gray' : 'gray', // Sesuaikan warna teks
+        },
+        inputContainer: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            borderWidth: 1,
+            borderColor: 'lightgray',
+            borderRadius: 5,
+            marginBottom: 15,
+            width: '100%',
+        },
+        input: {
+            flex: 1,
+            padding: 10,
+            color: colorScheme === 'dark' ? 'black' : 'black', // Sesuaikan warna teks input
+        },
+        eyeIcon: {
+            padding: 10,
+        },
+        continueButton: {
+            backgroundColor: '#001374',
+            padding: 15,
+            borderRadius: 25,
+            width: '100%',
+            alignItems: 'center',
+            marginBottom: 20,
+        },
+        continueButtonText: {
+            color: 'white',
+            fontWeight: 'bold',
+        },
+        forgotPassword: {
+            color: colorScheme === 'dark' ? '#000' : '#000', // Sesuaikan warna teks
+        },
+        skeletonProfile: {
+            marginBottom: 20,
+            borderRadius: 50,
+        },
+        skeletonUsername: {
+            marginBottom: 20,
+        },
+        skeletonInstruction: {
+            marginBottom: 20,
+        },
+        error: {
+            color: 'red',
+            marginBottom: 30,
+        },
+    });
+
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.content}>
@@ -144,6 +219,7 @@ const VerifyAccount = ({navigation}) => {
                     <TextInput
                         style={styles.input}
                         placeholder="Password"
+                        placeholderTextColor={colorScheme === 'dark' ? 'gray' : 'gray'}
                         secureTextEntry={!isPasswordVisible}
                         value={password}
                         onChangeText={setPassword}
@@ -172,75 +248,3 @@ const VerifyAccount = ({navigation}) => {
 };
 
 export default VerifyAccount;
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: 'white',
-    },
-    content: {
-        alignItems: 'center',
-        padding: 20,
-    },
-    profile: {
-        width: 100,
-        height: 100,
-        borderRadius: 50,
-        marginBottom: 20,
-    },
-    username: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        marginBottom: 20,
-    },
-    instruction: {
-        textAlign: 'center',
-        marginBottom: 20,
-        color: 'gray',
-    },
-    inputContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        borderWidth: 1,
-        borderColor: 'lightgray',
-        borderRadius: 5,
-        marginBottom: 15,
-        width: '100%',
-    },
-    input: {
-        flex: 1,
-        padding: 10,
-    },
-    eyeIcon: {
-        padding: 10,
-    },
-    continueButton: {
-        backgroundColor: '#001374',
-        padding: 15,
-        borderRadius: 25,
-        width: '100%',
-        alignItems: 'center',
-        marginBottom: 20,
-    },
-    continueButtonText: {
-        color: 'white',
-        fontWeight: 'bold',
-    },
-    forgotPassword: {
-        color: '#000',
-    },
-    skeletonProfile: {
-        marginBottom: 20,
-        borderRadius: 50,
-    },
-    skeletonUsername: {
-        marginBottom: 20,
-    },
-    skeletonInstruction: {
-        marginBottom: 20,
-    },
-    error: {
-        color: 'red',
-        marginBottom: 30,
-    },
-});

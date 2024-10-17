@@ -75,18 +75,24 @@ const UpdatePassword = ({ navigation }) => {
     }
   }, [oldPassword, newPassword, verifyNewPassword]);
 
+  const inputTextColor = colorScheme === 'dark' ? '#000000' : '#000000'; // Warna teks input
+  const placeholderTextColor = colorScheme === 'dark' ? '#000000' : '#000000'; // Warna placeholder
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Old Password</Text>
         <View style={styles.passwordContainer}>
           <TextInput
-            style={styles.passwordInput}
+            style={[
+              styles.passwordInput,
+              { color: inputTextColor } // Atur warna teks
+            ]}
             placeholder="Please enter current password"
             secureTextEntry={!showOldPassword}
             value={oldPassword}
             onChangeText={setOldPassword}
-            placeholderTextColor={colorScheme === 'dark' ? '#cccccc' : '#888888'}
+            placeholderTextColor={placeholderTextColor}
           />
           <TouchableOpacity
             style={styles.eyeIcon}
@@ -104,12 +110,15 @@ const UpdatePassword = ({ navigation }) => {
         <Text style={styles.label}>New Password</Text>
         <View style={styles.passwordContainer}>
           <TextInput
-            style={styles.passwordInput}
+            style={[
+              styles.passwordInput,
+              { color: inputTextColor } // Atur warna teks
+            ]}
             placeholder="Please enter new password"
             secureTextEntry={!showNewPassword}
             value={newPassword}
             onChangeText={setNewPassword}
-            placeholderTextColor={colorScheme === 'dark' ? '#cccccc' : '#888888'}
+            placeholderTextColor={placeholderTextColor}
           />
           <TouchableOpacity
             style={styles.eyeIcon}
@@ -127,12 +136,15 @@ const UpdatePassword = ({ navigation }) => {
         <Text style={styles.label}>Verify New Password</Text>
         <View style={styles.passwordContainer}>
           <TextInput
-            style={styles.passwordInput}
+            style={[
+              styles.passwordInput,
+              { color: inputTextColor } // Atur warna teks
+            ]}
             placeholder="Please verify new password"
             secureTextEntry={!showVerifyNewPassword}
             value={verifyNewPassword}
             onChangeText={setVerifyNewPassword}
-            placeholderTextColor={colorScheme === 'dark' ? '#cccccc' : '#888888'}
+            placeholderTextColor={placeholderTextColor}
           />
           <TouchableOpacity
             style={styles.eyeIcon}
