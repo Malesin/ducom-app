@@ -103,18 +103,18 @@ const CreatePost = ({ route, navigation }) => {
         let uploadedMedia = [];
 
         for (const media of selectedMedia) {
-          const mediaType = media.type || 'image/jpeg'; // Default ke 'image/jpeg' jika null
+          const mediaType = media.type || 'image/jpeg'; 
           const compressedUri = await compressMedia(media.uri, mediaType);
 
           if (typeof compressedUri === 'string') {
             const fileType = compressedUri.endsWith('.mp4')
               ? 'video/mp4'
-              : mediaType; // Gunakan mediaType asli
+              : mediaType; 
 
             formData.append('media', {
               uri: compressedUri,
               type: fileType,
-              name: `media.${compressedUri.endsWith('.mp4') ? 'mp4' : 'png'}`, // Pastikan nama file sesuai
+              name: `media.${compressedUri.endsWith('.mp4') ? 'mp4' : 'png'}`,
             });
 
             uploadedMedia.push({
