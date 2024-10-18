@@ -20,16 +20,16 @@ import config from '../../config';
 const serverUrl = config.SERVER_URL;
 
 const CreatePassword = ({navigation}) => {
-  const [password, setPassword] = useState(''); // State for new password
-  const [confirmPassword, setConfirmPassword] = useState(''); // State for confirm password
+  const [password, setPassword] = useState(''); 
+  const [confirmPassword, setConfirmPassword] = useState(''); 
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isCheckedPass, setIsCheckedPass] = useState(false); // State for checkbox
-  const [isButtonDisabled, setIsButtonDisabled] = useState(false); // Perbaikan deklarasi useState
+  const [isCheckedPass, setIsCheckedPass] = useState(false); 
+  const [isButtonDisabled, setIsButtonDisabled] = useState(false); 
   const route = useRoute();
   const {email} = route.params;
-  const colorScheme = useColorScheme(); // Detect light or dark mode
+  const colorScheme = useColorScheme(); 
 
   const validatePassword = password => {
     const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,15}$/;
@@ -37,19 +37,19 @@ const CreatePassword = ({navigation}) => {
   };
 
   const handleContinue = async () => {
-    setIsButtonDisabled(true); // Disable the button immediately
+    setIsButtonDisabled(true); 
     if (!password || !confirmPassword) {
       setError('Password and Confirm Password are required.');
-      setIsButtonDisabled(false); // Re-enable the button if validation fails
+      setIsButtonDisabled(false); 
     } else if (!validatePassword(password)) {
       setError('Password must be between 8 and 15 characters and include at least one letter and one number.');
-      setIsButtonDisabled(false); // Re-enable the button if validation fails
+      setIsButtonDisabled(false); 
     } else if (password !== confirmPassword) {
       setError('Passwords do not match.');
-      setIsButtonDisabled(false); // Re-enable the button if validation fails
+      setIsButtonDisabled(false); 
     } else if (!isCheckedPass) {
       setError('You must confirm the password change.');
-      setIsButtonDisabled(false); // Re-enable the button if validation fails
+      setIsButtonDisabled(false); 
     } else {
       setError('');
       try {
@@ -65,24 +65,24 @@ const CreatePassword = ({navigation}) => {
             textBody: 'Password updated successfully',
             onHide: () => {
               setTimeout(() => {
-                Dialog.hide(); // Hide the dialog
+                Dialog.hide(); 
                 navigation.navigate('Signin');
               }, 1000);
             },
           });
           setTimeout(() => {
-            Dialog.hide(); // Hide the dialog if it doesn't already
-          }, 3000); // Duration to show the dialog
+            Dialog.hide(); 
+          }, 3000); 
         } else if (response.data.status === 'errorPassSame') {
           setError('New password cannot be same as old password');
-          setIsButtonDisabled(false); // Re-enable the button if validation fails
+          setIsButtonDisabled(false); 
         } else {
           setError(response.data.data);
-          setIsButtonDisabled(false); // Re-enable the button if validation fails
+          setIsButtonDisabled(false); 
         }
       } catch (error) {
         setError('Failed to update password. Please try again.');
-        setIsButtonDisabled(false); // Re-enable the button if there is an error
+        setIsButtonDisabled(false); 
       }
     }
   };
@@ -99,14 +99,14 @@ const CreatePassword = ({navigation}) => {
             <TextInput
               style={[
                 styles.input,
-                { color: colorScheme === 'dark' ? '#000000' : '#000000' } // Adjust text color based on theme
+                { color: colorScheme === 'dark' ? '#000000' : '#000000' } 
               ]}
               onChangeText={setPassword}
               value={password}
               placeholder="New Password"
               secureTextEntry={!showPassword}
               autoCapitalize="none"
-              placeholderTextColor={colorScheme === 'dark' ? '#cccccc' : '#888888'} // Adjust placeholder text color based on theme
+              placeholderTextColor={colorScheme === 'dark' ? '#cccccc' : '#888888'} 
             />
             <TouchableOpacity
               style={styles.eyeIcon}
@@ -122,14 +122,14 @@ const CreatePassword = ({navigation}) => {
             <TextInput
               style={[
                 styles.input,
-                { color: colorScheme === 'dark' ? '#000000' : '#000000' } // Adjust text color based on theme
+                { color: colorScheme === 'dark' ? '#000000' : '#000000' } 
               ]}
               onChangeText={setConfirmPassword}
               value={confirmPassword}
               placeholder="Confirm Password"
               secureTextEntry={!showConfirmPassword}
               autoCapitalize="none"
-              placeholderTextColor={colorScheme === 'dark' ? '#cccccc' : '#888888'} // Adjust placeholder text color based on theme
+              placeholderTextColor={colorScheme === 'dark' ? '#cccccc' : '#888888'} 
             />
             <TouchableOpacity
               style={styles.eyeIcon}
@@ -159,13 +159,13 @@ const CreatePassword = ({navigation}) => {
           <TouchableOpacity
             style={[
               styles.buttonForgot,
-              (isButtonDisabled || !isCheckedPass) && styles.disabledButton, // Add disabled style
+              (isButtonDisabled || !isCheckedPass) && styles.disabledButton, 
             ]}
             onPress={handleContinue}
             disabled={isButtonDisabled || !isCheckedPass}>
             <Text style={[
               styles.textForgot,
-              (isButtonDisabled || !isCheckedPass) && styles.disabledText, // Add disabled text style
+              (isButtonDisabled || !isCheckedPass) && styles.disabledText, 
             ]}>
               Continue
             </Text>
@@ -244,9 +244,9 @@ const styles = StyleSheet.create({
     textAlign: 'left',
   },
   disabledText: {
-    opacity: 0.5, // Reduce the opacity to visually indicate disabled state
+    opacity: 0.5, 
   },
   disabledButton: {
-    backgroundColor: '#cccccc', // Change background color to indicate disabled state
+    backgroundColor: '#cccccc', 
   },
 });

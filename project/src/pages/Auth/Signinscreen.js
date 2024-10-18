@@ -23,7 +23,7 @@ const Signinscreen = ({ navigation }) => {
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
 
-  const colorScheme = useColorScheme(); // Detect light or dark mode
+  const colorScheme = useColorScheme();
 
   useEffect(() => {
     const checkLoginStatus = async () => {
@@ -68,7 +68,7 @@ const Signinscreen = ({ navigation }) => {
               text2: 'Login Successfully!!',
               onHide: () => {
                 setTimeout(() => {
-                  navigation.navigate('Home'); // Direct to Home
+                  navigation.navigate('Home');
                 }, 1000);
               },
             });
@@ -166,7 +166,7 @@ const Signinscreen = ({ navigation }) => {
     setPassword(text.slice(0, 25));
   };
 
-  const styles = getStyles(colorScheme); // Get styles based on color scheme
+  const styles = getStyles(colorScheme);
 
   return (
     <>
@@ -179,7 +179,7 @@ const Signinscreen = ({ navigation }) => {
           placeholder="Email or Username"
           keyboardType="email-address"
           autoCapitalize="none"
-          placeholderTextColor={colorScheme === 'dark' ? '#cccccc' : '#888888'} // Adjust placeholder text color based on theme
+          placeholderTextColor={colorScheme === 'dark' ? '#cccccc' : '#888888'}
         />
         {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
         <View
@@ -196,7 +196,7 @@ const Signinscreen = ({ navigation }) => {
             autoCapitalize="none"
             placeholderTextColor={
               colorScheme === 'dark' ? '#cccccc' : '#888888'
-            } // Adjust placeholder text color based on theme
+            }
           />
           <TouchableOpacity
             style={styles.eyeIcon}
@@ -241,7 +241,7 @@ const getStyles = () =>
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
-      backgroundColor: '#fff', // Tetap putih untuk kedua mode
+      backgroundColor: '#fff',
       padding: 16,
     },
     title: {
@@ -249,18 +249,18 @@ const getStyles = () =>
       fontWeight: 'bold',
       textAlign: 'center',
       marginBottom: 20,
-      color: '#000000', // Tetap hitam untuk kedua mode
+      color: '#000000',
     },
     input: {
       width: '80%',
       height: 50,
       margin: 12,
       borderWidth: 1,
-      borderColor: '#dcdcdc', // Tetap abu-abu untuk kedua mode
+      borderColor: '#dcdcdc',
       borderRadius: 5,
       padding: 10,
-      backgroundColor: '#f5f5f5', // Tetap abu-abu terang untuk kedua mode
-      color: '#000000', // Tetap hitam untuk kedua mode
+      backgroundColor: '#f5f5f5',
+      color: '#000000',
     },
     passwordContainer: {
       flexDirection: 'row',
@@ -268,15 +268,15 @@ const getStyles = () =>
       width: '80%',
       margin: 12,
       borderWidth: 1,
-      borderColor: '#dcdcdc', // Tetap abu-abu untuk kedua mode
+      borderColor: '#dcdcdc',
       borderRadius: 5,
-      backgroundColor: '#f5f5f5', // Tetap abu-abu terang untuk kedua mode
+      backgroundColor: '#f5f5f5',
     },
     passwordInput: {
       flex: 1,
       height: 50,
       padding: 10,
-      color: '#000000', // Tetap hitam untuk kedua mode
+      color: '#000000',
     },
     eyeIcon: {
       marginRight: 10,
@@ -284,28 +284,28 @@ const getStyles = () =>
     buttonLogin: {
       width: '80%',
       height: 50,
-      backgroundColor: '#001374', // Tetap biru untuk kedua mode
+      backgroundColor: '#001374',
       borderRadius: 25,
       justifyContent: 'center',
       alignItems: 'center',
       marginTop: 20,
     },
     textLogin: {
-      color: '#fff', // Tetap putih untuk kedua mode
+      color: '#fff',
       fontSize: 18,
       fontWeight: 'bold',
     },
     forgotPassLink: {
-      color: '#000000', // Tetap hitam untuk kedua mode
+      color: '#000000',
       marginTop: 20,
     },
     signupText: {
-      color: '#000000', // Tetap hitam untuk kedua mode
+      color: '#000000',
       fontSize: 14,
       marginTop: 20,
     },
     signupLink: {
-      color: '#0a3e99', // Tetap biru untuk kedua mode
+      color: '#0a3e99',
       fontWeight: 'bold',
     },
     errorText: {

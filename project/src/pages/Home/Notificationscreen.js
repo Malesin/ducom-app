@@ -8,10 +8,11 @@ import CommentNotification from '../../components/Notification/CommentNotificati
 import { Skeleton } from 'react-native-elements'; // Tambahkan import Skeleton
 import ReportedNotification from '../../components/ReportedNotification';
 
+
 const serverUrl = config.SERVER_URL;
 
 const Notificationscreen = () => {
-  const [allNotifications, setAllNotifications] = useState([]); // State untuk semua notifikasi
+  const [allNotifications, setAllNotifications] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [showSkeleton, setShowSkeleton] = useState(true); 
 
@@ -19,7 +20,6 @@ const Notificationscreen = () => {
     try {
       const token = await AsyncStorage.getItem('token');
 
-      // Fetch Like Notifications
       const likeResponse = await axios.post(`${serverUrl}/like-notifications`, { token });
       const { data: likeData, status: likeStatus } = likeResponse.data;
       let likeNotifications = [];
@@ -29,7 +29,6 @@ const Notificationscreen = () => {
         Alert.alert('Error', 'Failed to fetch like notifications');
       }
 
-      // Fetch Comment Notifications
       const commentResponse = await axios.post(`${serverUrl}/comment-notifications`, { token });
       const { data: commentData, status: commentStatus } = commentResponse.data;
       let commentNotifications = [];
@@ -61,7 +60,7 @@ const Notificationscreen = () => {
 
   const onRefresh = async () => {
     setRefreshing(true);
-    setShowSkeleton(true); 
+    setShowSkeleton(true);
     await fetchNotifications();
     setRefreshing(false);
   };
@@ -165,4 +164,3 @@ const styles = StyleSheet.create({
 });
 
 export default Notificationscreen;
-

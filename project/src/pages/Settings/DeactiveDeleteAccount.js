@@ -7,16 +7,16 @@ const DeactiveDeleteAccount = ({ navigation }) => {
   const [selectedOption, setSelectedOption] = useState(null);
   const [showDeleteInfo, setShowDeleteInfo] = useState(false); 
 
-  // Handler for selecting "Deactivate Account"
+
   const handleDeactivateCheck = () => {
     if (selectedOption === 'deactivate') {
       setSelectedOption(null);
     } else {
       setSelectedOption('deactivate');
+
     }
   };
 
-  // Handler for selecting "Delete Account"
   const handleDeleteCheck = () => {
     if (selectedOption === 'delete') {
       setSelectedOption(null);
@@ -31,6 +31,7 @@ const DeactiveDeleteAccount = ({ navigation }) => {
       setShowDeleteInfo(true); 
     } else {
       navigation.navigate('VerifyAccount');
+
     }
   };
 
@@ -48,7 +49,6 @@ const DeactiveDeleteAccount = ({ navigation }) => {
       <View style={styles.card}>
         <View style={styles.cardSection}>
 
-          {/* Deactivate Option */}
           <View style={styles.optionRow}>
             <Text style={styles.cardTitle}>Deactivate your Account</Text>
             <Pressable onPress={handleDeactivateCheck}>
@@ -63,7 +63,6 @@ const DeactiveDeleteAccount = ({ navigation }) => {
             Deactivating your account is temporary, and it means your profile will be hidden on Ducom until you log in to your Ducom Account.
           </Text>
 
-          {/* Delete Option */}
           <View style={styles.optionRow}>
             <Text style={styles.cardTitle}>Delete Account</Text>
             <Pressable onPress={handleDeleteCheck}>
@@ -80,7 +79,6 @@ const DeactiveDeleteAccount = ({ navigation }) => {
         </View>
       </View>
 
-      {/* Continue Button */}
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={[
