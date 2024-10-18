@@ -333,8 +333,6 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
     }
   }
 
-  console.log(tweet?.commentsEnabled);
-
   return (
     <SafeAreaView style={styles.card}>
       {/* User Info */}

@@ -409,13 +409,11 @@ const CreatePost = ({ route, navigation }) => {
     const keyboardDidShowListener = Keyboard.addListener(
       'keyboardDidShow',
       () => {
-        // setKeyboardVisible(true);
       },
     );
     const keyboardDidHideListener = Keyboard.addListener(
       'keyboardDidHide',
       () => {
-        // setKeyboardVisible(false);
       },
     );
 

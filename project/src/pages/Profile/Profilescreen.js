@@ -36,7 +36,6 @@ export default function Profilescreen() {
       const token = await AsyncStorage.getItem('token');
       console.log('Token Retrieved Successfully');
 
-      // Ambil data pengguna
       const userResponse = await axios.post(`${serverUrl}/userdata`, {
         token: token,
       });
@@ -84,16 +83,16 @@ export default function Profilescreen() {
   const toggleDropdown = () => {
     if (dropdownVisible) {
       Animated.timing(dropdownAnimation, {
-        toValue: 0, // Nilai akhir animasi
-        duration: 150, // Durasi animasi dalam milidetik
-        useNativeDriver: true, // Menggunakan native driver untuk performa yang lebih baik
-      }).start(() => setDropdownVisible(false)); // Menyembunyikan dropdown setelah animasi selesai
+        toValue: 0,
+        duration: 150,
+        useNativeDriver: true,
+      }).start(() => setDropdownVisible(false));
     } else {
-      setDropdownVisible(true); // Menampilkan dropdown sebelum animasi dimulai
+      setDropdownVisible(true);
       Animated.timing(dropdownAnimation, {
-        toValue: 1, // Nilai akhir animasi
-        duration: 150, // Durasi animasi dalam milidetik
-        useNativeDriver: true, // Menggunakan native driver untuk performa yang lebih baik
+        toValue: 1,
+        duration: 150,
+        useNativeDriver: true,
       }).start();
     }
   };
@@ -270,8 +269,8 @@ const styles = StyleSheet.create({
     minHeight: 150,
   },
   nameContainer: {
-    flexDirection: 'row', // Tambahkan ini untuk mengatur elemen dalam satu baris
-    alignItems: 'center', // Tambahkan ini untuk menyelaraskan elemen secara vertikal
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   name: {
     fontSize: 20,
@@ -331,14 +330,14 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    zIndex: 999, // Ensure it is above other elements
+    zIndex: 999,
   },
   dropdownMenu: {
     position: 'absolute',
     top: 10,
     right: 10,
     width: 200,
-    backgroundColor: '#fff', // Warna latar belakang putih
+    backgroundColor: '#fff',
     borderRadius: 7,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -346,19 +345,19 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     elevation: 5,
     zIndex: 1000,
-    padding: 10, // Add padding for better appearance
+    padding: 10,
   },
   dropdownItem: {
-    flexDirection: 'row', // Tambahkan flexDirection row
-    alignItems: 'center', // Tambahkan alignItems center
-    padding: 15, // Sesuaikan padding
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 15,
   },
   dropdownItemText: {
-    color: '#000', // Warna teks hitam
-    marginLeft: 10, // Tambahkan margin kiri untuk memberi jarak antara ikon dan teks
-    fontWeight: 'bold', // Membuat teks menjadi bold
+    color: '#000',
+    marginLeft: 10,
+    fontWeight: 'bold',
   },
   dropdownIcon: {
-    marginRight: 10, // Tambahkan margin kanan untuk memberi jarak antara ikon dan teks
+    marginRight: 10,
   },
 });

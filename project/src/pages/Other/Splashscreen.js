@@ -6,7 +6,6 @@ const Splashscreen = ({ navigation }) => {
   
   useEffect(() => {
     const checkLoginStatus = async () => {
-      // Simulasi delay sebelum memeriksa status login
       setTimeout(async () => {
         const token = await AsyncStorage.getItem('token');
         if (token) {
@@ -14,7 +13,7 @@ const Splashscreen = ({ navigation }) => {
         } else {
           navigation.navigate('Auths');
         }
-      }, 1500); // Delay selama 2 detik
+      }, 1500);
     };
 
     checkLoginStatus();

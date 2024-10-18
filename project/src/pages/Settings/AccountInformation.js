@@ -52,7 +52,7 @@ const AccountInformation = () => {
         });
         ToastAndroid.show('Phone number cleared successfully.', ToastAndroid.SHORT);
         setIsEditing(false);
-        getData(); // Refresh data after saving
+        getData(); 
       } catch (error) {
         ToastAndroid.show('Error occurred while clearing phone number.', ToastAndroid.SHORT);
         console.error('Error occurred:', error);
@@ -74,7 +74,7 @@ const AccountInformation = () => {
       });
       ToastAndroid.show('Phone number saved successfully.', ToastAndroid.SHORT);
       setIsEditing(false);
-      getData(); // Refresh data after saving
+      getData(); 
     } catch (error) {
       ToastAndroid.show('Error occurred while saving phone number.', ToastAndroid.SHORT);
       console.error('Error occurred:', error);

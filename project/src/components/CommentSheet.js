@@ -4,7 +4,7 @@ import {
   Text,
   View,
   TouchableOpacity,
-  ToastAndroid // Tambahkan import ToastAndroid
+  ToastAndroid 
 } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import React, { useState, useEffect } from 'react';
@@ -30,13 +30,6 @@ const CommentSheet = ({ commentId, postId, token, idUser, userIdPost, onDeleteSu
       console.log("user")
       setIsOwn(false)
     }
-
-    console.log("idUser: ", idUser)
-    console.log("userIdPost: ", userIdPost)
-    console.log("amIAdmin: ", amIAdmin)
-    console.log("commentId: ", commentId)
-    console.log("commentId: ", commentId)
-    console.log("=================================")
   }, [idUser, userIdPost, amIAdmin]);
 
   const deleteComment = async () => {
