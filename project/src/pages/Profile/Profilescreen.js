@@ -164,31 +164,44 @@ export default function Profilescreen() {
             </View>
           </View>
         </View>
-        <View style={styles.userInfoContainer}>
-          <Text style={styles.name}>{userData?.name}</Text>
-          <Text style={styles.username}>@{userData?.username}</Text>
-          <Text style={styles.description}>
-            {userData?.bio || 'No Description'}
-          </Text>
-        </View>
-      </View>
-      {/*  */}
-      <Modal
-        visible={modalVisible}
-        transparent
-        onRequestClose={closeModal}
-        animationType="fade"
-      >
-        <TouchableWithoutFeedback onPress={closeModal}>
-          <View style={styles.modalBackground}>
-            <View style={styles.modalContainer}>
-              {modalImageSource && (
-                <Image source={modalImageSource} style={styles.previewImage} />
+        <View style={styles.userInfoWrapper}>
+          <View style={styles.userInfoContainer}>
+            <View style={styles.nameContainer}>
+              <Text style={styles.name}>{userData?.name}</Text>
+              {userData?.isAdmin && (
+                <Text style={styles.verifiedIcon}>{verifiedIcon}</Text>
               )}
             </View>
+            <Text style={styles.username}>@{userData?.username}</Text>
+            <Text style={styles.description}>
+              {userData?.bio || 'No Description'}
+            </Text>
           </View>
-        </TouchableWithoutFeedback>
-      </Modal>
+          <TouchableOpacity
+            style={styles.editButton}
+            onPress={() => navigation.navigate('EditProfile')}
+          >
+            <Text style={styles.editButtonText}>Edit Profile</Text>
+          </TouchableOpacity>
+        </View>
+        {/*  */}
+        <Modal
+          visible={modalVisible}
+          transparent
+          onRequestClose={closeModal}
+          animationType="fade"
+        >
+          <TouchableWithoutFeedback onPress={closeModal}>
+            <View style={styles.modalBackground}>
+              <View style={styles.modalContainer}>
+                {modalImageSource && (
+                  <Image source={modalImageSource} style={styles.previewImage} />
+                )}
+              </View>
+            </View>
+          </TouchableWithoutFeedback>
+        </Modal>
+      </View>
     </SafeAreaView>
   );
 }
@@ -229,17 +242,20 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   userInfoContainer: {
-    marginLeft: 20,
     marginTop: 10,
+    marginBottom: 10,
   },
   name: {
     fontSize: 17,
     fontWeight: 'bold',
     color: '#000',
     marginBottom: 5,
+    marginRight: 5,
   },
   verifiedIcon: {
     marginLeft: 5,
+    marginTop: 5,
+    marginRight: 5,
   },
   username: {
     fontSize: 14,
@@ -249,6 +265,23 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 13,
     color: '#000',
+  },
+  editButton: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#E1E8ED',
+    borderColor: '#000',
+    borderWidth: 1,
+    paddingVertical: 5,
+    paddingHorizontal: 30,
+    borderRadius: 100,
+    marginTop: 20,
+    marginBottom: 20,
+    marginRight: 10,
+  },
+  editButtonText: {
+    fontSize: 13,
+    color: '#000',
+    fontWeight: 'bold',
   },
   statsContainer: {
     flexDirection: 'row',
@@ -322,5 +355,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 10,
+  },
+  userInfoWrapper: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 10,
+    marginLeft: 20,
+  },
+  nameContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 });
