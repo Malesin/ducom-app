@@ -25,7 +25,7 @@ const Settingsscreen = ({ navigation }) => {
       const response = await axios.post(`${serverUrl}/userdata`, {
         token: token,
       });
-      const { data, status } = response.data;
+      const { data } = response.data;
 
       const routeAmIAdmin = data.isAdmin;
 
@@ -88,12 +88,32 @@ const Settingsscreen = ({ navigation }) => {
             />
             <Text style={styles.buttonText}>Deactivate or Delete Account</Text>
           </TouchableOpacity>
-          {/* {amIAdmin ? (<>
-            <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('AdminSettings')}>
-              {verifiedIcon}
-              <Text style={styles.buttonText}>Admin Settings</Text>
-            </TouchableOpacity>
-          </>) : null} */}
+          {amIAdmin && (
+            <>
+              <TouchableOpacity
+                style={styles.button}
+                onPress={() => navigation.navigate('#')}>
+                <MaterialCommunityIcons name="account" size={25} color="#000" />
+                <Text style={styles.buttonText}>User Lists</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.button}
+                onPress={() => navigation.navigate('#')}>
+                <MaterialCommunityIcons name="flag" size={25} color="#000" />
+                <Text style={styles.buttonText}>Reports Management</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.button}
+                onPress={() => navigation.navigate('#')}>
+                <MaterialCommunityIcons
+                  name="delete"
+                  size={25}
+                  color="#000"
+                />
+                <Text style={styles.buttonText}>Deactivated or Deleted Accounts</Text>
+              </TouchableOpacity>
+            </>
+          )}
         </View>
         <View style={styles.separator} />
         <View style={styles.section}>

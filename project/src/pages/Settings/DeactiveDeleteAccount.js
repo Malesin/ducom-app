@@ -1,25 +1,36 @@
 import React, { useState } from 'react';
 import { SafeAreaView, StyleSheet, Text, View, Pressable, TouchableOpacity } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import DeleteInfo from '../../components/DeleteInfo';
 
 const DeactiveDeleteAccount = ({ navigation }) => {
-  const [selectedOption, setSelectedOption] = useState(null); // null for no option selected
+  const [selectedOption, setSelectedOption] = useState(null);
+  const [showDeleteInfo, setShowDeleteInfo] = useState(false); 
 
   // Handler for selecting "Deactivate Account"
   const handleDeactivateCheck = () => {
     if (selectedOption === 'deactivate') {
-      setSelectedOption(null); // Uncheck if already selected
+      setSelectedOption(null);
     } else {
-      setSelectedOption('deactivate'); // Select "Deactivate Account"
+      setSelectedOption('deactivate');
     }
   };
 
   // Handler for selecting "Delete Account"
   const handleDeleteCheck = () => {
     if (selectedOption === 'delete') {
-      setSelectedOption(null); // Uncheck if already selected
+      setSelectedOption(null);
     } else {
-      setSelectedOption('delete'); // Select "Delete Account"
+      setSelectedOption('delete');
+    }
+  };
+
+  // Handler for "Continue" button
+  const handleContinue = () => {
+    if (selectedOption === 'delete') {
+      setShowDeleteInfo(true); 
+    } else {
+      navigation.navigate('VerifyAccount');
     }
   };
 
@@ -77,7 +88,7 @@ const DeactiveDeleteAccount = ({ navigation }) => {
             { backgroundColor: selectedOption ? '#001374' : '#ccc' }
           ]}
           disabled={!selectedOption}
-          onPress={() => navigation.navigate('VerifyAccount')}
+          onPress={handleContinue} 
         >
           <Text style={[
             styles.buttonText,
@@ -87,6 +98,7 @@ const DeactiveDeleteAccount = ({ navigation }) => {
           </Text>
         </TouchableOpacity>
       </View>
+      {showDeleteInfo && <DeleteInfo navigation={navigation} />}
     </SafeAreaView>
   );
 };
