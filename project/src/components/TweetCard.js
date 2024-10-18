@@ -554,7 +554,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     marginVertical: 8,
     color: '#040608',
-    marginTop: 10
+    marginTop: 5,
   },
   mediaFlatList: {
     marginTop: 30,

@@ -100,6 +100,12 @@ const Settingsscreen = ({ navigation }) => {
           <Text style={styles.title}>Privacy and Interactions</Text>
           <TouchableOpacity
             style={styles.button}
+            onPress={() => navigation.navigate('AccountPrivacy')}>
+            <MaterialCommunityIcons name="lock-outline" size={25} color="#000" />
+            <Text style={styles.buttonText}>Account Privacy</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.button}
             onPress={() => navigation.navigate('BlockedUsers')}>
             <MaterialCommunityIcons name="cancel" size={25} color="#000" />
             <Text style={styles.buttonText}>Blocked Users</Text>

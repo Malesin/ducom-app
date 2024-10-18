@@ -18,6 +18,7 @@ import {
   BlockedUsers,
   MutedUsers,
   VerifyAccount,
+  AccountPrivacy,
 } from '../pages';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -108,7 +109,7 @@ export default function MainNavigation() {
           name="Userprofile"
           component={UserTopTabNavigator}
           options={{ headerShown: true, title: 'User Profile' }}
-          initialParams={{ userIdPost: '', username: '' }}  
+          initialParams={{ userIdPost: '', username: '' }}
         />
         <Stack.Screen
           name="DrawerNavigator"
@@ -124,6 +125,11 @@ export default function MainNavigation() {
           name="UpdatePassword"
           component={UpdatePassword}
           options={{ headerShown: true, title: 'Update Password' }}
+        />
+        <Stack.Screen
+          name="AccountPrivacy"
+          component={AccountPrivacy}
+          options={{ headerShown: true, title: 'Account Privacy' }}
         />
         <Stack.Screen
           name="BlockedUsers"

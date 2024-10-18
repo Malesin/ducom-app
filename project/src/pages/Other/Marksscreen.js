@@ -191,7 +191,7 @@ const Marksscreen = ({navigation}) => {
     <SafeAreaView style={styles.container}>
       {!isConnected && (
         <View style={styles.noConnectionContainer}>
-          <Text style={styles.noConnectionText}>Tidak ada jaringan</Text>
+          <Text style={styles.noConnectionText}>No Internet</Text>
         </View>
       )}
       <ScrollView
@@ -213,7 +213,7 @@ const Marksscreen = ({navigation}) => {
         ) : (
           tweets.length === 0 ? (
             <View style={styles.noTweetsContainer}>
-              <Text style={styles.noTweetsText}>Belum ada Bookmark untuk saat ini</Text>
+              <Text style={styles.noTweetsText}>No Bookmarks</Text>
             </View>
           ) : (
             tweets.map((tweet, index) => (

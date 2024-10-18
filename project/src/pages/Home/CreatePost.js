@@ -103,31 +103,36 @@ const CreatePost = ({ route, navigation }) => {
 
         for (const media of selectedMedia) {
           const mediaType = media.type || 'image/jpeg';
-          const compressedUri = await compressMedia(media.uri, mediaType);
+          try {
+            const compressedUri = await compressMedia(media.uri, mediaType);
 
-          if (typeof compressedUri === 'string') {
-            const fileType = compressedUri.endsWith('.mp4')
-              ? 'video/mp4'
-              : mediaType;
+            if (typeof compressedUri === 'string') {
+              const fileType = compressedUri.endsWith('.mp4')
+                ? 'video/mp4'
+                : mediaType;
 
-            formData.append('media', {
-              uri: compressedUri,
-              type: fileType,
-              name: `media.${compressedUri.endsWith('.mp4') ? 'mp4' : 'png'}`,
-            });
+              formData.append('media', {
+                uri: compressedUri,
+                type: fileType,
+                name: `media.${compressedUri.endsWith('.mp4') ? 'mp4' : 'png'}`,
+              });
 
-            uploadedMedia.push({
-              uri: compressedUri,
-              type: fileType,
-            });
+              uploadedMedia.push({
+                uri: compressedUri,
+                type: fileType,
+              });
 
-            if (uploadedMedia.length === 4) {
-              break;
+              if (uploadedMedia.length === 4) {
+                break;
+              }
+            } else {
+              console.error(
+                'Compressed URI is not a string, skipping this media.',
+              );
             }
-          } else {
-            console.error(
-              'Compressed URI is not a string, skipping this media.',
-            );
+          } catch (error) {
+            Alert.alert('Upload Error', error.message);
+            return;
           }
         }
 
@@ -204,20 +209,18 @@ const CreatePost = ({ route, navigation }) => {
     if (mediaType === 'image/heic' || mediaType === 'image/heif') {
       try {
         const uriWithPrefix = uri.startsWith('file://') ? uri : `file://${uri}`;
-
         const { uri: resizedUri } = await ImageResizer.createResizedImage(
           uriWithPrefix,
           1920,
           1080,
-          'HEIC',
+          'JPEG', // Ubah ke 'JPEG'
           80,
         );
-
-        console.log('HEIF image resized successfully:', resizedUri);
+        console.log('HEIF image resized and converted to JPEG successfully:', resizedUri);
         return resizedUri;
       } catch (error) {
         console.error('Error resizing HEIF image:', error);
-        return uri;
+        throw new Error('Failed to convert HEIF/HEIC image to JPEG.');
       }
     } else if (mediaType === 'image/png' || mediaType === 'image/jpeg' || mediaType === 'image/jpg') {
       try {
@@ -276,7 +279,7 @@ const CreatePost = ({ route, navigation }) => {
     const options = {
       mediaType: 'mixed',
       saveToPhotos: true,
-      allowedFileTypes: ['heic', 'heif', 'jpeg', 'jpg', 'png'],
+      allowedFileTypes: ['jpeg', 'jpg', 'png'],
     };
 
     ImagePicker.launchCamera(options, async response => {
@@ -288,7 +291,7 @@ const CreatePost = ({ route, navigation }) => {
         const { mediaType, assets } = response;
         if (assets && assets.length > 0) {
           const uri = assets[0].uri;
-          const type = assets[0].type || mediaType; 
+          const type = assets[0].type || mediaType;
           setMediaType(type);
           if (type === 'video') {
             try {
@@ -313,7 +316,7 @@ const CreatePost = ({ route, navigation }) => {
     const options = {
       mediaType: 'mixed',
       selectionLimit: 4,
-      allowedFileTypes: ['heic', 'heif', 'jpeg', 'jpg', 'png'],
+      allowedFileTypes: ['jpeg', 'jpg', 'png'], 
       saveToPhotos: true,
     };
 
@@ -325,6 +328,14 @@ const CreatePost = ({ route, navigation }) => {
       } else {
         const { assets } = response;
         if (assets && assets.length > 0) {
+          for (const asset of assets) {
+            const type = asset.type || 'image/jpeg';
+            if (type === 'image/heic' || type === 'image/heif') {
+              Alert.alert('Upload Error', 'HEIC/HEIF format is not supported.');
+              return;
+            }
+          }
+
           const currentMediaCount = selectedMedia.length;
           const newMediaCount = assets.length;
           if (currentMediaCount + newMediaCount > 4) {
@@ -333,7 +344,7 @@ const CreatePost = ({ route, navigation }) => {
           }
 
           const newMedia = await Promise.all(assets.map(async asset => {
-            const type = asset.type || 'image/jpeg'; 
+            const type = asset.type || 'image/jpeg';
             const thumbnail = type === 'video' ? (await createThumbnail({ url: asset.uri, timeStamp: 1000 })).path : null;
             return {
               uri: asset.uri,

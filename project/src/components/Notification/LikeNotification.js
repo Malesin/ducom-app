@@ -98,7 +98,6 @@ const styles = StyleSheet.create({
     maxWidth: 800,
     borderColor: '#E1E8ED',
     borderWidth: 1,
-    borderRadius: 8,
   },
   notificationRow: {
     flexDirection: 'row',
