@@ -26,6 +26,7 @@ const Userprofile = ({ userIdPost, navigation, tweet }) => {
   const [modalImageSource, setModalImageSource] = useState(null);
   const [userData, setUserData] = useState('');
   const [dropdownVisible, setDropdownVisible] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(false);
 
   useEffect(() => {
     navigation.setOptions({ title: '' });
@@ -97,6 +98,10 @@ const Userprofile = ({ userIdPost, navigation, tweet }) => {
     }
     console.log(item);
     toggleDropdown();
+  };
+
+  const handleFollowPress = () => {
+    setIsFollowing(!isFollowing);
   };
 
   return (
@@ -192,10 +197,12 @@ const Userprofile = ({ userIdPost, navigation, tweet }) => {
             </Text>
           </View>
           <TouchableOpacity
-            style={styles.editButton}
-            onPress={() => navigation.navigate('#')}
+            style={[styles.editButton, isFollowing && styles.followingButton]}
+            onPress={handleFollowPress}
           >
-            <Text style={styles.editButtonText}>Follow</Text>
+            <Text style={[styles.editButtonText, isFollowing && styles.followingButtonText]}>
+              {isFollowing ? 'Following' : 'Follow'}
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -313,7 +320,7 @@ const styles = StyleSheet.create({
     borderColor: '#000',
     borderWidth: 1,
     paddingVertical: 5,
-    paddingHorizontal: 30,
+    paddingHorizontal: 50,
     borderRadius: 100,
     marginTop: 20,
     marginBottom: 20,
@@ -323,6 +330,12 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#fff',
     fontWeight: 'bold',
+  },
+  followingButton: {
+    backgroundColor: '#E1E8ED',
+  },
+  followingButtonText: {
+    color: '#000',
   },
   modalBackground: {
     flex: 1,
