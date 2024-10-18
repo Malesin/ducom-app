@@ -16,13 +16,13 @@ import {
   Keyboard,
   useColorScheme,
 } from 'react-native';
-import React, {useState, useEffect, useCallback} from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../../config';
 import Video from 'react-native-video';
-import {createThumbnail} from 'react-native-create-thumbnail';
+import { createThumbnail } from 'react-native-create-thumbnail';
 import CommentCard from '../../components/CommentCard';
 import BottomSheet from '../../components/BottomSheet'; // Tambahkan ini jika belum ada
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -30,7 +30,7 @@ const verifiedIcon = <Icon name="verified" size={16} color="#699BF7" />;
 
 const serverUrl = config.SERVER_URL;
 
-const ViewPost = ({route}) => {
+const ViewPost = ({ route }) => {
   const {
     tweet,
     comments: initialComments,
@@ -42,6 +42,8 @@ const ViewPost = ({route}) => {
   const [likesCount, setLikesCount] = useState(tweet.likesCount);
   const [bookmarked, setBookmarked] = useState(tweet.isBookmarked);
   const [bookmarksCount, setBookmarksCount] = useState(tweet.bookMarksCount);
+  const [reposted, setReposted] = useState(false);
+  const [repostsCount, setRepostsCount] = useState(0);
   const [profilePicture, setProfilePicture] = useState(tweet.profilePicture);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState(null);
@@ -73,7 +75,7 @@ const ViewPost = ({route}) => {
       for (const media of tweet.media || []) {
         if (media.type === 'video' && media.uri) {
           try {
-            const {path} = await createThumbnail({url: media.uri});
+            const { path } = await createThumbnail({ url: media.uri });
             newThumbnails[media.uri] = path;
           } catch (error) {
             console.log('Error generating thumbnail:', error);
@@ -180,6 +182,16 @@ const ViewPost = ({route}) => {
     }
   };
 
+  const handleRepost = () => {
+    if (reposted) {
+      setReposted(false);
+      setRepostsCount(prevRepostsCount => prevRepostsCount - 1);
+    } else {
+      setReposted(true);
+      setRepostsCount(prevRepostsCount => prevRepostsCount + 1);
+    }
+  };
+
   const handleShare = async () => {
     try {
       await Share.share({
@@ -217,7 +229,7 @@ const ViewPost = ({route}) => {
     return `${hours}:${minutes} ${day} ${month} ${year}`;
   };
 
-  const InteractionButton = ({icon, color, onPress}) => (
+  const InteractionButton = ({ icon, color, onPress }) => (
     <TouchableOpacity style={styles.actionButton} onPress={onPress}>
       <MaterialCommunityIcons name={icon} size={20} color={color} />
     </TouchableOpacity>
@@ -236,7 +248,7 @@ const ViewPost = ({route}) => {
     setRefreshing(true);
     try {
       const url = `${serverUrl}/comments`;
-      const params = {postId: tweet.id};
+      const params = { postId: tweet.id };
 
       const response = await axios.post(url, params);
       const dataComment = response.data.data;
@@ -249,15 +261,15 @@ const ViewPost = ({route}) => {
         isLikedCom: comment.likes.some(like => like.user === tweet.idUser),
         replies: Array.isArray(comment.replies)
           ? comment.replies.map(reply => ({
-              id: reply._id,
-              text: reply.comment,
-              userIdPost: reply.user._id,
-              idUser: tweet.idUser,
-              username: reply.user.username,
-              isLikedCom: reply.likes.some(like => like.user === tweet.idUser),
-              profilePicture: reply.user.profilePicture,
-              replies: reply.replies || [],
-            }))
+            id: reply._id,
+            text: reply.comment,
+            userIdPost: reply.user._id,
+            idUser: tweet.idUser,
+            username: reply.user.username,
+            isLikedCom: reply.likes.some(like => like.user === tweet.idUser),
+            profilePicture: reply.user.profilePicture,
+            replies: reply.replies || [],
+          }))
           : [],
         username: comment.user.username,
         profilePicture: comment.user.profilePicture,
@@ -359,7 +371,7 @@ const ViewPost = ({route}) => {
     <SafeAreaView style={styles.container}>
       <ScrollView
         style={styles.scrollContainer}
-        contentContainerStyle={{paddingBottom: 50}}
+        contentContainerStyle={{ paddingBottom: 50 }}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }>
@@ -368,7 +380,7 @@ const ViewPost = ({route}) => {
             <Image
               source={
                 tweet.userAvatar
-                  ? {uri: tweet.userAvatar}
+                  ? { uri: tweet.userAvatar }
                   : require('../../assets/profilepic.png')
               }
               style={styles.avatar}
@@ -378,7 +390,7 @@ const ViewPost = ({route}) => {
                 <Text
                   style={[
                     styles.userName,
-                    {color: colorScheme === 'dark' ? '#000000' : '#000'},
+                    { color: colorScheme === 'dark' ? '#000000' : '#000' },
                   ]}>
                   {tweet.userName}
                 </Text>
@@ -390,7 +402,7 @@ const ViewPost = ({route}) => {
               <Text
                 style={[
                   styles.userHandle,
-                  {color: colorScheme === 'dark' ? '#ccc' : 'gray'},
+                  { color: colorScheme === 'dark' ? '#ccc' : 'gray' },
                 ]}>
                 @{tweet.userHandle}
               </Text>
@@ -415,7 +427,7 @@ const ViewPost = ({route}) => {
                   onPress={() => handleMediaPress(mediaItem.uri)}>
                   {mediaItem.type === 'image' ? (
                     <Image
-                      source={{uri: mediaItem.uri}}
+                      source={{ uri: mediaItem.uri }}
                       style={
                         tweet.media.length === 1
                           ? styles.singleMediaImage
@@ -428,7 +440,7 @@ const ViewPost = ({route}) => {
                       onPress={() => handleMediaPress(mediaItem.uri)}
                       style={styles.videoContainer}>
                       <Image
-                        source={{uri: thumbnails[mediaItem.uri]}}
+                        source={{ uri: thumbnails[mediaItem.uri] }}
                         style={
                           tweet.media.length === 1
                             ? styles.singleMediaVideo
@@ -462,6 +474,9 @@ const ViewPost = ({route}) => {
             <Text style={styles.interactionText}>
               <Text style={styles.interactionNumber}>{likesCount}</Text> Likes{' '}
             </Text>
+            <Text style={styles.interactionText}>
+              <Text style={styles.interactionNumber}>{repostsCount}</Text> Reposts{' '}
+            </Text>
           </View>
           <View style={styles.actions}>
             <InteractionButton
@@ -480,6 +495,12 @@ const ViewPost = ({route}) => {
               icon={bookmarked ? 'bookmark' : 'bookmark-outline'}
               color={bookmarked ? '#00c5ff' : '#040608'}
               onPress={handleBookmark}
+            />
+            <InteractionButton
+              icon="repeat-variant"
+              color={reposted ? '#097969' : '#040608'}
+              count={repostsCount}
+              onPress={handleRepost}
             />
             <TouchableOpacity style={styles.actionButton} onPress={handleShare}>
               <MaterialCommunityIcons
@@ -522,8 +543,8 @@ const ViewPost = ({route}) => {
           </View>
         </View>
       </ScrollView>
-      <View style={[styles.inputContainer, {height: inputHeight}]}>
-        <Image source={{uri: profilePicture}} style={styles.profilePicture} />
+      <View style={[styles.inputContainer, { height: inputHeight }]}>
+        <Image source={{ uri: profilePicture }} style={styles.profilePicture} />
 
         {isEnabledComm ? (
           <>
@@ -563,7 +584,7 @@ const ViewPost = ({route}) => {
             <Text
               style={[
                 styles.commentDisabled,
-                {color: colorScheme === 'dark' ? '#ccc' : '#888'},
+                { color: colorScheme === 'dark' ? '#ccc' : '#888' },
               ]}>
               Comments Disabled
             </Text>
@@ -580,15 +601,15 @@ const ViewPost = ({route}) => {
             <View style={styles.modalBackground}>
               <View style={styles.modalContainer}>
                 {selectedMedia.endsWith('.jpg') ||
-                selectedMedia.endsWith('.png') ? (
+                  selectedMedia.endsWith('.png') ? (
                   <Image
-                    source={{uri: selectedMedia}}
+                    source={{ uri: selectedMedia }}
                     style={styles.modalImage}
                     onError={() => console.log('Failed to load image')}
                   />
                 ) : (
                   <Video
-                    source={{uri: selectedMedia}}
+                    source={{ uri: selectedMedia }}
                     style={styles.modalImage}
                     controls
                     resizeMode="contain"

@@ -237,21 +237,21 @@ const HomeScreen = ({ navigation }) => {
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    setShowSkeleton(true); // Tampilkan.
-    setHasMore(true); // Reset hasMore to true
+    setShowSkeleton(true); 
+    setHasMore(true); 
     const newTweets = await fetchTweets(1);
     const newPinTweet = await fetchPinTweet();
     if (newPinTweet) {
-      setPinTweets([newPinTweet]); // Set pintweets sebagai array dengan satu elemen
-      setPinnedTweetId(newPinTweet.id); // Simpan ID tweet yang dipin
+      setPinTweets([newPinTweet]); 
+      setPinnedTweetId(newPinTweet.id); 
     } else {
-      setPinTweets([]); // Kosongkan pintweets jika tidak ada pin tweet
-      setPinnedTweetId(null); // Reset ID tweet yang dipin
+      setPinTweets([]);
+      setPinnedTweetId(null); 
     }
-    const filteredTweets = newTweets.filter(tweet => tweet.id !== newPinTweet?.id); // Filter tweet yang dipin
-    setTweets(filteredTweets.slice(0, 4)); // Only display 4 tweets
+    const filteredTweets = newTweets.filter(tweet => tweet.id !== newPinTweet?.id); 
+    setTweets(filteredTweets.slice(0, 4));
     setRefreshing(false);
-    setShowSkeleton(false); // Sembunyikan skeleton setelah refresh selesai
+    setShowSkeleton(false); 
   }, [isConnected]);
 
   const LoadingIndicator = () => {
