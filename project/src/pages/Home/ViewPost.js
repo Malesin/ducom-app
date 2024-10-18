@@ -65,9 +65,6 @@ const ViewPost = ({ route }) => {
   const [isEnabledComm, setIsEnabledComm] = useState(true);
   const [loading, setLoading] = useState(true); 
 
-  const [reposted, setReposted] = useState(false);
-  const [repostsCount, setRepostsCount] = useState(0);
-
   useEffect(() => {
     if (focusCommentInput && textInputRef.current) {
       textInputRef.current.focus();
@@ -382,18 +379,8 @@ const ViewPost = ({ route }) => {
 
   const onRefreshPage = () => {
     setRefreshing(true);
-    setShowBottomSheet(false);
+    setShowBottomSheet(false);  
     onRefresh();
-  };
-
-  const handleRepost = () => {
-    if (reposted) {
-      setReposted(false);
-      setRepostsCount(prevRepostsCount => prevRepostsCount - 1);
-    } else {
-      setReposted(true);
-      setRepostsCount(prevRepostsCount => prevRepostsCount + 1);
-    }
   };
 
   const renderSkeleton = () => (
