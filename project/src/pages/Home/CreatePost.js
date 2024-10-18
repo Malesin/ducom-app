@@ -288,7 +288,7 @@ const CreatePost = ({ route, navigation }) => {
         const { mediaType, assets } = response;
         if (assets && assets.length > 0) {
           const uri = assets[0].uri;
-          const type = assets[0].type || mediaType;
+          const type = assets[0].type || mediaType; 
           setMediaType(type);
           if (type === 'video') {
             try {
@@ -333,7 +333,7 @@ const CreatePost = ({ route, navigation }) => {
           }
 
           const newMedia = await Promise.all(assets.map(async asset => {
-            const type = asset.type || 'image/jpeg';
+            const type = asset.type || 'image/jpeg'; 
             const thumbnail = type === 'video' ? (await createThumbnail({ url: asset.uri, timeStamp: 1000 })).path : null;
             return {
               uri: asset.uri,

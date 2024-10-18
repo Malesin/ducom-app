@@ -231,11 +231,11 @@ const HomeScreen = ({ navigation }) => {
       setPinTweets([newPinTweet]); 
       setPinnedTweetId(newPinTweet.id); 
     } else {
-      setPinTweets([]); 
+      setPinTweets([]);
       setPinnedTweetId(null); 
     }
     const filteredTweets = newTweets.filter(tweet => tweet.id !== newPinTweet?.id); 
-    setTweets(filteredTweets.slice(0, 4)); 
+    setTweets(filteredTweets.slice(0, 4));
     setRefreshing(false);
     setShowSkeleton(false); 
   }, [isConnected]);

@@ -6,6 +6,7 @@ const { height } = Dimensions.get('window');
 
 const PostSheet = () => {
     const [visible, setVisible] = useState(false);
+    const [selectedOption, setSelectedOption] = useState('everyone'); // State to track selected radio option
     const [animationValue] = useState(new Animated.Value(height));
 
     const openBottomSheet = () => {
@@ -36,19 +37,28 @@ const PostSheet = () => {
                     <TouchableOpacity style={styles.overlay} onPress={closeBottomSheet} />
                     <Animated.View
                         style={[styles.bottomSheetContainer, { transform: [{ translateY: animationValue }] }]}>
+
                         <Text style={styles.title}>Who Can Reply?</Text>
                         <Text style={styles.subtitle}>
                             Choose who can reply to this Post. Anyone mentioned can always reply.
                         </Text>
 
-                        <TouchableOpacity style={styles.option}>
+                        {/* Option 1: Everyone */}
+                        <TouchableOpacity style={styles.option} onPress={() => setSelectedOption('everyone')}>
                             <MaterialCommunityIcons name="earth" size={25} color="#001374" />
                             <Text style={styles.optionText}>Everyone</Text>
+                            <View style={styles.radioCircle}>
+                                {selectedOption === 'everyone' && <View style={styles.checkedCircle} />}
+                            </View>
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={styles.option}>
+                        {/* Option 2: Only Me */}
+                        <TouchableOpacity style={styles.option} onPress={() => setSelectedOption('onlyme')}>
                             <MaterialCommunityIcons name="account-circle" size={25} color="#001374" />
                             <Text style={styles.optionText}>Only me</Text>
+                            <View style={styles.radioCircle}>
+                                {selectedOption === 'onlyme' && <View style={styles.checkedCircle} />}
+                            </View>
                         </TouchableOpacity>
                     </Animated.View>
                 </View>
@@ -113,11 +123,28 @@ const styles = StyleSheet.create({
     option: {
         flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'space-between',
         paddingVertical: 10,
     },
     optionText: {
         marginLeft: 10,
         fontSize: 16,
         color: '#000',
+        flex: 1,
+    },
+    radioCircle: {
+        height: 20,
+        width: 20,
+        borderRadius: 10,
+        borderWidth: 2,
+        borderColor: '#001374',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    checkedCircle: {
+        width: 10,
+        height: 10,
+        borderRadius: 5,
+        backgroundColor: '#001374',
     },
 });
