@@ -43,7 +43,7 @@ const Userprofile = ({ userIdPost, navigation, tweet }) => {
       setUserData(user);
 
       if (user.username) {
-        navigation.setOptions({ title: `@${user.username}` }); 
+        navigation.setOptions({ title: `@${user.username}` });
       }
 
       if (user.bannerPicture) {
@@ -157,53 +157,46 @@ const Userprofile = ({ userIdPost, navigation, tweet }) => {
           </TouchableWithoutFeedback>
         )}
         <View style={styles.profileContainer}>
-          <TouchableOpacity onPress={openModal}>
-            <Image
-              source={profilePicture || require('../../assets/profilepic.png')}
-              style={styles.profile}
-            />
-          </TouchableOpacity>
-          <View style={styles.profileText}>
-            {!userData ? (
-              <>
-                <Skeleton
-                  animation="pulse"
-                  height={20}
-                  width={150}
-                  style={styles.skeleton}
-                />
-                <Skeleton
-                  animation="pulse"
-                  height={14}
-                  width={100}
-                  style={styles.skeleton}
-                />
-                <Skeleton
-                  animation="pulse"
-                  height={13}
-                  width={200}
-                  style={styles.skeleton}
-                />
-                <Skeleton
-                  animation="pulse"
-                  height={30}
-                  width={120}
-                  style={styles.skeleton}
-                />
-              </>
-            ) : (
-              <>
-                <View style={styles.nameContainer}>
-                  <Text style={styles.name}>{userData?.name}</Text>
-                  {userData?.isAdmin ? (<Text style={styles.verifiedIcon}>{verifiedIcon}</Text>) : null}
-                </View>
-                <Text style={styles.username}>@{userData?.username}</Text>
-                <Text style={styles.description}>
-                  {userData?.bio || 'No Description'}
-                </Text>
-              </>
-            )}
+          <View style={styles.profilePictureContainer}>
+            <TouchableOpacity onPress={openModal}>
+              <Image
+                source={profilePicture || require('../../assets/profilepic.png')}
+                style={styles.profile}
+              />
+            </TouchableOpacity>
           </View>
+          <View style={styles.statsContainer}>
+            <View style={styles.statItem}>
+              <Text style={styles.statNumber}>0</Text>
+              <Text style={styles.statLabel}>Posts</Text>
+            </View>
+            <View style={styles.statItem}>
+              <Text style={styles.statNumber}>0</Text>
+              <Text style={styles.statLabel}>Followers</Text>
+            </View>
+            <View style={styles.statItem}>
+              <Text style={styles.statNumber}>0</Text>
+              <Text style={styles.statLabel}>Following</Text>
+            </View>
+          </View>
+        </View>
+        <View style={styles.userInfoWrapper}>
+          <View style={styles.userInfoContainer}>
+            <View style={styles.nameContainer}>
+              <Text style={styles.name}>{userData?.name}</Text>
+              {userData?.isAdmin ? (<Text style={styles.verifiedIcon}>{verifiedIcon}</Text>) : null}
+            </View>
+            <Text style={styles.username}>@{userData?.username}</Text>
+            <Text style={styles.description}>
+              {userData?.bio || 'No Description'}
+            </Text>
+          </View>
+          <TouchableOpacity
+            style={styles.editButton}
+            onPress={() => navigation.navigate('#')}
+          >
+            <Text style={styles.editButtonText}>Follow</Text>
+          </TouchableOpacity>
         </View>
       </View>
       <Modal
@@ -255,25 +248,54 @@ const styles = StyleSheet.create({
     width: 83,
     height: 82,
     borderRadius: 40,
-    marginRight: 20,
-    marginBottom: 15,
+    marginTop: 10,
+    marginLeft: 10,
   },
-  profileText: {
+  profilePictureContainer: {
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+  },
+  statsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
     flex: 1,
-    justifyContent: 'center',
-    minHeight: 150, // Set minimum height to avoid layout shift
   },
-  nameContainer: {
-    flexDirection: 'row', // Tambahkan ini untuk mengatur elemen dalam satu baris
-    alignItems: 'center', // Tambahkan ini untuk menyelaraskan elemen secara vertikal
+  statItem: {
+    alignItems: 'center',
+    marginLeft: 30,
   },
-  name: {
-    fontSize: 20,
+  statNumber: {
+    fontSize: 18,
     fontWeight: 'bold',
     color: '#000',
   },
+  statLabel: {
+    fontSize: 14,
+    color: '#777',
+  },
+  userInfoWrapper: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginLeft: 20,
+  },
+  userInfoContainer: {
+    marginTop: 10,
+    marginBottom: 10,
+  },
+  nameContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  name: {
+    fontSize: 17,
+    fontWeight: 'bold',
+    color: '#000',
+    marginBottom: 5,
+    marginRight: 5,
+  },
   verifiedIcon: {
-    marginLeft: 5, // Pastikan ini ada untuk memberikan jarak
+    marginLeft: 5,
     marginTop: 3
   },
   username: {
@@ -284,6 +306,23 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 13,
     color: '#000',
+  },
+  editButton: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#001374',
+    borderColor: '#000',
+    borderWidth: 1,
+    paddingVertical: 5,
+    paddingHorizontal: 30,
+    borderRadius: 100,
+    marginTop: 20,
+    marginBottom: 20,
+    marginRight: 10,
+  },
+  editButtonText: {
+    fontSize: 13,
+    color: '#fff',
+    fontWeight: 'bold',
   },
   modalBackground: {
     flex: 1,
@@ -311,14 +350,14 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    zIndex: 999, // Ensure it is above other elements
+    zIndex: 999,
   },
   dropdownMenu: {
     position: 'absolute',
     top: 10,
     right: 10,
     width: 200,
-    backgroundColor: '#fff', // Warna latar belakang putih
+    backgroundColor: '#fff',
     borderRadius: 7,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -326,20 +365,20 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     elevation: 5,
     zIndex: 1000,
-    padding: 10, // Add padding for better appearance
+    padding: 10,
   },
   dropdownItem: {
-    flexDirection: 'row', // Tambahkan flexDirection row
-    alignItems: 'center', // Tambahkan alignItems center
-    padding: 15, // Sesuaikan padding
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 15,
   },
   dropdownItemText: {
-    color: '#000', // Warna teks hitam
-    marginLeft: 10, // Tambahkan margin kiri untuk memberi jarak antara ikon dan teks
-    fontWeight: 'bold', // Membuat teks menjadi bold
+    color: '#000',
+    marginLeft: 10,
+    fontWeight: 'bold',
   },
   dropdownIcon: {
-    marginRight: 10, // Tambahkan margin kanan untuk memberi jarak antara ikon dan teks
+    marginRight: 10,
   },
 });
 
