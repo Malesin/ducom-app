@@ -9,7 +9,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../config';
-import NetInfo from '@react-native-community/netinfo'; // Tambahkan import NetInfo
+import NetInfo from '@react-native-community/netinfo';
 const serverUrl = config.SERVER_URL;
 
 import TopTabNavigator from './TopTabNavigator';
@@ -20,15 +20,13 @@ const Tab = createBottomTabNavigator();
 
 function BottomTabNavigator() {
   const [profilePicture, setProfilePicture] = useState('');
-  const [isConnected, setIsConnected] = useState(true); // Tambahkan state untuk koneksi
+  const [isConnected, setIsConnected] = useState(true);
 
-  // Fungsi untuk mengambil data pengguna
   const getData = useCallback(async () => {
     try {
       const token = await AsyncStorage.getItem('token');
       console.log('Token Retrieved Successfully');
 
-      // Ambil data pengguna
       const userResponse = await axios.post(`${serverUrl}/userdata`, {
         token: token,
       });
@@ -46,12 +44,11 @@ function BottomTabNavigator() {
     }
   }, []);
 
-  // Memantau status koneksi internet
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener(state => {
       setIsConnected(state.isConnected);
       if (state.isConnected) {
-        getData(); // Panggil getData ketika koneksi internet tersedia
+        getData();
       }
     });
 
@@ -60,7 +57,6 @@ function BottomTabNavigator() {
     };
   }, [getData]);
 
-  // Memanggil getData setiap kali tab "Profile" mendapatkan fokus
   useFocusEffect(
     useCallback(() => {
       getData();
@@ -148,7 +144,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   headerIcon: {
-    marginRight: 8, // Space between icon and text
+    marginRight: 8,
   },
   headerTitle: {
     fontSize: 18,

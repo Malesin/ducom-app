@@ -24,9 +24,9 @@ import config from '../../config';
 import Video from 'react-native-video';
 import {createThumbnail} from 'react-native-create-thumbnail';
 import CommentCard from '../../components/CommentCard';
-import BottomSheet from '../../components/BottomSheet'; // Tambahkan ini jika belum ada
+import BottomSheet from '../../components/BottomSheet'; 
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import {Skeleton} from 'react-native-elements'; // Tambahkan import ini
+import {Skeleton} from 'react-native-elements'; 
 const verifiedIcon = <Icon name="verified" size={16} color="#699BF7" />;
 
 const serverUrl = config.SERVER_URL;
@@ -61,7 +61,10 @@ const ViewPost = ({route}) => {
   const [refreshing, setRefreshing] = useState(false);
   const [showBottomSheet, setShowBottomSheet] = useState(false);
   const [isEnabledComm, setIsEnabledComm] = useState(true);
-  const [loading, setLoading] = useState(true); // Tambahkan state loading
+  const [loading, setLoading] = useState(true); 
+
+  const [reposted, setReposted] = useState(false);
+  const [repostsCount, setRepostsCount] = useState(0);
 
   useEffect(() => {
     if (focusCommentInput && textInputRef.current) {
@@ -90,13 +93,13 @@ const ViewPost = ({route}) => {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setLoading(false); // Set loading ke false setelah 2 detik
+      setLoading(false); 
     }, 10000);
 
     fetchComments();
     isEnabledComment();
 
-    return () => clearTimeout(timer); // Bersihkan timer saat komponen unmount
+    return () => clearTimeout(timer);
   }, [fetchComments]);
 
   const handleLike = async () => {
@@ -278,7 +281,7 @@ const ViewPost = ({route}) => {
       }));
       setComments(formattedComments || []);
       setVisibleComments(3);
-      setLoading(false); // Set loading ke false setelah data diambil
+      setLoading(false); 
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -300,16 +303,16 @@ const ViewPost = ({route}) => {
   }, []);
 
   const onRefresh = useCallback(async () => {
-    setLoading(true); // Set loading ke true saat refresh
+    setLoading(true); 
     const timer = setTimeout(() => {
-      setLoading(false); // Set loading ke false setelah 2 detik
+      setLoading(false);
     }, 2000);
 
     fetchComments();
     isEnabledComment();
     setShowBottomSheet(false);
 
-    return () => clearTimeout(timer); // Bersihkan timer saat komponen unmount
+    return () => clearTimeout(timer); 
   }, [fetchComments]);
 
   const onDeleteSuccess = () => {
@@ -371,15 +374,25 @@ const ViewPost = ({route}) => {
     onRefresh();
   };
 
+  const handleRepost = () => {
+    if (reposted) {
+      setReposted(false);
+      setRepostsCount(prevRepostsCount => prevRepostsCount - 1);
+    } else {
+      setReposted(true);
+      setRepostsCount(prevRepostsCount => prevRepostsCount + 1);
+    }
+  };
+
   const renderSkeleton = () => (
     <View style={styles.skeletonContainer}>
       <View style={styles.skeletonHeader}>
-        <Skeleton 
+        <Skeleton
           animation="pulse"
           circle
           height={50}
           width={50}
-          style={styles.skeletonAvatar} 
+          style={styles.skeletonAvatar}
         />
         <View style={styles.skeletonTextContainer}>
           <Skeleton
@@ -397,9 +410,9 @@ const ViewPost = ({route}) => {
         </View>
         <Skeleton
           animation="pulse"
-          height={30} // Tinggi skeleton vertikal
-          width={10}  // Lebar skeleton vertikal
-          style={styles.skeletonVertical} // Tambahkan gaya untuk posisi
+          height={30}
+          width={10} 
+          style={styles.skeletonVertical}
           borderRadius={3}
         />
       </View>
@@ -425,11 +438,11 @@ const ViewPost = ({route}) => {
         animation="pulse"
         height={1}
         width="100%"
-        style={[styles.skeleton, {borderRadius: 3, marginTop: 5}]} // Ubah marginTop menjadi 5
+        style={[styles.skeleton, {borderRadius: 3, marginTop: 5}]}
       />
       <Skeleton
         animation="pulse"
-        height={16  }
+        height={16}
         width="58%"
         style={[styles.skeleton, {borderRadius: 3, marginTop: 5}]}
       />
@@ -437,7 +450,7 @@ const ViewPost = ({route}) => {
         animation="pulse"
         height={1}
         width="100%"
-        style={[styles.skeleton, {borderRadius: 3, marginTop: 5}]} // Ubah marginTop menjadi 5
+        style={[styles.skeleton, {borderRadius: 3, marginTop: 5}]}
       />
       <View style={styles.skeletonIconRow}>
         <Skeleton
@@ -468,12 +481,19 @@ const ViewPost = ({route}) => {
           width={20}
           style={styles.skeletonIcon}
         />
+        <Skeleton
+          animation="pulse"
+          circle
+          height={20}
+          width={20}
+          style={styles.skeletonIcon} 
+        />
       </View>
       <Skeleton
         animation="pulse"
         height={1}
         width="100%"
-        style={[styles.skeleton, {borderRadius: 3, marginTop: 5}]} // Ubah marginTop menjadi 5
+        style={[styles.skeleton, {borderRadius: 3, marginTop: 5}]} 
       />
     </View>
   );
@@ -481,7 +501,7 @@ const ViewPost = ({route}) => {
   return (
     <SafeAreaView style={styles.container}>
       {loading ? (
-        renderSkeleton() // Tampilkan skeleton saat loading
+        renderSkeleton()
       ) : (
         <ScrollView
           style={styles.scrollContainer}
@@ -523,7 +543,7 @@ const ViewPost = ({route}) => {
               </View>
               <TouchableOpacity
                 style={styles.optionsButton}
-                onPress={() => setShowBottomSheet(true)} // Ubah ini
+                onPress={() => setShowBottomSheet(true)}
               >
                 <MaterialCommunityIcons
                   name="dots-vertical"
@@ -609,6 +629,15 @@ const ViewPost = ({route}) => {
                 color={bookmarked ? '#00c5ff' : '#040608'}
                 onPress={handleBookmark}
               />
+              <TouchableOpacity
+                style={styles.actionButton}
+                onPress={handleRepost}>
+                <MaterialCommunityIcons
+                  name="repeat-variant"
+                  size={22}
+                  color={reposted ? '#097969' : '#040608'}
+                />
+              </TouchableOpacity>
               <TouchableOpacity
                 style={styles.actionButton}
                 onPress={handleShare}>
@@ -798,8 +827,8 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
   },
   usernameContainer: {
-    flexDirection: 'row', // Tambahkan ini untuk mengatur elemen dalam satu baris
-    alignItems: 'center', // Tambahkan ini untuk menyelaraskan elemen secara vertikal
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   verifiedIcon: {
     marginLeft: 4,
@@ -998,22 +1027,23 @@ const styles = StyleSheet.create({
   },
   skeletonTextContainer: {
     flex: 1,
-    marginLeft: 10, // Tambahkan jarak antara avatar dan skeleton text
+    marginLeft: 10, 
   },
   skeleton: {
     marginBottom: 10,
   },
   skeletonIconRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between', // Menggunakan space-between untuk jarak lebih lebar
-   
+    justifyContent: 'space-between', 
+    alignItems: 'center',
+    width: '100%', 
   },
   skeletonIcon: {
-    marginHorizontal: 35, // Menambah margin untuk jarak lebih lebar
+    marginHorizontal: 5, 
   },
   skeletonVertical: {
     position: 'absolute',
-    right: 20, // Pindahkan sedikit ke kiri dengan menambah nilai right
+    right: 20,
     top: 0,
   },
 });

@@ -567,13 +567,13 @@ const styles = StyleSheet.create({
   },
   singleMediaImage: {
     width: 390,
-    height: 200, // Adjust height if needed
+    height: 200, 
     borderRadius: 8,
     resizeMode: 'cover',
   },
   singleMediaVideo: {
     width: 390,
-    height: 200, // Adjust height if needed
+    height: 200, 
     borderRadius: 8,
   },
   actions: {

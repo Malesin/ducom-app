@@ -10,13 +10,12 @@ import { Alert } from 'react-native';
 const serverUrl = config.SERVER_URL;
 
 const VerifyAccount = ({navigation}) => {
-    const colorScheme = useColorScheme(); // Dapatkan mode tema saat ini
+    const colorScheme = useColorScheme();
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
     const [profilePicture, setProfilePicture] = useState(null);
     const [username, setUsername] = useState(null);
     const [password, setPassword] = useState('');
-    // const [myToken, setMyToken] = useState('');
-    const [error, setError] = useState(''); // Tambahkan state untuk error
+    const [error, setError] = useState('');
 
     async function myData() {
         try {
@@ -108,7 +107,7 @@ const VerifyAccount = ({navigation}) => {
     const styles = StyleSheet.create({
         container: {
             flex: 1,
-            backgroundColor: colorScheme === 'dark' ? 'white' : 'white', // Sesuaikan warna latar belakang
+            backgroundColor: colorScheme === 'dark' ? 'white' : 'white',
         },
         content: {
             alignItems: 'center',
@@ -124,12 +123,12 @@ const VerifyAccount = ({navigation}) => {
             fontSize: 18,
             fontWeight: 'bold',
             marginBottom: 20,
-            color: colorScheme === 'dark' ? 'black' : 'black', // Sesuaikan warna teks
+            color: colorScheme === 'dark' ? 'black' : 'black',
         },
         instruction: {
             textAlign: 'center',
             marginBottom: 20,
-            color: colorScheme === 'dark' ? 'gray' : 'gray', // Sesuaikan warna teks
+            color: colorScheme === 'dark' ? 'gray' : 'gray',
         },
         inputContainer: {
             flexDirection: 'row',
@@ -143,7 +142,7 @@ const VerifyAccount = ({navigation}) => {
         input: {
             flex: 1,
             padding: 10,
-            color: colorScheme === 'dark' ? 'black' : 'black', // Sesuaikan warna teks input
+            color: colorScheme === 'dark' ? 'black' : 'black',
         },
         eyeIcon: {
             padding: 10,
@@ -161,7 +160,7 @@ const VerifyAccount = ({navigation}) => {
             fontWeight: 'bold',
         },
         forgotPassword: {
-            color: colorScheme === 'dark' ? '#000' : '#000', // Sesuaikan warna teks
+            color: colorScheme === 'dark' ? '#000' : '#000',
         },
         skeletonProfile: {
             marginBottom: 20,

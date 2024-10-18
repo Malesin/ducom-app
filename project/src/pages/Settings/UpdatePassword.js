@@ -24,7 +24,7 @@ const UpdatePassword = ({ navigation }) => {
   const [showOldPassword, setShowOldPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showVerifyNewPassword, setShowVerifyNewPassword] = useState(false);
-  const [isButtonDisabled, setIsButtonDisabled] = useState(true); // Tambahkan state ini
+  const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const colorScheme = useColorScheme();
 
   const validatePassword = password => {
@@ -42,7 +42,7 @@ const UpdatePassword = ({ navigation }) => {
     } else {
       setError('');
       try {
-        const token = await AsyncStorage.getItem('token'); // Assuming token is stored in AsyncStorage
+        const token = await AsyncStorage.getItem('token');
         const response = await axios.post(`${serverUrl}/changepassword`, {
           oldPassword,
           newPassword,
@@ -67,7 +67,6 @@ const UpdatePassword = ({ navigation }) => {
   };
 
   useEffect(() => {
-    // Periksa apakah semua input sudah terisi
     if (oldPassword && newPassword && verifyNewPassword) {
       setIsButtonDisabled(false);
     } else {
@@ -75,8 +74,8 @@ const UpdatePassword = ({ navigation }) => {
     }
   }, [oldPassword, newPassword, verifyNewPassword]);
 
-  const inputTextColor = colorScheme === 'dark' ? '#000000' : '#000000'; // Warna teks input
-  const placeholderTextColor = colorScheme === 'dark' ? '#000000' : '#000000'; // Warna placeholder
+  const inputTextColor = colorScheme === 'dark' ? '#000000' : '#000000';
+  const placeholderTextColor = colorScheme === 'dark' ? '#000000' : '#000000';
 
   return (
     <SafeAreaView style={styles.container}>
@@ -86,7 +85,7 @@ const UpdatePassword = ({ navigation }) => {
           <TextInput
             style={[
               styles.passwordInput,
-              { color: inputTextColor } // Atur warna teks
+              { color: inputTextColor }
             ]}
             placeholder="Please enter current password"
             secureTextEntry={!showOldPassword}
@@ -112,7 +111,7 @@ const UpdatePassword = ({ navigation }) => {
           <TextInput
             style={[
               styles.passwordInput,
-              { color: inputTextColor } // Atur warna teks
+              { color: inputTextColor }
             ]}
             placeholder="Please enter new password"
             secureTextEntry={!showNewPassword}
@@ -138,7 +137,7 @@ const UpdatePassword = ({ navigation }) => {
           <TextInput
             style={[
               styles.passwordInput,
-              { color: inputTextColor } // Atur warna teks
+              { color: inputTextColor }
             ]}
             placeholder="Please verify new password"
             secureTextEntry={!showVerifyNewPassword}
@@ -162,9 +161,9 @@ const UpdatePassword = ({ navigation }) => {
       {successMessage ? <Text style={styles.success}>{successMessage}</Text> : null}
       <View style={styles.buttonContainer}>
         <TouchableOpacity
-          style={[styles.button, isButtonDisabled && styles.disabledButton]} // Tambahkan gaya untuk tombol yang dinonaktifkan
+          style={[styles.button, isButtonDisabled && styles.disabledButton]}
           onPress={handleUpdatePassword}
-          disabled={isButtonDisabled} // Nonaktifkan tombol jika isButtonDisabled true
+          disabled={isButtonDisabled}
         >
           <Text style={styles.buttonText}>Update</Text>
         </TouchableOpacity>
@@ -253,6 +252,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   disabledButton: {
-    backgroundColor: '#cccccc', // Warna abu-abu untuk tombol yang dinonaktifkan
+    backgroundColor: '#cccccc',
   },
 });

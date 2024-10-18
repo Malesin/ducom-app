@@ -77,7 +77,7 @@ function Likescreen({ navigation }) {
 
     useFocusEffect(
         useCallback(() => {
-            if (!isFetched) { // Only fetch if data has not been fetched yet
+            if (!isFetched) { 
                 (async () => {
                     setLoading(true);
                     const newTweets = await fetchTweets(page);

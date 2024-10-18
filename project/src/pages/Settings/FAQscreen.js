@@ -4,7 +4,6 @@ import { ScrollView } from 'react-native-gesture-handler';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-// Debounce utility function
 const debounce = (func, delay) => {
     let timer;
     return (...args) => {
@@ -17,7 +16,6 @@ const Accordion = ({ title, content, isExpanded, onPress }) => {
     const height = useSharedValue(0);
     const borderOpacity = useSharedValue(0);
 
-    // Update the height and border opacity when `isExpanded` changes
     height.value = withSpring(isExpanded ? 60 : 0, { damping: 20, stiffness: 100 });
     borderOpacity.value = withTiming(isExpanded ? 1 : 0, { duration: 300 });
 
@@ -27,10 +25,10 @@ const Accordion = ({ title, content, isExpanded, onPress }) => {
     }));
 
     const contentTextStyle = useAnimatedStyle(() => ({
-        borderWidth: height.value > 0 ? 1 : 0, // Ensure border is visible during expansion
-        borderColor: '#ccc', // Static border color
-        opacity: borderOpacity.value, // Animated border opacity
-        padding: height.value > 0 ? 10 : 0, // Add padding when expanded
+        borderWidth: height.value > 0 ? 1 : 0,
+        borderColor: '#ccc',
+        opacity: borderOpacity.value,
+        padding: height.value > 0 ? 10 : 0,
     }));
 
     return (
@@ -58,15 +56,12 @@ const Accordion = ({ title, content, isExpanded, onPress }) => {
 const FAQscreen = () => {
     const [expandedIndex, setExpandedIndex] = useState(null);
 
-    // Wrap toggleAccordion in debounce
     const toggleAccordion = useCallback(debounce((index) => {
         setExpandedIndex(expandedIndex === index ? null : index);
     }, 300), [expandedIndex]);
 
-
-    // Email API
     const handlePress = async () => {
-        const email = 'reysend01@gmail.com'; // Replace with admin email
+        const email = 'dugamcomunity@gmail.com';
         const subject = 'Support Request';
         const body = 'Please describe your issue here.';
         const url = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
@@ -112,7 +107,6 @@ const FAQscreen = () => {
                     ))}
                 </View>
 
-                {/* Section for text and button */}
                 <View style={styles.helpSection}>
                     <Text style={styles.helpText}>Let Us Help You</Text>
                     <TouchableOpacity style={styles.pillButton} onPress={handlePress}>

@@ -68,12 +68,6 @@ const HomeScreen = ({ navigation }) => {
       const token = await AsyncStorage.getItem('token');
       const response = await axios.post(`${serverUrl}/userdata`, { token: token });
       const { data, status } = response.data;
-      // if (status === 'error') {
-      //   Alert.alert('Error', 'Anda Telah Keluar dari Akun', [
-      //     { text: 'OK', onPress: () => navigation.navigate('Auths') },
-      //   ]);
-      //   return;
-      // }
       const emailUser = data.email;
       const idUser = data._id;
       const profilePicture = data.profilePicture;
@@ -134,12 +128,6 @@ const HomeScreen = ({ navigation }) => {
       const token = await AsyncStorage.getItem('token');
       const response = await axios.post(`${serverUrl}/userdata`, { token: token });
       const { data, status } = response.data;
-      // if (status === 'error') {
-      //   Alert.alert('Error', 'Anda Telah Keluar dari Akun', [
-      //     { text: 'OK', onPress: () => navigation.navigate('Auths') },
-      //   ]);
-      //   return;
-      // }
       const emailUser = data.email;
       const idUser = data._id;
       const profilePicture = data.profilePicture;
@@ -151,7 +139,6 @@ const HomeScreen = ({ navigation }) => {
         token: token
       });
 
-      // Tambahkan pengecekan null
       if (!pinPost.data.data) {
         console.error('Pinned post data is null');
         return null;
@@ -161,7 +148,7 @@ const HomeScreen = ({ navigation }) => {
       const postPin = pinPost.data.data.post;
 
       if (!postPin) {
-        return null; // Kembalikan null jika pinPost tidak ada
+        return null; 
       }
       const totalComments = postPin.comments.length + postPin.comments.reduce((acc, comment) => acc + comment.replies.length, 0);
 
@@ -198,15 +185,14 @@ const HomeScreen = ({ navigation }) => {
 
       return pinTweet;
     } catch (error) {
-      console.error('Error fetching pinned tweets:', error); // Perbaiki pesan error
-      return null; // Kembalikan null jika terjadi error
+      console.error('Error fetching pinned tweets:', error);
+      return null; 
     }
   };
 
   const fetchComments = async (postId) => {
     try {
       const response = await axios.get(`${serverUrl}/comments`, {
-        // token: token,
         params: { postId },
       });
       if (response.data.status === 'ok') {
@@ -237,21 +223,21 @@ const HomeScreen = ({ navigation }) => {
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    setShowSkeleton(true); // Tampilkan.
-    setHasMore(true); // Reset hasMore to true
+    setShowSkeleton(true); 
+    setHasMore(true); 
     const newTweets = await fetchTweets(1);
     const newPinTweet = await fetchPinTweet();
     if (newPinTweet) {
-      setPinTweets([newPinTweet]); // Set pintweets sebagai array dengan satu elemen
-      setPinnedTweetId(newPinTweet.id); // Simpan ID tweet yang dipin
+      setPinTweets([newPinTweet]); 
+      setPinnedTweetId(newPinTweet.id); 
     } else {
-      setPinTweets([]); // Kosongkan pintweets jika tidak ada pin tweet
-      setPinnedTweetId(null); // Reset ID tweet yang dipin
+      setPinTweets([]); 
+      setPinnedTweetId(null); 
     }
-    const filteredTweets = newTweets.filter(tweet => tweet.id !== newPinTweet?.id); // Filter tweet yang dipin
-    setTweets(filteredTweets.slice(0, 4)); // Only display 4 tweets
+    const filteredTweets = newTweets.filter(tweet => tweet.id !== newPinTweet?.id); 
+    setTweets(filteredTweets.slice(0, 4)); 
     setRefreshing(false);
-    setShowSkeleton(false); // Sembunyikan skeleton setelah refresh selesai
+    setShowSkeleton(false); 
   }, [isConnected]);
 
   const LoadingIndicator = () => {
@@ -295,18 +281,18 @@ const HomeScreen = ({ navigation }) => {
   useEffect(() => {
     const loadInitialTweets = async () => {
       const initialTweets = await fetchTweets(1);
-      const initialPinTweets = await fetchPinTweet(); // Panggil fetchPinTweet saat inisialisasi
+      const initialPinTweets = await fetchPinTweet(); 
       if (initialPinTweets) {
-        setPinTweets([initialPinTweets]); // Set pintweets sebagai array dengan satu elemen
-        setPinnedTweetId(initialPinTweets.id); // Simpan ID tweet yang dipin
+        setPinTweets([initialPinTweets]); 
+        setPinnedTweetId(initialPinTweets.id); 
       } else {
-        setPinTweets([]); // Kosongkan pintweets jika tidak ada pin tweet
-        setPinnedTweetId(null); // Reset ID tweet yang dipin
+        setPinTweets([]); 
+        setPinnedTweetId(null); 
       }
-      const filteredTweets = initialTweets.filter(tweet => tweet.id !== initialPinTweets?.id); // Filter tweet yang dipin
-      setTweets(filteredTweets.slice(0, 5)); // Load only 4 tweets initially
+      const filteredTweets = initialTweets.filter(tweet => tweet.id !== initialPinTweets?.id); 
+      setTweets(filteredTweets.slice(0, 5)); 
       setLoading(false);
-      setShowSkeleton(false); // Sembunyikan skeleton setelah data awal di-load
+      setShowSkeleton(false); 
     };
     loadInitialTweets();
   }, [isConnected]);
@@ -316,7 +302,7 @@ const HomeScreen = ({ navigation }) => {
       const checkLoginStatus = async () => {
         const token = await AsyncStorage.getItem('token');
         if (!token) {
-          navigation.navigate('Auths'); // Redirect to Auths if not logged in
+          navigation.navigate('Auths'); 
         }
       };
       checkLoginStatus();
@@ -409,16 +395,15 @@ const HomeScreen = ({ navigation }) => {
   const handleLoadMore = async () => {
     if (!loadingMore && hasMore) {
       setLoadingMore(true);
-      const moreTweets = await fetchTweets(page + 1); // Load next page of tweets
+      const moreTweets = await fetchTweets(page + 1); 
       const newTweets = moreTweets.filter(
-        tweet => !tweets.some(existingTweet => existingTweet.id === tweet.id) && tweet.id !== pinnedTweetId, // Filter tweet yang dipin
+        tweet => !tweets.some(existingTweet => existingTweet.id === tweet.id) && tweet.id !== pinnedTweetId, 
       );
       if (newTweets.length > 0) {
-        setTweets(prevTweets => [...prevTweets, ...newTweets.slice(0, 5)]); // Add only 4 new tweets
-        setPage(prevPage => prevPage + 1); // Increment page number
+        setTweets(prevTweets => [...prevTweets, ...newTweets.slice(0, 5)]); 
       }
       setLoadingMore(false);
-      if (newTweets.length < 4) { // Check if less than 4 tweets are returned
+      if (newTweets.length < 4) { 
         setHasMore(false);
       }
     }
@@ -440,13 +425,13 @@ const HomeScreen = ({ navigation }) => {
               <Skeleton
                 animation="pulse"
                 height={20}
-                width="25%" // 25% of the screen width
+                width="25%"
                 style={styles.skeleton}
               />
               <Skeleton
                 animation="pulse"
                 height={14}
-                width="15%" // 15% of the screen width
+                width="15%" 
                 style={styles.skeleton}
               />
             </View>
@@ -454,13 +439,13 @@ const HomeScreen = ({ navigation }) => {
           <Skeleton
             animation="pulse"
             height={20}
-            width="75%" // 75% of the screen width
+            width="75%" 
             style={[styles.skeleton, { borderRadius: 3 }]}
           />
           <Skeleton
             animation="pulse"
             height={200}
-            width="100%" // 100% of the screen width
+            width="100%" 
             style={[styles.skeleton, { borderRadius: 7 }]}
           />
         </View>
@@ -595,14 +580,14 @@ const styles = StyleSheet.create({
   },
   skeletonContainer: {
     padding: 20,
-    alignItems: 'flex-start', // Align items to the left
-    width: '100%', // Ensure the container takes full width
+    alignItems: 'flex-start', 
+    width: '100%', 
   },
   skeletonHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 10,
-    width: '100%', // Ensure the header takes full width
+    width: '100%', 
   },
   skeletonAvatar: {
     marginRight: 10,
