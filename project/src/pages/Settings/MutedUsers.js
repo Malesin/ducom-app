@@ -12,6 +12,7 @@ import MuteCard from '../../components/MuteCard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../../config';
+import { ToastAndroid } from 'react-native'; 
 
 const serverUrl = config.SERVER_URL;
 
@@ -39,10 +40,10 @@ const MuteUsers = () => {
           myToken: token
         };
       });
-      setShowSkeleton(false); // Tambahkan baris ini untuk menyembunyikan skeleton
+      setShowSkeleton(false); 
       return formattedMuted;
     } catch (error) {
-      setShowSkeleton(false); // Tambahkan baris ini untuk menyembunyikan skeleton
+      setShowSkeleton(false);
       console.error(error)
     }
   };
@@ -67,9 +68,9 @@ const MuteUsers = () => {
 
   const handleUnmute = async (muteUserData) => {
     try {
-      const respUnmute = await axios.post(`${serverUrl}/unmute-user`, { token: muteUserData.myToken, unmuteUserId: muteUserData.id })
-      console.log(respUnmute)
+      await axios.post(`${serverUrl}/unmute-user`, { token: muteUserData.myToken, unmuteUserId: muteUserData.id })
       await onRefresh();
+      ToastAndroid.show('User berhasil di-unmute', ToastAndroid.SHORT);
     } catch (error) {
       console.error(error)
     }

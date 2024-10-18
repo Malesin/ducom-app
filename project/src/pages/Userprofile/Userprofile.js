@@ -62,38 +62,33 @@ const Userprofile = ({ userIdPost, navigation, tweet }) => {
     }
   }
 
-  // Ambil data pengguna saat komponen pertama kali dimuat
   useEffect(() => {
     getData();
   }, []);
 
-  // Ambil data pengguna setiap kali layar menjadi fokus
   useFocusEffect(
     useCallback(() => {
       getData();
     }, []),
   );
 
-  // Fungsi untuk membuka modal untuk melihat foto profil
   const openModal = () => {
     setModalImageSource(profilePicture);
     setModalVisible(true);
   };
 
-  // Fungsi untuk menutup modal
   const closeModal = () => {
     setModalVisible(false);
     setModalImageSource(null);
   };
 
-  // Fungsi untuk membuka dan menutup dropdown
   const toggleDropdown = () => {
     setDropdownVisible(!dropdownVisible);
   };
 
   const handleDropdownItemPress = item => {
     if (item === 'Report') {
-      navigation.navigate('Report'); // Navigasi ke layar 'Report' seperti di BottomSheet.js
+      navigation.navigate('Report');
     }
     console.log(item);
     toggleDropdown();
@@ -261,11 +256,11 @@ const styles = StyleSheet.create({
   profileText: {
     flex: 1,
     justifyContent: 'center',
-    minHeight: 150, // Set minimum height to avoid layout shift
+    minHeight: 150,
   },
   nameContainer: {
-    flexDirection: 'row', // Tambahkan ini untuk mengatur elemen dalam satu baris
-    alignItems: 'center', // Tambahkan ini untuk menyelaraskan elemen secara vertikal
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   name: {
     fontSize: 20,
@@ -273,7 +268,7 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   verifiedIcon: {
-    marginLeft: 5, // Pastikan ini ada untuk memberikan jarak
+    marginLeft: 5,
     marginTop: 3
   },
   username: {
@@ -311,14 +306,14 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    zIndex: 999, // Ensure it is above other elements
+    zIndex: 999,
   },
   dropdownMenu: {
     position: 'absolute',
     top: 10,
     right: 10,
     width: 200,
-    backgroundColor: '#fff', // Warna latar belakang putih
+    backgroundColor: '#fff',
     borderRadius: 7,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -326,20 +321,20 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     elevation: 5,
     zIndex: 1000,
-    padding: 10, // Add padding for better appearance
+    padding: 10,
   },
   dropdownItem: {
-    flexDirection: 'row', // Tambahkan flexDirection row
-    alignItems: 'center', // Tambahkan alignItems center
-    padding: 15, // Sesuaikan padding
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 15,
   },
   dropdownItemText: {
-    color: '#000', // Warna teks hitam
-    marginLeft: 10, // Tambahkan margin kiri untuk memberi jarak antara ikon dan teks
-    fontWeight: 'bold', // Membuat teks menjadi bold
+    color: '#000',
+    marginLeft: 10,
+    fontWeight: 'bold',
   },
   dropdownIcon: {
-    marginRight: 10, // Tambahkan margin kanan untuk memberi jarak antara ikon dan teks
+    marginRight: 10,
   },
 });
 

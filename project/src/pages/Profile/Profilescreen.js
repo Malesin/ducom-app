@@ -320,6 +320,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     width: 180,
     elevation: 10,
+
     padding: 10,
   },
   dropdownItem: {

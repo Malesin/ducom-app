@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { StyleSheet, View, Dimensions, RefreshControl } from 'react-native';
-import { Usermedia, Userpost, Replyscreen, Userprofile, Repostscreen } from '../pages'; // Ganti Postscreen dengan Userpost
+import { Usermedia, Userpost, Replyscreen, Userprofile, Repostscreen } from '../pages';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Tabs, MaterialTabBar } from 'react-native-collapsible-tab-view';
 import { Skeleton } from 'react-native-elements';
@@ -22,7 +22,7 @@ function UserTopTabNavigator({ route, navigation }) {
     setRefreshing(true);
     setTimeout(() => {
       setRefreshing(false);
-    }, 300); // Set to 0,3 second
+    }, 300);
   }, []);
 
   const handleScroll = event => {
@@ -157,19 +157,19 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   tabBar: {
-    backgroundColor: '#fff', // Warna latar belakang putih
+    backgroundColor: '#fff',
     borderBottomWidth: 0,
-    elevation: 0, // Menghilangkan bayangan di Android
-    shadowOpacity: 0, // Menghilangkan bayangan di iOS
+    elevation: 0,
+    shadowOpacity: 0,
   },
   tabBarLabel: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#000', // Warna teks hitam
+    color: '#000',
     textTransform: 'none',
   },
   tabBarIndicator: {
-    backgroundColor: '#000', // Warna indikator hitam
+    backgroundColor: '#000',
     height: 3,
   },
   skeletonContainer: {
@@ -188,7 +188,7 @@ const styles = StyleSheet.create({
   },
   skeleton: {
     marginBottom: 10,
-    backgroundColor: '#e1e1e1', // Warna skeleton
+    backgroundColor: '#e1e1e1',
   },
 });
 

@@ -29,7 +29,7 @@ const Capthcascreen = ({navigation}) => {
   const [timer, setTimer] = useState(60);
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [attemptsLeft, setAttemptsLeft] = useState(3);
-  const colorScheme = useColorScheme(); // Detect light or dark mode
+  const colorScheme = useColorScheme();
 
   const handleVerifyOtp = async () => {
     console.log('Verifying OTP:', otp);
@@ -50,12 +50,12 @@ const Capthcascreen = ({navigation}) => {
             Dialog.hide();
             setTimeout(() => {
               navigation.navigate('CreatePassword', {email});
-            }, 1000); // Delay 1 detik sebelum navigasi
+            }, 1000);
           },
         });
         setTimeout(() => {
-          Dialog.hide(); // Hide the dialog if it doesn't already
-        }, 3000); // Duration to show the dialog
+          Dialog.hide();
+        }, 3000);
       } else if (response.data.status === 'errorExpired') {
         setError('OTP expired. Try to resend the code.');
       } else {
@@ -121,7 +121,7 @@ const Capthcascreen = ({navigation}) => {
     } else if (attemptsLeft === 0) {
       Alert.alert('Kesempatan Habis', 'Tunggu 1 jam sebelum mencoba lagi.');
       setIsButtonDisabled(true);
-      setTimer(3600); // Set timer to 1 hour (3600 seconds)
+      setTimer(3600);
     }
   };
 
@@ -137,7 +137,7 @@ const Capthcascreen = ({navigation}) => {
             style={[
               styles.input,
               error ? styles.inputError : null,
-              { color: colorScheme === 'dark' ? '#000000' : '#000000' } // Adjust text color based on theme
+              { color: colorScheme === 'dark' ? '#000000' : '#000000' }
             ]}
             onChangeText={setOtp}
             value={otp}
@@ -145,7 +145,7 @@ const Capthcascreen = ({navigation}) => {
             keyboardType="numeric"
             autoCapitalize="none"
             maxLength={6}
-            placeholderTextColor={colorScheme === 'dark' ? '#cccccc' : '#888888'} // Adjust placeholder text color based on theme
+            placeholderTextColor={colorScheme === 'dark' ? '#cccccc' : '#888888'}
           />
           {error ? <Text style={styles.error}>{error}</Text> : null}
           <TouchableOpacity
@@ -196,7 +196,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#ECECEC',
   },
   inputError: {
-    // Error style for the input field
     borderColor: 'red',
   },
   buttonForgot: {

@@ -3,23 +3,21 @@ import { SafeAreaView, StyleSheet, Text, View, Pressable, TouchableOpacity } fro
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const DeactiveDeleteAccount = ({ navigation }) => {
-  const [selectedOption, setSelectedOption] = useState(null); // null for no option selected
+  const [selectedOption, setSelectedOption] = useState(null); 
 
-  // Handler for selecting "Deactivate Account"
   const handleDeactivateCheck = () => {
     if (selectedOption === 'deactivate') {
-      setSelectedOption(null); // Uncheck if already selected
+      setSelectedOption(null); 
     } else {
-      setSelectedOption('deactivate'); // Select "Deactivate Account"
+      setSelectedOption('deactivate'); 
     }
   };
 
-  // Handler for selecting "Delete Account"
   const handleDeleteCheck = () => {
     if (selectedOption === 'delete') {
-      setSelectedOption(null); // Uncheck if already selected
+      setSelectedOption(null); 
     } else {
-      setSelectedOption('delete'); // Select "Delete Account"
+      setSelectedOption('delete'); 
     }
   };
 
@@ -37,7 +35,6 @@ const DeactiveDeleteAccount = ({ navigation }) => {
       <View style={styles.card}>
         <View style={styles.cardSection}>
 
-          {/* Deactivate Option */}
           <View style={styles.optionRow}>
             <Text style={styles.cardTitle}>Deactivate your Account</Text>
             <Pressable onPress={handleDeactivateCheck}>
@@ -52,7 +49,6 @@ const DeactiveDeleteAccount = ({ navigation }) => {
             Deactivating your account is temporary, and it means your profile will be hidden on Ducom until you log in to your Ducom Account.
           </Text>
 
-          {/* Delete Option */}
           <View style={styles.optionRow}>
             <Text style={styles.cardTitle}>Delete Account</Text>
             <Pressable onPress={handleDeleteCheck}>
@@ -69,7 +65,6 @@ const DeactiveDeleteAccount = ({ navigation }) => {
         </View>
       </View>
 
-      {/* Continue Button */}
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={[

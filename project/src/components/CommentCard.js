@@ -43,7 +43,7 @@ const CommentCard = ({
   const [showMoreReplies, setShowMoreReplies] = useState(false);
   const [showCommentSheet, setShowCommentSheet] = useState(false);
   const [gettoken, setGetToken] = useState();
-  const navigator = useNavigation(); // Ganti nama dari navigation ke navigator
+  const navigator = useNavigation();
   const tokenconst = async () => {
     const token = await AsyncStorage.getItem('token');
     setGetToken(token);
@@ -284,8 +284,8 @@ const styles = StyleSheet.create({
     marginRight: 20,
   },
   usernameContainer: {
-    flexDirection: 'row', // Tambahkan ini untuk mengatur elemen dalam satu baris
-    alignItems: 'center', // Tambahkan ini untuk menyelaraskan elemen secara vertikal
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   username: {
     fontWeight: 'bold',
@@ -293,7 +293,7 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   verifiedIcon: {
-    marginLeft: 5, // Pastikan ini ada untuk memberikan jarak
+    marginLeft: 5,
   },
   commentText: {
     fontSize: 15,

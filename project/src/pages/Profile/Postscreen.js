@@ -9,13 +9,13 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import PinTweetCard from '../../components/PinTweetCard';
-import TweetCard from '../../components/TweetCard'; // Import TweetCard
+import TweetCard from '../../components/TweetCard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import config from '../../config';
-import { Skeleton } from 'react-native-elements'; // Import Skeleton
+import { Skeleton } from 'react-native-elements';
 
 const serverUrl = config.SERVER_URL;
 
@@ -107,7 +107,7 @@ function Postscreen({ }) {
 
       const postPin = pinPost.data.data;
       if (!postPin) {
-        return null; // Kembalikan null jika pinPost tidak ada
+        return null;
       }
       const totalComments = postPin.comments.length + postPin.comments.reduce((acc, comment) => acc + comment.replies.length, 0);
 
@@ -139,15 +139,14 @@ function Postscreen({ }) {
 
       return pinTweet;
     } catch (error) {
-      console.error('Error fetching pinned tweets:', error); // Perbaiki pesan error
-      return null; // Kembalikan null jika terjadi error
+      console.error('Error fetching pinned tweets:', error);
+      return null;
     }
   };
 
   const fetchComments = async (postId) => {
     try {
       const response = await axios.get(`${serverUrl}/comments`, {
-        // token: token,
         params: { postId },
       });
       if (response.data.status === 'ok') {
@@ -202,16 +201,16 @@ function Postscreen({ }) {
         (async () => {
           setLoading(true);
           const newTweets = await fetchTweets(page);
-          const initialPinTweets = await fetchPinTweet(); // Panggil fetchPinTweet saat inisialisasi
+          const initialPinTweets = await fetchPinTweet();
           if (initialPinTweets) {
-            setPinTweets([initialPinTweets]); // Set pintweets sebagai array dengan satu elemen
-            setPinnedTweetId(initialPinTweets.id); // Simpan ID tweet yang dipin
+            setPinTweets([initialPinTweets]);
+            setPinnedTweetId(initialPinTweets.id);
           } else {
-            setPinTweets([]); // Kosongkan pintweets jika tidak ada pin tweet
-            setPinnedTweetId(null); // Reset ID tweet yang dipin
+            setPinTweets([]);
+            setPinnedTweetId(null);
           }
-          const filteredTweets = newTweets.filter(tweet => tweet.id !== initialPinTweets?.id); // Filter tweet yang dipin
-          setTweets(filteredTweets.slice(0, 5)); // Load only 4 tweets initially
+          const filteredTweets = newTweets.filter(tweet => tweet.id !== initialPinTweets?.id);
+          setTweets(filteredTweets.slice(0, 5));
           setIsFetched(true);
           setLoading(false);
         })();
@@ -227,13 +226,13 @@ function Postscreen({ }) {
       const newTweets = await fetchTweets(newPage);
       const newPinTweet = await fetchPinTweet();
       if (newPinTweet) {
-        setPinTweets([newPinTweet]); // Set pintweets sebagai array dengan satu elemen
-        setPinnedTweetId(newPinTweet.id); // Simpan ID tweet yang dipin
+        setPinTweets([newPinTweet]);
+        setPinnedTweetId(newPinTweet.id);
       } else {
-        setPinTweets([]); // Kosongkan pintweets jika tidak ada pin tweet
-        setPinnedTweetId(null); // Reset ID tweet yang dipin
+        setPinTweets([]);
+        setPinnedTweetId(null);
       }
-      const filteredTweets = newTweets.filter(tweet => tweet.id !== newPinTweet?.id); // Filter tweet yang dipin
+      const filteredTweets = newTweets.filter(tweet => tweet.id !== newPinTweet?.id);
       setTweets(prevTweets => {
         const uniqueTweets = newTweets.filter(
           newTweet => !prevTweets.some(tweet => tweet.id === newTweet.id),
