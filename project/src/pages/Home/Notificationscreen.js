@@ -38,14 +38,12 @@ const Notificationscreen = () => {
         Alert.alert('Error', 'Failed to fetch comment notifications');
       }
 
-      // Gabungkan dan sortir notifikasi dari likes dan comments
       const allNotifications = [...likeNotifications, ...commentNotifications].sort((a, b) => {
         const aDate = a.like?.created_at || a.comment?.created_at;
         const bDate = b.like?.created_at || b.comment?.created_at;
-        return new Date(bDate) - new Date(aDate); // Descending order
+        return new Date(bDate) - new Date(aDate);
       });
 
-      // Set hasil sorting ke state
       setAllNotifications(allNotifications);
     } catch (error) {
       console.error('Error fetching notifications:', error);
@@ -62,7 +60,7 @@ const Notificationscreen = () => {
 
   const onRefresh = async () => {
     setRefreshing(true);
-    setShowSkeleton(true); // Tampilkan skeleton saat refresh
+    setShowSkeleton(true); 
     await fetchNotifications();
     setRefreshing(false);
   };

@@ -19,7 +19,7 @@ const SettingsStackNavigator = () => {
   return (
     <Stack.Navigator>
       <Stack.Screen
-        name="SettingsScreen" // Ubah nama layar di sini
+        name="SettingsScreen" 
         component={Settingsscreen}
         options={{ headerShown: false }}
       />
@@ -31,7 +31,7 @@ const DrawerNavigator = () => {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Drawer.Navigator
-        initialRouteName="Home" // Set Home as the initial route
+        initialRouteName="Home" 
         screenOptions={{
           headerTitle: () => (
             <View style={styles.headerTitleContainer}>
@@ -107,12 +107,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    width: '100%', // Ensure the container takes full width
-    paddingHorizontal: 20, // Add padding if needed
+    width: '100%', 
+    paddingHorizontal: 20, 
   },
   logo: {
-    width: 150, // Increase the width of the logo to make it larger
-    height: 50, // Increase the height of the logo to maintain aspect ratio
+    width: 150, 
+    height: 50, 
     resizeMode: 'contain',
   },
 });

@@ -12,6 +12,7 @@ import FAQscreen from './Settings/FAQscreen';
 import Marksscreen from './Other/Marksscreen';
 import ReportScreen from './Other/ReportScreen';
 import Settingsscreen from './Settings/Settingsscreen';
+import AccountPrivacy from './Settings/AccountPrivacy';
 import AccountInformation from './Settings/AccountInformation';
 import UpdatePassword from './Settings/UpdatePassword';
 import Profilescreen from './Profile/Profilescreen';
@@ -48,6 +49,7 @@ export {
   ReportScreen,
   Settingsscreen,
   AccountInformation,
+  AccountPrivacy,
   UpdatePassword,
   Profilescreen,
   Notificationscreen,
