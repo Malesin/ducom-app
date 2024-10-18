@@ -9,14 +9,14 @@ import {
 } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import config from '../../config';
 const serverUrl = config.SERVER_URL;
 const verifiedIcon = <Icon name="verified" size={25} color="#699BF7" />;
 
-const Settingsscreen = ({navigation}) => {
+const Settingsscreen = ({ navigation }) => {
   const [amIAdmin, setAmIAdmin] = useState(null);
 
   const getData = async () => {
@@ -25,7 +25,7 @@ const Settingsscreen = ({navigation}) => {
       const response = await axios.post(`${serverUrl}/userdata`, {
         token: token,
       });
-      const {data, status} = response.data;
+      const { data, status } = response.data;
 
       const routeAmIAdmin = data.isAdmin;
 
@@ -53,7 +53,7 @@ const Settingsscreen = ({navigation}) => {
           await AsyncStorage.clear();
           navigation.reset({
             index: 0,
-            routes: [{name: 'Auths'}],
+            routes: [{ name: 'Auths' }],
           });
           console.log('Logout successfully');
         },

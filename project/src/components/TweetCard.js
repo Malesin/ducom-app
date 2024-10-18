@@ -431,7 +431,7 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
         <InteractionButton
           icon={bookmarked ? 'bookmark' : 'bookmark-outline'}
           color={bookmarked ? '#00c5ff' : '#040608'}
-          count={bookMarksCount} 
+          count={bookMarksCount}
           onPress={handleBookmark}
         />
         <InteractionButton
@@ -469,8 +469,9 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
                 ) : (
                   <Video
                     source={{ uri: modalMediaUri }}
-                    style={styles.modalImage}
+                    style={styles.modalVideo}
                     controls
+                    resizeMode='contain'
                   />
                 )
               ) : null}
@@ -569,13 +570,13 @@ const styles = StyleSheet.create({
   },
   singleMediaImage: {
     width: 390,
-    height: 200, // Adjust height if needed
+    height: 200,
     borderRadius: 8,
     resizeMode: 'cover',
   },
   singleMediaVideo: {
-    width: 390,
-    height: 200, // Adjust height if needed
+    width: '100%',
+    height: '100%',
     borderRadius: 8,
   },
   actions: {
@@ -612,8 +613,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalImage: {
-    width: '100%',
-    height: '100%',
+    width: '90%',
+    height: '80%',
+    resizeMode: 'contain',
+  },
+  modalVideo: {
+    width: '90%',
+    height: '80%',
     resizeMode: 'contain',
   },
   videoContainer: {
