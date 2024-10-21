@@ -89,8 +89,7 @@ const Userprofile = ({ userIdPost, navigation, tweet }) => {
 
   const handleDropdownItemPress = item => {
     if (item === 'Report') {
-      navigation.navigate('Report');
-    }
+      navigation.navigate('Report'); 
     console.log(item);
     toggleDropdown();
   };
