@@ -111,8 +111,8 @@ const DrawerNavigator = ({ navigation }) => {
 const styles = StyleSheet.create({
   headerTitleContainer: {
     flexDirection: 'row',
-    alignItems: 'flex-end',
-    justifyContent: 'space-between',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
     width: '100%',
     paddingHorizontal: 10,
   },
@@ -129,10 +129,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'flex-end',
   },
-  search: {
-    padding: 10,
-    paddingLeft: 20
-  },
+
 });
 
 export default DrawerNavigator;
