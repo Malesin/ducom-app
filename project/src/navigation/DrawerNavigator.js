@@ -36,7 +36,7 @@ const DrawerNavigator = ({ navigation }) => {
           headerTitle: () => (
             <View style={styles.headerTitleContainer}>
               <Image source={logo} style={styles.logo} />
-              <View style={styles.spacer} />
+              <View style={styles.iconContainer} />
               <TouchableOpacity style={styles.search} onPress={() => navigation.navigate('SearchPage')}>
                 <MaterialIcons name="search" size={25} color="black" />
               </TouchableOpacity>
@@ -119,8 +119,9 @@ const styles = StyleSheet.create({
     height: 50,
     resizeMode: 'contain',
   },
-  search: {
-    paddingLeft: 90,
+  iconContainer: {
+    alignItems: 'flex-end',
+    padding: 45
   },
 });
 
