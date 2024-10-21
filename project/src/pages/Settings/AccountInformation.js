@@ -15,6 +15,7 @@ import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import config from '../../config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Skeleton } from 'react-native-elements';
 
 const serverUrl = config.SERVER_URL;
 
@@ -84,15 +85,25 @@ const AccountInformation = () => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.infoContainer}>
-        <Text style={styles.label}>Username</Text>
+        {userData ? (
+          <Text style={styles.label}>Username</Text>
+        ) : (
+          <Skeleton animation="pulse" height={16} width={80} style={styles.skeleton} />
+        )}
         <View style={styles.infoRow}>
-          <Text style={styles.infoText}>
-            @{userData ? userData.username : ''}
-          </Text>
+          {userData ? (
+            <Text style={styles.infoText}>@{userData.username}</Text>
+          ) : (
+            <Skeleton animation="pulse" height={20} width={100} style={styles.skeleton} />
+          )}
         </View>
       </View>
       <TouchableOpacity style={styles.infoContainer} onPress={() => setIsEditing(true)}>
-        <Text style={styles.label}>Phone</Text>
+        {userData ? (
+          <Text style={styles.label}>Phone</Text>
+        ) : (
+          <Skeleton animation="pulse" height={16} width={80} style={styles.skeleton} />
+        )}
         <View style={styles.infoRow}>
           {isEditing ? (
             <>
@@ -105,8 +116,10 @@ const AccountInformation = () => {
                 autoFocus={true}
               />
             </>
-          ) : (
+          ) : userData ? (
             <Text style={styles.infoText}>{phoneNumber || 'add'}</Text>
+          ) : (
+            <Skeleton animation="pulse" height={20} width={100} style={styles.skeleton} />
           )}
           {isEditing ? (
             <TouchableOpacity style={styles.saveButtonInline} onPress={savePhone}>
@@ -118,18 +131,28 @@ const AccountInformation = () => {
         </View>
       </TouchableOpacity>
       <TouchableOpacity style={styles.infoContainer}>
-        <Text style={styles.label}>Email</Text>
+        {userData ? (
+          <Text style={styles.label}>Email</Text>
+        ) : (
+          <Skeleton animation="pulse" height={16} width={80} style={styles.skeleton} />
+        )}
         <View style={styles.infoRow}>
-          <Text style={styles.infoText}>
-            {userData ? userData.email : ''}
-          </Text>
+          {userData ? (
+            <Text style={styles.infoText}>{userData.email}</Text>
+          ) : (
+            <Skeleton animation="pulse" height={20} width={150} style={styles.skeleton} />
+          )}
         </View>
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.infoContainer}
         onPress={() => navigation.navigate('EditProfile')}>
         <View style={styles.infoRow}>
-          <Text style={styles.label}>Edit Profile</Text>
+          {userData ? (
+            <Text style={styles.label}>Edit Profile</Text>
+          ) : (
+            <Skeleton animation="pulse" height={16} width={100} style={styles.skeleton} />
+          )}
           <MaterialCommunityIcons name="chevron-right" size={25} color="#000" />
         </View>
       </TouchableOpacity>
@@ -181,5 +204,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
     borderRadius: 50,
     paddingVertical: 7,
+  },
+  skeleton: {
+    borderRadius: 3,
+    marginBottom: 10,
   },
 });
