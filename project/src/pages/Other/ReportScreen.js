@@ -5,26 +5,79 @@ import {
   View,
   TouchableOpacity,
   ScrollView,
+  ToastAndroid
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import React, {useState} from 'react';
-import {useNavigation} from '@react-navigation/native';
+import React, { useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import config from '../../config';
+import { useRoute } from '@react-navigation/native';
+
+const serverUrl = config.SERVER_URL;
 
 const ReportScreen = () => {
+  const route = useRoute();
+  const { reportPostId } = route.params;
   const [checkedItems, setCheckedItems] = useState({});
   const navigation = useNavigation();
 
   const handleCheckboxPress = item => {
-    setCheckedItems(prevCheckedItems => ({
-      ...prevCheckedItems,
-      [item]: !prevCheckedItems[item],
+    setCheckedItems(prevState => ({
+      ...prevState,
+      [item]: !prevState[item],
     }));
   };
 
-  const handleSubmit = () => {
-    setTimeout(() => {
-      navigation.navigate('Home', {reported: true});
-    }, 1000);
+  const handleSubmit = async () => {
+    const token = await AsyncStorage.getItem('token');
+    try {
+      const reportCategory = Object.keys(checkedItems).reduce((acc, key) => {
+        if (checkedItems[key]) {
+          switch (key) {
+            case 'spam':
+              acc.push(1);
+              break;
+            case 'suicide':
+              acc.push(2);
+              break;
+            case 'impersonation':
+              acc.push(3);
+              break;
+            case 'sensitive':
+              acc.push(4);
+              break;
+            case 'hate':
+              acc.push(5);
+              break;
+            case 'abuse':
+              acc.push(6);
+              break;
+            default:
+              break;
+          }
+        }
+        return acc;
+      }, []);
+
+      axios
+        .post(`${serverUrl}/report-post`, {
+          token: token,
+          reportPostId: reportPostId,
+          reportCategory: reportCategory
+        })
+        .then(res => {
+          if (res.data.status == 'ok') {
+            setTimeout(() => {
+              navigation.navigate('Home');
+            }, 1000);
+            ToastAndroid.show('Post was Successfully Reported!', ToastAndroid.SHORT);
+          }
+        })
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (

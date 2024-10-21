@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Modal,
   TouchableWithoutFeedback,
+  ToastAndroid
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
@@ -18,6 +19,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 const verifiedIcon = <Icon name="verified" size={18} color="#699BF7" />;
 const serverUrl = config.SERVER_URL;
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { DrawerContentScrollView } from '@react-navigation/drawer';
 
 const Userprofile = ({ userIdPost, navigation, tweet }) => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -32,7 +34,7 @@ const Userprofile = ({ userIdPost, navigation, tweet }) => {
     navigation.setOptions({ title: '' });
   }, [navigation]);
 
-  async function getData() {
+  const getData = async () => {
     try {
       const token = await AsyncStorage.getItem('token');
       console.log('Token Berhasil Diambil');
@@ -42,6 +44,9 @@ const Userprofile = ({ userIdPost, navigation, tweet }) => {
       });
       const user = userResponse.data.data;
       setUserData(user);
+
+      const isFollow = user.followers.some(follow => follow === tweet.idUser)
+      setIsFollowing(isFollow)
 
       if (user.username) {
         navigation.setOptions({ title: `@${user.username}` });
@@ -91,12 +96,41 @@ const Userprofile = ({ userIdPost, navigation, tweet }) => {
     if (item === 'Report') {
       navigation.navigate('Report');
     }
-    console.log(item);
+    // console.log(item);
     toggleDropdown();
   };
 
-  const handleFollowPress = () => {
-    setIsFollowing(!isFollowing);
+  const handleFollowPress = async () => {
+    const updatedFollowersCount = isFollowing
+      ? userData.followers.length - 1
+      : userData.followers.length + 1;
+    
+    setUserData({
+      ...userData,
+      followers: new Array(updatedFollowersCount).fill(null), // Simulasi perubahan jumlah followers
+    });
+
+    try {
+      const token = await AsyncStorage.getItem('token');
+      if (isFollowing) {
+        const unfollow = await axios.post(`${serverUrl}/unfollow`, {
+          token: token,
+          unfollowUserId: userIdPost
+        });
+        console.log(unfollow.data);
+      } else {
+        const follow = await axios.post(`${serverUrl}/follow`, {
+          token: token,
+          followUserId: userIdPost
+        });
+        console.log(follow.data);
+      }
+      setIsFollowing(!isFollowing);
+    } catch (error) {
+      setIsFollowing(isFollowing);
+      console.error(error);
+      ToastAndroid.show("Something Error, Try Again Later", ToastAndroid.SHORT); // Menambahkan toast error
+    }
   };
 
   return (
@@ -167,15 +201,15 @@ const Userprofile = ({ userIdPost, navigation, tweet }) => {
           </View>
           <View style={styles.statsContainer}>
             <View style={styles.statItem}>
-              <Text style={styles.statNumber}>0</Text>
+              <Text style={styles.statNumber}>{userData?.postCount || 0}</Text>
               <Text style={styles.statLabel}>Posts</Text>
             </View>
             <View style={styles.statItem}>
-              <Text style={styles.statNumber}>0</Text>
+              <Text style={styles.statNumber}>{userData ? userData?.followers.length : 0}</Text>
               <Text style={styles.statLabel}>Followers</Text>
             </View>
             <View style={styles.statItem}>
-              <Text style={styles.statNumber}>0</Text>
+              <Text style={styles.statNumber}>{userData ? userData?.following.length : 0}</Text>
               <Text style={styles.statLabel}>Following</Text>
             </View>
           </View>

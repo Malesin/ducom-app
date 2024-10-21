@@ -99,7 +99,7 @@ const Settingsscreen = ({ navigation }) => {
               <TouchableOpacity
                 style={styles.button}
                 onPress={() => navigation.navigate('#')}>
-                <MaterialCommunityIcons name="flag" size={25} color="#000" />
+                <MaterialCommunity Icons name="flag" size={25} color="#000" />
                 <Text style={styles.buttonText}>Reports Management</Text>
               </TouchableOpacity>
               <TouchableOpacity

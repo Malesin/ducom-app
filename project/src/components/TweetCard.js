@@ -31,8 +31,8 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
   const [likesCount, setLikesCount] = useState(tweet?.likesCount || 0);
   const [bookmarked, setBookmarked] = useState(tweet?.isBookmarked || false);
   const [bookMarksCount, setBookMarksCount] = useState(tweet?.bookMarksCount || 0);
-  const [reposted, setReposted] = useState(false);
-  const [repostsCount, setRepostsCount] = useState(0);
+  const [reposted, setReposted] = useState(tweet?.isReposted || false);
+  const [repostsCount, setRepostsCount] = useState(tweet?.repostsCount || 0);
   const [commentsCount] = useState(tweet?.commentsCount || 0);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalMediaUri, setModalMediaUri] = useState('');
@@ -51,6 +51,7 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
         idUser: tweet?.idUser,
         isAdmin: tweet?.isAdmin,
         amIAdmin: tweet?.amIAdmin,
+        tweet: tweet,
         isUserProfile: isUserProfile
       });
     }
@@ -79,53 +80,51 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
     const token = await AsyncStorage.getItem('token');
 
     if (liked) {
-      await handleUnlike();
+      setLiked(false);
+      setLikesCount(prevLikesCount => prevLikesCount - 1);
+      try {
+        const response = await axios.post(`${serverUrl}/unlike-post`, {
+          token: token,
+          postId: tweet.id,
+        });
+
+        if (response.data.status !== 'ok') {
+          // Jika gagal, kembalikan ke state semula
+          setLiked(true);
+          setLikesCount(prevLikesCount => prevLikesCount + 1);
+          console.log('Error in unlike response data:', response.data.data);
+          Alert.alert('Error', 'Failed to unlike post. Please try again.');
+        }
+      } catch (error) {
+        console.error('Error unliking post:', error.message);
+        // Jika ada error, kembalikan ke state semula
+        setLiked(true);
+        setLikesCount(prevLikesCount => prevLikesCount + 1);
+        Alert.alert('Error', 'Failed to unlike post. Please try again.');
+      }
     } else {
+      setLiked(true);
+      setLikesCount(prevLikesCount => prevLikesCount + 1);
       try {
         const response = await axios.post(`${serverUrl}/like-post`, {
           token: token,
           postId: tweet.id,
         });
 
-        if (response.data.status === 'ok') {
-          setLiked(true);
-          setLikesCount(prevLikesCount => {
-            const newLikesCount = prevLikesCount + 1;
-            return newLikesCount;
-          });
-        } else {
+        if (response.data.status !== 'ok') {
+          // Jika gagal, kembalikan ke state semula
+          setLiked(false);
+          setLikesCount(prevLikesCount => prevLikesCount - 1);
           console.log('Error in like response data:', response.data.data);
           Alert.alert('Error', 'Failed to like post. Please try again.');
         }
       } catch (error) {
         console.error('Error liking post:', error.message);
+        // Jika ada error, kembalikan ke state semula
+        setLiked(false);
+        setLikesCount(prevLikesCount => prevLikesCount - 1);
         Alert.alert('Error', 'Failed to like post. Please try again.');
       }
-    }
-  };
-
-  const handleUnlike = async () => {
-    const token = await AsyncStorage.getItem('token');
-
-    try {
-      const response = await axios.post(`${serverUrl}/unlike-post`, {
-        token: token,
-        postId: tweet.id,
-      });
-
-      if (response.data.status === 'ok') {
-        setLiked(false);
-        setLikesCount(prevLikesCount => {
-          const newLikesCount = prevLikesCount - 1;
-          return newLikesCount;
-        });
-      } else {
-        console.log('Error in unlike response data:', response.data.data);
-        Alert.alert('Error', 'Failed to unlike post. Please try again.');
-      }
-    } catch (error) {
-      console.error('Error unliking post:', error.message);
-      Alert.alert('Error', 'Failed to unlike post. Please try again.');
     }
   };
 
@@ -133,61 +132,95 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
     const token = await AsyncStorage.getItem('token');
 
     if (bookmarked) {
-      await handleUnbookmark();
+      setBookmarked(false);
+      setBookMarksCount(prevBookmarksCount => prevBookmarksCount - 1);
+      try {
+        const response = await axios.post(`${serverUrl}/unbookmark-post`, {
+          token: token,
+          postId: tweet.id,
+        });
+
+        if (response.data.status !== 'ok') {
+          // Jika gagal, kembalikan ke state semula
+          setBookmarked(true);
+          setBookMarksCount(prevBookmarksCount => prevBookmarksCount + 1);
+          console.log('Error in unbookmark response data:', response.data.data);
+        } else {
+          ToastAndroid.show('Post removed from bookmarks!', ToastAndroid.SHORT);
+        }
+      } catch (error) {
+        console.error('Error unbookmarking post:', error.message);
+        // Jika ada error, kembalikan ke state semula
+        setBookmarked(true);
+        setBookMarksCount(prevBookmarksCount => prevBookmarksCount + 1);
+      }
     } else {
+      setBookmarked(true);
+      setBookMarksCount(prevBookmarksCount => prevBookmarksCount + 1);
       try {
         const response = await axios.post(`${serverUrl}/bookmark-post`, {
           token: token,
           postId: tweet.id,
         });
 
-        if (response.data.status === 'ok') {
-          setBookmarked(true);
-          setBookMarksCount(prevBookmarksCount => {
-            const newBookmarksCount = prevBookmarksCount + 1;
-            return newBookmarksCount;
-          });
-          ToastAndroid.show('Post added to bookmarks!', ToastAndroid.SHORT);
-        } else {
+        if (response.data.status !== 'ok') {
+          // Jika gagal, kembalikan ke state semula
+          setBookmarked(false);
+          setBookMarksCount(prevBookmarksCount => prevBookmarksCount - 1);
           console.log('Error in bookmark response data:', response.data.data);
+        } else {
+          ToastAndroid.show('Post added to bookmarks!', ToastAndroid.SHORT);
         }
       } catch (error) {
         console.error('Error bookmarking post:', error.message);
+        // Jika ada error, kembalikan ke state semula
+        setBookmarked(false);
+        setBookMarksCount(prevBookmarksCount => prevBookmarksCount - 1);
       }
     }
   };
 
-  const handleUnbookmark = async () => {
+  const handleRepost = async () => {
     const token = await AsyncStorage.getItem('token');
-
     try {
-      const response = await axios.post(`${serverUrl}/unbookmark-post`, {
-        token: token,
-        postId: tweet.id,
-      });
-
-      if (response.data.status === 'ok') {
-        setBookmarked(false);
-        setBookMarksCount(prevBookmarksCount => {
-          const newBookmarksCount = prevBookmarksCount - 1;
-          return newBookmarksCount;
-        });
-        ToastAndroid.show('Post removed from bookmarks!', ToastAndroid.SHORT);
+      if (reposted) {
+        setReposted(false);
+        setRepostsCount(prevRepostsCount => prevRepostsCount - 1);
+        axios
+          .post(`${serverUrl}/unrepost-post`, {
+            token: token,
+            postId: tweet.id
+          })
+          .then(res => {
+            if (res.data.status !== 'ok') {
+              // Jika gagal, kembalikan ke state semula
+              setReposted(true);
+              setRepostsCount(prevRepostsCount => prevRepostsCount + 1);
+              console.log('Error in unrepost response data:', res.data);
+            }
+          })
       } else {
-        console.log('Error in unbookmark response data:', response.data.data);
+        setReposted(true);
+        setRepostsCount(prevRepostsCount => prevRepostsCount + 1);
+        axios
+          .post(`${serverUrl}/repost-post`, {
+            token: token,
+            postId: tweet.id
+          })
+          .then(res => {
+            if (res.data.status !== 'ok') {
+              // Jika gagal, kembalikan ke state semula
+              setReposted(false);
+              setRepostsCount(prevRepostsCount => prevRepostsCount - 1);
+              console.log('Error in repost response data:', res.data);
+            }
+          })
       }
     } catch (error) {
-      console.error('Error unbookmarking post:', error.message);
-    }
-  };
-
-  const handleRepost = () => {
-    if (reposted) {
-      setReposted(false);
-      setRepostsCount(prevRepostsCount => prevRepostsCount - 1);
-    } else {
-      setReposted(true);
-      setRepostsCount(prevRepostsCount => prevRepostsCount + 1);
+      console.error('Error reposting:', error);
+      // Jika ada error, kembalikan ke state semula
+      setReposted(!reposted);
+      setRepostsCount(prevRepostsCount => reposted ? prevRepostsCount + 1 : prevRepostsCount - 1);
     }
   };
 
@@ -208,6 +241,7 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
     setIsModalVisible(false);
     setModalMediaUri('');
   };
+  
   const handleShare = async () => {
     try {
       await Share.share({
