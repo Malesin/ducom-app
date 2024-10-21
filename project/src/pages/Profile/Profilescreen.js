@@ -163,6 +163,7 @@ export default function Profilescreen() {
               <Text style={styles.statLabel}>Following</Text>
             </View>
           </View>
+
         </View>
         <View style={styles.userInfoWrapper}>
           <View style={styles.userInfoContainer}>
@@ -286,16 +287,23 @@ const styles = StyleSheet.create({
   statsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    flex: 1,
+    marginTop: 10,
+    marginLeft: 20,
   },
   statItem: {
     alignItems: 'center',
-    marginRight: 10,
+    marginRight: 40,
   },
   statNumber: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#000',
+    textAlign: 'center',
+  },
+  statLabel: {
+    fontSize: 14,
+    color: '#777',
+    textAlign: 'center',
   },
   statLabel: {
     fontSize: 14,

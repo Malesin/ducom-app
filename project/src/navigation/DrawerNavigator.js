@@ -1,7 +1,7 @@
 import React from 'react';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { createStackNavigator } from '@react-navigation/stack';
-import { Image, StyleSheet, View, SafeAreaView } from 'react-native';
+import { Image, StyleSheet, View, SafeAreaView, TouchableOpacity } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {
   Homescreen,
@@ -27,7 +27,7 @@ const SettingsStackNavigator = () => {
   );
 };
 
-const DrawerNavigator = () => {
+const DrawerNavigator = ({ navigation }) => {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Drawer.Navigator
@@ -36,6 +36,10 @@ const DrawerNavigator = () => {
           headerTitle: () => (
             <View style={styles.headerTitleContainer}>
               <Image source={logo} style={styles.logo} />
+              <View style={styles.spacer} />
+              <TouchableOpacity style={styles.search} onPress={() => navigation.navigate('SearchPage')}>
+                <MaterialIcons name="search" size={25} color="black" />
+              </TouchableOpacity>
             </View>
           ),
           headerStyle: {
@@ -106,14 +110,17 @@ const styles = StyleSheet.create({
   headerTitleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     width: '100%',
-    paddingHorizontal: 20,
+    paddingHorizontal: 50,
   },
   logo: {
     width: 150,
     height: 50,
     resizeMode: 'contain',
+  },
+  search: {
+    paddingLeft: 90,
   },
 });
 

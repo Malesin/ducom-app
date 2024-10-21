@@ -7,14 +7,14 @@ import {
   ScrollView,
   useColorScheme,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Toast from 'react-native-toast-message';
 import axios from 'axios';
 import config from '../../config';
 const serverUrl = config.SERVER_URL;
 
-const RegisterScreen = ({navigation}) => {
+const RegisterScreen = ({ navigation }) => {
   const [name, setName] = useState('');
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
@@ -112,13 +112,13 @@ const RegisterScreen = ({navigation}) => {
     setErrors(newErrors);
 
     if (valid) {
-      const userData = {name, username, email, password};
+      const userData = { name, username, email, password };
 
       setTimeout(() => {
         axios
           .post(`${serverUrl}/register`, userData)
           .then(res => {
-            const {status} = res.data;
+            const { status } = res.data;
             switch (status) {
               case 'ok':
                 Toast.show({
