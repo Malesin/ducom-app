@@ -94,7 +94,7 @@ const Userprofile = ({ userIdPost, navigation, tweet }) => {
 
   const handleDropdownItemPress = item => {
     if (item === 'Report') {
-      navigation.navigate('Report'); // Navigasi ke layar 'Report' seperti di BottomSheet.js
+      navigation.navigate('Report'); 
     }
     console.log(item);
     toggleDropdown();

@@ -1,6 +1,6 @@
 import React, {useState, useCallback} from 'react';
 import {StyleSheet, View, RefreshControl} from 'react-native';
-import {Likescreen, Mediascreen, Postscreen, Replyscreen, Repostscreen} from '../pages';
+import {Likescreen, Mediascreen, Postscreen, Repostscreen} from '../pages';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {Tabs, MaterialTabBar} from 'react-native-collapsible-tab-view';
 import Profilescreen from '../pages/Profile/Profilescreen';

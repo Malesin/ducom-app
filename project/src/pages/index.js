@@ -17,6 +17,8 @@ import AccountPrivacy from './Settings/AccountPrivacy';
 import AccountInformation from './Settings/AccountInformation';
 import UpdatePassword from './Settings/UpdatePassword';
 import Profilescreen from './Profile/Profilescreen';
+import FollowerPage from './Home/FollowerPage';
+import FollowingPage from './Home/FollowingPage';
 import Notificationscreen from './Home/Notificationscreen';
 import formatNotification from './Home/formatNotification';
 import TermsandConditionscreen from './Settings/TermsandConditionscreen';
@@ -54,6 +56,8 @@ export {
   AccountPrivacy,
   UpdatePassword,
   Profilescreen,
+  FollowerPage,
+  FollowingPage,
   Notificationscreen,
   TermsandConditionscreen,
   Likescreen,

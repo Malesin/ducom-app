@@ -29,6 +29,7 @@ import UserTopTabNavigator from './UserTopTabNavigator';
 import TopTabNavigator from './TopTabNavigator';
 import DeactiveDeleteAccount from '../pages/Settings/DeactiveDeleteAccount';
 import AdminSettings from '../pages/Settings/AdminSettings';
+import FollowTopTabNavigator from './FollowTopTabNavigator';
 
 const Stack = createNativeStackNavigator();
 
@@ -105,6 +106,11 @@ export default function MainNavigation() {
           name="Profile"
           component={TopTabNavigator}
           options={{ headerShown: true }}
+        />
+        <Stack.Screen
+          name="Follow"
+          component={FollowTopTabNavigator}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name="EditProfile"
