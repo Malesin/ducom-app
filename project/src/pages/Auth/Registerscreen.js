@@ -7,14 +7,14 @@ import {
   ScrollView,
   useColorScheme,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Toast from 'react-native-toast-message';
 import axios from 'axios';
 import config from '../../config';
 const serverUrl = config.SERVER_URL;
 
-const RegisterScreen = ({navigation}) => {
+const RegisterScreen = ({ navigation }) => {
   const [name, setName] = useState('');
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
@@ -24,7 +24,7 @@ const RegisterScreen = ({navigation}) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState({});
-  const colorScheme = useColorScheme(); // Detect light or dark mode
+  const colorScheme = useColorScheme();
 
   const validateName = name => {
     const nameRegex = /^[a-zA-Z]+( [a-zA-Z]+)*$/;
@@ -113,13 +113,13 @@ const RegisterScreen = ({navigation}) => {
     setErrors(newErrors);
 
     if (valid) {
-      const userData = {name, username, email, password};
+      const userData = { name, username, email, password };
 
       setTimeout(() => {
         axios
           .post(`${serverUrl}/register`, userData)
           .then(res => {
-            const {status} = res.data;
+            const { status } = res.data;
             switch (status) {
               case 'ok':
                 Toast.show({
@@ -163,7 +163,7 @@ const RegisterScreen = ({navigation}) => {
               text2: 'An error occurred. Please try again later.',
             });
           });
-      }, 1000); // Delay 1 second
+      }, 1000);
     }
   };
   const showToast = () => {
@@ -174,7 +174,7 @@ const RegisterScreen = ({navigation}) => {
     });
   };
 
-  const styles = getStyles(colorScheme); // Get styles based on color scheme
+  const styles = getStyles(colorScheme);
 
   return (
     <>
@@ -186,7 +186,7 @@ const RegisterScreen = ({navigation}) => {
           value={name}
           placeholder="Name"
           autoCapitalize="words"
-          placeholderTextColor={colorScheme === 'dark' ? '#cccccc' : '#888888'} // Adjust placeholder text color based on theme
+          placeholderTextColor={colorScheme === 'dark' ? '#cccccc' : '#888888'}
         />
         {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
         <TextInput
@@ -195,7 +195,7 @@ const RegisterScreen = ({navigation}) => {
           value={username}
           placeholder="Username"
           autoCapitalize="none"
-          placeholderTextColor={colorScheme === 'dark' ? '#cccccc' : '#888888'} // Adjust placeholder text color based on theme
+          placeholderTextColor={colorScheme === 'dark' ? '#cccccc' : '#888888'}
         />
         {errors.username && (
           <Text style={styles.errorText}>{errors.username}</Text>
@@ -207,8 +207,8 @@ const RegisterScreen = ({navigation}) => {
           placeholder="Email"
           keyboardType="email-address"
           autoCapitalize="none"
-          onFocus={showToast} // Menampilkan toast saat TextInput diklik
-          placeholderTextColor={colorScheme === 'dark' ? '#cccccc' : '#888888'} // Adjust placeholder text color based on theme
+          onFocus={showToast}
+          placeholderTextColor={colorScheme === 'dark' ? '#cccccc' : '#888888'}
         />
         {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
         <View
@@ -225,7 +225,7 @@ const RegisterScreen = ({navigation}) => {
             autoCapitalize="none"
             placeholderTextColor={
               colorScheme === 'dark' ? '#cccccc' : '#888888'
-            } // Adjust placeholder text color based on theme
+            }
           />
           <TouchableOpacity
             style={styles.eyeIcon}
@@ -254,7 +254,7 @@ const RegisterScreen = ({navigation}) => {
             autoCapitalize="none"
             placeholderTextColor={
               colorScheme === 'dark' ? '#cccccc' : '#888888'
-            } // Adjust placeholder text color based on theme
+            }
           />
           <TouchableOpacity
             style={styles.eyeIcon}

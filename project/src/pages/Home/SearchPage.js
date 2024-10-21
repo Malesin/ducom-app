@@ -1,27 +1,33 @@
-import { StyleSheet, View, TextInput, SafeAreaView, TouchableOpacity, Text } from 'react-native';
-import React, { useState, useRef, useEffect } from 'react';
+import { StyleSheet, View, TextInput, SafeAreaView, TouchableOpacity, Text, ScrollView } from 'react-native';
+import React, { useState, useRef } from 'react';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 const SearchPage = ({ navigation }) => {
     const [searchText, setSearchText] = useState('');
     const textInputRef = useRef(null);
 
-    useEffect(() => {
+    const handleSearchPress = () => {
         if (textInputRef.current) {
             textInputRef.current.focus();
         }
-    }, []);
+    };
+
+    const handleBackPress = () => {
+        navigation.navigate('Home');
+    };
 
     return (
         <SafeAreaView style={styles.searchContainer}>
             <View style={styles.headerSearchContainer}>
                 <View style={styles.backButtonContainer}>
-                    <TouchableOpacity onPress={() => navigation.goBack()}>
+                    <TouchableOpacity onPress={handleBackPress}>
                         <MaterialIcons name="arrow-back" size={22} color="#000" />
                     </TouchableOpacity>
                 </View>
                 <View style={styles.searchInputContainer}>
-                    <MaterialIcons name="search" size={20} color="gray" style={styles.searchIcon} />
+                    <TouchableOpacity onPress={handleSearchPress}>
+                        <MaterialIcons name="search" size={20} color="gray" style={styles.searchIcon} />
+                    </TouchableOpacity>
                     <TextInput
                         ref={textInputRef}
                         placeholder="Search"
@@ -36,6 +42,9 @@ const SearchPage = ({ navigation }) => {
                     </TouchableOpacity>
                 )}
             </View>
+            <ScrollView style={styles.searchedContainer} showsVerticalScrollIndicator={false}>
+                <Text style={styles.searchedText}>Recently Searched</Text>
+            </ScrollView>
         </SafeAreaView>
     );
 };
@@ -46,8 +55,6 @@ const styles = StyleSheet.create({
     searchContainer: {
         flex: 1,
         backgroundColor: '#fff',
-        flexDirection: 'row',
-        alignItems: 'flex-start',
     },
     headerSearchContainer: {
         flexDirection: 'row',
@@ -88,5 +95,15 @@ const styles = StyleSheet.create({
         color: '#000',
         fontSize: 14,
         fontWeight: 'bold',
+    },
+    searchedContainer: {
+        flex: 1,
+        paddingHorizontal: 10,
+    },
+    searchedText: {
+        fontSize: 14,
+        fontWeight: 'bold',
+        marginTop: 10,
+        color: '#000',
     },
 });
