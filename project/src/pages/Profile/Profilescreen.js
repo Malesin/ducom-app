@@ -296,7 +296,7 @@ const styles = StyleSheet.create({
   },
   statItem: {
     alignItems: 'center',
-    marginRight: 40,
+    marginRight: 45,
   },
   statNumber: {
     fontSize: 18,

@@ -35,11 +35,14 @@ const DrawerNavigator = ({ navigation }) => {
         screenOptions={{
           headerTitle: () => (
             <View style={styles.headerTitleContainer}>
-              <Image source={logo} style={styles.logo} />
-              <View style={styles.spacer} />
-              <TouchableOpacity style={styles.search} onPress={() => navigation.navigate('SearchPage')}>
-                <MaterialIcons name="search" size={25} color="black" />
-              </TouchableOpacity>
+              <View style={styles.logoContainer}>
+                <Image source={logo} style={styles.logo} />
+              </View>
+              <View style={styles.searchContainer}>
+                <TouchableOpacity style={styles.search} onPress={() => navigation.navigate('SearchPage')}>
+                  <MaterialIcons name="search" size={25} color="black" />
+                </TouchableOpacity>
+              </View>
             </View>
           ),
           headerStyle: {
@@ -48,7 +51,6 @@ const DrawerNavigator = ({ navigation }) => {
             borderBottomColor: '#e1e8ed',
           },
           headerTintColor: '#000',
-          headerTitleAlign: 'center',
           drawerStyle: {
             backgroundColor: '#fff',
           },
@@ -109,18 +111,27 @@ const DrawerNavigator = ({ navigation }) => {
 const styles = StyleSheet.create({
   headerTitleContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-end',
     justifyContent: 'space-between',
     width: '100%',
-    paddingHorizontal: 50,
+    paddingHorizontal: 10,
+  },
+  logoContainer: {
+    flex: 2,
+    alignItems: 'flex-end',
   },
   logo: {
     width: 150,
     height: 50,
     resizeMode: 'contain',
   },
+  searchContainer: {
+    flex: 1,
+    alignItems: 'flex-end',
+  },
   search: {
-    paddingLeft: 90,
+    padding: 10,
+    paddingLeft: 20
   },
 });
 
