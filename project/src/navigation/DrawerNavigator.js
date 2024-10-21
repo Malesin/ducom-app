@@ -27,7 +27,7 @@ const SettingsStackNavigator = () => {
   );
 };
 
-const DrawerNavigator = () => {
+const DrawerNavigator = ({ navigation }) => {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Drawer.Navigator
@@ -37,7 +37,7 @@ const DrawerNavigator = () => {
             <View style={styles.headerTitleContainer}>
               <Image source={logo} style={styles.logo} />
               <View style={styles.spacer} />
-              <TouchableOpacity style={styles.search}>
+              <TouchableOpacity style={styles.search} onPress={() => navigation.navigate('SearchPage')}>
                 <MaterialIcons name="search" size={25} color="black" />
               </TouchableOpacity>
             </View>

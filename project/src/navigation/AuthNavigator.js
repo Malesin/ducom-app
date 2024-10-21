@@ -19,6 +19,7 @@ import {
   MutedUsers,
   VerifyAccount,
   AccountPrivacy,
+  SearchPage,
 } from '../pages';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -78,6 +79,11 @@ export default function MainNavigation() {
         <Stack.Screen
           name="Home"
           component={BottomTabNavigator}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="SearchPage"
+          component={SearchPage}
           options={{ headerShown: false }}
         />
         <Stack.Screen
