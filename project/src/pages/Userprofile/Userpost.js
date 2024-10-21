@@ -11,7 +11,7 @@ import {
 import TweetCard from '../../components/TweetCard';
 import PinTweetCard from '../../components/PinTweetCard';
 import { useFocusEffect } from '@react-navigation/native';
-import { Skeleton } from 'react-native-elements'; // Import Skeleton
+import { Skeleton } from 'react-native-elements'; 
 import axios from 'axios';
 import config from '../../config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -22,7 +22,7 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
   const [tweets, setTweets] = useState([]);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
-  const [isFetched, setIsFetched] = useState(false); // State to track if data has been fetched
+  const [isFetched, setIsFetched] = useState(false);
   const [pintweets, setPinTweets] = useState([]);
   const [pinnedTweetId, setPinnedTweetId] = useState(null);
 
@@ -40,7 +40,7 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
 
       const postPin = pinPost.data.data;
       if (!postPin) {
-        return null; // Kembalikan null jika pinPost tidak ada
+        return null; 
       }
       const totalComments = postPin.comments.length + postPin.comments.reduce((acc, comment) => acc + comment.replies.length, 0);
 
@@ -77,7 +77,7 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
       if (error.response && error.response.status === 403) {
         console.log("lo diblokir")
         setLoading(false)
-        return "You are blocked by this user"; // Return text if status code is 403
+        return "You are blocked by this user"; 
       }
       setLoading(false)
       console.error('Error fetching data:', error);

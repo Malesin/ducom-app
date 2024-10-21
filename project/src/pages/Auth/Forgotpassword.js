@@ -21,19 +21,18 @@ const serverUrl = config.SERVER_URL;
 const Forgotpassword = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
-  const [isButtonDisabled, setIsButtonDisabled] = useState(false); // Perbaikan deklarasi useState
-  const colorScheme = useColorScheme(); // Tambahkan useColorScheme
+  const [isButtonDisabled, setIsButtonDisabled] = useState(false);
+  const colorScheme = useColorScheme();
 
   const handleContinue = async () => {
-    setIsButtonDisabled(true); // Disable the button immediately
-    // Validation for email or username
+    setIsButtonDisabled(true);
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email) {
       setError('Email is required.');
-      setIsButtonDisabled(false); // Re-enable the button if validation fails
+      setIsButtonDisabled(false);
     } else if (!emailRegex.test(email) && email.length < 4) {
       setError('Please enter a valid email address or username.');
-      setIsButtonDisabled(false); // Re-enable the button if validation fails
+      setIsButtonDisabled(false);
     } else {
       setError('');
       try {
@@ -49,17 +48,17 @@ const Forgotpassword = ({navigation}) => {
             textBody: 'OTP successfully sent to email',
             onHide: () => {
               setTimeout(() => {
-                Dialog.hide(); // Hide the dialog
+                Dialog.hide();
                 navigation.navigate('OTPScreen', {email: email});
-              }, 1000); // Delay 1 second before hiding the dialog and navigating
+              }, 1000);
             },
           });
           setTimeout(() => {
-            Dialog.hide(); // Hide the dialog if it doesn't already
-          }, 3000); // Duration to show the dialog
+            Dialog.hide();
+          }, 3000);
         } else if (response.data.status === 'errorEmail') {
           setError('Email not registered');
-          setIsButtonDisabled(false); // Re-enable button if the email is not registered
+          setIsButtonDisabled(false);
         }
       } catch (error) {
         console.error('Error in sending OTP:', error);
@@ -69,13 +68,13 @@ const Forgotpassword = ({navigation}) => {
           textBody: 'Error in sending OTP',
           onHide: () => {
             setTimeout(() => {
-              Dialog.hide(); // Hide the dialog
-            }, 1000); // Delay 1 second before hiding the dialog
+              Dialog.hide();
+            }, 1000);
           },
         });
         setTimeout(() => {
-          Dialog.hide(); // Hide the dialog if it doesn't already
-        }, 2000); // Duration to show the dialog
+          Dialog.hide();
+        }, 2000);
       }
     }
   };
@@ -89,23 +88,23 @@ const Forgotpassword = ({navigation}) => {
             style={[
               styles.email,
               error ? styles.emailError : null,
-              { color: colorScheme === 'dark' ? '#000000' : '#000000' } // Sesuaikan warna teks berdasarkan tema
+              { color: colorScheme === 'dark' ? '#000000' : '#000000' }
             ]}
             onChangeText={setEmail}
             value={email}
             placeholder="Enter your Email Address"
             keyboardType="email-address"
             autoCapitalize="none"
-            placeholderTextColor={colorScheme === 'dark' ? '#cccccc' : '#888888'} // Sesuaikan warna placeholder berdasarkan tema
+            placeholderTextColor={colorScheme === 'dark' ? '#cccccc' : '#888888'}
           />
           {error ? <Text style={styles.error}>{error}</Text> : null}
           <Text style={styles.subtitle}>
             You may receive Gmail notifications from us for security
           </Text>
           <TouchableOpacity
-            style={[styles.buttonForgot, isButtonDisabled && styles.disabledButton]} // Tambahkan gaya disabled
+            style={[styles.buttonForgot, isButtonDisabled && styles.disabledButton]}
             onPress={handleContinue}
-            disabled={isButtonDisabled} // Nonaktifkan tombol saat isButtonDisabled true
+            disabled={isButtonDisabled}
           >
             <Text style={[styles.textForgot, isButtonDisabled && styles.disabledText]}>Continue</Text>
           </TouchableOpacity>
@@ -165,7 +164,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   disabledText: {
-    opacity: 0.5, // Reduce the opacity to visually indicate disabled state
+    opacity: 0.5,
   },
   error: {
     color: 'red',
@@ -173,6 +172,6 @@ const styles = StyleSheet.create({
     textAlign: 'left',
   },
   disabledButton: {
-    backgroundColor: '#cccccc', // Ubah warna latar belakang untuk menunjukkan status nonaktif
+    backgroundColor: '#cccccc',
   },
 });

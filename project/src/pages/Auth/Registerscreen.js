@@ -109,7 +109,6 @@ const RegisterScreen = ({ navigation }) => {
       valid = false;
     }
 
-    // Set Errors and Proceed if Valid
     setErrors(newErrors);
 
     if (valid) {

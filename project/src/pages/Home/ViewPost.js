@@ -24,8 +24,9 @@ import config from '../../config';
 import Video from 'react-native-video';
 import { createThumbnail } from 'react-native-create-thumbnail';
 import CommentCard from '../../components/CommentCard';
-import BottomSheet from '../../components/BottomSheet'; // Tambahkan ini jika belum ada
+import BottomSheet from '../../components/BottomSheet'; 
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import {Skeleton} from 'react-native-elements'; 
 const verifiedIcon = <Icon name="verified" size={16} color="#699BF7" />;
 
 const serverUrl = config.SERVER_URL;
@@ -62,6 +63,7 @@ const ViewPost = ({ route }) => {
   const [refreshing, setRefreshing] = useState(false);
   const [showBottomSheet, setShowBottomSheet] = useState(false);
   const [isEnabledComm, setIsEnabledComm] = useState(true);
+  const [loading, setLoading] = useState(true); 
 
   useEffect(() => {
     if (focusCommentInput && textInputRef.current) {
@@ -87,6 +89,17 @@ const ViewPost = ({ route }) => {
 
     generateThumbnails();
   }, [tweet.media]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false); 
+    }, 10000);
+
+    fetchComments();
+    isEnabledComment();
+
+    return () => clearTimeout(timer);
+  }, [fetchComments]);
 
   const handleLike = async () => {
     const token = await AsyncStorage.getItem('token');
@@ -277,6 +290,7 @@ const ViewPost = ({ route }) => {
       }));
       setComments(formattedComments || []);
       setVisibleComments(3);
+      setLoading(false); 
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -297,15 +311,17 @@ const ViewPost = ({ route }) => {
     }
   }, []);
 
-  useEffect(() => {
-    fetchComments();
-    isEnabledComment();
-  }, [fetchComments]);
-
   const onRefresh = useCallback(async () => {
+    setLoading(true); 
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+
     fetchComments();
     isEnabledComment();
     setShowBottomSheet(false);
+
+    return () => clearTimeout(timer); 
   }, [fetchComments]);
 
   const onDeleteSuccess = () => {
@@ -363,188 +379,317 @@ const ViewPost = ({ route }) => {
 
   const onRefreshPage = () => {
     setRefreshing(true);
-    setShowBottomSheet(false);
+    setShowBottomSheet(false);  
     onRefresh();
   };
 
+  const renderSkeleton = () => (
+    <View style={styles.skeletonContainer}>
+      <View style={styles.skeletonHeader}>
+        <Skeleton
+          animation="pulse"
+          circle
+          height={50}
+          width={50}
+          style={styles.skeletonAvatar}
+        />
+        <View style={styles.skeletonTextContainer}>
+          <Skeleton
+            animation="pulse"
+            height={20}
+            width="30%"
+            style={styles.skeleton}
+          />
+          <Skeleton
+            animation="pulse"
+            height={14}
+            width="20%"
+            style={styles.skeleton}
+          />
+        </View>
+        <Skeleton
+          animation="pulse"
+          height={30}
+          width={10} 
+          style={styles.skeletonVertical}
+          borderRadius={3}
+        />
+      </View>
+      <Skeleton
+        animation="pulse"
+        height={20}
+        width="80%"
+        style={[styles.skeleton, {borderRadius: 3}]}
+      />
+      <Skeleton
+        animation="pulse"
+        height={200}
+        width="100%"
+        style={[styles.skeleton, {borderRadius: 8, marginTop: 10}]}
+      />
+      <Skeleton
+        animation="pulse"
+        height={17}
+        width="50%"
+        style={[styles.skeleton, {borderRadius: 3, marginTop: 10}]}
+      />
+      <Skeleton
+        animation="pulse"
+        height={1}
+        width="100%"
+        style={[styles.skeleton, {borderRadius: 3, marginTop: 5}]}
+      />
+      <Skeleton
+        animation="pulse"
+        height={16}
+        width="58%"
+        style={[styles.skeleton, {borderRadius: 3, marginTop: 5}]}
+      />
+      <Skeleton
+        animation="pulse"
+        height={1}
+        width="100%"
+        style={[styles.skeleton, {borderRadius: 3, marginTop: 5}]}
+      />
+      <View style={styles.skeletonIconRow}>
+        <Skeleton
+          animation="pulse"
+          circle
+          height={20}
+          width={20}
+          style={styles.skeletonIcon}
+        />
+        <Skeleton
+          animation="pulse"
+          circle
+          height={20}
+          width={20}
+          style={styles.skeletonIcon}
+        />
+        <Skeleton
+          animation="pulse"
+          circle
+          height={20}
+          width={20}
+          style={styles.skeletonIcon}
+        />
+        <Skeleton
+          animation="pulse"
+          circle
+          height={20}
+          width={20}
+          style={styles.skeletonIcon}
+        />
+        <Skeleton
+          animation="pulse"
+          circle
+          height={20}
+          width={20}
+          style={styles.skeletonIcon} 
+        />
+      </View>
+      <Skeleton
+        animation="pulse"
+        height={1}
+        width="100%"
+        style={[styles.skeleton, {borderRadius: 3, marginTop: 5}]} 
+      />
+    </View>
+  );
+
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView
-        style={styles.scrollContainer}
-        contentContainerStyle={{ paddingBottom: 50 }}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }>
-        <View style={styles.postContainer}>
-          <View style={styles.headerContainer}>
-            <Image
-              source={
-                tweet.userAvatar
-                  ? { uri: tweet.userAvatar }
-                  : require('../../assets/profilepic.png')
-              }
-              style={styles.avatar}
-            />
-            <View style={styles.userInfo}>
-              <View style={styles.usernameContainer}>
+      {loading ? (
+        renderSkeleton()
+      ) : (
+        <ScrollView
+          style={styles.scrollContainer}
+          contentContainerStyle={{paddingBottom: 50}}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }>
+          <View style={styles.postContainer}>
+            <View style={styles.headerContainer}>
+              <Image
+                source={
+                  tweet.userAvatar
+                    ? {uri: tweet.userAvatar}
+                    : require('../../assets/profilepic.png')
+                }
+                style={styles.avatar}
+              />
+              <View style={styles.userInfo}>
+                <View style={styles.usernameContainer}>
+                  <Text
+                    style={[
+                      styles.userName,
+                      {color: colorScheme === 'dark' ? '#000000' : '#000'},
+                    ]}>
+                    {tweet.userName}
+                  </Text>
+                  {tweet.isAdmin ? (
+                    <Text style={styles.verifiedIcon}>{verifiedIcon}</Text>
+                  ) : null}
+                </View>
+
                 <Text
                   style={[
-                    styles.userName,
-                    { color: colorScheme === 'dark' ? '#000000' : '#000' },
-                  ]}>
-                  {tweet.userName}
-                </Text>
-                {tweet.isAdmin ? (
-                  <Text style={styles.verifiedIcon}>{verifiedIcon}</Text>
-                ) : null}
-              </View>
+                    styles.userHandle,
+                    {color: colorScheme === 'dark' ? '#ccc' : 'gray'},
+                         
+                         
 
-              <Text
-                style={[
-                  styles.userHandle,
-                  { color: colorScheme === 'dark' ? '#ccc' : 'gray' },
-                ]}>
-                @{tweet.userHandle}
-              </Text>
+                  ]}>
+                  @{tweet.userHandle}
+                </Text>
+              </View>
+              <TouchableOpacity
+                style={styles.optionsButton}
+                onPress={() => setShowBottomSheet(true)}
+              >
+                <MaterialCommunityIcons
+                  name="dots-vertical"
+                  size={26}
+                  color="#000"
+                />
+              </TouchableOpacity>
             </View>
-            <TouchableOpacity
-              style={styles.optionsButton}
-              onPress={() => setShowBottomSheet(true)} // Ubah ini
-            >
-              <MaterialCommunityIcons
-                name="dots-vertical"
-                size={26}
-                color="#000"
-              />
-            </TouchableOpacity>
-          </View>
-          <View>
-            <Text style={styles.postContent}>{tweet.content}</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              {(tweet.media || []).map((mediaItem, index) => (
-                <TouchableOpacity
-                  key={index}
-                  onPress={() => handleMediaPress(mediaItem.uri)}>
-                  {mediaItem.type === 'image' ? (
-                    <Image
-                      source={{ uri: mediaItem.uri }}
-                      style={
-                        tweet.media.length === 1
-                          ? styles.singleMediaImage
-                          : styles.tweetImage
-                      }
-                      onError={() => console.log('Failed to load image')}
-                    />
-                  ) : (
-                    <TouchableOpacity
-                      onPress={() => handleMediaPress(mediaItem.uri)}
-                      style={styles.videoContainer}>
+            <View>
+              <Text style={styles.postContent}>{tweet.content}</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                {(tweet.media || []).map((mediaItem, index) => (
+                  <TouchableOpacity
+                    key={index}
+                    onPress={() => handleMediaPress(mediaItem.uri)}>
+                    {mediaItem.type === 'image' ? (
                       <Image
-                        source={{ uri: thumbnails[mediaItem.uri] }}
+                        source={{uri: mediaItem.uri}}
                         style={
                           tweet.media.length === 1
-                            ? styles.singleMediaVideo
-                            : styles.tweetVideo
+                            ? styles.singleMediaImage
+                            : styles.tweetImage
                         }
+                        onError={() => console.log('Failed to load image')}
                       />
-                      <MaterialCommunityIcons
-                        name="play-circle-outline"
-                        size={40}
-                        color="#fff"
-                        style={styles.playIcon}
-                      />
-                    </TouchableOpacity>
-                  )}
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-            <Text style={styles.postDate}>{formatDate(tweet.postDate)}</Text>
-          </View>
-          <View style={styles.interactionsContainer}>
-            <Text style={styles.interactionText}>
-              <Text style={styles.interactionNumber}>
-                {tweet.commentsCount}
-              </Text>{' '}
-              Comments{' '}
-            </Text>
-            <Text style={styles.interactionText}>
-              <Text style={styles.interactionNumber}>{bookmarksCount}</Text>{' '}
-              Bookmarks{' '}
-            </Text>
-            <Text style={styles.interactionText}>
-              <Text style={styles.interactionNumber}>{likesCount}</Text> Likes{' '}
-            </Text>
-            <Text style={styles.interactionText}>
-              <Text style={styles.interactionNumber}>{repostsCount}</Text> Reposts{' '}
-            </Text>
-          </View>
-          <View style={styles.actions}>
-            <InteractionButton
-              icon={liked ? 'heart' : 'heart-outline'}
-              color={liked ? '#E0245E' : '#040608'}
-              onPress={handleLike}
-            />
-            <InteractionButton
-              icon={
-                isEnabledComm ? 'message-reply-outline' : 'message-off-outline'
-              }
-              color="#040608"
-              onPress={handleReplyIconPress}
-            />
-            <InteractionButton
-              icon={bookmarked ? 'bookmark' : 'bookmark-outline'}
-              color={bookmarked ? '#00c5ff' : '#040608'}
-              onPress={handleBookmark}
-            />
-            <InteractionButton
-              icon="repeat-variant"
-              color={reposted ? '#097969' : '#040608'}
-              count={repostsCount}
-              onPress={handleRepost}
-            />
-            <TouchableOpacity style={styles.actionButton} onPress={handleShare}>
-              <MaterialCommunityIcons
-                name="export-variant"
-                size={20}
-                color="#657786"
+                    ) : (
+                      <TouchableOpacity
+                        onPress={() => handleMediaPress(mediaItem.uri)}
+                        style={styles.videoContainer}>
+                        <Image
+                          source={{uri: thumbnails[mediaItem.uri]}}
+                          style={
+                            tweet.media.length === 1
+                              ? styles.singleMediaVideo
+                              : styles.tweetVideo
+                          }
+                        />
+                        <MaterialCommunityIcons
+                          name="play-circle-outline"
+                          size={40}
+                          color="#fff"
+                          style={styles.playIcon}
+                        />
+                      </TouchableOpacity>
+                    )}
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+              <Text style={styles.postDate}>{formatDate(tweet.postDate)}</Text>
+            </View>
+            <View style={styles.interactionsContainer}>
+              <Text style={styles.interactionText}>
+                <Text style={styles.interactionNumber}>
+                  {tweet.commentsCount}
+                </Text>{' '}
+                Comments{' '}
+              </Text>
+              <Text style={styles.interactionText}>
+                <Text style={styles.interactionNumber}>{bookmarksCount}</Text>{' '}
+                Bookmarks{' '}
+              </Text>
+              <Text style={styles.interactionText}>
+                <Text style={styles.interactionNumber}>{likesCount}</Text> Likes{' '}
+              </Text>
+            </View>
+            <View style={styles.actions}>
+              <InteractionButton
+                icon={liked ? 'heart' : 'heart-outline'}
+                color={liked ? '#E0245E' : '#040608'}
+                onPress={handleLike}
               />
-            </TouchableOpacity>
-          </View>
-          <View style={styles.commentContainer}>
-            {comments.slice(0, visibleComments).map(comment => (
-              <CommentCard
-                key={comment.id}
-                text={comment.text}
-                tweet={tweet}
-                replies={comment.replies}
-                hasReplies={comment.replies.length > 0}
-                username={comment.username}
-                profilePicture={comment.profilePicture}
-                onReplyPress={() =>
-                  handleReplyPress(comment.id, comment.username)
+              <InteractionButton
+                icon={
+                  isEnabledComm
+                    ? 'message-reply-outline'
+                    : 'message-off-outline'
                 }
-                onAddReply={replyText => handleAddReply(comment.id, replyText)}
-                commentId={comment.id}
-                postId={tweet.id}
-                userIdPost={comment.userIdPost}
-                idUser={tweet.idUser}
-                isLikedCom={comment.isLikedCom}
-                isAdmin={comment.isAdmin}
-                amIAdmin={tweet.amIAdmin}
-                onDeleteSuccess={onDeleteSuccess}
+                color="#040608"
+                onPress={handleReplyIconPress}
               />
-            ))}
-            {visibleComments < comments.length && (
+              <InteractionButton
+                icon={bookmarked ? 'bookmark' : 'bookmark-outline'}
+                color={bookmarked ? '#00c5ff' : '#040608'}
+                onPress={handleBookmark}
+              />
               <TouchableOpacity
-                onPress={() => setVisibleComments(prevCount => prevCount + 3)}>
-                <Text style={styles.loadMoreText}>Load more comments</Text>
+                style={styles.actionButton}
+                onPress={handleRepost}>
+                <MaterialCommunityIcons
+                  name="repeat-variant"
+                  size={22}
+                  color={reposted ? '#097969' : '#040608'}
+                />
               </TouchableOpacity>
-            )}
+              <TouchableOpacity
+                style={styles.actionButton}
+                onPress={handleShare}>
+                <MaterialCommunityIcons
+                  name="export-variant"
+                  size={20}
+                  color="#657786"
+                />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.commentContainer}>
+              {comments.slice(0, visibleComments).map(comment => (
+                <CommentCard
+                  key={comment.id}
+                  text={comment.text}
+                  tweet={tweet}
+                  replies={comment.replies}
+                  hasReplies={comment.replies.length > 0}
+                  username={comment.username}
+                  profilePicture={comment.profilePicture}
+                  onReplyPress={() =>
+                    handleReplyPress(comment.id, comment.username)
+                  }
+                  onAddReply={replyText =>
+                    handleAddReply(comment.id, replyText)
+                  }
+                  commentId={comment.id}
+                  postId={tweet.id}
+                  userIdPost={comment.userIdPost}
+                  idUser={tweet.idUser}
+                  isLikedCom={comment.isLikedCom}
+                  isAdmin={comment.isAdmin}
+                  amIAdmin={tweet.amIAdmin}
+                  onDeleteSuccess={onDeleteSuccess}
+                />
+              ))}
+              {visibleComments < comments.length && (
+                <TouchableOpacity
+                  onPress={() =>
+                    setVisibleComments(prevCount => prevCount + 3)
+                  }>
+                  <Text style={styles.loadMoreText}>Load more comments</Text>
+                </TouchableOpacity>
+              )}
+            </View>
           </View>
-        </View>
-      </ScrollView>
-      <View style={[styles.inputContainer, { height: inputHeight }]}>
-        <Image source={{ uri: profilePicture }} style={styles.profilePicture} />
+        </ScrollView>
+      )}
+      <View style={[styles.inputContainer, {height: inputHeight}]}>
+        <Image source={{uri: profilePicture}} style={styles.profilePicture} />
 
         {isEnabledComm ? (
           <>
@@ -684,8 +829,8 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
   },
   usernameContainer: {
-    flexDirection: 'row', // Tambahkan ini untuk mengatur elemen dalam satu baris
-    alignItems: 'center', // Tambahkan ini untuk menyelaraskan elemen secara vertikal
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   verifiedIcon: {
     marginLeft: 4,
@@ -867,5 +1012,40 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
+  },
+  skeletonContainer: {
+    padding: 7,
+    alignItems: 'flex-start',
+    width: '100%',
+  },
+  skeletonHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+    width: '100%',
+  },
+  skeletonAvatar: {
+    marginRight: 10,
+  },
+  skeletonTextContainer: {
+    flex: 1,
+    marginLeft: 10, 
+  },
+  skeleton: {
+    marginBottom: 10,
+  },
+  skeletonIconRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between', 
+    alignItems: 'center',
+    width: '100%', 
+  },
+  skeletonIcon: {
+    marginHorizontal: 5, 
+  },
+  skeletonVertical: {
+    position: 'absolute',
+    right: 20,
+    top: 0,
   },
 });

@@ -20,10 +20,9 @@ import config from '../../config';
 import Toast from 'react-native-toast-message';
 import {Skeleton} from 'react-native-elements';
 
-// Impor gambar profilepic.png
 const serverUrl = config.SERVER_URL;
 const defaultBanner = require('../../assets/banner.png');
-const defaultProfilePicture = require('../../assets/profilepic.png'); // Ubah di sini
+const defaultProfilePicture = require('../../assets/profilepic.png');
 
 export default function EditProfilePage() {
   const navigation = useNavigation();
@@ -62,7 +61,7 @@ export default function EditProfilePage() {
         const profile = {uri: user.profilePicture};
         setProfilePicture(profile);
       } else {
-        setProfilePicture(defaultProfilePicture); // Set default profile picture
+        setProfilePicture(defaultProfilePicture);
       }
     } catch (error) {
       console.error('Error occurred:', error);
@@ -80,9 +79,9 @@ export default function EditProfilePage() {
     getData();
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 3000); // 3 detik
+    }, 3000);
 
-    return () => clearTimeout(timer); // Bersihkan timer saat komponen unmount
+    return () => clearTimeout(timer);
   }, []);
 
 
@@ -146,8 +145,7 @@ export default function EditProfilePage() {
     setIsSaving(true);
     let hasError = false;
 
-    // Validasi username
-     if (!validateUsername(username)) { // Menghapus pengkondisian username tidak boleh kosong
+     if (!validateUsername(username)) {
     Toast.show({
       type: 'error',
       text1: 'Error',
@@ -157,7 +155,6 @@ export default function EditProfilePage() {
     hasError = true;
     } 
 
-    // Validasi nama
     if (name && name !== userData?.name && !validateName(name)) {
       setNameError('Name can only contain letters and spaces, and must be up to 40 characters long.');
       hasError = true;
@@ -165,7 +162,6 @@ export default function EditProfilePage() {
       setNameError('');
     }
 
-    // Validasi bio
     if (bio && bio.length > 150) {
       hasError = true;
     }
@@ -175,7 +171,6 @@ export default function EditProfilePage() {
       return;
     }
 
-    // Cek apakah ada perubahan data
     const isDataChanged = 
       (name && name !== userData?.name) ||
       (username && username !== userData?.username) ||
@@ -214,7 +209,6 @@ export default function EditProfilePage() {
         updatedUserData.bio = bio;
       }
 
-      // Upload the new profile image if exists
       if (newProfileImage) {
         const profileFormData = new FormData();
         profileFormData.append('image', {
@@ -231,7 +225,6 @@ export default function EditProfilePage() {
         });
       }
 
-      // Upload the new banner image if exists
       if (newBannerImage) {
         const bannerFormData = new FormData();
         bannerFormData.append('image', {
@@ -288,7 +281,7 @@ export default function EditProfilePage() {
           Alert.alert('Error', 'Image size exceeds 5 MB.');
           return;
         }
-        console.log('New profile image selected:', image); // Log untuk gambar profil baru
+        console.log('New profile image selected:', image);
         setNewProfileImage(image);
         setProfilePicture({uri: image.path});
       })
@@ -311,7 +304,7 @@ export default function EditProfilePage() {
           Alert.alert('Error', 'Image size exceeds 5 MB.');
           return;
         }
-        console.log('New banner image selected:', image); // Log untuk gambar banner baru
+        console.log('New banner image selected:', image);
         setNewBannerImage(image);
         setBanner({uri: image.path});
       })
@@ -386,13 +379,13 @@ export default function EditProfilePage() {
                 />
               ) : isEditing ? (
                 <TextInput
-                  style={[styles.usernameInput, {borderRadius: 5, color: colorScheme === 'dark' ? '#000000' : '#000000'}]} // Adjust text color based on theme
+                  style={[styles.usernameInput, {borderRadius: 5, color: colorScheme === 'dark' ? '#000000' : '#000000'}]}
                   value={username}
                   onChangeText={text => setUsername(text)}
                   onBlur={() => setIsEditing(false)}
                   autoFocus
                   maxLength={15}
-                  placeholderTextColor={colorScheme === 'dark' ? '#cccccc' : '#888888'} // Adjust placeholder text color based on theme
+                  placeholderTextColor={colorScheme === 'dark' ? '#cccccc' : '#888888'}
                 />
               ) : (
                 <Text style={styles.username}> {username} </Text>
@@ -416,7 +409,7 @@ export default function EditProfilePage() {
             ) : (
               <TextInput
                 value={name}
-                style={[styles.textInput, {color: colorScheme === 'dark' ? '#000000' : '#000000'}]} // Adjust text color based on theme
+                style={[styles.textInput, {color: colorScheme === 'dark' ? '#000000' : '#000000'}]}
                 onChangeText={setName}
                 placeholder={userData?.name}
                 placeholderTextColor={
@@ -443,9 +436,9 @@ export default function EditProfilePage() {
               <TextInput
               value={bio}
               onChangeText={setBio}
-              style={[styles.textInput, {color: colorScheme === 'dark' ? '#000000' : '#000000'}]} // Adjust text color based on theme
+              style={[styles.textInput, {color: colorScheme === 'dark' ? '#000000' : '#000000'}]}
               placeholder={userData?.bio || 'Bio'}
-              placeholderTextColor={colorScheme === 'dark' ? '#cccccc' : '#888888'} // Adjust placeholder text color based on theme
+              placeholderTextColor={colorScheme === 'dark' ? '#cccccc' : '#888888'}
               autoCapitalize="none"
               multiline
               maxLength={150}
@@ -463,7 +456,7 @@ export default function EditProfilePage() {
               />
             ) : (
               <TextInput
-                style={[styles.textInput, {color: colorScheme === 'dark' ? '#000000' : '#000000'}]} // Adjust text color based on theme
+                style={[styles.textInput, {color: colorScheme === 'dark' ? '#000000' : '#000000'}]}
                 placeholder={userData?.email}
                 placeholderTextColor={
                   colorScheme === 'dark' ? '#cccccc' : '#888888'
@@ -487,7 +480,7 @@ const getStyles = colorScheme => {
       flexGrow: 1,
       alignItems: 'center',
       backgroundColor: '#fff',
-      paddingBottom: 20, // Tambahkan padding bawah untuk menghindari konten terpotong
+      paddingBottom: 20,
     },
     bannerContainer: {
       width: '100%',
@@ -524,7 +517,7 @@ const getStyles = colorScheme => {
       alignItems: 'center',
       backgroundColor: 'rgba(0, 0, 0, 0.5)',
       borderRadius: 60,
-      zIndex: 1, // Ensure overlay is above the image
+      zIndex: 1,
     },
     contentContainer: {
       width: '100%',

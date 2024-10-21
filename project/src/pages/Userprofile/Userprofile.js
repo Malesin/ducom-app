@@ -63,31 +63,26 @@ const Userprofile = ({ userIdPost, navigation, tweet }) => {
     }
   }
 
-  // Ambil data pengguna saat komponen pertama kali dimuat
   useEffect(() => {
     getData();
   }, []);
 
-  // Ambil data pengguna setiap kali layar menjadi fokus
   useFocusEffect(
     useCallback(() => {
       getData();
     }, []),
   );
 
-  // Fungsi untuk membuka modal untuk melihat foto profil
   const openModal = () => {
     setModalImageSource(profilePicture);
     setModalVisible(true);
   };
 
-  // Fungsi untuk menutup modal
   const closeModal = () => {
     setModalVisible(false);
     setModalImageSource(null);
   };
 
-  // Fungsi untuk membuka dan menutup dropdown
   const toggleDropdown = () => {
     setDropdownVisible(!dropdownVisible);
   };
@@ -95,7 +90,6 @@ const Userprofile = ({ userIdPost, navigation, tweet }) => {
   const handleDropdownItemPress = item => {
     if (item === 'Report') {
       navigation.navigate('Report'); 
-    }
     console.log(item);
     toggleDropdown();
   };
@@ -289,6 +283,7 @@ const styles = StyleSheet.create({
   userInfoContainer: {
     marginTop: 10,
     marginBottom: 10,
+
   },
   nameContainer: {
     flexDirection: 'row',

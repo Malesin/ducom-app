@@ -97,7 +97,7 @@ const Marksscreen = ({navigation}) => {
         console.error('Error fetching data:', error);
         return [];
       } finally {
-        setLoading(false); 
+        setLoading(false);
         setLoadingMore(false);
       }
     },
@@ -106,7 +106,7 @@ const Marksscreen = ({navigation}) => {
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    setShowSkeleton(true); 
+    setShowSkeleton(true);
     setPage(1);
     setHasMore(true);
     const newTweets = await fetchTweets(1);

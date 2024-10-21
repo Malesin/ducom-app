@@ -12,6 +12,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../../config';
 import BlockCard from '../../components/BlockCard';
+import { ToastAndroid } from 'react-native'; 
 
 const serverUrl = config.SERVER_URL;
 
@@ -39,10 +40,10 @@ const BlockedUsers = () => {
           myToken: token
         };
       });
-      setShowSkeleton(false); // Tambahkan baris ini untuk menyembunyikan skeleton
+      setShowSkeleton(false); 
       return formattedBlocked;
     } catch (error) {
-      setShowSkeleton(false); // Tambahkan baris ini untuk menyembunyikan skeleton
+      setShowSkeleton(false);
       console.error(error)
     }
   };
@@ -68,9 +69,9 @@ const BlockedUsers = () => {
 
   const handleUnblock = async (blockUserData) => {
     try {
-      const respUnblock = await axios.post(`${serverUrl}/unblock-user`, { token: blockUserData.myToken, unblockUserId: blockUserData.id })
-      console.log(respUnblock)
+      await axios.post(`${serverUrl}/unblock-user`, { token: blockUserData.myToken, unblockUserId: blockUserData.id })
       await onRefresh();
+      ToastAndroid.show('User berhasil di-unblock', ToastAndroid.SHORT); 
     } catch (error) {
       console.error(error)
     }

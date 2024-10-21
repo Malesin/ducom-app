@@ -56,7 +56,7 @@ const Authscreen = ({navigation}) => {
 
   const slideInterpolation = slideAnim.interpolate({
     inputRange: [0, 1],
-    outputRange: [0, 150], // Bisa di adjust sesuai dengan lebar button
+    outputRange: [0, 150], 
   });
 
   const slideStyle = {
@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: '50%',
     height: '100%',
-    backgroundColor: '#001374', // Ubah warna biru di sini
+    backgroundColor: '#001374', 
     borderRadius: 30,
   },
   buttonLogin: {

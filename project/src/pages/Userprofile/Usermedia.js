@@ -10,7 +10,7 @@ import {
 import TweetCard from '../../components/TweetCard';
 import axios from 'axios';
 import config from '../../config';
-import { Skeleton } from 'react-native-elements'; // Import Skeleton
+import { Skeleton } from 'react-native-elements'; 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const serverUrl = config.SERVER_URL;
@@ -31,7 +31,7 @@ const Usermedia = ({ userIdPost, profilePicture }) => {
       console.log('Data Berhasil Diambil');
 
       const dataTweet = userResponse.data.data;
-      console.log('Fetched tweets:', dataTweet); // Tambahkan log untuk memeriksa data
+      console.log('Fetched tweets:', dataTweet); 
 
       const formattedTweets = dataTweet.map(post => ({
         id: post._id,
@@ -71,7 +71,7 @@ const Usermedia = ({ userIdPost, profilePicture }) => {
         console.error("Error fetching tweets:", error);
       }
     } finally {
-      setLoading(false); // Pastikan setLoading(false) dipanggil di sini
+      setLoading(false); 
     }
   }, [userIdPost]);
 
