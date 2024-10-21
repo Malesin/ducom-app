@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
     profileTextContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        flex: 1,  // Ensures the profile and text take up available space
+        flex: 1,
     },
     profilePicture: {
         width: 40,
@@ -141,6 +141,6 @@ const styles = StyleSheet.create({
         color: '#000',
     },
     closeIcon: {
-        marginLeft: 10, 
+        marginLeft: 10,
     },
 });
