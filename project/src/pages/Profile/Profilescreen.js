@@ -32,21 +32,24 @@ export default function Profilescreen() {
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const dropdownAnimation = useRef(new Animated.Value(0)).current;
   const navigation = useNavigation();
-  const [refreshing, setRefreshing] = useState(false);
 
   async function getData() {
     try {
       const token = await AsyncStorage.getItem('token');
       const userResponse = await axios.post(`${serverUrl}/userdata`, { token });
       const user = userResponse.data.data;
-      setUserData(user);
 
-      if (user.bannerPicture) {
-        setBanner({ uri: user.bannerPicture });
-      }
-      if (user.profilePicture) {
-        setProfilePicture({ uri: user.profilePicture });
-      }
+      // Tambahkan delay 3 detik sebelum mengatur data
+      setTimeout(() => {
+        setUserData(user);
+
+        if (user.bannerPicture) {
+          setBanner({ uri: user.bannerPicture });
+        }
+        if (user.profilePicture) {
+          setProfilePicture({ uri: user.profilePicture });
+        }
+      }, 2500); // 3000 ms = 3 detik
     } catch (error) {
       console.error('Error occurred:', error);
     }
@@ -61,11 +64,6 @@ export default function Profilescreen() {
       getData();
     }, [])
   );
-
-  const onRefresh = useCallback(() => {
-    setRefreshing(true);
-    getData().finally(() => setRefreshing(false));
-  }, []);
 
   const openModal = () => {
     setModalImageSource(profilePicture);
@@ -105,11 +103,7 @@ export default function Profilescreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-      >
+      <ScrollView>
         <View style={styles.bannerContainer}>
           <Image
             source={banner || require('../../assets/banner.png')}
@@ -163,43 +157,89 @@ export default function Profilescreen() {
               </TouchableOpacity>
             </View>
             <View style={styles.statsContainer}>
-              <View style={styles.statItem}>
-                <Text style={styles.statNumber}>0</Text>
-                <Text style={styles.statLabel}>Posts</Text>
-              </View>
-              <View style={styles.statItem}>
-                <TouchableOpacity onPress={() => navigation.navigate('Follow')}>
-                  <Text style={styles.statNumber}>0</Text>
-                  <Text style={styles.statLabel}>Followers</Text>
-                </TouchableOpacity>
-              </View>
-              <View style={styles.statItem}>
-                <TouchableOpacity onPress={() => navigation.navigate('Follow')}>
-                  <Text style={styles.statNumber}>0</Text>
-                  <Text style={styles.statLabel}>Following</Text>
-                </TouchableOpacity>
-              </View>
+              {['Posts', 'Followers', 'Following'].map((label) => (
+                <View style={styles.statItem} key={label}>
+                  {!userData ? (
+                    <>
+                      <Skeleton
+                        animation="pulse"
+                        height={18}
+                        width={30}
+                        style={[styles.skeleton, { borderRadius: 3 }]} // Ubah borderRadius ke 3
+                      />
+                      <Skeleton
+                        animation="pulse"
+                        height={14}
+                        width={60}
+                        style={[styles.skeleton, { borderRadius: 3 }]} // Ubah borderRadius ke 3
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <Text style={styles.statNumber}>0</Text>
+                      <Text style={styles.statLabel}>{label}</Text>
+                    </>
+                  )}
+                </View>
+              ))}
             </View>
           </View>
           <View style={styles.userInfoWrapper}>
             <View style={styles.userInfoContainer}>
               <View style={styles.nameContainer}>
-                <Text style={styles.name}>{userData?.name}</Text>
+                {!userData ? (
+                  <Skeleton
+                    animation="pulse"
+                    height={20}
+                    width={150}
+                    style={[styles.skeleton, { borderRadius: 3 }]} // Ubah borderRadius ke 3
+                  />
+                ) : (
+                  <Text style={styles.name}>{userData?.name}</Text>
+                )}
                 {userData?.isAdmin && (
                   <Text style={styles.verifiedIcon}>{verifiedIcon}</Text>
                 )}
               </View>
-              <Text style={styles.username}>@{userData?.username}</Text>
-              <Text style={styles.description}>
-                {userData?.bio || 'No Description'}
-              </Text>
+              {!userData ? (
+                <Skeleton
+                  animation="pulse"
+                  height={14}
+                  width={100}
+                  style={[styles.skeleton, { borderRadius: 3 }]} // Ubah borderRadius ke 3
+                />
+              ) : (
+                <Text style={styles.username}>@{userData?.username}</Text>
+              )}
+              {!userData ? (
+                <Skeleton
+                  animation="pulse"
+                  height={13}
+                  width={200}
+                  style={[styles.skeleton, { borderRadius: 3 }]} // Ubah borderRadius ke 3
+                />
+              ) : (
+                <Text style={styles.description}>
+                  {userData?.bio || 'No Description'}
+                </Text>
+              )}
             </View>
-            <TouchableOpacity
-              style={styles.editButton}
-              onPress={() => navigation.navigate('EditProfile')}
-            >
-              <Text style={styles.editButtonText}>Edit Profile</Text>
-            </TouchableOpacity>
+            {!userData ? (
+              <Skeleton
+                animation="pulse"
+                height={28}
+                width={120}
+                borderRadius={14}
+                style={[styles.skeleton, { marginRight: 14, borderRadius: 3 }]} // Ubah borderRadius ke 3
+              />
+            ) : (
+              <TouchableOpacity
+                style={styles.editButton}
+                onPress={() => navigation.navigate('EditProfile')}
+              >
+                <Text style={styles.editButtonText}>Edit Profile</Text>
+              </TouchableOpacity>
+            )}
           </View>
           {/*  */}
           <Modal
