@@ -5,7 +5,9 @@ import axios from 'axios';
 import config from '../../config';
 import LikeNotification from '../../components/Notification/LikeNotification';
 import CommentNotification from '../../components/Notification/CommentNotification';
-import { Skeleton } from 'react-native-elements';
+import { Skeleton } from 'react-native-elements'; // Tambahkan import Skeleton
+import ReportedNotification from '../../components/ReportedNotification';
+
 
 const serverUrl = config.SERVER_URL;
 
@@ -103,6 +105,7 @@ const Notificationscreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <ReportedNotification />
       <ScrollView
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />

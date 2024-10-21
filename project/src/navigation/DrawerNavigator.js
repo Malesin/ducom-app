@@ -19,7 +19,7 @@ const SettingsStackNavigator = () => {
   return (
     <Stack.Navigator>
       <Stack.Screen
-        name="SettingsScreen" 
+        name="SettingsScreen"
         component={Settingsscreen}
         options={{ headerShown: false }}
       />
@@ -31,7 +31,7 @@ const DrawerNavigator = () => {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Drawer.Navigator
-        initialRouteName="Home" 
+        initialRouteName="Home"
         screenOptions={{
           headerTitle: () => (
             <View style={styles.headerTitleContainer}>
@@ -53,7 +53,7 @@ const DrawerNavigator = () => {
           drawerItemStyle: {
             color: 'black',
           },
-          drawerIcon: ({ color, size, focused }) => ({
+          drawerIcon: () => ({
             color: 'black',
           }),
         }}>
@@ -107,12 +107,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    width: '100%', 
-    paddingHorizontal: 20, 
+    width: '100%',
+    paddingHorizontal: 20,
   },
   logo: {
-    width: 150, 
-    height: 50, 
+    width: 150,
+    height: 50,
     resizeMode: 'contain',
   },
 });

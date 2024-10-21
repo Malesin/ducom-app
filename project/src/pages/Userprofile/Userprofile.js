@@ -26,6 +26,7 @@ const Userprofile = ({ userIdPost, navigation, tweet }) => {
   const [modalImageSource, setModalImageSource] = useState(null);
   const [userData, setUserData] = useState('');
   const [dropdownVisible, setDropdownVisible] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(false);
 
   useEffect(() => {
     navigation.setOptions({ title: '' });
@@ -43,7 +44,7 @@ const Userprofile = ({ userIdPost, navigation, tweet }) => {
       setUserData(user);
 
       if (user.username) {
-        navigation.setOptions({ title: `@${user.username}` }); 
+        navigation.setOptions({ title: `@${user.username}` });
       }
 
       if (user.bannerPicture) {
@@ -92,6 +93,10 @@ const Userprofile = ({ userIdPost, navigation, tweet }) => {
     }
     console.log(item);
     toggleDropdown();
+  };
+
+  const handleFollowPress = () => {
+    setIsFollowing(!isFollowing);
   };
 
   return (
@@ -152,53 +157,48 @@ const Userprofile = ({ userIdPost, navigation, tweet }) => {
           </TouchableWithoutFeedback>
         )}
         <View style={styles.profileContainer}>
-          <TouchableOpacity onPress={openModal}>
-            <Image
-              source={profilePicture || require('../../assets/profilepic.png')}
-              style={styles.profile}
-            />
-          </TouchableOpacity>
-          <View style={styles.profileText}>
-            {!userData ? (
-              <>
-                <Skeleton
-                  animation="pulse"
-                  height={20}
-                  width={150}
-                  style={styles.skeleton}
-                />
-                <Skeleton
-                  animation="pulse"
-                  height={14}
-                  width={100}
-                  style={styles.skeleton}
-                />
-                <Skeleton
-                  animation="pulse"
-                  height={13}
-                  width={200}
-                  style={styles.skeleton}
-                />
-                <Skeleton
-                  animation="pulse"
-                  height={30}
-                  width={120}
-                  style={styles.skeleton}
-                />
-              </>
-            ) : (
-              <>
-                <View style={styles.nameContainer}>
-                  <Text style={styles.name}>{userData?.name}</Text>
-                  {userData?.isAdmin ? (<Text style={styles.verifiedIcon}>{verifiedIcon}</Text>) : null}
-                </View>
-                <Text style={styles.username}>@{userData?.username}</Text>
-                <Text style={styles.description}>
-                  {userData?.bio || 'No Description'}
-                </Text>
-              </>
-            )}
+          <View style={styles.profilePictureContainer}>
+            <TouchableOpacity onPress={openModal}>
+              <Image
+                source={profilePicture || require('../../assets/profilepic.png')}
+                style={styles.profile}
+              />
+            </TouchableOpacity>
           </View>
+          <View style={styles.statsContainer}>
+            <View style={styles.statItem}>
+              <Text style={styles.statNumber}>0</Text>
+              <Text style={styles.statLabel}>Posts</Text>
+            </View>
+            <View style={styles.statItem}>
+              <Text style={styles.statNumber}>0</Text>
+              <Text style={styles.statLabel}>Followers</Text>
+            </View>
+            <View style={styles.statItem}>
+              <Text style={styles.statNumber}>0</Text>
+              <Text style={styles.statLabel}>Following</Text>
+            </View>
+          </View>
+        </View>
+        <View style={styles.userInfoWrapper}>
+          <View style={styles.userInfoContainer}>
+            <View style={styles.nameContainer}>
+              <Text style={styles.name}>{userData?.name}</Text>
+              {userData?.isAdmin ? (<Text style={styles.verifiedIcon}>{verifiedIcon}</Text>) : null}
+            </View>
+            <Text style={styles.username}>@{userData?.username}</Text>
+            <Text style={styles.description}>
+              {userData?.bio || 'No Description'}
+            </Text>
+          </View>
+          <TouchableOpacity
+            style={[styles.editButton, isFollowing && styles.followingButton]}
+            onPress={handleFollowPress}
+          >
+            <Text style={[styles.editButtonText, isFollowing && styles.followingButtonText]}>
+              {isFollowing ? 'Following' : 'Follow'}
+            </Text>
+          </TouchableOpacity>
         </View>
       </View>
       <Modal
@@ -250,22 +250,52 @@ const styles = StyleSheet.create({
     width: 83,
     height: 82,
     borderRadius: 40,
-    marginRight: 20,
-    marginBottom: 15,
+    marginTop: 10,
+    marginLeft: 10,
   },
-  profileText: {
+  profilePictureContainer: {
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+  },
+  statsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
     flex: 1,
-    justifyContent: 'center',
-    minHeight: 150,
+  },
+  statItem: {
+    alignItems: 'center',
+    marginLeft: 30,
+  },
+  statNumber: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#000',
+  },
+  statLabel: {
+    fontSize: 14,
+    color: '#777',
+  },
+  userInfoWrapper: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginLeft: 20,
+  },
+  userInfoContainer: {
+    marginTop: 10,
+    marginBottom: 10,
+
   },
   nameContainer: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   name: {
-    fontSize: 20,
+    fontSize: 17,
     fontWeight: 'bold',
     color: '#000',
+    marginBottom: 5,
+    marginRight: 5,
   },
   verifiedIcon: {
     marginLeft: 5,
@@ -278,6 +308,29 @@ const styles = StyleSheet.create({
   },
   description: {
     fontSize: 13,
+    color: '#000',
+  },
+  editButton: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#001374',
+    borderColor: '#000',
+    borderWidth: 1,
+    paddingVertical: 5,
+    paddingHorizontal: 50,
+    borderRadius: 100,
+    marginTop: 20,
+    marginBottom: 20,
+    marginRight: 10,
+  },
+  editButtonText: {
+    fontSize: 13,
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  followingButton: {
+    backgroundColor: '#E1E8ED',
+  },
+  followingButtonText: {
     color: '#000',
   },
   modalBackground: {

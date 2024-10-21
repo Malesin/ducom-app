@@ -1,23 +1,37 @@
 import React, { useState } from 'react';
 import { SafeAreaView, StyleSheet, Text, View, Pressable, TouchableOpacity } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import DeleteInfo from '../../components/DeleteInfo';
 
 const DeactiveDeleteAccount = ({ navigation }) => {
-  const [selectedOption, setSelectedOption] = useState(null); 
+  const [selectedOption, setSelectedOption] = useState(null);
+  const [showDeleteInfo, setShowDeleteInfo] = useState(false); 
+
 
   const handleDeactivateCheck = () => {
     if (selectedOption === 'deactivate') {
-      setSelectedOption(null); 
+      setSelectedOption(null);
     } else {
-      setSelectedOption('deactivate'); 
+      setSelectedOption('deactivate');
+
     }
   };
 
   const handleDeleteCheck = () => {
     if (selectedOption === 'delete') {
-      setSelectedOption(null); 
+      setSelectedOption(null);
     } else {
-      setSelectedOption('delete'); 
+      setSelectedOption('delete');
+    }
+  };
+
+  // Handler for "Continue" button
+  const handleContinue = () => {
+    if (selectedOption === 'delete') {
+      setShowDeleteInfo(true); 
+    } else {
+      navigation.navigate('VerifyAccount');
+
     }
   };
 
@@ -72,7 +86,7 @@ const DeactiveDeleteAccount = ({ navigation }) => {
             { backgroundColor: selectedOption ? '#001374' : '#ccc' }
           ]}
           disabled={!selectedOption}
-          onPress={() => navigation.navigate('VerifyAccount')}
+          onPress={handleContinue} 
         >
           <Text style={[
             styles.buttonText,
@@ -82,6 +96,7 @@ const DeactiveDeleteAccount = ({ navigation }) => {
           </Text>
         </TouchableOpacity>
       </View>
+      {showDeleteInfo && <DeleteInfo navigation={navigation} />}
     </SafeAreaView>
   );
 };

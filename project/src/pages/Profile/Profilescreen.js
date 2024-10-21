@@ -151,7 +151,7 @@ export default function Profilescreen() {
           </View>
           <View style={styles.statsContainer}>
             <View style={styles.statItem}>
-              <Text style={styles.statNumber}>2</Text>
+              <Text style={styles.statNumber}>0</Text>
               <Text style={styles.statLabel}>Posts</Text>
             </View>
             <View style={styles.statItem}>
