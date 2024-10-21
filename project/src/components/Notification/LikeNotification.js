@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import DefaultAvatar from '../../assets/profilepic.png';
+import PostImage from '../../assets/iya.png';
 import { useNavigation } from '@react-navigation/native';
 import { formatNotification } from '../../pages/Home/formatNotification';
 
@@ -78,6 +79,7 @@ const LikeNotification = ({ likeNotification }) => {
             </View>
             <Text style={styles.notificationText}>Liked your post</Text>
           </View>
+          <Image source={PostImage} style={styles.postImage} />
         </View>
       </TouchableOpacity>
     </SafeAreaView>
@@ -118,13 +120,13 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   userName: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: 'bold',
     color: '#000',
-    marginRight: 5,
+    marginRight: 2,
   },
   userNameAt: {
-    fontSize: 15,
+    fontSize: 13,
     color: '#657786',
     marginRight: 5,
   },
@@ -134,12 +136,16 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
   },
   notificationText: {
-    fontSize: 15,
+    fontSize: 14,
     color: '#000',
   },
   date: {
     fontSize: 13,
     color: '#657786',
+  },
+  postImage: {
+    width: 40,
+    height: 40,
   },
 });
 

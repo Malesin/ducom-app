@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import DefaultAvatar from '../../assets/profilepic.png';
+import PostImage from '../../assets/iya.png';
 import { useNavigation } from '@react-navigation/native';
 import { formatNotification } from '../../pages/Home/formatNotification';
 
@@ -75,13 +76,13 @@ const CommentNotification = ({ commentNotification }) => {
               <Text style={styles.dot}> • </Text>
               <Text style={styles.date}>{formatDate(commentNotification.comment.created_at)}</Text>
             </View>
-            <Text style={styles.comment}>
-              Commented on your post: {commentNotification.post.description.slice(0, 20)}
-              {commentNotification.post.description.length > 20 ? '...' : ''}
-            </Text>
-          </View>
-          <View>
-            <Image source={commentNotification.post.content} style={styles.avatar} />
+            <View style={styles.commentRow}>
+              <Text style={styles.comment}>
+                Commented on your post: {commentNotification.post.description.slice(0, 20)}
+                {commentNotification.post.description.length > 20 ? '...' : ''}
+              </Text>
+              <Image source={PostImage} style={styles.postImage} />
+            </View>
           </View>
         </View>
       </TouchableOpacity>
@@ -133,12 +134,10 @@ const styles = StyleSheet.create({
   userNameAt: {
     fontSize: 15,
     color: '#657786',
-    marginLeft: 5,
   },
   dot: {
     fontSize: 15,
     color: '#657786',
-    marginHorizontal: 5,
   },
   comment: {
     fontSize: 15,
@@ -147,7 +146,14 @@ const styles = StyleSheet.create({
   date: {
     fontSize: 12,
     color: '#657786',
-    marginLeft: 5,
+  },
+  postImage: {
+    width: 35,
+    height: 35,
+  },
+  commentRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 });
 

@@ -3,6 +3,7 @@ import Authscreen from './Auth/Authscreen';
 import Signinscreen from './Auth/Signinscreen';
 import Registerscreen from './Auth/Registerscreen';
 import Homescreen from './Home/Homescreen';
+import SearchPage from './Home/SearchPage';
 import ViewPost from './Home/ViewPost';
 import CreatePost from './Home/CreatePost';
 import Forgotpassword from './Auth/Forgotpassword';
@@ -17,6 +18,7 @@ import AccountInformation from './Settings/AccountInformation';
 import UpdatePassword from './Settings/UpdatePassword';
 import Profilescreen from './Profile/Profilescreen';
 import Notificationscreen from './Home/Notificationscreen';
+import formatNotification from './Home/formatNotification';
 import TermsandConditionscreen from './Settings/TermsandConditionscreen';
 import Likescreen from './Profile/Likescreen';
 import Mediascreen from './Profile/Mediascreen';
@@ -31,7 +33,6 @@ import BlockedUsers from './Settings/BlockedUsers';
 import MutedUsers from './Settings/MutedUsers';
 import DeactiveDeleteAccount from './Settings/DeactiveDeleteAccount';
 import VerifyAccount from './Settings/VerifyAccount';
-import formatNotification from './Home/formatNotification';
 
 export {
   Splashscreen,
@@ -39,6 +40,7 @@ export {
   Signinscreen,
   Registerscreen,
   Homescreen,
+  SearchPage,
   ViewPost,
   CreatePost,
   Forgotpassword,
