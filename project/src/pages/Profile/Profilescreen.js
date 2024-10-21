@@ -9,6 +9,8 @@ import {
   Modal,
   TouchableWithoutFeedback,
   Animated,
+  RefreshControl,
+  ScrollView,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
@@ -30,6 +32,7 @@ export default function Profilescreen() {
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const dropdownAnimation = useRef(new Animated.Value(0)).current;
   const navigation = useNavigation();
+  const [refreshing, setRefreshing] = useState(false);
 
   async function getData() {
     try {
@@ -58,6 +61,11 @@ export default function Profilescreen() {
       getData();
     }, [])
   );
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    getData().finally(() => setRefreshing(false));
+  }, []);
 
   const openModal = () => {
     setModalImageSource(profilePicture);
@@ -97,116 +105,121 @@ export default function Profilescreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.bannerContainer}>
-        <Image
-          source={banner || require('../../assets/banner.png')}
-          style={styles.banner}
-        />
-        <TouchableOpacity
-          style={styles.settingsButton}
-          onPress={toggleDropdown}
-        >
-          <MaterialCommunityIcons name="dots-vertical" size={30} color="#000" />
-        </TouchableOpacity>
-        {dropdownVisible && (
-          <TouchableWithoutFeedback onPress={toggleDropdown}>
-            <View style={styles.dropdownOverlay}>
-              <View style={styles.dropdownMenu}>
-                <TouchableOpacity
-                  style={styles.dropdownItem}
-                  onPress={() => handleDropdownItemPress('Need Help')}
-                >
-                  <MaterialCommunityIcons
-                    name="information"
-                    size={20}
-                    color="#000"
-                    style={styles.dropdownIcon}
-                  />
-                  <Text style={styles.dropdownItemText}>Need Help?</Text>
+      <ScrollView
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+        <View style={styles.bannerContainer}>
+          <Image
+            source={banner || require('../../assets/banner.png')}
+            style={styles.banner}
+          />
+          <TouchableOpacity
+            style={styles.settingsButton}
+            onPress={toggleDropdown}
+          >
+            <MaterialCommunityIcons name="dots-vertical" size={30} color="#000" />
+          </TouchableOpacity>
+          {dropdownVisible && (
+            <TouchableWithoutFeedback onPress={toggleDropdown}>
+              <View style={styles.dropdownOverlay}>
+                <View style={styles.dropdownMenu}>
+                  <TouchableOpacity
+                    style={styles.dropdownItem}
+                    onPress={() => handleDropdownItemPress('Need Help')}
+                  >
+                    <MaterialCommunityIcons
+                      name="information"
+                      size={20}
+                      color="#000"
+                      style={styles.dropdownIcon}
+                    />
+                    <Text style={styles.dropdownItemText}>Need Help?</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.dropdownItem}
+                    onPress={() => handleDropdownItemPress('Settings and Support')}
+                  >
+                    <MaterialCommunityIcons
+                      name="cog"
+                      size={20}
+                      color="#000"
+                      style={styles.dropdownIcon}
+                    />
+                    <Text style={styles.dropdownItemText}>Settings</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </TouchableWithoutFeedback>
+          )}
+          <View style={styles.profileContainer}>
+            <View style={styles.profilePictureContainer}>
+              <TouchableOpacity onPress={openModal}>
+                <Image
+                  source={profilePicture || require('../../assets/profilepic.png')}
+                  style={styles.profile}
+                />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.statsContainer}>
+              <View style={styles.statItem}>
+                <Text style={styles.statNumber}>0</Text>
+                <Text style={styles.statLabel}>Posts</Text>
+              </View>
+              <View style={styles.statItem}>
+                <TouchableOpacity onPress={() => navigation.navigate('Follow')}>
+                  <Text style={styles.statNumber}>0</Text>
+                  <Text style={styles.statLabel}>Followers</Text>
                 </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.dropdownItem}
-                  onPress={() => handleDropdownItemPress('Settings and Support')}
-                >
-                  <MaterialCommunityIcons
-                    name="cog"
-                    size={20}
-                    color="#000"
-                    style={styles.dropdownIcon}
-                  />
-                  <Text style={styles.dropdownItemText}>Settings</Text>
+              </View>
+              <View style={styles.statItem}>
+                <TouchableOpacity onPress={() => navigation.navigate('Follow')}>
+                  <Text style={styles.statNumber}>0</Text>
+                  <Text style={styles.statLabel}>Following</Text>
                 </TouchableOpacity>
               </View>
             </View>
-          </TouchableWithoutFeedback>
-        )}
-        <View style={styles.profileContainer}>
-          <View style={styles.profilePictureContainer}>
-            <TouchableOpacity onPress={openModal}>
-              <Image
-                source={profilePicture || require('../../assets/profilepic.png')}
-                style={styles.profile}
-              />
-            </TouchableOpacity>
           </View>
-          <View style={styles.statsContainer}>
-            <View style={styles.statItem}>
-              <Text style={styles.statNumber}>0</Text>
-              <Text style={styles.statLabel}>Posts</Text>
-            </View>
-            <View style={styles.statItem}>
-              <TouchableOpacity onPress={() => navigation.navigate('Follow')}>
-                <Text style={styles.statNumber}>0</Text>
-                <Text style={styles.statLabel}>Followers</Text>
-              </TouchableOpacity>
-            </View>
-            <View style={styles.statItem}>
-              <TouchableOpacity onPress={() => navigation.navigate('Follow')}>
-                <Text style={styles.statNumber}>0</Text>
-                <Text style={styles.statLabel}>Following</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-
-        </View>
-        <View style={styles.userInfoWrapper}>
-          <View style={styles.userInfoContainer}>
-            <View style={styles.nameContainer}>
-              <Text style={styles.name}>{userData?.name}</Text>
-              {userData?.isAdmin && (
-                <Text style={styles.verifiedIcon}>{verifiedIcon}</Text>
-              )}
-            </View>
-            <Text style={styles.username}>@{userData?.username}</Text>
-            <Text style={styles.description}>
-              {userData?.bio || 'No Description'}
-            </Text>
-          </View>
-          <TouchableOpacity
-            style={styles.editButton}
-            onPress={() => navigation.navigate('EditProfile')}
-          >
-            <Text style={styles.editButtonText}>Edit Profile</Text>
-          </TouchableOpacity>
-        </View>
-        {/*  */}
-        <Modal
-          visible={modalVisible}
-          transparent
-          onRequestClose={closeModal}
-          animationType="fade"
-        >
-          <TouchableWithoutFeedback onPress={closeModal}>
-            <View style={styles.modalBackground}>
-              <View style={styles.modalContainer}>
-                {modalImageSource && (
-                  <Image source={modalImageSource} style={styles.previewImage} />
+          <View style={styles.userInfoWrapper}>
+            <View style={styles.userInfoContainer}>
+              <View style={styles.nameContainer}>
+                <Text style={styles.name}>{userData?.name}</Text>
+                {userData?.isAdmin && (
+                  <Text style={styles.verifiedIcon}>{verifiedIcon}</Text>
                 )}
               </View>
+              <Text style={styles.username}>@{userData?.username}</Text>
+              <Text style={styles.description}>
+                {userData?.bio || 'No Description'}
+              </Text>
             </View>
-          </TouchableWithoutFeedback>
-        </Modal>
-      </View>
+            <TouchableOpacity
+              style={styles.editButton}
+              onPress={() => navigation.navigate('EditProfile')}
+            >
+              <Text style={styles.editButtonText}>Edit Profile</Text>
+            </TouchableOpacity>
+          </View>
+          {/*  */}
+          <Modal
+            visible={modalVisible}
+            transparent
+            onRequestClose={closeModal}
+            animationType="fade"
+          >
+            <TouchableWithoutFeedback onPress={closeModal}>
+              <View style={styles.modalBackground}>
+                <View style={styles.modalContainer}>
+                  {modalImageSource && (
+                    <Image source={modalImageSource} style={styles.previewImage} />
+                  )}
+                </View>
+              </View>
+            </TouchableWithoutFeedback>
+          </Modal>
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
