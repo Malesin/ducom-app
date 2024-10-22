@@ -7,13 +7,13 @@ const SearchedCard = () => {
         <SafeAreaView style={styles.container}>
             <View style={styles.overlay} />
             <View style={styles.card}>
-                <Image source={ProfilePicture} style={styles.profilePicture} />                
+                <Image source={ProfilePicture} style={styles.profilePicture} />
                 <View style={styles.textContainer}>
                     <Text style={styles.username}>ryansunday123</Text>
                     <Text style={styles.handle}>@ryansun</Text>
                     <Text style={styles.description}>
                         bismillah lancar gen z sehat selalu jangan lupa berdoa agar dimudahkan
-                    </Text>                    
+                    </Text>
                     <TouchableOpacity style={styles.followButton}>
                         <Text style={styles.followButtonText}>Follow</Text>
                     </TouchableOpacity>
@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
         right: 0,
         backgroundColor: '#D3D3D3',
         borderRadius: 15,
-        borderWidth: 1,
+        borderWidth: 0.5,
         borderColor: '#000',
         zIndex: -1,
     },
@@ -79,9 +79,9 @@ const styles = StyleSheet.create({
         borderColor: '#000',
         paddingHorizontal: 25,
         paddingVertical: 10,
-        width: '100%',   
-        alignSelf: 'center', 
-        alignItems: 'center', 
+        width: '100%',
+        alignSelf: 'center',
+        alignItems: 'center',
     },
     followButtonText: {
         color: '#fff',
