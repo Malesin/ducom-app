@@ -157,31 +157,75 @@ export default function Profilescreen() {
               </TouchableOpacity>
             </View>
             <View style={styles.statsContainer}>
-              {['Posts', 'Followers', 'Following'].map((label) => (
-                <View style={styles.statItem} key={label}>
-                  {!userData ? (
-                    <>
-                      <Skeleton
-                        animation="pulse"
-                        height={18}
-                        width={30}
-                        style={[styles.skeleton, { borderRadius: 3 }]} 
-                      />
-                      <Skeleton
-                        animation="pulse"
-                        height={14}
-                        width={60}
-                        style={[styles.skeleton, { borderRadius: 3 }]} 
-                      />
-                    </>
-                  ) : (
-                    <>
-                      <Text style={styles.statNumber}>0</Text>
-                      <Text style={styles.statLabel}>{label}</Text>
-                    </>
-                  )}
-                </View>
-              ))}
+              <View style={styles.statItem}>
+                {!userData ? (
+                  <>
+                    <Skeleton
+                      animation="pulse"
+                      height={18}
+                      width={30}
+                      style={[styles.skeleton, { borderRadius: 3 }]}
+                    />
+                    <Skeleton
+                      animation="pulse"
+                      height={14}
+                      width={60}
+                      style={[styles.skeleton, { borderRadius: 3 }]}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <Text style={styles.statNumber}>{userData?.postCount || 0}</Text>
+                    <Text style={styles.statLabel}>Posts</Text>
+                  </>
+                )}
+              </View>
+              <View style={styles.statItem}>
+                {!userData ? (
+                  <>
+                    <Skeleton
+                      animation="pulse"
+                      height={18}
+                      width={30}
+                      style={[styles.skeleton, { borderRadius: 3 }]}
+                    />
+                    <Skeleton
+                      animation="pulse"
+                      height={14}
+                      width={60}
+                      style={[styles.skeleton, { borderRadius: 3 }]}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <Text style={styles.statNumber}>{userData ? userData?.followers.length : 0}</Text>
+                    <Text style={styles.statLabel}>Followers</Text>
+                  </>
+                )}
+              </View>
+              <View style={styles.statItem}>
+                {!userData ? (
+                  <>
+                    <Skeleton
+                      animation="pulse"
+                      height={18}
+                      width={30}
+                      style={[styles.skeleton, { borderRadius: 3 }]}
+                    />
+                    <Skeleton
+                      animation="pulse"
+                      height={14}
+                      width={60}
+                      style={[styles.skeleton, { borderRadius: 3 }]}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <Text style={styles.statNumber}>{userData ? userData?.following.length : 0}</Text>
+                    <Text style={styles.statLabel}>Following</Text>
+                  </>
+                )}
+              </View>
             </View>
           </View>
           <View style={styles.userInfoWrapper}>
@@ -311,9 +355,8 @@ const styles = StyleSheet.create({
     marginRight: 5,
   },
   verifiedIcon: {
-    marginLeft: 5,
-    marginTop: 5,
-    marginRight: 5,
+    marginLeft: -1,
+    marginTop: -3,
   },
   username: {
     fontSize: 14,
