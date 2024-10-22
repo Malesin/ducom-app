@@ -94,9 +94,9 @@ const Userprofile = ({ userIdPost, navigation, idUser }) => {
 
   const handleDropdownItemPress = item => {
     if (item === 'Report') {
-      navigation.navigate('Report');
+      navigation.navigate('Report'); 
     }
-    // console.log(item);
+    console.log(item);
     toggleDropdown();
   };
 

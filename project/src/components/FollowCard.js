@@ -16,7 +16,7 @@ const FollowCard = ({ followText, followingText }) => {
                 source={ProfileImage}
                 style={styles.profileImage}
             />
-            <Text style={styles.username}>zhaa_191</Text>
+            <Text style={styles.username}>mikadotjees</Text>
             <TouchableOpacity
                 style={[styles.messageButton, isFollowing && styles.followingButton]}
                 onPress={handleFollowToggle}
