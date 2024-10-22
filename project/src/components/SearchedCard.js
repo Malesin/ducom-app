@@ -2,15 +2,18 @@ import React from 'react';
 import { Image, SafeAreaView, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import ProfilePicture from '../assets/iya.png';
 
-const SearchedCard = () => {
+const SearchedCard = ({ search, myData, onClose }) => {
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.overlay} />
             <View style={styles.card}>
-                <Image source={ProfilePicture} style={styles.profilePicture} />
+                <Image source={
+                    search?.profilePicture
+                        ? { uri: search?.profilePicture }
+                        : require('../assets/profilepic.png')} style={styles.profilePicture} />
                 <View style={styles.textContainer}>
-                    <Text style={styles.username}>ryansunday123</Text>
-                    <Text style={styles.handle}>@ryansun</Text>
+                    <Text style={styles.username}>{search?.username}</Text>
+                    <Text style={styles.handle}>@{search?.username}</Text>
                     <Text style={styles.description}>
                         bismillah lancar gen z sehat selalu jangan lupa berdoa agar dimudahkan
                     </Text>

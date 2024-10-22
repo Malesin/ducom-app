@@ -94,16 +94,15 @@ const SearchPage = ({ navigation }) => {
                 )}
             </View>
             <ScrollView style={styles.searchedContainer} showsVerticalScrollIndicator={false}>
-                <SearchedCard />
-//                 {searchText.length > 0 && searchs.map((search, index) => (
-//                     <View key={index} >
-//                         <SearchResultCard
-//                             search={search}
-//                             myData={myData}
-//                             onClose={() => console.log('Close button pressed')}
-//                         />
-//                     </View>
-//                 ))}
+                {searchText.length > 0 && searchs.map((search, index) => (
+                     <View key={index} >
+                         <SearchedCard
+                             search={search}
+                             myData={myData}
+                             onClose={() => console.log('Close button pressed')}
+                         />
+                     </View>
+                 ))}
                 {/* <Text style={styles.searchedText}>Recently Searched</Text> */}
             </ScrollView>
         </SafeAreaView>
