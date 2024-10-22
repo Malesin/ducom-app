@@ -1,7 +1,7 @@
 import { StyleSheet, View, TextInput, SafeAreaView, TouchableOpacity, Text, ScrollView, Image } from 'react-native';
 import React, { useState, useRef } from 'react';
-import ProfilePicture from '../../assets/iya.png';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import SearchedCard from '../../components/SearchedCard';
 
 const SearchPage = ({ navigation }) => {
     const [searchText, setSearchText] = useState('');
@@ -44,16 +44,7 @@ const SearchPage = ({ navigation }) => {
                 )}
             </View>
             <ScrollView style={styles.searchedContainer} showsVerticalScrollIndicator={false}>
-                <Text style={styles.searchedText}>Recently Searched</Text>
-                <TouchableOpacity style={styles.searchedItemContainer}>
-                    <View style={styles.profileTextContainer}>
-                        <Image source={ProfilePicture} style={styles.profilePicture} />
-                        <Text style={styles.searchedItemText}>mikadotjees</Text>
-                    </View>
-                    <TouchableOpacity>
-                        <MaterialIcons style={styles.closeIcon} name="close" size={20} color="#000" />
-                    </TouchableOpacity>
-                </TouchableOpacity>
+                <SearchedCard />
             </ScrollView>
         </SafeAreaView>
     );
@@ -108,40 +99,7 @@ const styles = StyleSheet.create({
     },
     searchedContainer: {
         flex: 1,
-        paddingHorizontal: 10,
-    },
-    searchedText: {
-        fontSize: 14,
-        fontWeight: 'bold',
-        marginTop: 10,
-        color: '#000',
-    },
-    searchedItemContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: 10,
-        borderRadius: 10,
-        borderBottomWidth: 2,
-        borderBottomColor: '#ccc',
-        marginHorizontal: -10,
-    },
-    profileTextContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        flex: 1,
-    },
-    profilePicture: {
-        width: 40,
-        height: 40,
-        borderRadius: 100,
-        marginRight: 10,
-    },
-    searchedItemText: {
-        fontSize: 14,
-        color: '#000',
-    },
-    closeIcon: {
-        marginLeft: 10,
+        paddingHorizontal: 15,
+        paddingVertical: 10,
     },
 });
