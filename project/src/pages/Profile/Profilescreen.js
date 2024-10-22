@@ -39,7 +39,7 @@ export default function Profilescreen() {
       const userResponse = await axios.post(`${serverUrl}/userdata`, { token });
       const user = userResponse.data.data;
 
-      // Tambahkan delay 3 detik sebelum mengatur data
+      // delay 3 detik sebelum mengatur data
       setTimeout(() => {
         setUserData(user);
 
@@ -49,7 +49,7 @@ export default function Profilescreen() {
         if (user.profilePicture) {
           setProfilePicture({ uri: user.profilePicture });
         }
-      }, 2500); // 3000 ms = 3 detik
+      }, 2500); 
     } catch (error) {
       console.error('Error occurred:', error);
     }

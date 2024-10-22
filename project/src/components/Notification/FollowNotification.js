@@ -5,22 +5,30 @@ import ProfilePicture from '../../assets/iya.png';
 const FollowNotification = () => {
     const [isFollowing, setIsFollowing] = useState(false);
 
-    const handlePress = () => {
-        setIsFollowing(!isFollowing);
+    const handleFollowPress = () => {
+        setIsFollowing(!isFollowing);  // Toggle the follow state
     };
 
     return (
         <SafeAreaView style={styles.container}>
             <Image source={ProfilePicture} style={styles.profilePicture} />
             <View style={styles.textContainer}>
-                <Text style={styles.username}>zhaa_191</Text>
+                <Text style={styles.username}>mikadotjees</Text>
                 <Text style={styles.message}>started following you. <Text style={styles.time}>1d</Text></Text>
             </View>
             <TouchableOpacity
-                style={[styles.followButton, isFollowing && styles.followingButton]}
-                onPress={handlePress}
+                style={[
+                    styles.followButton,
+                    isFollowing ? styles.followingButton : styles.followButtonUnpressed
+                ]}
+                onPress={handleFollowPress}
             >
-                <Text style={[styles.followButtonText, isFollowing && styles.followingButtonText]}>
+                <Text
+                    style={[
+                        styles.followButtonText,
+                        isFollowing ? styles.followingButtonText : styles.followButtonUnpressedText
+                    ]}
+                >
                     {isFollowing ? 'Following' : 'Follow Back'}
                 </Text>
             </TouchableOpacity>
@@ -62,21 +70,26 @@ const styles = StyleSheet.create({
         fontSize: 12,
     },
     followButton: {
-        borderWidth: 1,
         borderRadius: 5,
         paddingVertical: 5,
-        paddingHorizontal: 15,
-        backgroundColor: 'navy',
+        paddingHorizontal: 20,
     },
-    followButtonText: {
-        fontWeight: 'bold',
+    followButtonUnpressed: {
+        backgroundColor: '#001374', 
+        borderColor: '#001374',
+        borderWidth: 1,
+    },
+    followButtonUnpressedText: {
         color: '#fff',
+        fontWeight: 'bold',
     },
     followingButton: {
-        backgroundColor: '#fff',
-        borderColor: '#000',
+        backgroundColor: '#fff', 
+        borderColor: '#000', 
+        borderWidth: 1,
     },
     followingButtonText: {
         color: '#000',
+        fontWeight: 'bold',
     },
 });
