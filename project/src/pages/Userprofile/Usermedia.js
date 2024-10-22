@@ -10,7 +10,7 @@ import {
 import TweetCard from '../../components/TweetCard';
 import axios from 'axios';
 import config from '../../config';
-import { Skeleton } from 'react-native-elements'; 
+import { Skeleton } from 'react-native-elements';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const serverUrl = config.SERVER_URL;
@@ -31,33 +31,35 @@ const Usermedia = ({ userIdPost, profilePicture }) => {
       console.log('Data Berhasil Diambil');
 
       const dataTweet = userResponse.data.data;
-      console.log('Fetched tweets:', dataTweet); 
+      console.log('Fetched tweets:', dataTweet);
 
-      const formattedTweets = dataTweet.map(post => ({
-        id: post._id,
-        userAvatar: post.user.profilePicture,
-        userName: post.user.name,
-        userHandle: post.user.username,
-        postDate: post.created_at,
-        content: post.description,
-        media: Array.isArray(post.media)
-          ? post.media.map(mediaItem => ({
-            type: mediaItem.type,
-            uri: mediaItem.uri,
-          }))
-          : [],
-        likesCount: post.likes.length,
-        commentsCount: post.comments.length,
-        bookMarksCount: post.bookmarks.length,
-        isLiked: post.likes.some(like => like._id === userIdPost),
-        isBookmarked: post.bookmarks.some(
-          bookmark => bookmark.user === userIdPost,
-        ),
-        userIdPost: post.user._id,
-        profilePicture: profilePicture,
-        commentsEnabled: post.commentsEnabled,
-        isAdmin: post.user.isAdmin
-      }));
+      const formattedTweets = dataTweet
+        .filter(post => post.user !== null)
+        .map(post => ({
+          id: post._id,
+          userAvatar: post.user.profilePicture,
+          userName: post.user.name,
+          userHandle: post.user.username,
+          postDate: post.created_at,
+          content: post.description,
+          media: Array.isArray(post.media)
+            ? post.media.map(mediaItem => ({
+              type: mediaItem.type,
+              uri: mediaItem.uri,
+            }))
+            : [],
+          likesCount: post.likes.length,
+          commentsCount: post.comments.length,
+          bookMarksCount: post.bookmarks.length,
+          isLiked: post.likes.some(like => like._id === userIdPost),
+          isBookmarked: post.bookmarks.some(
+            bookmark => bookmark.user === userIdPost,
+          ),
+          userIdPost: post.user._id,
+          profilePicture: profilePicture,
+          commentsEnabled: post.commentsEnabled,
+          isAdmin: post.user.isAdmin
+        }));
 
       setTweets(formattedTweets);
     } catch (error) {
@@ -71,7 +73,7 @@ const Usermedia = ({ userIdPost, profilePicture }) => {
         console.error("Error fetching tweets:", error);
       }
     } finally {
-      setLoading(false); 
+      setLoading(false);
     }
   }, [userIdPost]);
 

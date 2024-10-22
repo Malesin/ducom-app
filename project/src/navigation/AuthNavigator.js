@@ -166,9 +166,10 @@ export default function MainNavigation() {
         <Stack.Screen
           name="VerifyAccount"
           component={VerifyAccount}
-          options={{
-            headerShown: true, title: 'Deactivate or Delete Account'
-          }}
+          options={({ route }) => ({
+            headerShown: true,
+            title: route.params?.choice === 'delete' ? 'Delete Account' : 'Deactivate Account'
+          })}
         />
       </Stack.Navigator>
     </NavigationContainer>

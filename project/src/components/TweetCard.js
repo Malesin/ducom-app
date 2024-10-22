@@ -186,7 +186,7 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
       if (reposted) {
         setReposted(false);
         setRepostsCount(prevRepostsCount => prevRepostsCount - 1);
-        axios
+        await axios
           .post(`${serverUrl}/unrepost-post`, {
             token: token,
             postId: tweet.id
@@ -202,7 +202,7 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
       } else {
         setReposted(true);
         setRepostsCount(prevRepostsCount => prevRepostsCount + 1);
-        axios
+        await axios
           .post(`${serverUrl}/repost-post`, {
             token: token,
             postId: tweet.id

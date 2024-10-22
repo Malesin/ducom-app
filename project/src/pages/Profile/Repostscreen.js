@@ -34,40 +34,41 @@ function Repostscreen({ navigation }) {
                 ]);
                 return [];
             }
-            
+
             const idUser = data._id;
             const profilePicture = data.profilePicture
 
             const responseTweet = await axios.post(`${serverUrl}/reposts`, { token });
             const dataTweet = responseTweet.data.data;
-            console.log("response:", dataTweet[0].reposts)
 
-            const formattedTweets = dataTweet.map(post => ({
-                id: post._id,
-                userAvatar: post.user.profilePicture,
-                userName: post.user.name,
-                userHandle: post.user.username,
-                postDate: post.created_at,
-                content: post.description,
-                media: Array.isArray(post.media)
-                    ? post.media.map(mediaItem => ({
-                        type: mediaItem.type,
-                        uri: mediaItem.uri,
-                    }))
-                    : [],
-                likesCount: post.likes.length,
-                commentsCount: post.comments.length,
-                bookMarksCount: post.bookmarks.length,
-                repostsCount: post.reposts.length,
-                isLiked: post.likes.some(like => like._id === idUser),
-                isBookmarked: post.bookmarks.some(bookmark => bookmark.user === idUser),
-                isReposted: post.reposts.some(repost => repost.user._id === idUser),
-                userIdPost: post.user._id,
-                idUser: idUser,
-                profilePicture: profilePicture,
-                commentsEnabled: post.commentsEnabled,
-                isAdmin: post.user.isAdmin
-            }));
+            const formattedTweets = dataTweet
+                .filter(post => post.user !== null) 
+                .map(post => ({
+                    id: post._id,
+                    userAvatar: post.user.profilePicture,
+                    userName: post.user.name,
+                    userHandle: post.user.username,
+                    postDate: post.created_at,
+                    content: post.description,
+                    media: Array.isArray(post.media)
+                        ? post.media.map(mediaItem => ({
+                            type: mediaItem.type,
+                            uri: mediaItem.uri,
+                        }))
+                        : [],
+                    likesCount: post.likes.length,
+                    commentsCount: post.comments.length,
+                    bookMarksCount: post.bookmarks.length,
+                    repostsCount: post.reposts.length,
+                    isLiked: post.likes.some(like => like._id === idUser),
+                    isBookmarked: post.bookmarks.some(bookmark => bookmark.user === idUser),
+                    isReposted: post.reposts.some(repost => repost.user._id === idUser),
+                    userIdPost: post.user._id,
+                    idUser: idUser,
+                    profilePicture: profilePicture,
+                    commentsEnabled: post.commentsEnabled,
+                    isAdmin: post.user.isAdmin
+                }));
 
             return formattedTweets;
         } catch (error) {
@@ -77,8 +78,6 @@ function Repostscreen({ navigation }) {
             setLoadingMore(false);
         }
     }, [navigation]);
-
-    console.log("reposted:", tweets.isReposted)
 
     useFocusEffect(
         useCallback(() => {

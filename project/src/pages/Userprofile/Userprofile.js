@@ -21,7 +21,7 @@ const serverUrl = config.SERVER_URL;
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { DrawerContentScrollView } from '@react-navigation/drawer';
 
-const Userprofile = ({ userIdPost, navigation, tweet }) => {
+const Userprofile = ({ userIdPost, navigation, idUser }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [banner, setBanner] = useState(false);
   const [profilePicture, setProfilePicture] = useState(false);
@@ -45,7 +45,7 @@ const Userprofile = ({ userIdPost, navigation, tweet }) => {
       const user = userResponse.data.data;
       setUserData(user);
 
-      const isFollow = user.followers.some(follow => follow === tweet.idUser)
+      const isFollow = user.followers.some(follow => follow === idUser)
       setIsFollowing(isFollow)
 
       if (user.username) {
