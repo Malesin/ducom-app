@@ -166,39 +166,90 @@ const Userprofile = ({ userIdPost, navigation, tweet }) => {
             </TouchableOpacity>
           </View>
           <View style={styles.statsContainer}>
-            <View style={styles.statItem}>
-              <Text style={styles.statNumber}>0</Text>
-              <Text style={styles.statLabel}>Posts</Text>
-            </View>
-            <View style={styles.statItem}>
-              <Text style={styles.statNumber}>0</Text>
-              <Text style={styles.statLabel}>Followers</Text>
-            </View>
-            <View style={styles.statItem}>
-              <Text style={styles.statNumber}>0</Text>
-              <Text style={styles.statLabel}>Following</Text>
-            </View>
+            {['Posts', 'Followers', 'Following'].map((label) => (
+              <View style={styles.statItem} key={label}>
+                {!userData ? (
+                  <>
+                    <Skeleton
+                      animation="pulse"
+                      height={18}
+                      width={30}
+                      style={[styles.skeleton, { borderRadius: 3 }]}
+                    />
+                    <Skeleton
+                      animation="pulse"
+                      height={14}
+                      width={60}
+                      style={[styles.skeleton, { borderRadius: 3 }]}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <Text style={styles.statNumber}>0</Text>
+                    <Text style={styles.statLabel}>{label}</Text>
+                  </>
+                )}
+              </View>
+            ))}
           </View>
         </View>
         <View style={styles.userInfoWrapper}>
           <View style={styles.userInfoContainer}>
             <View style={styles.nameContainer}>
-              <Text style={styles.name}>{userData?.name}</Text>
-              {userData?.isAdmin ? (<Text style={styles.verifiedIcon}>{verifiedIcon}</Text>) : null}
+              {!userData ? (
+                <Skeleton
+                  animation="pulse"
+                  height={20}
+                  width={150}
+                  style={[styles.skeleton, { borderRadius: 3 }]}
+                />
+              ) : (
+                <Text style={styles.name}>{userData?.name}</Text>
+              )}
+              {userData?.isAdmin && (
+                <Text style={styles.verifiedIcon}>{verifiedIcon}</Text>
+              )}
             </View>
-            <Text style={styles.username}>@{userData?.username}</Text>
-            <Text style={styles.description}>
-              {userData?.bio || 'No Description'}
-            </Text>
+            {!userData ? (
+              <Skeleton
+                animation="pulse"
+                height={14}
+                width={100}
+                style={[styles.skeleton, { borderRadius: 3 }]}
+              />
+            ) : (
+              <Text style={styles.username}>@{userData?.username}</Text>
+            )}
+            {!userData ? (
+              <Skeleton
+                animation="pulse"
+                height={13}
+                width={200}
+                style={[styles.skeleton, { borderRadius: 3 }]}
+              />
+            ) : (
+              <Text style={styles.description}>
+                {userData?.bio || 'No Description'}
+              </Text>
+            )}
           </View>
-          <TouchableOpacity
-            style={[styles.editButton, isFollowing && styles.followingButton]}
-            onPress={handleFollowPress}
-          >
-            <Text style={[styles.editButtonText, isFollowing && styles.followingButtonText]}>
-              {isFollowing ? 'Following' : 'Follow'}
-            </Text>
-          </TouchableOpacity>
+          {!userData ? (
+            <Skeleton
+              animation="pulse"
+              height={28}
+              width={120}
+              style={[styles.skeleton, { marginRight: 14, borderRadius: 14 }]}
+            />
+          ) : (
+            <TouchableOpacity
+              style={[styles.editButton, isFollowing && styles.followingButton]}
+              onPress={handleFollowPress}
+            >
+              <Text style={[styles.editButtonText, isFollowing && styles.followingButtonText]}>
+                {isFollowing ? 'Following' : 'Follow'}
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
       <Modal
