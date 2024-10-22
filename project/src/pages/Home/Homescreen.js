@@ -11,7 +11,7 @@ import {
   ActivityIndicator,
   Text,
 } from 'react-native';
-import NetInfo from '@react-native-community/netinfo'; 
+import NetInfo from '@react-native-community/netinfo';
 import { useFocusEffect } from '@react-navigation/native';
 import TweetCard from '../../components/TweetCard';
 import PinTweetCard from '../../components/PinTweetCard';
@@ -122,7 +122,7 @@ const HomeScreen = ({ navigation }) => {
     }
   };
 
-  // Tweet Pinned
+  // Pinned Tweet
   const fetchPinTweet = async () => {
     try {
       const token = await AsyncStorage.getItem('token');
@@ -148,7 +148,7 @@ const HomeScreen = ({ navigation }) => {
       const postPin = pinPost.data.data.post;
 
       if (!postPin) {
-        return null; 
+        return null;
       }
       const totalComments = postPin.comments.length + postPin.comments.reduce((acc, comment) => acc + comment.replies.length, 0);
 
@@ -186,7 +186,7 @@ const HomeScreen = ({ navigation }) => {
       return pinTweet;
     } catch (error) {
       console.error('Error fetching pinned tweets:', error);
-      return null; 
+      return null;
     }
   };
 
@@ -223,21 +223,21 @@ const HomeScreen = ({ navigation }) => {
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    setShowSkeleton(true); 
-    setHasMore(true); 
+    setShowSkeleton(true);
+    setHasMore(true);
     const newTweets = await fetchTweets(1);
     const newPinTweet = await fetchPinTweet();
     if (newPinTweet) {
-      setPinTweets([newPinTweet]); 
-      setPinnedTweetId(newPinTweet.id); 
+      setPinTweets([newPinTweet]);
+      setPinnedTweetId(newPinTweet.id);
     } else {
       setPinTweets([]);
-      setPinnedTweetId(null); 
+      setPinnedTweetId(null);
     }
-    const filteredTweets = newTweets.filter(tweet => tweet.id !== newPinTweet?.id); 
+    const filteredTweets = newTweets.filter(tweet => tweet.id !== newPinTweet?.id);
     setTweets(filteredTweets.slice(0, 4));
     setRefreshing(false);
-    setShowSkeleton(false); 
+    setShowSkeleton(false);
   }, [isConnected]);
 
   const LoadingIndicator = () => {
@@ -281,18 +281,18 @@ const HomeScreen = ({ navigation }) => {
   useEffect(() => {
     const loadInitialTweets = async () => {
       const initialTweets = await fetchTweets(1);
-      const initialPinTweets = await fetchPinTweet(); 
+      const initialPinTweets = await fetchPinTweet();
       if (initialPinTweets) {
-        setPinTweets([initialPinTweets]); 
-        setPinnedTweetId(initialPinTweets.id); 
+        setPinTweets([initialPinTweets]);
+        setPinnedTweetId(initialPinTweets.id);
       } else {
-        setPinTweets([]); 
-        setPinnedTweetId(null); 
+        setPinTweets([]);
+        setPinnedTweetId(null);
       }
-      const filteredTweets = initialTweets.filter(tweet => tweet.id !== initialPinTweets?.id); 
-      setTweets(filteredTweets.slice(0, 5)); 
+      const filteredTweets = initialTweets.filter(tweet => tweet.id !== initialPinTweets?.id);
+      setTweets(filteredTweets.slice(0, 5));
       setLoading(false);
-      setShowSkeleton(false); 
+      setShowSkeleton(false);
     };
     loadInitialTweets();
   }, [isConnected]);
@@ -302,7 +302,7 @@ const HomeScreen = ({ navigation }) => {
       const checkLoginStatus = async () => {
         const token = await AsyncStorage.getItem('token');
         if (!token) {
-          navigation.navigate('Auths'); 
+          navigation.navigate('Auths');
         }
       };
       checkLoginStatus();
@@ -320,7 +320,7 @@ const HomeScreen = ({ navigation }) => {
       mediaType: 'photo',
       saveToPhotos: true,
     };
-
+    
     ImagePicker.launchCamera(options, response => {
       if (response.didCancel) {
         console.log('User cancelled photo');
@@ -395,15 +395,15 @@ const HomeScreen = ({ navigation }) => {
   const handleLoadMore = async () => {
     if (!loadingMore && hasMore) {
       setLoadingMore(true);
-      const moreTweets = await fetchTweets(page + 1); 
+      const moreTweets = await fetchTweets(page + 1);
       const newTweets = moreTweets.filter(
-        tweet => !tweets.some(existingTweet => existingTweet.id === tweet.id) && tweet.id !== pinnedTweetId, 
+        tweet => !tweets.some(existingTweet => existingTweet.id === tweet.id) && tweet.id !== pinnedTweetId,
       );
       if (newTweets.length > 0) {
-        setTweets(prevTweets => [...prevTweets, ...newTweets.slice(0, 5)]); 
+        setTweets(prevTweets => [...prevTweets, ...newTweets.slice(0, 5)]);
       }
       setLoadingMore(false);
-      if (newTweets.length < 4) { 
+      if (newTweets.length < 4) {
         setHasMore(false);
       }
     }
@@ -431,7 +431,7 @@ const HomeScreen = ({ navigation }) => {
               <Skeleton
                 animation="pulse"
                 height={14}
-                width="15%" 
+                width="15%"
                 style={styles.skeleton}
               />
             </View>
@@ -439,13 +439,13 @@ const HomeScreen = ({ navigation }) => {
           <Skeleton
             animation="pulse"
             height={20}
-            width="75%" 
+            width="75%"
             style={[styles.skeleton, { borderRadius: 3 }]}
           />
           <Skeleton
             animation="pulse"
             height={200}
-            width="100%" 
+            width="100%"
             style={[styles.skeleton, { borderRadius: 7 }]}
           />
         </View>
@@ -580,14 +580,14 @@ const styles = StyleSheet.create({
   },
   skeletonContainer: {
     padding: 20,
-    alignItems: 'flex-start', 
-    width: '100%', 
+    alignItems: 'flex-start',
+    width: '100%',
   },
   skeletonHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 10,
-    width: '100%', 
+    width: '100%',
   },
   skeletonAvatar: {
     marginRight: 10,

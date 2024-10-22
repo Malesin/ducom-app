@@ -165,13 +165,13 @@ export default function Profilescreen() {
                         animation="pulse"
                         height={18}
                         width={30}
-                        style={[styles.skeleton, { borderRadius: 3 }]} // Ubah borderRadius ke 3
+                        style={[styles.skeleton, { borderRadius: 3 }]} 
                       />
                       <Skeleton
                         animation="pulse"
                         height={14}
                         width={60}
-                        style={[styles.skeleton, { borderRadius: 3 }]} // Ubah borderRadius ke 3
+                        style={[styles.skeleton, { borderRadius: 3 }]} 
                       />
                     </>
                   ) : (
@@ -192,7 +192,7 @@ export default function Profilescreen() {
                     animation="pulse"
                     height={20}
                     width={150}
-                    style={[styles.skeleton, { borderRadius: 3 }]} // Ubah borderRadius ke 3
+                    style={[styles.skeleton, { borderRadius: 3 }]} 
                   />
                 ) : (
                   <Text style={styles.name}>{userData?.name}</Text>
@@ -206,7 +206,7 @@ export default function Profilescreen() {
                   animation="pulse"
                   height={14}
                   width={100}
-                  style={[styles.skeleton, { borderRadius: 3 }]} // Ubah borderRadius ke 3
+                  style={[styles.skeleton, { borderRadius: 3 }]} 
                 />
               ) : (
                 <Text style={styles.username}>@{userData?.username}</Text>
@@ -216,7 +216,7 @@ export default function Profilescreen() {
                   animation="pulse"
                   height={13}
                   width={200}
-                  style={[styles.skeleton, { borderRadius: 3 }]} // Ubah borderRadius ke 3
+                  style={[styles.skeleton, { borderRadius: 3 }]} 
                 />
               ) : (
                 <Text style={styles.description}>
@@ -230,7 +230,7 @@ export default function Profilescreen() {
                 height={28}
                 width={120}
                 borderRadius={14}
-                style={[styles.skeleton, { marginRight: 14, borderRadius: 3 }]} // Ubah borderRadius ke 3
+                style={[styles.skeleton, { marginRight: 14, borderRadius: 3 }]} 
               />
             ) : (
               <TouchableOpacity
@@ -281,8 +281,8 @@ const styles = StyleSheet.create({
     top: 10,
     right: 10,
     borderRadius: 30,
-    padding: 3,
-    backgroundColor: 'rgba(217, 217, 217, 0.2)',
+    padding: 5,
+    backgroundColor: 'rgba(217, 217, 217, 0.5)',
   },
   profileContainer: {
     flexDirection: 'row',
@@ -371,11 +371,8 @@ const styles = StyleSheet.create({
   },
   dropdownOverlay: {
     position: 'absolute',
-    top: 40,
+    top: 50,
     right: 10,
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
-    width: '100%',
-    height: '100%',
   },
   dropdownMenu: {
     position: 'absolute',

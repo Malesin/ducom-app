@@ -46,12 +46,13 @@ const SearchPage = ({ navigation }) => {
             <ScrollView style={styles.searchedContainer} showsVerticalScrollIndicator={false}>
                 <Text style={styles.searchedText}>Recently Searched</Text>
                 <TouchableOpacity style={styles.searchedItemContainer}>
-                    {/* Wrap profile picture and text in a view */}
                     <View style={styles.profileTextContainer}>
                         <Image source={ProfilePicture} style={styles.profilePicture} />
                         <Text style={styles.searchedItemText}>mikadotjees</Text>
                     </View>
-                    <MaterialIcons style={styles.closeIcon} name="close" size={20} color="#000" />
+                    <TouchableOpacity>
+                        <MaterialIcons style={styles.closeIcon} name="close" size={20} color="#000" />
+                    </TouchableOpacity>
                 </TouchableOpacity>
             </ScrollView>
         </SafeAreaView>

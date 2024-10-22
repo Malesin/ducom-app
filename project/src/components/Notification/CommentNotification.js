@@ -24,7 +24,7 @@ const CommentNotification = ({ commentNotification }) => {
     }
   };
 
-  const formatDate = dateString => {
+  const formatDate = (dateString) => {
     const date = new Date(dateString);
     const now = new Date();
     const diffInSeconds = Math.floor((now - date) / 1000);
@@ -60,8 +60,6 @@ const CommentNotification = ({ commentNotification }) => {
     return `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
   };
 
-  console.log(commentNotification)
-
   return (
     <SafeAreaView style={styles.card}>
       <TouchableOpacity onPress={handleCommentNotification}>
@@ -76,12 +74,19 @@ const CommentNotification = ({ commentNotification }) => {
               <Text style={styles.dot}> • </Text>
               <Text style={styles.date}>{formatDate(commentNotification.comment.created_at)}</Text>
             </View>
-            <View style={styles.commentRow}>
-              <Text style={styles.comment}>
-                Commented on your post: {commentNotification.post.description.slice(0, 20)}
-                {commentNotification.post.description.length > 20 ? '...' : ''}
-              </Text>
-              <Image source={PostImage} style={styles.postImage} />
+            <View style={styles.commentRowContainer}>
+              <View style={styles.commentRow}>
+                <Text style={styles.comment}>
+                  Commented on your post:
+                </Text>
+                <Text style={styles.commentDescription} >
+                  {commentNotification.post.description.slice(0, 20)}
+                  {commentNotification.post.description.length > 20 ? '...' : ''}
+                </Text>
+              </View>
+              <View style={styles.postMediaContainer}>
+                <Image source={PostImage} style={styles.postImage} />
+              </View>
             </View>
           </View>
         </View>
@@ -127,34 +132,47 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   nameAt: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: 'bold',
     color: '#000',
   },
   userNameAt: {
-    fontSize: 15,
+    fontSize: 14,
     color: '#657786',
   },
   dot: {
-    fontSize: 15,
+    fontSize: 13,
     color: '#657786',
   },
+  commentRowContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between', // Ensure the comment and image are spaced apart
+    alignItems: 'center',
+  },
   comment: {
-    fontSize: 15,
+    fontSize: 14,
+    color: '#000',
+  },
+  commentDescription: {
+    fontSize: 14,
     color: '#000',
   },
   date: {
     fontSize: 12,
     color: '#657786',
   },
+  postMediaContainer: {
+    alignSelf: 'flex-end', // Moves the image to the right
+  },
   postImage: {
     width: 35,
     height: 35,
   },
   commentRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: 'column',
+    alignItems: 'flex-start',
   },
 });
 
 export default CommentNotification;
+

@@ -170,6 +170,13 @@ function Postscreen({ }) {
     const postId = tweet.id;
     const idUser = tweet.idUser;
     const focusCommentInput = true;
+
+    navigation.navigate('ViewPost', {
+      tweet: tweet,
+      comments: comments,
+      focusCommentInput: focusCommentInput,
+      isUserProfile: true,
+    });
   };
 
   const onRefreshPage = () => {
@@ -306,7 +313,7 @@ function Postscreen({ }) {
           {pintweets.map((tweet, index) => (
             <View key={index} style={styles.tweetContainer}>
               <TouchableOpacity onPress={() => handlePostPress(tweet)}>
-                <PinTweetCard tweet={tweet} onRefreshPage={onRefreshPage} isUserProfile={true}/>
+                <PinTweetCard tweet={tweet} onRefreshPage={onRefreshPage} isUserProfile={true} />
               </TouchableOpacity>
             </View>
           ))}
@@ -314,7 +321,7 @@ function Postscreen({ }) {
             tweets.map((tweet, index) => (
               <View key={index} style={styles.tweetContainer}>
                 <TouchableOpacity onPress={() => handlePostPress(tweet)}>
-                  <TweetCard tweet={tweet} onRefreshPage={onRefreshPage} isUserProfile={true}/>
+                  <TweetCard tweet={tweet} onRefreshPage={onRefreshPage} isUserProfile={true} />
                 </TouchableOpacity>
               </View>
             ))

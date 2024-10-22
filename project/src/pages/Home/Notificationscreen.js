@@ -14,7 +14,7 @@ const serverUrl = config.SERVER_URL;
 const Notificationscreen = () => {
   const [allNotifications, setAllNotifications] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
-  const [showSkeleton, setShowSkeleton] = useState(true); 
+  const [showSkeleton, setShowSkeleton] = useState(true);
 
   const fetchNotifications = async () => {
     try {
@@ -81,13 +81,13 @@ const Notificationscreen = () => {
               <Skeleton
                 animation="pulse"
                 height={20}
-                width="25%" 
+                width="25%"
                 style={styles.skeleton}
               />
               <Skeleton
                 animation="pulse"
                 height={14}
-                width="15%" 
+                width="15%"
                 style={styles.skeleton}
               />
             </View>
@@ -95,7 +95,7 @@ const Notificationscreen = () => {
           <Skeleton
             animation="pulse"
             height={40}
-            width="100%" 
+            width="100%"
             style={[styles.skeleton, { borderRadius: 3 }]}
           />
         </View>

@@ -27,6 +27,7 @@ const Userprofile = ({ userIdPost, navigation, tweet }) => {
   const [userData, setUserData] = useState('');
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
+  const [followersCount, setFollowersCount] = useState(0);
 
   useEffect(() => {
     navigation.setOptions({ title: '' });
@@ -73,6 +74,12 @@ const Userprofile = ({ userIdPost, navigation, tweet }) => {
     }, []),
   );
 
+  useEffect(() => {
+    if (userData.followersCount) {
+      setFollowersCount(userData.followersCount);
+    }
+  }, [userData]);
+
   const openModal = () => {
     setModalImageSource(profilePicture);
     setModalVisible(true);
@@ -89,7 +96,7 @@ const Userprofile = ({ userIdPost, navigation, tweet }) => {
 
   const handleDropdownItemPress = item => {
     if (item === 'Report') {
-      navigation.navigate('Report'); 
+      navigation.navigate('Report');
     }
     console.log(item);
     toggleDropdown();
@@ -97,6 +104,7 @@ const Userprofile = ({ userIdPost, navigation, tweet }) => {
 
   const handleFollowPress = () => {
     setIsFollowing(!isFollowing);
+    setFollowersCount(prevCount => isFollowing ? prevCount - 1 : prevCount + 1);
   };
 
   return (
@@ -171,7 +179,7 @@ const Userprofile = ({ userIdPost, navigation, tweet }) => {
               <Text style={styles.statLabel}>Posts</Text>
             </View>
             <View style={styles.statItem}>
-              <Text style={styles.statNumber}>0</Text>
+              <Text style={styles.statNumber}>{followersCount}</Text>
               <Text style={styles.statLabel}>Followers</Text>
             </View>
             <View style={styles.statItem}>
