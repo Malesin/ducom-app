@@ -29,6 +29,7 @@ const Userprofile = ({ userIdPost, navigation, idUser }) => {
   const [userData, setUserData] = useState('');
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
+  const [followersCount, setFollowersCount] = useState(0);
 
   useEffect(() => {
     navigation.setOptions({ title: '' });
@@ -78,6 +79,12 @@ const Userprofile = ({ userIdPost, navigation, idUser }) => {
     }, []),
   );
 
+  useEffect(() => {
+    if (userData.followersCount) {
+      setFollowersCount(userData.followersCount);
+    }
+  }, [userData]);
+
   const openModal = () => {
     setModalImageSource(profilePicture);
     setModalVisible(true);
@@ -94,7 +101,7 @@ const Userprofile = ({ userIdPost, navigation, idUser }) => {
 
   const handleDropdownItemPress = item => {
     if (item === 'Report') {
-      navigation.navigate('Report'); 
+      navigation.navigate('Report');
     }
     console.log(item);
     toggleDropdown();

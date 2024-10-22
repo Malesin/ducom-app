@@ -1,16 +1,15 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   StyleSheet,
   ScrollView,
   View,
   SafeAreaView,
   Text,
-  ActivityIndicator,
   TouchableOpacity,
 } from 'react-native';
 import TweetCard from '../../components/TweetCard';
 import PinTweetCard from '../../components/PinTweetCard';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { Skeleton } from 'react-native-elements';
 import axios from 'axios';
 import config from '../../config';
@@ -19,6 +18,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const serverUrl = config.SERVER_URL;
 
 const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile }) => {
+  const navigation = useNavigation();
   const [tweets, setTweets] = useState([]);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -263,8 +263,8 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
   );
 
   const handlePostPress = (tweet) => {
-    console.log("Clicked Post Press")
-  }
+    navigation.navigate('ViewPost', { tweet });
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -303,7 +303,6 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
               {tweets === "You are blocked by this user" ? "You are blocked by this user" : (<>
                 {tweets === "You have blocked this user" ? "You have blocked this user" : "No Tweets Available"}
               </>)}
-
             </Text>
           )}
         </ScrollView>
@@ -311,7 +310,6 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
     </SafeAreaView>
   );
 };
-
 
 const styles = StyleSheet.create({
   container: {
@@ -355,4 +353,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Userpost;  
+export default Userpost;

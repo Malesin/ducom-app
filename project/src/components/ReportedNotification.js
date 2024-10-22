@@ -1,15 +1,41 @@
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { StyleSheet, Text, View, Animated } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const ReportedNotification = () => {
+    const slideAnim = useRef(new Animated.Value(-50)).current;
+    const fadeAnim = useRef(new Animated.Value(0)).current;
+
+    useEffect(() => {
+        Animated.parallel([
+            Animated.timing(slideAnim, {
+                toValue: 0,
+                duration: 500,
+                useNativeDriver: true,
+            }),
+            Animated.timing(fadeAnim, {
+                toValue: 1,
+                duration: 500,
+                useNativeDriver: true,
+            }),
+        ]).start();
+    }, [slideAnim, fadeAnim]);
+
     return (
-        <View style={styles.container}>
+        <Animated.View
+            style={[
+                styles.container,
+                {
+                    transform: [{ translateY: slideAnim }],
+                    opacity: fadeAnim,
+                },
+            ]}
+        >
             <Icon name="error-outline" size={30} color="#FF5722" style={styles.icon} />
             <Text style={styles.message}>
                 You have received this warning notification because your account has been reported for violating community guidelines.
             </Text>
-        </View>
+        </Animated.View>
     );
 };
 

@@ -172,6 +172,13 @@ function Postscreen({ }) {
     const postId = tweet.id;
     const idUser = tweet.idUser;
     const focusCommentInput = true;
+
+    navigation.navigate('ViewPost', {
+      tweet: tweet,
+      comments: comments,
+      focusCommentInput: focusCommentInput,
+      isUserProfile: true,
+    });
   };
 
   const onRefreshPage = () => {

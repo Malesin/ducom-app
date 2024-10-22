@@ -126,7 +126,7 @@ const HomeScreen = ({ navigation }) => {
     }
   };
 
-  // Tweet Pinned
+  // Pinned Tweet
   const fetchPinTweet = async () => {
     try {
       const token = await AsyncStorage.getItem('token');
@@ -326,7 +326,7 @@ const HomeScreen = ({ navigation }) => {
       mediaType: 'photo',
       saveToPhotos: true,
     };
-
+    
     ImagePicker.launchCamera(options, response => {
       if (response.didCancel) {
         console.log('User cancelled photo');

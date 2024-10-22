@@ -5,8 +5,9 @@ import axios from 'axios';
 import config from '../../config';
 import LikeNotification from '../../components/Notification/LikeNotification';
 import CommentNotification from '../../components/Notification/CommentNotification';
-import { Skeleton } from 'react-native-elements'; // Tambahkan import Skeleton
+import { Skeleton } from 'react-native-elements'; 
 import ReportedNotification from '../../components/ReportedNotification';
+import FollowNotification from '../../components/Notification/FollowNotification';
 
 
 const serverUrl = config.SERVER_URL;
@@ -14,7 +15,7 @@ const serverUrl = config.SERVER_URL;
 const Notificationscreen = () => {
   const [allNotifications, setAllNotifications] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
-  const [showSkeleton, setShowSkeleton] = useState(true); 
+  const [showSkeleton, setShowSkeleton] = useState(true);
 
   const fetchNotifications = async () => {
     try {
@@ -81,13 +82,13 @@ const Notificationscreen = () => {
               <Skeleton
                 animation="pulse"
                 height={20}
-                width="25%" 
+                width="25%"
                 style={styles.skeleton}
               />
               <Skeleton
                 animation="pulse"
                 height={14}
-                width="15%" 
+                width="15%"
                 style={styles.skeleton}
               />
             </View>
@@ -95,7 +96,7 @@ const Notificationscreen = () => {
           <Skeleton
             animation="pulse"
             height={40}
-            width="100%" 
+            width="100%"
             style={[styles.skeleton, { borderRadius: 3 }]}
           />
         </View>
@@ -106,6 +107,7 @@ const Notificationscreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       <ReportedNotification />
+      <FollowNotification />
       <ScrollView
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
