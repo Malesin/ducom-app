@@ -9,6 +9,8 @@ import {
   Modal,
   TouchableWithoutFeedback,
   Animated,
+  RefreshControl,
+  ScrollView,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
@@ -36,14 +38,18 @@ export default function Profilescreen() {
       const token = await AsyncStorage.getItem('token');
       const userResponse = await axios.post(`${serverUrl}/userdata`, { token });
       const user = userResponse.data.data;
-      setUserData(user);
 
-      if (user.bannerPicture) {
-        setBanner({ uri: user.bannerPicture });
-      }
-      if (user.profilePicture) {
-        setProfilePicture({ uri: user.profilePicture });
-      }
+      // Tambahkan delay 3 detik sebelum mengatur data
+      setTimeout(() => {
+        setUserData(user);
+
+        if (user.bannerPicture) {
+          setBanner({ uri: user.bannerPicture });
+        }
+        if (user.profilePicture) {
+          setProfilePicture({ uri: user.profilePicture });
+        }
+      }, 2500); // 3000 ms = 3 detik
     } catch (error) {
       console.error('Error occurred:', error);
     }
@@ -97,116 +103,163 @@ export default function Profilescreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.bannerContainer}>
-        <Image
-          source={banner || require('../../assets/banner.png')}
-          style={styles.banner}
-        />
-        <TouchableOpacity
-          style={styles.settingsButton}
-          onPress={toggleDropdown}
-        >
-          <MaterialCommunityIcons name="dots-vertical" size={30} color="#000" />
-        </TouchableOpacity>
-        {dropdownVisible && (
-          <TouchableWithoutFeedback onPress={toggleDropdown}>
-            <View style={styles.dropdownOverlay}>
-              <View style={styles.dropdownMenu}>
-                <TouchableOpacity
-                  style={styles.dropdownItem}
-                  onPress={() => handleDropdownItemPress('Need Help')}
-                >
-                  <MaterialCommunityIcons
-                    name="information"
-                    size={20}
-                    color="#000"
-                    style={styles.dropdownIcon}
-                  />
-                  <Text style={styles.dropdownItemText}>Need Help?</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.dropdownItem}
-                  onPress={() => handleDropdownItemPress('Settings and Support')}
-                >
-                  <MaterialCommunityIcons
-                    name="cog"
-                    size={20}
-                    color="#000"
-                    style={styles.dropdownIcon}
-                  />
-                  <Text style={styles.dropdownItemText}>Settings</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </TouchableWithoutFeedback>
-        )}
-        <View style={styles.profileContainer}>
-          <View style={styles.profilePictureContainer}>
-            <TouchableOpacity onPress={openModal}>
-              <Image
-                source={profilePicture || require('../../assets/profilepic.png')}
-                style={styles.profile}
-              />
-            </TouchableOpacity>
-          </View>
-          <View style={styles.statsContainer}>
-            <View style={styles.statItem}>
-              <Text style={styles.statNumber}>0</Text>
-              <Text style={styles.statLabel}>Posts</Text>
-            </View>
-            <View style={styles.statItem}>
-              <TouchableOpacity onPress={() => navigation.navigate('Follow')}>
-                <Text style={styles.statNumber}>0</Text>
-                <Text style={styles.statLabel}>Followers</Text>
-              </TouchableOpacity>
-            </View>
-            <View style={styles.statItem}>
-              <TouchableOpacity onPress={() => navigation.navigate('Follow')}>
-                <Text style={styles.statNumber}>0</Text>
-                <Text style={styles.statLabel}>Following</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-
-        </View>
-        <View style={styles.userInfoWrapper}>
-          <View style={styles.userInfoContainer}>
-            <View style={styles.nameContainer}>
-              <Text style={styles.name}>{userData?.name}</Text>
-              {userData?.isAdmin && (
-                <Text style={styles.verifiedIcon}>{verifiedIcon}</Text>
-              )}
-            </View>
-            <Text style={styles.username}>@{userData?.username}</Text>
-            <Text style={styles.description}>
-              {userData?.bio || 'No Description'}
-            </Text>
-          </View>
+      <ScrollView>
+        <View style={styles.bannerContainer}>
+          <Image
+            source={banner || require('../../assets/banner.png')}
+            style={styles.banner}
+          />
           <TouchableOpacity
-            style={styles.editButton}
-            onPress={() => navigation.navigate('EditProfile')}
+            style={styles.settingsButton}
+            onPress={toggleDropdown}
           >
-            <Text style={styles.editButtonText}>Edit Profile</Text>
+            <MaterialCommunityIcons name="dots-vertical" size={30} color="#000" />
           </TouchableOpacity>
-        </View>
-        {/*  */}
-        <Modal
-          visible={modalVisible}
-          transparent
-          onRequestClose={closeModal}
-          animationType="fade"
-        >
-          <TouchableWithoutFeedback onPress={closeModal}>
-            <View style={styles.modalBackground}>
-              <View style={styles.modalContainer}>
-                {modalImageSource && (
-                  <Image source={modalImageSource} style={styles.previewImage} />
+          {dropdownVisible && (
+            <TouchableWithoutFeedback onPress={toggleDropdown}>
+              <View style={styles.dropdownOverlay}>
+                <View style={styles.dropdownMenu}>
+                  <TouchableOpacity
+                    style={styles.dropdownItem}
+                    onPress={() => handleDropdownItemPress('Need Help')}
+                  >
+                    <MaterialCommunityIcons
+                      name="information"
+                      size={20}
+                      color="#000"
+                      style={styles.dropdownIcon}
+                    />
+                    <Text style={styles.dropdownItemText}>Need Help?</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.dropdownItem}
+                    onPress={() => handleDropdownItemPress('Settings and Support')}
+                  >
+                    <MaterialCommunityIcons
+                      name="cog"
+                      size={20}
+                      color="#000"
+                      style={styles.dropdownIcon}
+                    />
+                    <Text style={styles.dropdownItemText}>Settings</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </TouchableWithoutFeedback>
+          )}
+          <View style={styles.profileContainer}>
+            <View style={styles.profilePictureContainer}>
+              <TouchableOpacity onPress={openModal}>
+                <Image
+                  source={profilePicture || require('../../assets/profilepic.png')}
+                  style={styles.profile}
+                />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.statsContainer}>
+              {['Posts', 'Followers', 'Following'].map((label) => (
+                <View style={styles.statItem} key={label}>
+                  {!userData ? (
+                    <>
+                      <Skeleton
+                        animation="pulse"
+                        height={18}
+                        width={30}
+                        style={[styles.skeleton, { borderRadius: 3 }]} // Ubah borderRadius ke 3
+                      />
+                      <Skeleton
+                        animation="pulse"
+                        height={14}
+                        width={60}
+                        style={[styles.skeleton, { borderRadius: 3 }]} // Ubah borderRadius ke 3
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <Text style={styles.statNumber}>0</Text>
+                      <Text style={styles.statLabel}>{label}</Text>
+                    </>
+                  )}
+                </View>
+              ))}
+            </View>
+          </View>
+          <View style={styles.userInfoWrapper}>
+            <View style={styles.userInfoContainer}>
+              <View style={styles.nameContainer}>
+                {!userData ? (
+                  <Skeleton
+                    animation="pulse"
+                    height={20}
+                    width={150}
+                    style={[styles.skeleton, { borderRadius: 3 }]} // Ubah borderRadius ke 3
+                  />
+                ) : (
+                  <Text style={styles.name}>{userData?.name}</Text>
+                )}
+                {userData?.isAdmin && (
+                  <Text style={styles.verifiedIcon}>{verifiedIcon}</Text>
                 )}
               </View>
+              {!userData ? (
+                <Skeleton
+                  animation="pulse"
+                  height={14}
+                  width={100}
+                  style={[styles.skeleton, { borderRadius: 3 }]} // Ubah borderRadius ke 3
+                />
+              ) : (
+                <Text style={styles.username}>@{userData?.username}</Text>
+              )}
+              {!userData ? (
+                <Skeleton
+                  animation="pulse"
+                  height={13}
+                  width={200}
+                  style={[styles.skeleton, { borderRadius: 3 }]} // Ubah borderRadius ke 3
+                />
+              ) : (
+                <Text style={styles.description}>
+                  {userData?.bio || 'No Description'}
+                </Text>
+              )}
             </View>
-          </TouchableWithoutFeedback>
-        </Modal>
-      </View>
+            {!userData ? (
+              <Skeleton
+                animation="pulse"
+                height={28}
+                width={120}
+                borderRadius={14}
+                style={[styles.skeleton, { marginRight: 14, borderRadius: 3 }]} // Ubah borderRadius ke 3
+              />
+            ) : (
+              <TouchableOpacity
+                style={styles.editButton}
+                onPress={() => navigation.navigate('EditProfile')}
+              >
+                <Text style={styles.editButtonText}>Edit Profile</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+          {/*  */}
+          <Modal
+            visible={modalVisible}
+            transparent
+            onRequestClose={closeModal}
+            animationType="fade"
+          >
+            <TouchableWithoutFeedback onPress={closeModal}>
+              <View style={styles.modalBackground}>
+                <View style={styles.modalContainer}>
+                  {modalImageSource && (
+                    <Image source={modalImageSource} style={styles.previewImage} />
+                  )}
+                </View>
+              </View>
+            </TouchableWithoutFeedback>
+          </Modal>
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
