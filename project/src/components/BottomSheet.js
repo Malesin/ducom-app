@@ -230,6 +230,12 @@ const BottomSheet = ({
     }
   };
 
+  const handleReportPress = () => {
+    navigation.navigate('Report', {
+      reportPostId: tweet.id
+    })
+  }
+
   return (
     <SafeAreaView style={styles.container}>
 
@@ -302,7 +308,7 @@ const BottomSheet = ({
           <View style={styles.optionRow}>
             <TouchableOpacity
               style={styles.option}
-              onPress={() => navigation.navigate('Report')}>
+              onPress={handleReportPress}>
               <MaterialIcons name="report" size={24} color="#D60000" />
               <Text style={styles.optionTextReport}>Report @{tweet.userName}</Text>
             </TouchableOpacity>

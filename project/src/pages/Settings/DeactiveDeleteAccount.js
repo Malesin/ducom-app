@@ -5,7 +5,7 @@ import DeleteInfo from '../../components/DeleteInfo';
 
 const DeactiveDeleteAccount = ({ navigation }) => {
   const [selectedOption, setSelectedOption] = useState(null);
-  const [showDeleteInfo, setShowDeleteInfo] = useState(false); 
+  const [showDeleteInfo, setShowDeleteInfo] = useState(false);
 
 
   const handleDeactivateCheck = () => {
@@ -28,10 +28,11 @@ const DeactiveDeleteAccount = ({ navigation }) => {
   // Handler for "Continue" button
   const handleContinue = () => {
     if (selectedOption === 'delete') {
-      setShowDeleteInfo(true); 
+      setShowDeleteInfo(true);
     } else {
-      navigation.navigate('VerifyAccount');
-
+      navigation.navigate('VerifyAccount', {
+        choice: 'deactive'
+      });
     }
   };
 
@@ -86,7 +87,7 @@ const DeactiveDeleteAccount = ({ navigation }) => {
             { backgroundColor: selectedOption ? '#001374' : '#ccc' }
           ]}
           disabled={!selectedOption}
-          onPress={handleContinue} 
+          onPress={handleContinue}
         >
           <Text style={[
             styles.buttonText,

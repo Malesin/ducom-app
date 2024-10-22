@@ -47,6 +47,7 @@ function Mediascreen({ navigation }) {
 
         const formattedTweets = dataTweet
           .filter(post => Array.isArray(post.media) && post.media.length > 0)
+          .filter(post => post.user !== null)
           .map(post => ({
             id: post._id,
             userAvatar: post.user.profilePicture,

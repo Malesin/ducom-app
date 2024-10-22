@@ -39,32 +39,34 @@ function Likescreen({ navigation }) {
             const profilePicture = data.profilePicture
 
             const responseTweet = await axios.post(`${serverUrl}/liked-posts`, { token });
-            const dataTweet = responseTweet.data;
+            const dataTweet = responseTweet.data.data;
 
-            const formattedTweets = dataTweet.data.map(post => ({
-                id: post._id,
-                userAvatar: post.user.profilePicture,
-                userName: post.user.name,
-                userHandle: post.user.username,
-                postDate: post.created_at,
-                content: post.description,
-                media: Array.isArray(post.media)
-                    ? post.media.map(mediaItem => ({
-                        type: mediaItem.type,
-                        uri: mediaItem.uri,
-                    }))
-                    : [],
-                likesCount: post.likes.length,
-                commentsCount: post.comments.length,
-                bookMarksCount: post.bookmarks.length,
-                isLiked: post.likes.some(like => like._id === idUser),
-                isBookmarked: post.bookmarks.some(bookmark => bookmark.user === idUser),
-                userIdPost: post.user._id,
-                idUser: idUser,
-                profilePicture: profilePicture,
-                commentsEnabled: post.commentsEnabled,
-                isAdmin: post.user.isAdmin
-            }));
+            const formattedTweets = dataTweet
+                .filter(post => post.user !== null)
+                .map(post => ({
+                    id: post._id,
+                    userAvatar: post.user.profilePicture,
+                    userName: post.user.name,
+                    userHandle: post.user.username,
+                    postDate: post.created_at,
+                    content: post.description,
+                    media: Array.isArray(post.media)
+                        ? post.media.map(mediaItem => ({
+                            type: mediaItem.type,
+                            uri: mediaItem.uri,
+                        }))
+                        : [],
+                    likesCount: post.likes.length,
+                    commentsCount: post.comments.length,
+                    bookMarksCount: post.bookmarks.length,
+                    isLiked: post.likes.some(like => like._id === idUser),
+                    isBookmarked: post.bookmarks.some(bookmark => bookmark.user === idUser),
+                    userIdPost: post.user._id,
+                    idUser: idUser,
+                    profilePicture: profilePicture,
+                    commentsEnabled: post.commentsEnabled,
+                    isAdmin: post.user.isAdmin
+                }));
 
             return formattedTweets;
         } catch (error) {
@@ -77,7 +79,7 @@ function Likescreen({ navigation }) {
 
     useFocusEffect(
         useCallback(() => {
-            if (!isFetched) { 
+            if (!isFetched) {
                 (async () => {
                     setLoading(true);
                     const newTweets = await fetchTweets(page);

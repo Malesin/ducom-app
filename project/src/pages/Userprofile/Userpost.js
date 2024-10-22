@@ -99,33 +99,35 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
 
       const dataTweet = respTweet.data.data;
 
-      const formattedTweets = dataTweet.map(post => ({
-        id: post._id,
-        userAvatar: post.user.profilePicture,
-        userName: post.user.name,
-        userHandle: post.user.username,
-        postDate: post.created_at,
-        content: post.description,
-        media: Array.isArray(post.media)
-          ? post.media.map(mediaItem => ({
-            type: mediaItem.type,
-            uri: mediaItem.uri,
-          }))
-          : [],
-        likesCount: post.likes.length,
-        commentsCount: post.comments.length,
-        bookMarksCount: post.bookmarks.length,
-        isLiked: post.likes.some(like => like._id === idUser),
-        isBookmarked: post.bookmarks.some(
-          bookmark => bookmark.user === userIdPost,
-        ),
-        isMuted: isMuteds.some(isMuted => isMuted === post.user._id),
-        isBlocked: isBlockeds.some(isBlocked => isBlocked === post.user._id), userIdPost: post.user._id,
-        profilePicture: profilePicture,
-        commentsEnabled: post.commentsEnabled,
-        isAdmin: post.user.isAdmin,
-        amIAdmin: amIAdmin
-      }));
+      const formattedTweets = dataTweet
+        .filter(post => post.user !== null)
+        .map(post => ({
+          id: post._id,
+          userAvatar: post.user.profilePicture,
+          userName: post.user.name,
+          userHandle: post.user.username,
+          postDate: post.created_at,
+          content: post.description,
+          media: Array.isArray(post.media)
+            ? post.media.map(mediaItem => ({
+              type: mediaItem.type,
+              uri: mediaItem.uri,
+            }))
+            : [],
+          likesCount: post.likes.length,
+          commentsCount: post.comments.length,
+          bookMarksCount: post.bookmarks.length,
+          isLiked: post.likes.some(like => like._id === idUser),
+          isBookmarked: post.bookmarks.some(
+            bookmark => bookmark.user === userIdPost,
+          ),
+          isMuted: isMuteds.some(isMuted => isMuted === post.user._id),
+          isBlocked: isBlockeds.some(isBlocked => isBlocked === post.user._id), userIdPost: post.user._id,
+          profilePicture: profilePicture,
+          commentsEnabled: post.commentsEnabled,
+          isAdmin: post.user.isAdmin,
+          amIAdmin: amIAdmin
+        }));
 
       return formattedTweets;
     } catch (error) {
