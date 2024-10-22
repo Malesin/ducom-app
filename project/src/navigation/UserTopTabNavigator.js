@@ -32,7 +32,7 @@ function UserTopTabNavigator({ route, navigation }) {
 
   const Header = () => (
     <View style={styles.profileWrapper}>
-      <Userprofile userIdPost={userIdPost} navigation={navigation} isAdmin={isAdmin} tweet={tweet} />
+      <Userprofile userIdPost={userIdPost} navigation={navigation} idUser={idUser} />
     </View>
   );
 

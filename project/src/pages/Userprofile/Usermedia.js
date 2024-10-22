@@ -31,7 +31,6 @@ const Usermedia = ({ userIdPost, profilePicture }) => {
       console.log('Data Berhasil Diambil');
 
       const dataTweet = userResponse.data.data;
-      console.log('Fetched tweets:', dataTweet);
 
       const formattedTweets = dataTweet
         .filter(post => post.user !== null)
@@ -124,8 +123,6 @@ const Usermedia = ({ userIdPost, profilePicture }) => {
       ))}
     </>
   );
-
-  console.log(tweets)
 
   return (
     <SafeAreaView style={styles.container}>

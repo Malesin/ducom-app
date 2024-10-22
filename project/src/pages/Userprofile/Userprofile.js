@@ -12,14 +12,13 @@ import {
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import axios from 'axios';
-import config from '../../config';
 import { Skeleton } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 const verifiedIcon = <Icon name="verified" size={18} color="#699BF7" />;
-const serverUrl = config.SERVER_URL;
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { DrawerContentScrollView } from '@react-navigation/drawer';
+import axios from 'axios';
+import config from '../../config';
+const serverUrl = config.SERVER_URL;
 
 const Userprofile = ({ userIdPost, navigation, idUser }) => {
   const [modalVisible, setModalVisible] = useState(false);
@@ -45,7 +44,6 @@ const Userprofile = ({ userIdPost, navigation, idUser }) => {
       });
       const user = userResponse.data.data;
       setUserData(user);
-
       const isFollow = user.followers.some(follow => follow === idUser)
       setIsFollowing(isFollow)
 
