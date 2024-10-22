@@ -13,6 +13,9 @@ import FAQscreen from './Settings/FAQscreen';
 import Marksscreen from './Other/Marksscreen';
 import ReportScreen from './Other/ReportScreen';
 import Settingsscreen from './Settings/Settingsscreen';
+import AccountLists from './Settings/AccountLists';
+import DeactivatedorDeletedAccounts from './Settings/DeactivatedorDeletedAccounts';
+import ReportsManagement from './Settings/ReportsManagement';
 import AccountPrivacy from './Settings/AccountPrivacy';
 import AccountInformation from './Settings/AccountInformation';
 import UpdatePassword from './Settings/UpdatePassword';
@@ -52,6 +55,9 @@ export {
   Marksscreen,
   ReportScreen,
   Settingsscreen,
+  AccountLists,
+  DeactivatedorDeletedAccounts,
+  ReportsManagement,
   AccountInformation,
   AccountPrivacy,
   UpdatePassword,

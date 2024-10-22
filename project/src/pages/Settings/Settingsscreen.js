@@ -88,33 +88,35 @@ const Settingsscreen = ({ navigation }) => {
             />
             <Text style={styles.buttonText}>Deactivate or Delete Account</Text>
           </TouchableOpacity>
-          {amIAdmin && (
-            <>
-              <TouchableOpacity
-                style={styles.button}
-                onPress={() => navigation.navigate('#')}>
-                <MaterialCommunityIcons name="account" size={25} color="#000" />
-                <Text style={styles.buttonText}>User Lists</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.button}
-                onPress={() => navigation.navigate('#')}>
-                <MaterialCommunityIcons name="flag" size={25} color="#000" />
-                <Text style={styles.buttonText}>Reports Management</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.button}
-                onPress={() => navigation.navigate('#')}>
-                <MaterialCommunityIcons
-                  name="delete"
-                  size={25}
-                  color="#000"
-                />
-                <Text style={styles.buttonText}>Deactivated or Deleted Accounts</Text>
-              </TouchableOpacity>
-            </>
-          )}
         </View>
+        <View style={styles.separator} />
+        {amIAdmin && (
+          <View style={styles.section}>
+            <Text style={styles.title}>Admin Tools</Text>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => navigation.navigate('AccountLists')}>
+              <MaterialCommunityIcons name="account-key" size={25} color="#000" />
+              <Text style={styles.buttonText}>User Lists</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => navigation.navigate('ReportsManagement')}>
+              <MaterialCommunityIcons name="flag" size={25} color="#000" />
+              <Text style={styles.buttonText}>Reports Management</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => navigation.navigate('DeactivateorDeletedAccounts')}>
+              <MaterialCommunityIcons
+                name="delete"
+                size={25}
+                color="#000"
+              />
+              <Text style={styles.buttonText}>Deactivated or Deleted Accounts</Text>
+            </TouchableOpacity>
+          </View>
+        )}
         <View style={styles.separator} />
         <View style={styles.section}>
           <Text style={styles.title}>Privacy and Interactions</Text>
@@ -159,6 +161,7 @@ const Settingsscreen = ({ navigation }) => {
             <Text style={styles.buttonText}>Log out</Text>
           </TouchableOpacity>
         </View>
+        <View style={styles.separator} />
       </ScrollView>
     </SafeAreaView>
   );
