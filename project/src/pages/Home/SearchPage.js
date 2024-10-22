@@ -1,10 +1,18 @@
 import { StyleSheet, View, TextInput, SafeAreaView, TouchableOpacity, Text, ScrollView, Image } from 'react-native';
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import ProfilePicture from '../../assets/iya.png';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import config from '../../config';
+import SearchResultCard from '../../components/SearchResultCard';
+
+const serverUrl = config.SERVER_URL;
 
 const SearchPage = ({ navigation }) => {
     const [searchText, setSearchText] = useState('');
+    const [searchs, setSearchs] = useState([]);
+    const [myData, setMyData] = useState([]);
     const textInputRef = useRef(null);
 
     const handleSearchPress = () => {
@@ -12,6 +20,44 @@ const SearchPage = ({ navigation }) => {
             textInputRef.current.focus();
         }
     };
+
+    const getData = async () => {
+        const token = await AsyncStorage.getItem('token');
+        try {
+            await axios
+                .post(`${serverUrl}/userdata`, { token: token })
+                .then(res => {
+                    if (res.data.status == 'ok') {
+                        setMyData(res.data.data)
+                    }
+                })
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
+    const searchUser = async () => {
+        const token = await AsyncStorage.getItem('token');
+        try {
+            await axios
+                .post(`${serverUrl}/search-user`, {
+                    token: token,
+                    query: searchText
+                })
+                .then(res => {
+                    if (res.data.status == 'ok') {
+                        setSearchs(res.data.data)
+                    }
+                })
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
+    useEffect(() => {
+        searchUser()
+        getData()
+    }, [searchUser]);
 
     const handleBackPress = () => {
         navigation.navigate('Home');
@@ -35,6 +81,7 @@ const SearchPage = ({ navigation }) => {
                         style={styles.searchInput}
                         value={searchText}
                         onChangeText={setSearchText}
+                        keyboardType="default"
                     />
                 </View>
                 {searchText.length > 0 && (
@@ -44,15 +91,16 @@ const SearchPage = ({ navigation }) => {
                 )}
             </View>
             <ScrollView style={styles.searchedContainer} showsVerticalScrollIndicator={false}>
-                <Text style={styles.searchedText}>Recently Searched</Text>
-                <TouchableOpacity style={styles.searchedItemContainer}>
-                    {/* Wrap profile picture and text in a view */}
-                    <View style={styles.profileTextContainer}>
-                        <Image source={ProfilePicture} style={styles.profilePicture} />
-                        <Text style={styles.searchedItemText}>mikadotjees</Text>
+                {searchText.length > 0 && searchs.map((search, index) => (
+                    <View key={index} >
+                        <SearchResultCard
+                            search={search}
+                            myData={myData}
+                            onClose={() => console.log('Close button pressed')}
+                        />
                     </View>
-                    <MaterialIcons style={styles.closeIcon} name="close" size={20} color="#000" />
-                </TouchableOpacity>
+                ))}
+                {/* <Text style={styles.searchedText}>Recently Searched</Text> */}
             </ScrollView>
         </SafeAreaView>
     );

@@ -7,7 +7,9 @@ const DeleteInfo = ({ navigation }) => {
 
     const handleOkPress = () => {
         setVisible(false);
-        navigation.navigate('VerifyAccount');
+        navigation.navigate('VerifyAccount', {
+            choice: 'delete'
+        });
     };
 
     return (

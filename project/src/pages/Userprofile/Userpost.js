@@ -11,7 +11,7 @@ import {
 import TweetCard from '../../components/TweetCard';
 import PinTweetCard from '../../components/PinTweetCard';
 import { useFocusEffect } from '@react-navigation/native';
-import { Skeleton } from 'react-native-elements'; 
+import { Skeleton } from 'react-native-elements';
 import axios from 'axios';
 import config from '../../config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -40,7 +40,7 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
 
       const postPin = pinPost.data.data;
       if (!postPin) {
-        return null; 
+        return null;
       }
       const totalComments = postPin.comments.length + postPin.comments.reduce((acc, comment) => acc + comment.replies.length, 0);
 
@@ -77,7 +77,7 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
       if (error.response && error.response.status === 403) {
         console.log("lo diblokir")
         setLoading(false)
-        return "You are blocked by this user"; 
+        return "You are blocked by this user";
       }
       setLoading(false)
       console.error('Error fetching data:', error);
@@ -99,33 +99,35 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
 
       const dataTweet = respTweet.data.data;
 
-      const formattedTweets = dataTweet.map(post => ({
-        id: post._id,
-        userAvatar: post.user.profilePicture,
-        userName: post.user.name,
-        userHandle: post.user.username,
-        postDate: post.created_at,
-        content: post.description,
-        media: Array.isArray(post.media)
-          ? post.media.map(mediaItem => ({
-            type: mediaItem.type,
-            uri: mediaItem.uri,
-          }))
-          : [],
-        likesCount: post.likes.length,
-        commentsCount: post.comments.length,
-        bookMarksCount: post.bookmarks.length,
-        isLiked: post.likes.some(like => like._id === idUser),
-        isBookmarked: post.bookmarks.some(
-          bookmark => bookmark.user === userIdPost,
-        ),
-        isMuted: isMuteds.some(isMuted => isMuted === post.user._id),
-        isBlocked: isBlockeds.some(isBlocked => isBlocked === post.user._id), userIdPost: post.user._id,
-        profilePicture: profilePicture,
-        commentsEnabled: post.commentsEnabled,
-        isAdmin: post.user.isAdmin,
-        amIAdmin: amIAdmin
-      }));
+      const formattedTweets = dataTweet
+        .filter(post => post.user !== null)
+        .map(post => ({
+          id: post._id,
+          userAvatar: post.user.profilePicture,
+          userName: post.user.name,
+          userHandle: post.user.username,
+          postDate: post.created_at,
+          content: post.description,
+          media: Array.isArray(post.media)
+            ? post.media.map(mediaItem => ({
+              type: mediaItem.type,
+              uri: mediaItem.uri,
+            }))
+            : [],
+          likesCount: post.likes.length,
+          commentsCount: post.comments.length,
+          bookMarksCount: post.bookmarks.length,
+          isLiked: post.likes.some(like => like._id === idUser),
+          isBookmarked: post.bookmarks.some(
+            bookmark => bookmark.user === userIdPost,
+          ),
+          isMuted: isMuteds.some(isMuted => isMuted === post.user._id),
+          isBlocked: isBlockeds.some(isBlocked => isBlocked === post.user._id), userIdPost: post.user._id,
+          profilePicture: profilePicture,
+          commentsEnabled: post.commentsEnabled,
+          isAdmin: post.user.isAdmin,
+          amIAdmin: amIAdmin
+        }));
 
       return formattedTweets;
     } catch (error) {

@@ -6,16 +6,18 @@ import axios from 'axios';
 import config from '../../config';
 import { Skeleton } from 'react-native-elements';
 import { Alert } from 'react-native';
+import DefaultAvatar from '../../assets/profilepic.png';
 
 const serverUrl = config.SERVER_URL;
 
-const VerifyAccount = ({navigation}) => {
+const VerifyAccount = ({ navigation, route }) => {
     const colorScheme = useColorScheme();
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
     const [profilePicture, setProfilePicture] = useState(null);
     const [username, setUsername] = useState(null);
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const { choice } = route?.params || {};
 
     async function myData() {
         try {
@@ -30,7 +32,7 @@ const VerifyAccount = ({navigation}) => {
             const user = userResponse.data.data;
 
             if (user) {
-                const profile = { uri: user.profilePicture };
+                const profile = user.profilePicture ? { uri: user.profilePicture } : false;
                 const username = user.username;
                 setUsername(username);
                 setProfilePicture(profile);
@@ -66,10 +68,28 @@ const VerifyAccount = ({navigation}) => {
     const deactivateAcc = async () => {
         try {
             const token = await AsyncStorage.getItem('token');
-            const response = await axios.post(`${serverUrl}/deactivate-account`, {
-                token: token,
-            });
-            return response.data;
+            await axios
+                .post(`${serverUrl}/deactivate-account`, {
+                    token: token,
+                })
+                .then(res => {
+                    return res.data;
+                })
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
+
+    const deleteAcc = async () => {
+        try {
+            const token = await AsyncStorage.getItem('token');
+            await axios
+                .post(`${serverUrl}/delete-user`, {
+                    token: token,
+                })
+                .then(res => {
+                    return res.data;
+                })
         } catch (error) {
             console.error('Error:', error);
         }
@@ -80,14 +100,31 @@ const VerifyAccount = ({navigation}) => {
             const result = await checkPassword(password);
             if (result.status !== 'ok') {
                 setError('Password wrong.');
-            } else {
+            } else if (choice == 'deactive') {
                 const result = await deactivateAcc();
                 console.log(result);
                 setError('');
                 Alert.alert('Success', 'Deactivate Account Successfully', [
                     {
                         text: 'Ok',
-                        onPress: async() => {
+                        onPress: async () => {
+                            await AsyncStorage.removeItem('token');
+                            await AsyncStorage.clear();
+                            navigation.reset({
+                                index: 0,
+                                routes: [{ name: 'Auths' }],
+                            });
+                        },
+                    },
+                ]);
+            } else if (choice == 'delete') {
+                const result = await deleteAcc();
+                console.log(result);
+                setError('');
+                Alert.alert('Success', 'Delete Account Successfully', [
+                    {
+                        text: 'Ok',
+                        onPress: async () => {
                             await AsyncStorage.removeItem('token');
                             await AsyncStorage.clear();
                             navigation.reset({
@@ -98,6 +135,7 @@ const VerifyAccount = ({navigation}) => {
                     },
                 ]);
             }
+
         } catch (error) {
             console.error('Password verification failed:', error);
             setError('An error occurred during password verification.');
@@ -205,7 +243,7 @@ const VerifyAccount = ({navigation}) => {
                 ) : (
                     <>
                         <Image
-                            source={profilePicture || require('../../assets/profilepic.png')}
+                            source={profilePicture || DefaultAvatar}
                             style={styles.profile}
                         />
                         <Text style={styles.username}>@{username}</Text>
