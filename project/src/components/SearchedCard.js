@@ -7,18 +7,18 @@ const SearchedCard = () => {
         <SafeAreaView style={styles.container}>
             <View style={styles.overlay} />
             <View style={styles.card}>
-                <Image source={ProfilePicture} style={styles.profilePicture} />
+                <Image source={ProfilePicture} style={styles.profilePicture} />                
                 <View style={styles.textContainer}>
                     <Text style={styles.username}>ryansunday123</Text>
                     <Text style={styles.handle}>@ryansun</Text>
                     <Text style={styles.description}>
                         bismillah lancar gen z sehat selalu jangan lupa berdoa agar dimudahkan
-                    </Text>
+                    </Text>                    
+                    <TouchableOpacity style={styles.followButton}>
+                        <Text style={styles.followButtonText}>Follow</Text>
+                    </TouchableOpacity>
                 </View>
             </View>
-            <TouchableOpacity style={styles.followButton}>
-                <Text style={styles.followButtonText}>Follow</Text>
-            </TouchableOpacity>
         </SafeAreaView>
     );
 };
@@ -27,7 +27,7 @@ export default SearchedCard;
 
 const styles = StyleSheet.create({
     container: {
-        padding: 20,
+        padding: 15,
         position: 'relative',
     },
     overlay: {
@@ -38,6 +38,8 @@ const styles = StyleSheet.create({
         right: 0,
         backgroundColor: '#D3D3D3',
         borderRadius: 15,
+        borderWidth: 1,
+        borderColor: '#000',
         zIndex: -1,
     },
     card: {
@@ -62,21 +64,24 @@ const styles = StyleSheet.create({
     },
     handle: {
         fontSize: 14,
-        color: '#555',
+        color: '#000',
     },
     description: {
         fontSize: 14,
         color: '#333',
         marginTop: 2,
+        marginBottom: 10,
     },
     followButton: {
         backgroundColor: '#002366',
         borderRadius: 20,
+        borderWidth: 1,
+        borderColor: '#000',
         paddingHorizontal: 25,
         paddingVertical: 10,
-        marginTop: 10,
-        alignItems: 'center',
-        zIndex: 1,
+        width: '100%',   
+        alignSelf: 'center', 
+        alignItems: 'center', 
     },
     followButtonText: {
         color: '#fff',
