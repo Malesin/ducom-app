@@ -8,7 +8,6 @@ import {
   Signinscreen,
   Splashscreen,
   TermsandConditionscreen,
-  Profilescreen,
   EditProfilePage,
   CreatePost,
   ViewPost,
@@ -20,6 +19,9 @@ import {
   VerifyAccount,
   AccountPrivacy,
   SearchPage,
+  AccountLists,
+  ReportsManagement,
+  DeactivatedorDeletedAccounts,
 } from '../pages';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -28,7 +30,6 @@ import DrawerNavigator from './DrawerNavigator';
 import UserTopTabNavigator from './UserTopTabNavigator';
 import TopTabNavigator from './TopTabNavigator';
 import DeactiveDeleteAccount from '../pages/Settings/DeactiveDeleteAccount';
-import AdminSettings from '../pages/Settings/AdminSettings';
 import FollowTopTabNavigator from './FollowTopTabNavigator';
 
 const Stack = createNativeStackNavigator();
@@ -159,9 +160,19 @@ export default function MainNavigation() {
           options={{ headerShown: true, title: 'Deactivate or Delete Account' }}
         />
         <Stack.Screen
-          name="AdminSettings"
-          component={AdminSettings}
-          options={{ headerShown: true, title: 'Admin Settings' }}
+          name="AccountLists"
+          component={AccountLists}
+          options={{ headerShown: true, title: 'All Users' }}
+        />
+        <Stack.Screen
+          name="ReportsManagement"
+          component={ReportsManagement}
+          options={{ headerShown: true, title: 'All Reports' }}
+        />
+        <Stack.Screen
+          name="DeactivateorDeletedAccounts"
+          component={DeactivatedorDeletedAccounts}
+          options={{ headerShown: true, title: 'All Account Status' }}
         />
         <Stack.Screen
           name="VerifyAccount"

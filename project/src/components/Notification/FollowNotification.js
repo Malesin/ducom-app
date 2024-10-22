@@ -6,7 +6,7 @@ const FollowNotification = () => {
     const [isFollowing, setIsFollowing] = useState(false);
 
     const handleFollowPress = () => {
-        setIsFollowing(!isFollowing);  // Toggle the follow state
+        setIsFollowing(!isFollowing);  
     };
 
     return (
@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
     },
     followButtonUnpressed: {
-        backgroundColor: '#001374', 
+        backgroundColor: '#001374',
         borderColor: '#001374',
         borderWidth: 1,
     },
@@ -84,8 +84,8 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     followingButton: {
-        backgroundColor: '#fff', 
-        borderColor: '#000', 
+        backgroundColor: '#fff',
+        borderColor: '#000',
         borderWidth: 1,
     },
     followingButtonText: {
