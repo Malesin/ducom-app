@@ -1,13 +1,12 @@
-import { StyleSheet, View, TextInput, SafeAreaView, TouchableOpacity, Text, ScrollView, Image } from 'react-native';
+import { StyleSheet, View, TextInput, SafeAreaView, TouchableOpacity, Text, ScrollView, Image, ActivityIndicator } from 'react-native';
 
 import SearchedCard from '../../components/SearchedCard';
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import ProfilePicture from '../../assets/iya.png';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../../config';
-import SearchResultCard from '../../components/SearchResultCard';
 
 const serverUrl = config.SERVER_URL;
 
@@ -16,6 +15,9 @@ const SearchPage = ({ navigation }) => {
     const [searchText, setSearchText] = useState('');
     const [searchs, setSearchs] = useState([]);
     const [myData, setMyData] = useState([]);
+    const [debounceTimeout, setDebounceTimeout] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
+
     const textInputRef = useRef(null);
 
     const handleSearchPress = () => {
@@ -38,9 +40,9 @@ const SearchPage = ({ navigation }) => {
             console.error(error)
         }
     }
-
-    const searchUser = async () => {
+    const searchUser = useCallback(async () => {
         const token = await AsyncStorage.getItem('token');
+        setIsLoading(true); // Set loading to true
         try {
             await axios
                 .post(`${serverUrl}/search-user`, {
@@ -49,18 +51,30 @@ const SearchPage = ({ navigation }) => {
                 })
                 .then(res => {
                     if (res.data.status == 'ok') {
-                        setSearchs(res.data.data)
+                        setSearchs(res.data.data);
                     }
                 })
         } catch (error) {
-            console.error(error)
+            console.error(error);
+        } finally {
+            setIsLoading(false); // Set loading to false after data is fetched
         }
-    }
+    }, [searchText]);
 
     useEffect(() => {
-        searchUser()
         getData()
-    }, [searchUser]);
+        if (debounceTimeout) {
+            clearTimeout(debounceTimeout);
+        }
+        const timeoutId = setTimeout(() => {
+            if (searchText.length > 0) {
+                searchUser();
+            }
+        }, 300); // Adjust the delay as needed
+        setDebounceTimeout(timeoutId);
+
+        return () => clearTimeout(timeoutId);
+    }, [searchText, searchUser]);
 
     const handleBackPress = () => {
         navigation.navigate('Home');
@@ -94,16 +108,39 @@ const SearchPage = ({ navigation }) => {
                 )}
             </View>
             <ScrollView style={styles.searchedContainer} showsVerticalScrollIndicator={false}>
-                <SearchedCard />
-//                 {searchText.length > 0 && searchs.map((search, index) => (
-//                     <View key={index} >
-//                         <SearchResultCard
-//                             search={search}
-//                             myData={myData}
-//                             onClose={() => console.log('Close button pressed')}
-//                         />
-//                     </View>
-//                 ))}
+                {isLoading ? (
+                    <View style={styles.loadingContainer}>
+                        <ActivityIndicator size="large" color="#0000ff" />
+                    </View>
+                ) : (
+                    searchText.trim().length > 0 ? ( // Check if searchText has non-space characters
+                        searchs
+                            .filter(search =>
+                                search.username.replace(/\s+/g, '').toLowerCase().includes(searchText.replace(/\s+/g, '').toLowerCase()) ||
+                                search.name.replace(/\s+/g, '').toLowerCase().includes(searchText.replace(/\s+/g, '').toLowerCase())
+                            ).length > 0
+                            ? (
+                                searchs
+                                    .filter(search =>
+                                        search.username.replace(/\s+/g, '').toLowerCase().includes(searchText.replace(/\s+/g, '').toLowerCase()) ||
+                                        search.name.replace(/\s+/g, '').toLowerCase().includes(searchText.replace(/\s+/g, '').toLowerCase())
+                                    )
+                                    .map((search, index) => (
+                                        <View key={index} style={styles.cardWrapper}>
+                                            <SearchedCard
+                                                search={search}
+                                                myData={myData}
+                                                onClose={() => console.log('Close button pressed')}
+                                            />
+                                        </View>
+                                    ))
+                            ) : (
+                                <Text style={styles.notFoundText}>User not found</Text>
+                            )
+                    ) : (
+                        null
+                    )
+                )}
                 {/* <Text style={styles.searchedText}>Recently Searched</Text> */}
             </ScrollView>
         </SafeAreaView>
@@ -113,6 +150,12 @@ const SearchPage = ({ navigation }) => {
 export default SearchPage;
 
 const styles = StyleSheet.create({
+    notFoundText: {
+        textAlign: 'center',
+        marginTop: 20,
+        fontSize: 16,
+        color: '#888',
+    },
     searchContainer: {
         flex: 1,
         backgroundColor: '#fff',
@@ -151,6 +194,7 @@ const styles = StyleSheet.create({
     },
     cancelButton: {
         marginLeft: 15,
+        marginRight: 10
     },
     cancelText: {
         color: '#000',
@@ -161,5 +205,14 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingHorizontal: 15,
         paddingVertical: 10,
+    },
+    loadingContainer: {
+        flex: 1,
+        marginTop: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    cardWrapper: {
+        marginBottom: 10, // Adjust the margin as needed
     },
 });

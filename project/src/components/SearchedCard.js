@@ -1,22 +1,72 @@
-import React from 'react';
-import { Image, SafeAreaView, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
-import ProfilePicture from '../assets/iya.png';
+import React, { useEffect, useState } from 'react';
+import { Image, SafeAreaView, StyleSheet, Text, View, TouchableOpacity, ToastAndroid } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import config from '../config';
+const serverUrl = config.SERVER_URL;
 
-const SearchedCard = () => {
+const SearchedCard = ({ search, myData, onClose }) => {
+    const [isFollowing, setIsFollowing] = useState(false);
+
+    const handleFollowPress = async () => {
+        try {
+            const token = await AsyncStorage.getItem('token');
+            if (isFollowing) {
+                await axios
+                    .post(`${serverUrl}/unfollow`, {
+                        token: token,
+                        unfollowUserId: search._id
+                    })
+                    .then(res => {
+                        console.log(res.data);
+                    })
+            } else {
+                await axios
+                    .post(`${serverUrl}/follow`, {
+                        token: token,
+                        followUserId: search._id
+                    })
+                    .then(res => {
+                        console.log(res.data);
+                    })
+            }
+            setIsFollowing(!isFollowing);
+        } catch (error) {
+            setIsFollowing(isFollowing);
+            console.error(error);
+            ToastAndroid.show("Something Error, Try Again Later", ToastAndroid.SHORT); // Menambahkan toast error
+        }
+    };
+
+    useEffect(() => {
+        const follow = search.followers.some(follow => follow === myData._id)
+        setIsFollowing(follow)
+    }, []);
+
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.overlay} />
             <View style={styles.card}>
-                <Image source={ProfilePicture} style={styles.profilePicture} />
+                <Image source={
+                    search?.profilePicture
+                        ? { uri: search?.profilePicture }
+                        : require('../assets/profilepic.png')} style={styles.profilePicture} />
                 <View style={styles.textContainer}>
-                    <Text style={styles.username}>ryansunday123</Text>
-                    <Text style={styles.handle}>@ryansun</Text>
+                    <Text style={styles.username}>{search?.name}</Text>
+                    <Text style={styles.handle}>@{search?.username}</Text>
                     <Text style={styles.description}>
-                        bismillah lancar gen z sehat selalu jangan lupa berdoa agar dimudahkan
+                        {search?.bio}
                     </Text>
-                    <TouchableOpacity style={styles.followButton}>
-                        <Text style={styles.followButtonText}>Follow</Text>
-                    </TouchableOpacity>
+                    {!(search._id === myData._id) &&
+                        <TouchableOpacity
+                            style={[styles.followButton, isFollowing && styles.followingButton]}
+                            onPress={handleFollowPress}
+                        >
+                            <Text style={[styles.followButtonText, isFollowing && styles.followingButtonText]}>
+                                {isFollowing ? 'Following' : 'Follow'}
+                            </Text>
+                        </TouchableOpacity>
+                    }
                 </View>
             </View>
         </SafeAreaView>
@@ -82,9 +132,16 @@ const styles = StyleSheet.create({
         width: '100%',
         alignSelf: 'center',
         alignItems: 'center',
+        marginTop: 5
     },
     followButtonText: {
         color: '#fff',
         fontWeight: 'bold',
+    },
+    followingButton: {
+        backgroundColor: '#E1E8ED',
+    },
+    followingButtonText: {
+        color: '#000',
     },
 });
