@@ -89,7 +89,6 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
         });
 
         if (response.data.status !== 'ok') {
-          // Jika gagal, kembalikan ke state semula
           setLiked(true);
           setLikesCount(prevLikesCount => prevLikesCount + 1);
           console.log('Error in unlike response data:', response.data.data);
@@ -97,7 +96,6 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
         }
       } catch (error) {
         console.error('Error unliking post:', error.message);
-        // Jika ada error, kembalikan ke state semula
         setLiked(true);
         setLikesCount(prevLikesCount => prevLikesCount + 1);
         Alert.alert('Error', 'Failed to unlike post. Please try again.');
@@ -112,7 +110,6 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
         });
 
         if (response.data.status !== 'ok') {
-          // Jika gagal, kembalikan ke state semula
           setLiked(false);
           setLikesCount(prevLikesCount => prevLikesCount - 1);
           console.log('Error in like response data:', response.data.data);
@@ -120,7 +117,6 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
         }
       } catch (error) {
         console.error('Error liking post:', error.message);
-        // Jika ada error, kembalikan ke state semula
         setLiked(false);
         setLikesCount(prevLikesCount => prevLikesCount - 1);
         Alert.alert('Error', 'Failed to like post. Please try again.');
@@ -141,7 +137,6 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
         });
 
         if (response.data.status !== 'ok') {
-          // Jika gagal, kembalikan ke state semula
           setBookmarked(true);
           setBookMarksCount(prevBookmarksCount => prevBookmarksCount + 1);
           console.log('Error in unbookmark response data:', response.data.data);
@@ -150,7 +145,6 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
         }
       } catch (error) {
         console.error('Error unbookmarking post:', error.message);
-        // Jika ada error, kembalikan ke state semula
         setBookmarked(true);
         setBookMarksCount(prevBookmarksCount => prevBookmarksCount + 1);
       }
@@ -164,7 +158,6 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
         });
 
         if (response.data.status !== 'ok') {
-          // Jika gagal, kembalikan ke state semula
           setBookmarked(false);
           setBookMarksCount(prevBookmarksCount => prevBookmarksCount - 1);
           console.log('Error in bookmark response data:', response.data.data);
@@ -173,7 +166,6 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
         }
       } catch (error) {
         console.error('Error bookmarking post:', error.message);
-        // Jika ada error, kembalikan ke state semula
         setBookmarked(false);
         setBookMarksCount(prevBookmarksCount => prevBookmarksCount - 1);
       }
@@ -193,7 +185,6 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
           })
           .then(res => {
             if (res.data.status !== 'ok') {
-              // Jika gagal, kembalikan ke state semula
               setReposted(true);
               setRepostsCount(prevRepostsCount => prevRepostsCount + 1);
               console.log('Error in unrepost response data:', res.data);
@@ -209,7 +200,6 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
           })
           .then(res => {
             if (res.data.status !== 'ok') {
-              // Jika gagal, kembalikan ke state semula
               setReposted(false);
               setRepostsCount(prevRepostsCount => prevRepostsCount - 1);
               console.log('Error in repost response data:', res.data);
@@ -218,7 +208,6 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
       }
     } catch (error) {
       console.error('Error reposting:', error);
-      // Jika ada error, kembalikan ke state semula
       setReposted(!reposted);
       setRepostsCount(prevRepostsCount => reposted ? prevRepostsCount + 1 : prevRepostsCount - 1);
     }
@@ -241,7 +230,7 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
     setIsModalVisible(false);
     setModalMediaUri('');
   };
-  
+
   const handleShare = async () => {
     try {
       await Share.share({
@@ -369,7 +358,6 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
 
   return (
     <SafeAreaView style={styles.card}>
-      {/* User Info */}
       <View style={styles.userInfo}>
         <TouchableOpacity onPress={handleProfilePress}>
           <Image
@@ -387,8 +375,6 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
           {tweet?.isAdmin ? (<Text style={styles.verifiedIcon}>{verifiedIcon}</Text>) : null}
           <Text style={styles.postDate}>{formatDate(tweet?.postDate)}</Text>
         </View>
-
-        {/* Options Button */}
         <View style={styles.optionsContainer}>
           <TouchableOpacity
             style={styles.optionsButton}
@@ -400,7 +386,6 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
             />
           </TouchableOpacity>
         </View>
-
         <Modal
           animationType="slide"
           transparent={true}
@@ -430,11 +415,7 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
           </View>
         </Modal>
       </View>
-
-      {/* Tweet Content */}
       {tweet?.content ? <Text style={styles.tweetText}>{tweet?.content}</Text> : null}
-
-      {/* Tweet Media with Horizontal Scroll */}
       {tweet?.media && tweet?.media?.length > 0 ? (
         <FlatList
           data={tweet?.media}
@@ -445,8 +426,6 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
           style={styles.mediaFlatList}
         />
       ) : null}
-
-      {/* Interactions */}
       <View style={styles.actions}>
         <InteractionButton
           icon={liked ? 'heart' : 'heart-outline'}
@@ -555,9 +534,9 @@ const styles = StyleSheet.create({
     marginTop: 5
   },
   avatar: {
-    width: 52,
-    height: 49,
-    borderRadius: 24,
+    width: 35,
+    height: 40,
+    borderRadius: 20,
     marginRight: 12,
   },
   userDetails: {
@@ -565,7 +544,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   userName: {
-    fontSize: 16,
+    fontSize: 12,
     fontWeight: 'bold',
     color: '#040608',
     marginRight: 4,
@@ -574,6 +553,7 @@ const styles = StyleSheet.create({
     color: '#718096',
     fontWeight: '700',
     marginRight: 7,
+    fontSize: 12,
   },
   verifiedIcon: {
     marginLeft: -3,
@@ -582,7 +562,7 @@ const styles = StyleSheet.create({
   },
   postDate: {
     color: '#718096',
-    fontSize: 12,
+    fontSize: 10,
   },
   tweetText: {
     fontSize: 15,
@@ -591,7 +571,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   mediaFlatList: {
-    marginTop: 30,
+    marginTop: 20,
     marginVertical: 8,
   },
   tweetImage: {
