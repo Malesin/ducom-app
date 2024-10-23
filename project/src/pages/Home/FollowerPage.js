@@ -1,9 +1,9 @@
-import { SafeAreaView, ScrollView, StyleSheet } from 'react-native'
+import { SafeAreaView, ScrollView, StyleSheet, Text } from 'react-native'
 import React from 'react'
 import FollowCard from '../../components/FollowCard'
 
 const FollowerPage = () => {
-    const username = "mikadotjees"; 
+    const username = "mikadotjees";
 
     return (
         <SafeAreaView style={styles.container}>
@@ -11,9 +11,13 @@ const FollowerPage = () => {
                 <FollowCard
                     followText="Follow Back"
                     followingText="Following"
-                    removeButtonText="Remove Follower"
-                    message={`We won't tell ${username} they were removed from your followers.`}
-                    username={username} 
+                    removeButtonText="Remove"
+                    message={
+                        <Text>
+                            We won't tell <Text style={styles.boldUsername}>{username}</Text> they were removed from your followers.
+                        </Text>
+                    }
+                    username={username}
                 />
             </ScrollView>
         </SafeAreaView>
@@ -30,6 +34,9 @@ const styles = StyleSheet.create({
     },
     scrollView: {
         paddingBottom: 20,
+    },
+    boldUsername: {
+        fontWeight: 'bold',
     },
     text: {
         fontSize: 18,

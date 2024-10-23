@@ -3,14 +3,14 @@ import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
 import ProfileImage from '../assets/iya.png';
 import Modal from 'react-native-modal';
 
-const FollowSheet = ({ isVisible, onClose, onRemove, username, removeButtonText, message }) => {
+const FollowSheet = ({ isVisible, onClose, onRemove, removeButtonText, message }) => {
     return (
         <Modal isVisible={isVisible} onBackdropPress={onClose} style={styles.modal}>
             <View style={styles.container}>
                 <Image source={ProfileImage} style={styles.profileImage} />
                 <Text style={styles.title}>Remove follower?</Text>
                 <Text style={styles.message}>
-                    {message}.
+                    {message}
                 </Text>
                 <TouchableOpacity style={styles.removeButton} onPress={onRemove}>
                     <Text style={styles.removeButtonText}>{removeButtonText}</Text>
