@@ -1,21 +1,24 @@
 import React from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
-import ProfileImage from '../../assets/iya.png';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
-const Usercard = () => {
+const Usercard = ({ user, handleDeleteUser }) => {
+    const idUser = user?.id
     return (
         <View style={styles.container}>
             <Image
-                source={ProfileImage}
+                source={
+                    user?.profilePicture
+                        ? { uri: user?.profilePicture }
+                        : require('../../assets/profilepic.png')}
                 style={styles.profileImage}
             />
             <View style={styles.textContainer}>
-                <Text style={styles.username}>orangngoding</Text>
-                <Text style={styles.userhandle}>@mikadotjees</Text>
+                <Text style={styles.username}>{user?.name}</Text>
+                <Text style={styles.userhandle}>@{user?.username}</Text>
             </View>
             <View style={styles.iconContainer}>
-                <TouchableOpacity style={styles.iconButton}>
+                <TouchableOpacity style={styles.iconButton} onPress={() => handleDeleteUser(idUser)}>
                     <MaterialIcons name="delete" size={25} color="#C70039" />
                 </TouchableOpacity>
             </View>
