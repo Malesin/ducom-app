@@ -136,16 +136,16 @@ const styles = StyleSheet.create({
     },
     username: {
         fontWeight: 'bold',
-        fontSize: 14,
+        fontSize: 12,
         color: '#000',
     },
     message: {
         color: '#000',
-        fontSize: 14,
+        fontSize: 12,
     },
     time: {
         color: 'gray',
-        fontSize: 12,
+        fontSize: 10,
     },
     followButton: {
         borderRadius: 5,
