@@ -3,10 +3,18 @@ import React from 'react'
 import FollowCard from '../../components/FollowCard'
 
 const FollowingPage = () => {
+    const username = "mikadotjees"; // Ganti dengan username yang sesuai
+
     return (
         <SafeAreaView style={styles.container}>
             <ScrollView contentContainerStyle={styles.scrollView}>
-                <FollowCard followText="Follow" followingText="Following" />
+                <FollowCard
+                    followText="Follow"
+                    followingText="Following"
+                    removeButtonText="Unfollow"
+                    message={username} // Hanya username
+                    username={username} // Teruskan username
+                />
             </ScrollView>
         </SafeAreaView>
     )
