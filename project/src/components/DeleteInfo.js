@@ -21,16 +21,13 @@ const DeleteInfo = ({ navigation }) => {
         >
             <View style={styles.modalBackground}>
                 <View style={styles.modalContainer}>
-                    {/* Warning Icon */}
                     <View style={styles.iconContainer}>
                         <Icon name="warning" size={50} color="white" />
                     </View>
-                    {/* Info Text */}
                     <Text style={styles.title}>Info</Text>
                     <Text style={styles.message}>
                         When an account is deleted, you will not be able to restore the account and sign up to enter the application.
                     </Text>
-                    {/* OK Button */}
                     <TouchableOpacity style={styles.okButton} onPress={handleOkPress}>
                         <Text style={styles.okButtonText}>OK</Text>
                     </TouchableOpacity>

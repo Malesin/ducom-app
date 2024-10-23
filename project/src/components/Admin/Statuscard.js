@@ -19,9 +19,6 @@ const Statuscard = () => {
                     <MaterialIcons name="refresh" size={25} color="#21c002" />
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.iconButton}>
-                    <MaterialIcons name="error-outline" size={25} color="#FFC300" />
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.iconButton}>
                     <MaterialIcons name="delete" size={25} color="#C70039" />
                 </TouchableOpacity>
             </View>
@@ -40,8 +37,8 @@ const styles = StyleSheet.create({
     },
     profileImage: {
         marginLeft: 10,
-        width: 50,
-        height: 50,
+        width: 40,
+        height: 40,
         borderRadius: 30,
     },
     textContainer: {
@@ -49,7 +46,7 @@ const styles = StyleSheet.create({
         marginLeft: 15,
     },
     username: {
-        fontSize: 16,
+        fontSize: 14,
         fontWeight: 'bold',
         color: '#000',
     },
