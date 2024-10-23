@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Image, SafeAreaView, StyleSheet, Text, View, TouchableOpacity, ToastAndroid } from 'react-native';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../../config';
@@ -70,27 +71,36 @@ const FollowNotification = ({ followNotif }) => {
         } catch (error) {
             setIsFollowing(isFollowing);
             console.error(error);
-            ToastAndroid.show("Something Error, Try Again Later", ToastAndroid.SHORT); // Menambahkan toast error
-        };
+            ToastAndroid.show("Something Error, Try Again Later", ToastAndroid.SHORT);
+        }
+    };
 
-        useEffect(() => {
-            const follow = followNotif?.fromUser.followers.some(follow => follow === followNotif?.user)
-            setIsFollowing(follow)
-            console.log("followNotif:", followNotif)
-        }, []);;
+    useEffect(() => {
+        const follow = followNotif?.fromUser.followers.some(follow => follow === followNotif?.user)
+        setIsFollowing(follow)
+        console.log("followNotif:", followNotif)
+    }, []);
 
-        return (
-            <SafeAreaView style={styles.container}>
-                <Image
-                    source={followNotif?.fromUser.profilePicture
-                        ? { uri: followNotif?.fromUser.profilePicture }
-                        : require('../../assets/profilepic.png')}
-                    style={styles.profilePicture} />
-                <View style={styles.textContainer}>
-                    <Text style={styles.username}>{followNotif?.fromUser.username}</Text>
-                    <Text style={styles.message}>started following you. <Text style={styles.time}>{formatDate(followNotif?.created_at)}</Text></Text>
-                </View>
-                <TouchableOpacity
+    return (
+        <SafeAreaView style={styles.container}>
+            <MaterialCommunityIcons name="account-plus" size={15} color={'#000'} />
+            <Image
+                source={followNotif?.fromUser.profilePicture
+                    ? { uri: followNotif?.fromUser.profilePicture }
+                    : require('../../assets/profilepic.png')}
+                style={styles.profilePicture} />
+            <View style={styles.textContainer}>
+                <Text style={styles.username}>{followNotif?.fromUser.username}</Text>
+                <Text style={styles.message}>started following you. <Text style={styles.time}>{formatDate(followNotif?.created_at)}</Text></Text>
+            </View>
+            <TouchableOpacity
+                style={[
+                    styles.followButton,
+                    isFollowing ? styles.followingButton : styles.followButtonUnpressed
+                ]}
+                onPress={handleFollowPress}
+            >
+                <Text
                     style={[
                         styles.followButton,
                         isFollowing ? styles.followingButton : styles.followButtonUnpressed
@@ -125,6 +135,7 @@ const styles = StyleSheet.create({
         height: 35,
         borderRadius: 20,
         marginRight: 10,
+        marginLeft: 15
     },
     textContainer: {
         flex: 1,
@@ -165,5 +176,11 @@ const styles = StyleSheet.create({
     followingButtonText: {
         color: '#000',
         fontWeight: 'bold',
+        fontSize: 12
+    },
+    followButtonText: {
+        color: '#000',
+        fontWeight: 'bold',
+        fontSize: 12
     },
 })

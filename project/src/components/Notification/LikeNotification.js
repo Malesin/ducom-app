@@ -85,7 +85,7 @@ const LikeNotification = ({ likeNotification }) => {
     <SafeAreaView style={styles.card}>
       <TouchableOpacity onPress={handleLikeNotificationPress}>
         <View style={styles.notificationRow}>
-          <MaterialCommunityIcons name="heart" size={15} color="#E0245E" style={[styles.heartIcon, { marginRight: 8 }]} />
+          <MaterialCommunityIcons name="heart" size={15} color="#E0245E" style={styles.heartIcon} />
           <Image
             source={likeNotification.like.user.profilePicture ? { uri: likeNotification.like.user.profilePicture } : DefaultAvatar}
             style={styles.avatar}
@@ -103,7 +103,7 @@ const LikeNotification = ({ likeNotification }) => {
             source={
               likeNotification?.post?.media && likeNotification.post.media.length > 0
               && (likeNotification.post.media[0].type === 'video'
-                ? { uri: thumbnail } 
+                ? { uri: thumbnail }
                 : { uri: likeNotification.post.media[0].uri })
             }
             style={styles.postImage} />
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: '#fff',
     paddingVertical: 10,
-    paddingHorizontal: 15,
+    paddingHorizontal: 10,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -131,6 +131,9 @@ const styles = StyleSheet.create({
   notificationRow: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  heartIcon: {
+    marginRight: 8
   },
   avatar: {
     width: 40,

@@ -49,7 +49,7 @@ export default function Profilescreen() {
         if (user.profilePicture) {
           setProfilePicture({ uri: user.profilePicture });
         }
-      }, 2500); 
+      }, 2500);
     } catch (error) {
       console.error('Error occurred:', error);
     }
@@ -198,8 +198,10 @@ export default function Profilescreen() {
                   </>
                 ) : (
                   <>
-                    <Text style={styles.statNumber}>{userData ? userData?.followers.length : 0}</Text>
-                    <Text style={styles.statLabel}>Followers</Text>
+                    <TouchableOpacity onPress={() => navigation.navigate('Follow')}>
+                      <Text style={styles.statNumber}>{userData ? userData?.followers.length : 0}</Text>
+                      <Text style={styles.statLabel}>Followers</Text>
+                    </TouchableOpacity>
                   </>
                 )}
               </View>
@@ -221,8 +223,10 @@ export default function Profilescreen() {
                   </>
                 ) : (
                   <>
-                    <Text style={styles.statNumber}>{userData ? userData?.following.length : 0}</Text>
-                    <Text style={styles.statLabel}>Following</Text>
+                    <TouchableOpacity onPress={() => navigation.navigate('Follow')}>
+                      <Text style={styles.statNumber}>{userData ? userData?.following.length : 0}</Text>
+                      <Text style={styles.statLabel}>Following</Text>
+                    </TouchableOpacity>
                   </>
                 )}
               </View>
@@ -236,7 +240,7 @@ export default function Profilescreen() {
                     animation="pulse"
                     height={20}
                     width={150}
-                    style={[styles.skeleton, { borderRadius: 3 }]} 
+                    style={[styles.skeleton, { borderRadius: 3 }]}
                   />
                 ) : (
                   <Text style={styles.name}>{userData?.name}</Text>
@@ -250,7 +254,7 @@ export default function Profilescreen() {
                   animation="pulse"
                   height={14}
                   width={100}
-                  style={[styles.skeleton, { borderRadius: 3 }]} 
+                  style={[styles.skeleton, { borderRadius: 3 }]}
                 />
               ) : (
                 <Text style={styles.username}>@{userData?.username}</Text>
@@ -260,7 +264,7 @@ export default function Profilescreen() {
                   animation="pulse"
                   height={13}
                   width={200}
-                  style={[styles.skeleton, { borderRadius: 3 }]} 
+                  style={[styles.skeleton, { borderRadius: 3 }]}
                 />
               ) : (
                 <Text style={styles.description}>
@@ -274,7 +278,7 @@ export default function Profilescreen() {
                 height={28}
                 width={120}
                 borderRadius={14}
-                style={[styles.skeleton, { marginRight: 14, borderRadius: 3 }]} 
+                style={[styles.skeleton, { marginRight: 14, borderRadius: 3 }]}
               />
             ) : (
               <TouchableOpacity

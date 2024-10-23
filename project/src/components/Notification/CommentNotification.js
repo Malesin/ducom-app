@@ -141,6 +141,7 @@ const styles = StyleSheet.create({
   },
   icon: {
     marginRight: 10,
+    color: '#000'
   },
   avatar: {
     width: 40,
