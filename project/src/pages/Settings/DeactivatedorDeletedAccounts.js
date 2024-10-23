@@ -12,4 +12,6 @@ const DeactivatedorDeletedAccounts = () => {
 
 export default DeactivatedorDeletedAccounts
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+
+})
