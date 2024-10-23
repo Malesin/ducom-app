@@ -71,7 +71,6 @@ const FollowNotification = ({ followNotif }) => {
             setIsFollowing(isFollowing);
             console.error(error);
             ToastAndroid.show("Something Error, Try Again Later", ToastAndroid.SHORT); // Menambahkan toast error
-        }
     };
 
     useEffect(() => {
