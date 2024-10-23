@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import DefaultAvatar from '../../assets/profilepic.png';
@@ -108,7 +108,7 @@ const CommentNotification = ({ commentNotification }) => {
                   source={
                     commentNotification?.post?.media && commentNotification.post.media.length > 0
                     && (commentNotification.post.media[0].type === 'video'
-                      ? { uri: thumbnail } 
+                      ? { uri: thumbnail }
                       : { uri: commentNotification.post.media[0].uri })
                   }
                   style={styles.postImage} />
@@ -159,12 +159,12 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   nameAt: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: 'bold',
     color: '#000',
   },
   userNameAt: {
-    fontSize: 14,
+    fontSize: 12,
     color: '#657786',
   },
   dot: {
@@ -173,28 +173,28 @@ const styles = StyleSheet.create({
   },
   commentRowContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between', // Ensure the comment and image are spaced apart
+    justifyContent: 'space-between',
     alignItems: 'center',
   },
   comment: {
-    fontSize: 14,
+    fontSize: 12,
     color: '#000',
   },
   commentDescription: {
-    fontSize: 14,
+    fontSize: 12,
     color: '#000',
   },
   date: {
-    fontSize: 12,
+    fontSize: 11,
     color: '#657786',
   },
   postMediaContainer: {
-    alignSelf: 'flex-end', // Moves the image to the right
+    alignSelf: 'flex-end',
   },
   postImage: {
     width: 43,
     height: 43,
-    marginRight:5
+    marginRight: 5
   },
   commentRow: {
     flexDirection: 'column',

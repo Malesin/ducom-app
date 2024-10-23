@@ -150,27 +150,27 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   userName: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: 'bold',
     color: '#000',
     marginRight: 2,
   },
   userNameAt: {
-    fontSize: 13,
+    fontSize: 11,
     color: '#657786',
     marginRight: 5,
   },
   dot: {
-    fontSize: 15,
+    fontSize: 10,
     color: '#657786',
     marginHorizontal: 5,
   },
   notificationText: {
-    fontSize: 14,
+    fontSize: 13,
     color: '#000',
   },
   date: {
-    fontSize: 13,
+    fontSize: 10,
     color: '#657786',
   },
   postImage: {

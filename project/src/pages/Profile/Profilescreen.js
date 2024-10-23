@@ -392,7 +392,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     marginTop: 10,
-    marginLeft: 20,
+    marginLeft: 15,
   },
   statItem: {
     alignItems: 'center',
