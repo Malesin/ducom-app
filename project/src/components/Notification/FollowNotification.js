@@ -169,11 +169,11 @@ const styles = StyleSheet.create({
     followingButtonText: {
         color: '#000',
         fontWeight: 'bold',
-        fontSize: 12
+        fontSize: 11
     },
     followButtonText: {
         color: '#000',
         fontWeight: 'bold',
-        fontSize: 12
+        fontSize: 11
     },
 })
