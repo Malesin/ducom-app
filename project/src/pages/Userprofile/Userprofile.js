@@ -316,20 +316,21 @@ const Userprofile = ({ userIdPost, navigation, idUser }) => {
                 </Text>
             )}
           </View>
-          {!userData ? ( // Menambahkan skeleton untuk tombol edit
+          {!userData ? ( // Menambahkan skeleton di posisi tombol follow
             <Skeleton
               animation="pulse"
-              height={28}
-              width={120}
-              borderRadius={14}
-              style={[styles.skeleton, { marginRight: 14, borderRadius: 3 }]} 
+              height={30}
+              width={150}
+              style={[styles.skeleton, { borderRadius: 20, marginRight: 15 }]} 
             />
           ) : (
             <TouchableOpacity
-              style={styles.editButton}
-              onPress={() => navigation.navigate('EditProfile')}
+              style={[styles.editButton, isFollowing && styles.followingButton]}
+              onPress={handleFollowPress}
             >
-              <Text style={styles.editButtonText}>Edit Profile</Text>
+              <Text style={[styles.editButtonText, isFollowing && styles.followingButtonText]}>
+                {isFollowing ? 'Following' : 'Follow'}
+              </Text>
             </TouchableOpacity>
           )}
         </View>
