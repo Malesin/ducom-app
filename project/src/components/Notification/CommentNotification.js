@@ -1,13 +1,14 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import DefaultAvatar from '../../assets/profilepic.png';
-import PostImage from '../../assets/iya.png';
 import { useNavigation } from '@react-navigation/native';
 import { formatNotification } from '../../pages/Home/formatNotification';
+import { createThumbnail } from 'react-native-create-thumbnail';
 
 const CommentNotification = ({ commentNotification }) => {
   const navigation = useNavigation();
+  const [thumbnail, setThumbnail] = useState(null);
 
   const handleCommentNotification = async () => {
     const formattedTweet = await formatNotification(commentNotification);
@@ -60,6 +61,24 @@ const CommentNotification = ({ commentNotification }) => {
     return `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
   };
 
+  useEffect(() => {
+    const generateThumbnail = async () => {
+      if (commentNotification?.post?.media && commentNotification.post.media.length > 0) {
+        const media = commentNotification.post.media[0];
+        if (media.type === 'video' && media.uri) {
+          try {
+            const { path } = await createThumbnail({ url: media.uri });
+            setThumbnail(path);
+          } catch (error) {
+            console.log('Error generating thumbnail:', error);
+          }
+        }
+      }
+    };
+
+    generateThumbnail();
+  }, [commentNotification]);
+
   return (
     <SafeAreaView style={styles.card}>
       <TouchableOpacity onPress={handleCommentNotification}>
@@ -85,7 +104,14 @@ const CommentNotification = ({ commentNotification }) => {
                 </Text>
               </View>
               <View style={styles.postMediaContainer}>
-                <Image source={PostImage} style={styles.postImage} />
+                <Image
+                  source={
+                    commentNotification?.post?.media && commentNotification.post.media.length > 0
+                    && (commentNotification.post.media[0].type === 'video'
+                      ? { uri: thumbnail } 
+                      : { uri: commentNotification.post.media[0].uri })
+                  }
+                  style={styles.postImage} />
               </View>
             </View>
           </View>
@@ -165,8 +191,9 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-end', // Moves the image to the right
   },
   postImage: {
-    width: 35,
-    height: 35,
+    width: 43,
+    height: 43,
+    marginRight:5
   },
   commentRow: {
     flexDirection: 'column',

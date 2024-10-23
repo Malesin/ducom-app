@@ -1,20 +1,94 @@
-import React, { useState } from 'react';
-import { Image, SafeAreaView, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
-import ProfilePicture from '../../assets/iya.png';
+import React, { useState, useEffect } from 'react';
+import { Image, SafeAreaView, StyleSheet, Text, View, TouchableOpacity, ToastAndroid } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import config from '../../config';
+const serverUrl = config.SERVER_URL;
 
-const FollowNotification = () => {
+const FollowNotification = ({ followNotif }) => {
     const [isFollowing, setIsFollowing] = useState(false);
 
-    const handleFollowPress = () => {
-        setIsFollowing(!isFollowing);  
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffInSeconds = Math.floor((now - date) / 1000);
+
+        if (diffInSeconds < 1) {
+            return 'now';
+        }
+
+        if (diffInSeconds < 60) {
+            return `${diffInSeconds}s ago`;
+        }
+
+        const diffInMinutes = Math.floor(diffInSeconds / 60);
+        if (diffInMinutes < 60) {
+            return `${diffInMinutes}m ago`;
+        }
+
+        const diffInHours = Math.floor(diffInMinutes / 60);
+        if (diffInHours < 24) {
+            return `${diffInHours}h ago`;
+        }
+
+        const diffInDays = Math.floor(diffInHours / 24);
+        if (diffInDays < 7) {
+            return `${diffInDays}d ago`;
+        }
+
+        const diffInWeeks = Math.floor(diffInDays / 7);
+        if (diffInWeeks < 4) {
+            return `${diffInWeeks}w ago`;
+        }
+
+        return `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
     };
+
+    const handleFollowPress = async () => {
+        try {
+            const token = await AsyncStorage.getItem('token');
+            if (isFollowing) {
+                await axios
+                    .post(`${serverUrl}/unfollow`, {
+                        token: token,
+                        unfollowUserId: followNotif?.fromUser._id
+                    })
+                    .then(res => {
+                        console.log(res.data);
+                    })
+            } else {
+                await axios
+                    .post(`${serverUrl}/follow`, {
+                        token: token,
+                        followUserId: followNotif?.fromUser._id
+                    })
+                    .then(res => {
+                        console.log(res.data);
+                    })
+            }
+            setIsFollowing(!isFollowing);
+        } catch (error) {
+            setIsFollowing(isFollowing);
+            console.error(error);
+            ToastAndroid.show("Something Error, Try Again Later", ToastAndroid.SHORT); // Menambahkan toast error
+    };
+
+    useEffect(() => {
+        const follow = followNotif?.fromUser.followers.some(follow => follow === followNotif?.user)
+        setIsFollowing(follow)
+        console.log("followNotif:", followNotif)
+    }, []);;
 
     return (
         <SafeAreaView style={styles.container}>
-            <Image source={ProfilePicture} style={styles.profilePicture} />
+            <Image
+                source={followNotif?.fromUser.profilePicture
+                    ? { uri: followNotif?.fromUser.profilePicture }
+                    : require('../../assets/profilepic.png')}
+                style={styles.profilePicture} />
             <View style={styles.textContainer}>
-                <Text style={styles.username}>mikadotjees</Text>
-                <Text style={styles.message}>started following you. <Text style={styles.time}>1d</Text></Text>
+                <Text style={styles.username}>{followNotif?.fromUser.username}</Text>
+                <Text style={styles.message}>started following you. <Text style={styles.time}>{formatDate(followNotif?.created_at)}</Text></Text>
             </View>
             <TouchableOpacity
                 style={[

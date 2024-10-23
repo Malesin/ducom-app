@@ -47,10 +47,12 @@ const SearchedCard = ({ search, myData, onClose }) => {
         <SafeAreaView style={styles.container}>
             <View style={styles.overlay} />
             <View style={styles.card}>
-                <Image source={
-                    search?.profilePicture
-                        ? { uri: search?.profilePicture }
-                        : require('../assets/profilepic.png')} style={styles.profilePicture} />
+                <Image
+                    source={
+                        search?.profilePicture
+                            ? { uri: search?.profilePicture }
+                            : require('../assets/profilepic.png')}
+                    style={styles.profilePicture} />
                 <View style={styles.textContainer}>
                     <Text style={styles.username}>{search?.name}</Text>
                     <Text style={styles.handle}>@{search?.username}</Text>

@@ -5,7 +5,7 @@ import axios from 'axios';
 import config from '../../config';
 import LikeNotification from '../../components/Notification/LikeNotification';
 import CommentNotification from '../../components/Notification/CommentNotification';
-import { Skeleton } from 'react-native-elements'; 
+import { Skeleton } from 'react-native-elements';
 import ReportedNotification from '../../components/ReportedNotification';
 import FollowNotification from '../../components/Notification/FollowNotification';
 
@@ -14,6 +14,7 @@ const serverUrl = config.SERVER_URL;
 
 const Notificationscreen = () => {
   const [allNotifications, setAllNotifications] = useState([]);
+  const [followNotifs, setFollowNotifs] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [showSkeleton, setShowSkeleton] = useState(true);
 
@@ -21,27 +22,43 @@ const Notificationscreen = () => {
     try {
       const token = await AsyncStorage.getItem('token');
 
-      const likeResponse = await axios.post(`${serverUrl}/like-notifications`, { token });
-      const { data: likeData, status: likeStatus } = likeResponse.data;
       let likeNotifications = [];
-      if (likeStatus === 'ok') {
-        likeNotifications = likeData.flat().filter(notification => notification !== null);
-      } else {
-        Alert.alert('Error', 'Failed to fetch like notifications');
-      }
+      await axios
+        .post(`${serverUrl}/like-notifications`, { token })
+        .then(res => {
+          if (res.data.status === 'ok') {
+            likeNotifications = res.data.data.flat().filter(notification => notification !== null);
+          } else {
+            Alert.alert('Error', 'Failed to fetch like notifications');
+          }
+        })
 
-      const commentResponse = await axios.post(`${serverUrl}/comment-notifications`, { token });
-      const { data: commentData, status: commentStatus } = commentResponse.data;
       let commentNotifications = [];
-      if (commentStatus === 'ok') {
-        commentNotifications = commentData.flat().filter(notification => notification !== null);
-      } else {
-        Alert.alert('Error', 'Failed to fetch comment notifications');
-      }
+      await axios
+        .post(`${serverUrl}/comment-notifications`, { token })
+        .then(res => {
+          if (res.data.status === 'ok') {
+            commentNotifications = res.data.data.flat().filter(notification => notification !== null);
+          } else {
+            Alert.alert('Error', 'Failed to fetch comment notifications');
+          }
+        })
 
-      const allNotifications = [...likeNotifications, ...commentNotifications].sort((a, b) => {
-        const aDate = a.like?.created_at || a.comment?.created_at;
-        const bDate = b.like?.created_at || b.comment?.created_at;
+      let followNotifications = [];
+      await axios
+        .post(`${serverUrl}/follow-notifications`, { token })
+        .then(res => {
+          if (res.data.status === 'ok') {
+            followNotifications = res.data.data.flat().filter(notification => notification !== null);
+          } else {
+            Alert.alert('Error', 'Failed to fetch follow notifications');
+          }
+        })
+      setFollowNotifs(followNotifications)
+
+      const allNotifications = [...likeNotifications, ...commentNotifications, ...followNotifications].sort((a, b) => {
+        const aDate = a.like?.created_at || a.comment?.created_at || a?.created_at;
+        const bDate = b.like?.created_at || b.comment?.created_at || b?.created_at;
         return new Date(bDate) - new Date(aDate);
       });
 
@@ -103,11 +120,9 @@ const Notificationscreen = () => {
       ))}
     </>
   );
-
   return (
     <SafeAreaView style={styles.container}>
-      <ReportedNotification />
-      <FollowNotification />
+      {/* <ReportedNotification /> */}
       <ScrollView
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -122,8 +137,10 @@ const Notificationscreen = () => {
             allNotifications.map((notification, index) => (
               notification.like ? (
                 <LikeNotification key={index} likeNotification={notification} />
-              ) : (
+              ) : notification.comment ? (
                 <CommentNotification key={index} commentNotification={notification} />
+              ) : (
+                <FollowNotification key={index} followNotif={notification} />
               )
             ))
           )

@@ -1,13 +1,15 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import DefaultAvatar from '../../assets/profilepic.png';
 import PostImage from '../../assets/iya.png';
 import { useNavigation } from '@react-navigation/native';
 import { formatNotification } from '../../pages/Home/formatNotification';
+import { createThumbnail } from 'react-native-create-thumbnail';
 
 const LikeNotification = ({ likeNotification }) => {
   const navigation = useNavigation();
+  const [thumbnail, setThumbnail] = useState(null);
 
   const handleLikeNotificationPress = async () => {
     const formattedTweet = await formatNotification(likeNotification);
@@ -61,6 +63,24 @@ const LikeNotification = ({ likeNotification }) => {
     return `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
   };
 
+  useEffect(() => {
+    const generateThumbnail = async () => {
+      if (likeNotification?.post?.media && likeNotification.post.media.length > 0) {
+        const media = likeNotification.post.media[0];
+        if (media.type === 'video' && media.uri) {
+          try {
+            const { path } = await createThumbnail({ url: media.uri });
+            setThumbnail(path);
+          } catch (error) {
+            console.log('Error generating thumbnail:', error);
+          }
+        }
+      }
+    };
+
+    generateThumbnail();
+  }, [likeNotification]);
+
   return (
     <SafeAreaView style={styles.card}>
       <TouchableOpacity onPress={handleLikeNotificationPress}>
@@ -79,7 +99,14 @@ const LikeNotification = ({ likeNotification }) => {
             </View>
             <Text style={styles.notificationText}>Liked your post</Text>
           </View>
-          <Image source={PostImage} style={styles.postImage} />
+          <Image
+            source={
+              likeNotification?.post?.media && likeNotification.post.media.length > 0
+              && (likeNotification.post.media[0].type === 'video'
+                ? { uri: thumbnail } 
+                : { uri: likeNotification.post.media[0].uri })
+            }
+            style={styles.postImage} />
         </View>
       </TouchableOpacity>
     </SafeAreaView>
