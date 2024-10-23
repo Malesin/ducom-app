@@ -1,17 +1,29 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity, Modal, TextInput, SafeAreaView, Alert } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, Modal, TextInput, SafeAreaView, Alert, ScrollView } from 'react-native';
 import ProfileImage from '../../assets/iya.png';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import config from '../../config';
+const serverUrl = config.SERVER_URL;
 
-const ReportedUser = () => {
+const ReportedUser = ({ report }) => {
+    const capitalizeFirstLetter = (string) => {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+    };
     const [modalVisible, setModalVisible] = useState(false);
     const [reportText, setReportText] = useState('');
     const [inputHeight, setInputHeight] = useState(40);
     const [reportDetailsVisible, setReportDetailsVisible] = useState(false);
     const [reportDetails, setReportDetails] = useState({
-        postOrComment: 'kys',
-        reason: 'Inappropriate content'
+        category: report.category,
+        commentProof: report.commentProof,
+        reason: report.reason
     });
+    const reasonText = reportDetails.reason.join(', \n');
+    const reportCateogry = capitalizeFirstLetter(reportDetails.category);
+
+    // console.log(report)
 
     const handleReportPress = () => {
         setModalVisible(true);
@@ -22,10 +34,25 @@ const ReportedUser = () => {
         setReportText('');
     };
 
-    const handleSend = () => {
-        console.log('Report sent:', reportText);
-        setModalVisible(false);
-        setReportText('');
+    const handleSend = async () => {
+        const token = await AsyncStorage.getItem('token');
+        try {
+            await axios
+            .post(`${serverUrl}/send-warning`, {
+                token: token,
+                userId: report?.userId,
+                message: reportText
+            })
+            .then(res => {
+                console.log(res.data)
+            })
+        } catch (error) {
+            console.error(error)
+        } finally {
+            console.log('Report sent:', reportText);
+            setModalVisible(false);
+            setReportText('');
+        }
     };
 
     const handleDeletePress = () => {
@@ -53,12 +80,15 @@ const ReportedUser = () => {
     return (
         <SafeAreaView style={styles.container}>
             <Image
-                source={ProfileImage}
+                source={
+                    report?.profilePicture
+                        ? { uri: report?.profilePicture }
+                        : require('../../assets/profilepic.png')}
                 style={styles.profileImage}
             />
             <View style={styles.textContainer}>
-                <Text style={styles.username}>orangngoding</Text>
-                <Text style={styles.userhandle}>@mikadotjees</Text>
+                <Text style={styles.username}>{report.name}</Text>
+                <Text style={styles.userhandle}>@{report.username}</Text>
             </View>
             <View style={styles.iconContainer}>
                 <TouchableOpacity style={styles.iconButton} onPress={handleViewPress}>
@@ -117,19 +147,28 @@ const ReportedUser = () => {
                 <View style={styles.modalContainer}>
                     <View style={styles.modalView}>
                         <Text style={styles.modalText}>Report Details</Text>
-                        <Text style={styles.modalsubtitle}>Reported Content:</Text>
+                        <Text style={styles.modalsubtitle}>Reported Category: {reportCateogry}</Text>
+                        <Text style={styles.modalsubtitle}>{reportDetails.category == 'comment' ? 'Comment on post' : 'Reported Content'}: </Text>
                         <View style={styles.reportContentContainer}>
                             <Image
-                                source={ProfileImage}
+                                source={
+                                    report?.profilePicture
+                                        ? { uri: reportDetails.category == 'comment' ? report?.profilePicPost : report?.profilePicture }
+                                        : require('../../assets/profilepic.png')}
                                 style={styles.reportProfileImage}
                             />
                             <View style={styles.reportContentDetails} >
-                                <Text style={styles.reportUsername}>@mikadotjees</Text>
-                                <Text style={styles.reportContentText}>{reportDetails.postOrComment}</Text>
+                                <Text style={styles.reportUsername}>@{reportDetails.category == 'comment' ? report?.usernamePost : report.username}</Text>
                             </View>
                         </View>
+                        {reportDetails.category == 'comment' && (<>
+                            <Text style={styles.modalsubtitle}>Proof of comment: </Text>
+                            <ScrollView contentContainerStyle={styles.scrollView}>
+                                <Text style={styles.reportContent}>{report.commentProof}</Text>
+                            </ScrollView>
+                        </>)}
                         <Text style={styles.modalsubtitle}>Reason:</Text>
-                        <Text style={styles.reportContent}>{reportDetails.reason}</Text>
+                        <Text style={styles.reportContent}>{reasonText}</Text>
                         <View style={styles.buttonContainer}>
                             <TouchableOpacity style={styles.buttonCancel} onPress={() => setReportDetailsVisible(false)}>
                                 <Text style={styles.buttonTextCancel}>
@@ -218,6 +257,9 @@ const styles = StyleSheet.create({
         color: '#000',
         alignSelf: 'flex-start',
     },
+    scrollView: {
+        paddingBottom: 20,
+    },
     reportContent: {
         marginBottom: 10,
         textAlign: 'left',
@@ -225,6 +267,7 @@ const styles = StyleSheet.create({
         color: '#000',
         alignSelf: 'flex-start',
     },
+
     input: {
         borderColor: '#ccc',
         borderWidth: 1,

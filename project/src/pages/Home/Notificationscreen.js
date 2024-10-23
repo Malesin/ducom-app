@@ -17,6 +17,8 @@ const Notificationscreen = () => {
   const [followNotifs, setFollowNotifs] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [showSkeleton, setShowSkeleton] = useState(true);
+  const [warningNotifications, setWarningNotifications] = useState([]);
+  const [showReportedNotification, setShowReportedNotification] = useState(false);
 
   const fetchNotifications = async () => {
     try {
@@ -55,6 +57,18 @@ const Notificationscreen = () => {
           }
         })
       setFollowNotifs(followNotifications)
+
+      let warningNotifications = [];
+      await axios
+        .post(`${serverUrl}/warning-notifications`, { token })
+        .then(res => {
+          if (res.data.status === 'ok') {
+            const warnings = res.data.data.flat().filter(notification => notification !== null);
+            setWarningNotifications(warnings);
+          } else {
+            Alert.alert('Error', 'Failed to fetch warning notifications');
+          }
+        })
 
       const allNotifications = [...likeNotifications, ...commentNotifications, ...followNotifications].sort((a, b) => {
         const aDate = a.like?.created_at || a.comment?.created_at || a?.created_at;
@@ -120,10 +134,23 @@ const Notificationscreen = () => {
       ))}
     </>
   );
+
+  useEffect(() => {
+    if (warningNotifications.length > 0) {
+      setShowReportedNotification(true);
+      const timer = setTimeout(() => {
+        setShowReportedNotification(false);
+      }, 10000); // Notifikasi akan muncul selama 5 detik
+
+      return () => clearTimeout(timer); // Bersihkan timer saat komponen unmount atau warningNotifications berubah
+    }
+  }, [warningNotifications]);
+
   return (
     <SafeAreaView style={styles.container}>
-      <ReportedNotification />
+      {showReportedNotification && <ReportedNotification />}
       <ScrollView
+        contentContainerStyle={allNotifications.length === 0 ? styles.centeredContent : null}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
@@ -179,6 +206,11 @@ const styles = StyleSheet.create({
   },
   skeletonTextContainer: {
     flex: 1,
+  },
+  centeredContent: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 
