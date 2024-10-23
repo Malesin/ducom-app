@@ -7,6 +7,11 @@ const ReportedUser = () => {
     const [modalVisible, setModalVisible] = useState(false);
     const [reportText, setReportText] = useState('');
     const [inputHeight, setInputHeight] = useState(40);
+    const [reportDetailsVisible, setReportDetailsVisible] = useState(false);
+    const [reportDetails, setReportDetails] = useState({
+        postOrComment: 'kys',
+        reason: 'Inappropriate content'
+    });
 
     const handleReportPress = () => {
         setModalVisible(true);
@@ -37,6 +42,14 @@ const ReportedUser = () => {
         );
     };
 
+    const handleViewPress = () => {
+        setReportDetailsVisible(true);
+    };
+
+    const handleDeletePostOrComment = () => {
+        console.log("Viewing Post")
+    };
+
     return (
         <SafeAreaView style={styles.container}>
             <Image
@@ -48,7 +61,7 @@ const ReportedUser = () => {
                 <Text style={styles.userhandle}>@mikadotjees</Text>
             </View>
             <View style={styles.iconContainer}>
-                <TouchableOpacity style={styles.iconButton}>
+                <TouchableOpacity style={styles.iconButton} onPress={handleViewPress}>
                     <MaterialIcons name="visibility" size={23} color="#949494" />
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.iconButton} onPress={handleReportPress}>
@@ -88,6 +101,41 @@ const ReportedUser = () => {
                             <TouchableOpacity style={styles.buttonSend} onPress={handleSend}>
                                 <Text style={styles.buttonTextSend}>
                                     Send
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
+
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={reportDetailsVisible}
+                onRequestClose={() => setReportDetailsVisible(false)}
+            >
+                <View style={styles.modalContainer}>
+                    <View style={styles.modalView}>
+                        <Text style={styles.modalText}>Report Details</Text>
+                        <Text style={styles.modalsubtitle}>Reported Content:</Text>
+                        <View style={styles.reportContentContainer}>
+                            <Image
+                                source={ProfileImage}
+                                style={styles.reportProfileImage}
+                            />
+                            <Text style={styles.reportContentText}>{reportDetails.postOrComment}</Text>
+                        </View>
+                        <Text style={styles.modalsubtitle}>Reason:</Text>
+                        <Text style={styles.reportContent}>{reportDetails.reason}</Text>
+                        <View style={styles.buttonContainer}>
+                            <TouchableOpacity style={styles.buttonCancel} onPress={() => setReportDetailsVisible(false)}>
+                                <Text style={styles.buttonTextCancel}>
+                                    Close
+                                </Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.buttonSend} onPress={handleDeletePostOrComment}>
+                                <Text style={styles.buttonTextSend}>
+                                    Delete
                                 </Text>
                             </TouchableOpacity>
                         </View>
@@ -167,6 +215,13 @@ const styles = StyleSheet.create({
         color: '#000',
         alignSelf: 'flex-start',
     },
+    reportContent: {
+        marginBottom: 10,
+        textAlign: 'left',
+        fontSize: 14,
+        color: '#000',
+        alignSelf: 'flex-start',
+    },
     input: {
         borderColor: '#ccc',
         borderWidth: 1,
@@ -206,5 +261,26 @@ const styles = StyleSheet.create({
         fontSize: 15,
         color: "#fff",
         fontWeight: 'bold'
+    },
+    reportContentContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 10,
+        borderWidth: 0.5,
+        borderColor: '#000',
+        borderRadius: 10,
+        padding: 5,
+        width: '100%', // Memastikan konten memanjang
+    },
+    reportProfileImage: {
+        width: 30,
+        height: 30,
+        borderRadius: 15,
+        marginRight: 10,
+    },
+    reportContentText: {
+        fontSize: 14,
+        color: '#000',
+        flexShrink: 1, // Memungkinkan teks untuk memanjang
     },
 });
