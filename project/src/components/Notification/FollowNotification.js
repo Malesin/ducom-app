@@ -71,13 +71,14 @@ const FollowNotification = ({ followNotif }) => {
             setIsFollowing(isFollowing);
             console.error(error);
             ToastAndroid.show("Something Error, Try Again Later", ToastAndroid.SHORT); // Menambahkan toast error
-    };
+        }
+    }; // Tambahkan penutupan kurung kurawal di sini
 
     useEffect(() => {
         const follow = followNotif?.fromUser.followers.some(follow => follow === followNotif?.user)
         setIsFollowing(follow)
         console.log("followNotif:", followNotif)
-    }, []);;
+    }, []);
 
     return (
         <SafeAreaView style={styles.container}>
