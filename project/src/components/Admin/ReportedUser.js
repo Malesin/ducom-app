@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity, Modal, TextInput, Button } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, Modal, TextInput, SafeAreaView, Alert } from 'react-native';
 import ProfileImage from '../../assets/iya.png';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
@@ -23,8 +23,22 @@ const ReportedUser = () => {
         setReportText('');
     };
 
+    const handleDeletePress = () => {
+        Alert.alert(
+            "Delete Report",
+            "Are you sure you want to delete this report?",
+            [
+                {
+                    text: "Cancel",
+                    style: "cancel"
+                },
+                { text: "OK", onPress: () => console.log("Report Deleted") }
+            ]
+        );
+    };
+
     return (
-        <View style={styles.container}>
+        <SafeAreaView style={styles.container}>
             <Image
                 source={ProfileImage}
                 style={styles.profileImage}
@@ -35,13 +49,13 @@ const ReportedUser = () => {
             </View>
             <View style={styles.iconContainer}>
                 <TouchableOpacity style={styles.iconButton}>
-                    <MaterialIcons name="visibility" size={25} color="#000" />
+                    <MaterialIcons name="visibility" size={23} color="#949494" />
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.iconButton} onPress={handleReportPress}>
-                    <MaterialIcons name="report" size={25} color="#FFC300" />
+                    <MaterialIcons name="report" size={23} color="#FFC300" />
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.iconButton}>
-                    <MaterialIcons name="delete-forever" size={25} color="#C70039" />
+                <TouchableOpacity style={styles.iconButton} onPress={handleDeletePress}>
+                    <MaterialIcons name="delete-forever" size={23} color="#C70039" />
                 </TouchableOpacity>
             </View>
 
@@ -54,9 +68,10 @@ const ReportedUser = () => {
                 <View style={styles.modalContainer}>
                     <View style={styles.modalView}>
                         <Text style={styles.modalText}>Report User</Text>
+                        <Text style={styles.modalsubtitle}>Send a warning message to the user</Text>
                         <TextInput
                             style={[styles.input, { height: Math.max(40, inputHeight) }]}
-                            placeholder="Enter your report"
+                            placeholder="Enter your message"
                             value={reportText}
                             onChangeText={setReportText}
                             multiline={true}
@@ -79,7 +94,7 @@ const ReportedUser = () => {
                     </View>
                 </View>
             </Modal>
-        </View>
+        </SafeAreaView>
     );
 };
 
@@ -138,10 +153,17 @@ const styles = StyleSheet.create({
         elevation: 5,
     },
     modalText: {
-        marginBottom: 15,
+        marginBottom: 5,
         textAlign: 'left',
         fontSize: 18,
         fontWeight: 'bold',
+        color: '#000',
+        alignSelf: 'flex-start',
+    },
+    modalsubtitle: {
+        marginBottom: 10,
+        textAlign: 'left',
+        fontSize: 13,
         color: '#000',
         alignSelf: 'flex-start',
     },
@@ -168,18 +190,20 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     buttonTextCancel: {
+        fontSize: 15,
         color: "#000",
         fontWeight: 'bold'
     },
     buttonSend: {
         backgroundColor: '#001374',
         borderRadius: 10,
-        width: 70,
-        height: 40,
+        width: 80,
+        height: 35,
         justifyContent: 'center',
         alignItems: 'center',
     },
     buttonTextSend: {
+        fontSize: 15,
         color: "#fff",
         fontWeight: 'bold'
     },
