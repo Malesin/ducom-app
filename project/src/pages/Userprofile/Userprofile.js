@@ -109,7 +109,7 @@ const Userprofile = ({ userIdPost, navigation, idUser }) => {
     const updatedFollowersCount = isFollowing
       ? userData.followers.length - 1
       : userData.followers.length + 1;
-    
+
     setUserData({
       ...userData,
       followers: new Array(updatedFollowersCount).fill(null), // Simulasi perubahan jumlah followers
@@ -206,122 +206,122 @@ const Userprofile = ({ userIdPost, navigation, idUser }) => {
           </View>
           <View style={styles.statsContainer}>
             <View style={styles.statItem}>
-                {!userData ? ( // Menambahkan skeleton untuk postCount
-                    <>
-                        <Skeleton
-                            animation="pulse"
-                            height={18}
-                            width={30}
-                            style={[styles.skeleton, { borderRadius: 3 }]}
-                        />
-                        <Skeleton
-                            animation="pulse"
-                            height={14}
-                            width={60}
-                            style={[styles.skeleton, { borderRadius: 3 }]}
-                        />
-                    </>
-                ) : (
-                    <>
-                        <Text style={styles.statNumber}>{userData?.postCount || 0}</Text>
-                        <Text style={styles.statLabel}>Posts</Text>
-                    </>
-                )}
+              {!userData ? ( // Menambahkan skeleton untuk postCount
+                <>
+                  <Skeleton
+                    animation="pulse"
+                    height={18}
+                    width={30}
+                    style={[styles.skeleton, { borderRadius: 3 }]}
+                  />
+                  <Skeleton
+                    animation="pulse"
+                    height={14}
+                    width={60}
+                    style={[styles.skeleton, { borderRadius: 3 }]}
+                  />
+                </>
+              ) : (
+                <>
+                  <Text style={styles.statNumber}>{userData?.postCount || 0}</Text>
+                  <Text style={styles.statLabel}>Posts</Text>
+                </>
+              )}
             </View>
             <View style={styles.statItem}>
-                {!userData ? ( // Menambahkan skeleton untuk followers
-                    <>
-                        <Skeleton
-                            animation="pulse"
-                            height={18}
-                            width={30}
-                            style={[styles.skeleton, { borderRadius: 3 }]}
-                        />
-                        <Skeleton
-                            animation="pulse"
-                            height={14}
-                            width={60}
-                            style={[styles.skeleton, { borderRadius: 3 }]}
-                        />
-                    </>
-                ) : (
-                    <>
-                        <Text style={styles.statNumber}>{userData ? userData?.followers.length : 0}</Text>
-                        <Text style={styles.statLabel}>Followers</Text>
-                    </>
-                )}
+              {!userData ? ( // Menambahkan skeleton untuk followers
+                <>
+                  <Skeleton
+                    animation="pulse"
+                    height={18}
+                    width={30}
+                    style={[styles.skeleton, { borderRadius: 3 }]}
+                  />
+                  <Skeleton
+                    animation="pulse"
+                    height={14}
+                    width={60}
+                    style={[styles.skeleton, { borderRadius: 3 }]}
+                  />
+                </>
+              ) : (
+                <>
+                  <Text style={styles.statNumber}>{userData ? userData?.followers.length : 0}</Text>
+                  <Text style={styles.statLabel}>Followers</Text>
+                </>
+              )}
             </View>
             <View style={styles.statItem}>
-                {!userData ? ( // Menambahkan skeleton untuk following
-                    <>
-                        <Skeleton
-                            animation="pulse"
-                            height={18}
-                            width={30}
-                            style={[styles.skeleton, { borderRadius: 3 }]}
-                        />
-                        <Skeleton
-                            animation="pulse"
-                            height={14}
-                            width={60}
-                            style={[styles.skeleton, { borderRadius: 3 }]}
-                        />
-                    </>
-                ) : (
-                    <>
-                        <Text style={styles.statNumber}>{userData ? userData?.following.length : 0}</Text>
-                        <Text style={styles.statLabel}>Following</Text>
-                    </>
-                )}
+              {!userData ? ( // Menambahkan skeleton untuk following
+                <>
+                  <Skeleton
+                    animation="pulse"
+                    height={18}
+                    width={30}
+                    style={[styles.skeleton, { borderRadius: 3 }]}
+                  />
+                  <Skeleton
+                    animation="pulse"
+                    height={14}
+                    width={60}
+                    style={[styles.skeleton, { borderRadius: 3 }]}
+                  />
+                </>
+              ) : (
+                <>
+                  <Text style={styles.statNumber}>{userData ? userData?.following.length : 0}</Text>
+                  <Text style={styles.statLabel}>Following</Text>
+                </>
+              )}
             </View>
           </View>
         </View>
         <View style={styles.userInfoWrapper}>
           <View style={styles.userInfoContainer}>
             <View style={styles.nameContainer}>
-                {!userData ? ( // Menambahkan skeleton untuk name
-                    <Skeleton
-                        animation="pulse"
-                        height={20}
-                        width={150}
-                        style={[styles.skeleton, { borderRadius: 3 }]} 
-                    />
-                ) : (
-                    <Text style={styles.name}>{userData?.name}</Text>
-                )}
-                {userData?.isAdmin && (
-                    <Text style={styles.verifiedIcon}>{verifiedIcon}</Text>
-                )}
+              {!userData ? ( // Menambahkan skeleton untuk name
+                <Skeleton
+                  animation="pulse"
+                  height={20}
+                  width={150}
+                  style={[styles.skeleton, { borderRadius: 3 }]}
+                />
+              ) : (
+                <Text style={styles.name}>{userData?.name}</Text>
+              )}
+              {userData?.isAdmin && (
+                <Text style={styles.verifiedIcon}>{verifiedIcon}</Text>
+              )}
             </View>
             {!userData ? ( // Menambahkan skeleton untuk username
-                <Skeleton
-                    animation="pulse"
-                    height={14}
-                    width={100}
-                    style={[styles.skeleton, { borderRadius: 3 }]} 
-                />
+              <Skeleton
+                animation="pulse"
+                height={14}
+                width={100}
+                style={[styles.skeleton, { borderRadius: 3 }]}
+              />
             ) : (
-                <Text style={styles.username}>@{userData?.username}</Text>
+              <Text style={styles.username}>@{userData?.username}</Text>
             )}
             {!userData ? ( // Menambahkan skeleton untuk bio
-                <Skeleton
-                    animation="pulse"
-                    height={13}
-                    width={200}
-                    style={[styles.skeleton, { borderRadius: 3 }]} 
-                />
+              <Skeleton
+                animation="pulse"
+                height={13}
+                width={200}
+                style={[styles.skeleton, { borderRadius: 3 }]}
+              />
             ) : (
-                <Text style={styles.description}>
-                    {userData?.bio || 'No Description'}
-                </Text>
+              <Text style={styles.description}>
+                {userData?.bio || 'No Description'}
+              </Text>
             )}
           </View>
-          {!userData ? ( // Menambahkan skeleton di posisi tombol follow
+          {!userData ? (
             <Skeleton
               animation="pulse"
               height={30}
               width={150}
-              style={[styles.skeleton, { borderRadius: 20, marginRight: 15 }]} 
+              style={[styles.skeleton, { borderRadius: 20, marginRight: 15 }]}
             />
           ) : (
             <TouchableOpacity

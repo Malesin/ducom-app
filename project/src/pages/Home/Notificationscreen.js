@@ -122,7 +122,7 @@ const Notificationscreen = () => {
   );
   return (
     <SafeAreaView style={styles.container}>
-      {/* <ReportedNotification /> */}
+      <ReportedNotification />
       <ScrollView
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />

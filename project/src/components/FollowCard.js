@@ -2,12 +2,22 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
 import ProfileImage from '../assets/iya.png';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import FollowSheet from './FollowSheet';
 
-const FollowCard = ({ followText, followingText }) => {
+const FollowCard = ({ followText, followingText, removeButtonText, message, username }) => {
     const [isFollowing, setIsFollowing] = useState(true);
+    const [isModalVisible, setIsModalVisible] = useState(false);
 
     const handleFollowToggle = () => {
         setIsFollowing(!isFollowing);
+    };
+
+    const handleMorePress = () => {
+        setIsModalVisible(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsModalVisible(false);
     };
 
     return (
@@ -25,9 +35,19 @@ const FollowCard = ({ followText, followingText }) => {
                     {isFollowing ? followingText : followText}
                 </Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.iconButton}>
-                <MaterialIcons name="more-horiz" size={24} color="#000" />
+            <TouchableOpacity style={styles.iconButton} onPress={handleMorePress}>
+                <MaterialIcons name="more-horiz" size={20} color="#000" />
             </TouchableOpacity>
+            <FollowSheet
+                isVisible={isModalVisible}
+                onClose={handleCloseModal}
+                onRemove={() => {
+                    handleCloseModal();
+                }}
+                username={username}
+                removeButtonText={removeButtonText}
+                message={message}
+            />
         </View>
     );
 };
@@ -42,13 +62,13 @@ const styles = StyleSheet.create({
     },
     profileImage: {
         marginLeft: 10,
-        width: 50,
-        height: 50,
+        width: 40,
+        height: 40,
         borderRadius: 30,
     },
     username: {
         flex: 1,
-        fontSize: 16,
+        fontSize: 14,
         fontWeight: 'bold',
         marginLeft: 15,
         color: '#000',
@@ -63,7 +83,7 @@ const styles = StyleSheet.create({
         marginRight: 10,
     },
     messageButtonText: {
-        fontSize: 14,
+        fontSize: 12,
         fontWeight: '500',
         color: '#fff',
     },

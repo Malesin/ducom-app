@@ -89,9 +89,9 @@ const Settingsscreen = ({ navigation }) => {
             <Text style={styles.buttonText}>Deactivate or Delete Account</Text>
           </TouchableOpacity>
         </View>
-        <View style={styles.separator} />
         {amIAdmin && (
           <View style={styles.section}>
+            <View style={styles.separator} />
             <Text style={styles.title}>Admin Tools</Text>
             <TouchableOpacity
               style={styles.button}
