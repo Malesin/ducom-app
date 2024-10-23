@@ -115,10 +115,10 @@ const FollowNotification = ({ followNotif }) => {
                     >
                         {isFollowing ? 'Following' : 'Follow Back'}
                     </Text>
-                </TouchableOpacity>
-            </SafeAreaView>
-        );
-    };
+            </TouchableOpacity>
+        </SafeAreaView>
+    );
+};
 }
 export default FollowNotification;
 
