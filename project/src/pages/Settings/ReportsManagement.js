@@ -26,6 +26,7 @@ const ReportsManagement = () => {
             const formatted = resp.map(report => ({
                 id: report._id,
                 category: report.category,
+                userId: report.reportedEntity.user._id,
                 name: report.reportedEntity.user.name,
                 username: report.reportedEntity.user.username,
                 usernamePost: report.relatedPost?.user?.username || '',
