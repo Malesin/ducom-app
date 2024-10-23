@@ -62,9 +62,11 @@ const ReportScreen = () => {
       }, []);
 
       axios
-        .post(`${serverUrl}/report-post`, {
+        .post(`${serverUrl}/report`, {
           token: token,
           reportPostId: reportPostId,
+          // reportCommentId: reportCommentId, // FOR REPORT COMMENT
+          // reportUserId: reportUserId, // FOR REPORT USER
           reportCategory: reportCategory
         })
         .then(res => {
