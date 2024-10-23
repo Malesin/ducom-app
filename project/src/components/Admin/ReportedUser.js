@@ -123,7 +123,10 @@ const ReportedUser = () => {
                                 source={ProfileImage}
                                 style={styles.reportProfileImage}
                             />
-                            <Text style={styles.reportContentText}>{reportDetails.postOrComment}</Text>
+                            <View style={styles.reportContentDetails} >
+                                <Text style={styles.reportUsername}>@mikadotjees</Text>
+                                <Text style={styles.reportContentText}>{reportDetails.postOrComment}</Text>
+                            </View>
                         </View>
                         <Text style={styles.modalsubtitle}>Reason:</Text>
                         <Text style={styles.reportContent}>{reportDetails.reason}</Text>
@@ -270,7 +273,7 @@ const styles = StyleSheet.create({
         borderColor: '#000',
         borderRadius: 10,
         padding: 5,
-        width: '100%', // Memastikan konten memanjang
+        width: '100%',
     },
     reportProfileImage: {
         width: 30,
@@ -278,9 +281,18 @@ const styles = StyleSheet.create({
         borderRadius: 15,
         marginRight: 10,
     },
+    reportUsername: {
+        fontSize: 14,
+        fontWeight: 'bold',
+        color: '#000',
+    },
+    reportContentDetails: {
+        flexDirection: 'row',
+    },
     reportContentText: {
         fontSize: 14,
         color: '#000',
-        flexShrink: 1, // Memungkinkan teks untuk memanjang
+        flexShrink: 1,
+        marginLeft: 5,
     },
 });
