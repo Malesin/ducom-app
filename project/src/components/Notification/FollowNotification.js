@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Image, SafeAreaView, StyleSheet, Text, View, TouchableOpacity, ToastAndroid } from 'react-native';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../../config';
@@ -70,9 +71,9 @@ const FollowNotification = ({ followNotif }) => {
         } catch (error) {
             setIsFollowing(isFollowing);
             console.error(error);
-            ToastAndroid.show("Something Error, Try Again Later", ToastAndroid.SHORT); // Menambahkan toast error
+            ToastAndroid.show("Something Error, Try Again Later", ToastAndroid.SHORT);
         }
-    }; // Tambahkan penutupan kurung kurawal di sini
+    };
 
     useEffect(() => {
         const follow = followNotif?.fromUser.followers.some(follow => follow === followNotif?.user)
@@ -82,6 +83,7 @@ const FollowNotification = ({ followNotif }) => {
 
     return (
         <SafeAreaView style={styles.container}>
+            <MaterialCommunityIcons name="account-plus" size={15} color={'#000'} />
             <Image
                 source={followNotif?.fromUser.profilePicture
                     ? { uri: followNotif?.fromUser.profilePicture }
@@ -126,6 +128,7 @@ const styles = StyleSheet.create({
         height: 35,
         borderRadius: 20,
         marginRight: 10,
+        marginLeft: 15
     },
     textContainer: {
         flex: 1,
@@ -166,5 +169,11 @@ const styles = StyleSheet.create({
     followingButtonText: {
         color: '#000',
         fontWeight: 'bold',
+        fontSize: 12
+    },
+    followButtonText: {
+        color: '#000',
+        fontWeight: 'bold',
+        fontSize: 12
     },
 });

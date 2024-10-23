@@ -33,7 +33,6 @@ const FollowCard = ({ followText, followingText }) => {
 };
 
 export default FollowCard;
-
 const styles = StyleSheet.create({
     container: {
         flexDirection: 'row',
@@ -78,3 +77,4 @@ const styles = StyleSheet.create({
         padding: 5,
     },
 });
+
