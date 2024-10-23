@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
     openButtonText: {
         fontWeight: 'bold',
         color: '#001374',
-        fontSize: 15,
+        fontSize: 13,
     },
     modalBackground: {
         flex: 1,
