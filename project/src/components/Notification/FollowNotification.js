@@ -102,17 +102,24 @@ const FollowNotification = ({ followNotif }) => {
             >
                 <Text
                     style={[
-                        styles.followButtonText,
-                        isFollowing ? styles.followingButtonText : styles.followButtonUnpressedText
+                        styles.followButton,
+                        isFollowing ? styles.followingButton : styles.followButtonUnpressed
                     ]}
+                    onPress={handleFollowPress}
                 >
-                    {isFollowing ? 'Following' : 'Follow Back'}
-                </Text>
-            </TouchableOpacity>
-        </SafeAreaView>
-    );
-};
-
+                    <Text
+                        style={[
+                            styles.followButtonText,
+                            isFollowing ? styles.followingButtonText : styles.followButtonUnpressedText
+                        ]}
+                    >
+                        {isFollowing ? 'Following' : 'Follow Back'}
+                    </Text>
+                </TouchableOpacity>
+            </SafeAreaView>
+        );
+    };
+}
 export default FollowNotification;
 
 const styles = StyleSheet.create({
@@ -176,4 +183,4 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         fontSize: 12
     },
-});
+})
