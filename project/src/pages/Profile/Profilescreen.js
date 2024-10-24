@@ -335,8 +335,8 @@ const styles = StyleSheet.create({
   profileContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 10,
-    marginLeft: 20,
+    paddingHorizontal: 30,
+    paddingVertical: 10
   },
   profile: {
     width: 83,
@@ -348,8 +348,8 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   userInfoContainer: {
-    marginTop: 10,
-    marginBottom: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 10
   },
   name: {
     fontSize: 17,
@@ -376,12 +376,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#E1E8ED',
     borderColor: '#000',
     borderWidth: 1,
-    paddingVertical: 5,
+    paddingVertical: 10,
     paddingHorizontal: 30,
     borderRadius: 100,
     marginTop: 20,
-    marginBottom: 20,
-    marginRight: 10,
+    marginRight: 15,
   },
   editButtonText: {
     fontSize: 13,
@@ -391,12 +390,12 @@ const styles = StyleSheet.create({
   statsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    marginTop: 10,
-    marginLeft: 15,
+    paddingVertical: 10,
+    paddingHorizontal: 10
   },
   statItem: {
     alignItems: 'center',
-    marginRight: 45,
+    paddingHorizontal: 20
   },
   statNumber: {
     fontSize: 18,
