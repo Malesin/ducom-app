@@ -70,7 +70,6 @@ function BottomTabNavigator() {
           tabBarIcon: ({ color }) => {
             let iconName;
             const iconSize = 30;
-
             if (route.name === 'HomeTab') {
               iconName = 'home';
               return (
@@ -92,7 +91,7 @@ function BottomTabNavigator() {
           },
           tabBarLabel: () => null,
           tabBarStyle: {
-            paddingBottom: 10,
+            paddingVertical: 5,
             height: 60,
           },
           headerShown: false,

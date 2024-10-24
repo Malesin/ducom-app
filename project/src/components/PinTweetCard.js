@@ -91,7 +91,6 @@ const PinTweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
         });
 
         if (response.data.status !== 'ok') {
-          // Jika gagal, kembalikan ke state semula
           setLiked(true);
           setLikesCount(prevLikesCount => prevLikesCount + 1);
           console.log('Error in unlike response data:', response.data.data);
@@ -99,7 +98,6 @@ const PinTweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
         }
       } catch (error) {
         console.error('Error unliking post:', error.message);
-        // Jika ada error, kembalikan ke state semula
         setLiked(true);
         setLikesCount(prevLikesCount => prevLikesCount + 1);
         Alert.alert('Error', 'Failed to unlike post. Please try again.');
@@ -114,7 +112,6 @@ const PinTweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
         });
 
         if (response.data.status !== 'ok') {
-          // Jika gagal, kembalikan ke state semula
           setLiked(false);
           setLikesCount(prevLikesCount => prevLikesCount - 1);
           console.log('Error in like response data:', response.data.data);
@@ -122,7 +119,6 @@ const PinTweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
         }
       } catch (error) {
         console.error('Error liking post:', error.message);
-        // Jika ada error, kembalikan ke state semula
         setLiked(false);
         setLikesCount(prevLikesCount => prevLikesCount - 1);
         Alert.alert('Error', 'Failed to like post. Please try again.');
@@ -143,7 +139,6 @@ const PinTweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
         });
 
         if (response.data.status !== 'ok') {
-          // Jika gagal, kembalikan ke state semula
           setBookmarked(true);
           setBookMarksCount(prevBookmarksCount => prevBookmarksCount + 1);
           console.log('Error in unbookmark response data:', response.data.data);
@@ -152,7 +147,6 @@ const PinTweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
         }
       } catch (error) {
         console.error('Error unbookmarking post:', error.message);
-        // Jika ada error, kembalikan ke state semula
         setBookmarked(true);
         setBookMarksCount(prevBookmarksCount => prevBookmarksCount + 1);
       }
@@ -166,7 +160,6 @@ const PinTweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
         });
 
         if (response.data.status !== 'ok') {
-          // Jika gagal, kembalikan ke state semula
           setBookmarked(false);
           setBookMarksCount(prevBookmarksCount => prevBookmarksCount - 1);
           console.log('Error in bookmark response data:', response.data.data);
@@ -175,7 +168,6 @@ const PinTweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
         }
       } catch (error) {
         console.error('Error bookmarking post:', error.message);
-        // Jika ada error, kembalikan ke state semula
         setBookmarked(false);
         setBookMarksCount(prevBookmarksCount => prevBookmarksCount - 1);
       }
@@ -195,7 +187,6 @@ const PinTweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
           })
           .then(res => {
             if (res.data.status !== 'ok') {
-              // Jika gagal, kembalikan ke state semula
               setReposted(true);
               setRepostsCount(prevRepostsCount => prevRepostsCount + 1);
               console.log('Error in unrepost response data:', res.data);
@@ -211,7 +202,6 @@ const PinTweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
           })
           .then(res => {
             if (res.data.status !== 'ok') {
-              // Jika gagal, kembalikan ke state semula
               setReposted(false);
               setRepostsCount(prevRepostsCount => prevRepostsCount - 1);
               console.log('Error in repost response data:', res.data);
@@ -220,7 +210,6 @@ const PinTweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
       }
     } catch (error) {
       console.error('Error reposting:', error);
-      // Jika ada error, kembalikan ke state semula
       setReposted(!reposted);
       setRepostsCount(prevRepostsCount => reposted ? prevRepostsCount + 1 : prevRepostsCount - 1);
     }
@@ -377,14 +366,14 @@ const PinTweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
 
   return (
     <SafeAreaView style={styles.card}>
-      {/* User Info */}
-      <Text style={styles.pin}>
-        <MaterialCommunityIcons
-          name="pin"
-          size={13}
-          color="#001374"
-        />Pinned Post</Text>
-
+      <View style={styles.pin}>
+        <Text style={styles.pinIcon} >
+          <MaterialCommunityIcons
+            name="pin"
+            size={13}
+            color="#001374"
+          />Pinned Post</Text>
+      </View>
       <View style={styles.userInfo}>
         <TouchableOpacity onPress={handleProfilePress}>
           <Image
@@ -402,8 +391,6 @@ const PinTweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
           {tweet.isAdmin ? (<Text style={styles.verifiedIcon}>{verifiedIcon}</Text>) : null}
           <Text style={styles.postDate}>{formatDate(tweet.postDate)}</Text>
         </View>
-
-        {/* Options Button */}
         <View style={styles.optionsContainer}>
           <TouchableOpacity
             style={styles.optionsButton}
@@ -415,7 +402,6 @@ const PinTweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
             />
           </TouchableOpacity>
         </View>
-
         <Modal
           animationType="slide"
           transparent={true}
@@ -445,11 +431,7 @@ const PinTweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
           </View>
         </Modal>
       </View>
-
-      {/* Tweet Content */}
       {tweet.content ? <Text style={styles.tweetText}>{tweet.content}</Text> : null}
-
-      {/* Tweet Media with Horizontal Scroll */}
       {tweet.media && tweet.media.length > 0 ? (
         <FlatList
           data={tweet.media}
@@ -460,8 +442,6 @@ const PinTweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
           style={styles.mediaFlatList}
         />
       ) : null}
-
-      {/* Interactions */}
       <View style={styles.actions}>
         <InteractionButton
           icon={liked ? 'heart' : 'heart-outline'}
@@ -496,8 +476,6 @@ const PinTweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
           />
         </TouchableOpacity>
       </View>
-
-      {/* Modal for Media Preview */}
       <Modal
         visible={isModalVisible}
         transparent
@@ -576,12 +554,14 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   pin: {
-    color: '#001374',
     fontSize: 11,
     marginLeft: 60,
     marginBottom: -7,
     marginTop: 5,
-    fontWeight: '700'
+  },
+  pinIcon: {
+    color: '#001374',
+    fontWeight: '700',
   },
   userDetails: {
     flexDirection: 'row',
@@ -608,12 +588,12 @@ const styles = StyleSheet.create({
   },
   tweetText: {
     fontSize: 15,
-    marginVertical: 8,
+    paddingVertical: 8,
     color: '#040608',
   },
   mediaFlatList: {
-    marginTop: 30,
-    marginVertical: 8,
+    marginTop: 5,
+    marginVertical: 10,
   },
   tweetImage: {
     width: 200,
