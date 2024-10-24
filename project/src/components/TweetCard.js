@@ -571,7 +571,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   mediaFlatList: {
-    marginTop: 20,
+    marginTop: 5,
     marginVertical: 8,
   },
   tweetImage: {

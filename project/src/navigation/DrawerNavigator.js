@@ -39,7 +39,7 @@ const DrawerNavigator = ({ navigation }) => {
                 <Image source={logo} style={styles.logo} />
               </View>
               <View style={styles.searchContainer}>
-                <TouchableOpacity style={styles.search} onPress={() => navigation.navigate('SearchPage')}>
+                <TouchableOpacity onPress={() => navigation.navigate('SearchPage')}>
                   <MaterialIcons name="search" size={25} color="black" />
                 </TouchableOpacity>
               </View>
@@ -130,9 +130,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'flex-end',
   },
-  search: {
-
-  }
 });
 
 export default DrawerNavigator;
