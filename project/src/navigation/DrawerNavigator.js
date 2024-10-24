@@ -114,7 +114,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'flex-end',
     width: '100%',
-    paddingHorizontal: 10,
+    paddingHorizontal: 5,
+    paddingVertical: 5
   },
   logoContainer: {
     flex: 2,
@@ -129,7 +130,9 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'flex-end',
   },
+  search: {
 
+  }
 });
 
 export default DrawerNavigator;
