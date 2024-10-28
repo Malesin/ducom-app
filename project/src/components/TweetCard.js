@@ -459,8 +459,6 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
           />
         </TouchableOpacity>
       </View>
-
-      {/* Modal for Media Preview */}
       <Modal
         visible={isModalVisible}
         transparent

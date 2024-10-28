@@ -140,9 +140,9 @@ const Notificationscreen = () => {
       setShowReportedNotification(true);
       const timer = setTimeout(() => {
         setShowReportedNotification(false);
-      }, 10000); // Notifikasi akan muncul selama 5 detik
+      }, 10000);
 
-      return () => clearTimeout(timer); // Bersihkan timer saat komponen unmount atau warningNotifications berubah
+      return () => clearTimeout(timer); 
     }
   }, [warningNotifications]);
 
