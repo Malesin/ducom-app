@@ -1,13 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  SafeAreaView,
+} from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import DefaultAvatar from '../../assets/profilepic.png';
 import PostImage from '../../assets/iya.png';
-import { useNavigation } from '@react-navigation/native';
-import { formatNotification } from '../../pages/Home/formatNotification';
-import { createThumbnail } from 'react-native-create-thumbnail';
+import {useNavigation} from '@react-navigation/native';
+import {formatNotification} from '../../pages/Home/formatNotification';
+import {createThumbnail} from 'react-native-create-thumbnail';
 
-const LikeNotification = ({ likeNotification }) => {
+const LikeNotification = ({likeNotification}) => {
   const navigation = useNavigation();
   const [thumbnail, setThumbnail] = useState(null);
 
@@ -65,11 +72,14 @@ const LikeNotification = ({ likeNotification }) => {
 
   useEffect(() => {
     const generateThumbnail = async () => {
-      if (likeNotification?.post?.media && likeNotification.post.media.length > 0) {
+      if (
+        likeNotification?.post?.media &&
+        likeNotification.post.media.length > 0
+      ) {
         const media = likeNotification.post.media[0];
         if (media.type === 'video' && media.uri) {
           try {
-            const { path } = await createThumbnail({ url: media.uri });
+            const {path} = await createThumbnail({url: media.uri});
             setThumbnail(path);
           } catch (error) {
             console.log('Error generating thumbnail:', error);
@@ -85,28 +95,45 @@ const LikeNotification = ({ likeNotification }) => {
     <SafeAreaView style={styles.card}>
       <TouchableOpacity onPress={handleLikeNotificationPress}>
         <View style={styles.notificationRow}>
-          <MaterialCommunityIcons name="heart" size={15} color="#E0245E" style={styles.heartIcon} />
+          <MaterialCommunityIcons
+            name="heart"
+            size={15}
+            color="#E0245E"
+            style={styles.heartIcon}
+          />
           <Image
-            source={likeNotification.like.user.profilePicture ? { uri: likeNotification.like.user.profilePicture } : DefaultAvatar}
+            source={
+              likeNotification.like.user.profilePicture
+                ? {uri: likeNotification.like.user.profilePicture}
+                : DefaultAvatar
+            }
             style={styles.avatar}
           />
           <View style={styles.textContainer}>
             <View style={styles.nameRow}>
-              <Text style={styles.userName}>{likeNotification.like.user.name}</Text>
-              <Text style={styles.userNameAt}>@{likeNotification.like.user.username}</Text>
+              <Text style={styles.userName}>
+                {likeNotification.like.user.name}
+              </Text>
+              <Text style={styles.userNameAt}>
+                @{likeNotification.like.user.username}
+              </Text>
               <Text style={styles.dot}>•</Text>
-              <Text style={styles.date}>{formatDate(likeNotification.like.created_at)}</Text>
+              <Text style={styles.date}>
+                {formatDate(likeNotification.like.created_at)}
+              </Text>
             </View>
             <Text style={styles.notificationText}>Liked your post</Text>
           </View>
           <Image
             source={
-              likeNotification?.post?.media && likeNotification.post.media.length > 0
-              && (likeNotification.post.media[0].type === 'video'
-                ? { uri: thumbnail }
-                : { uri: likeNotification.post.media[0].uri })
+              likeNotification?.post?.media &&
+              likeNotification.post.media.length > 0 &&
+              (likeNotification.post.media[0].type === 'video'
+                ? {uri: thumbnail}
+                : {uri: likeNotification.post.media[0].uri})
             }
-            style={styles.postImage} />
+            style={styles.postImage}
+          />
         </View>
       </TouchableOpacity>
     </SafeAreaView>
@@ -118,22 +145,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     paddingVertical: 10,
     paddingHorizontal: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 1,
     width: '100%',
-    maxWidth: 800,
-    borderColor: '#E1E8ED',
-    borderWidth: 1,
+
   },
   notificationRow: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   heartIcon: {
-    marginRight: 8
+    marginRight: 8,
   },
   avatar: {
     width: 40,
