@@ -1,14 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import { SafeAreaView, ScrollView, StyleSheet, Alert, Text, RefreshControl, View } from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Alert,
+  Text,
+  RefreshControl,
+  View,
+} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../../config';
 import LikeNotification from '../../components/Notification/LikeNotification';
 import CommentNotification from '../../components/Notification/CommentNotification';
-import { Skeleton } from 'react-native-elements';
+import {Skeleton} from 'react-native-elements';
 import ReportedNotification from '../../components/ReportedNotification';
 import FollowNotification from '../../components/Notification/FollowNotification';
-
 
 const serverUrl = config.SERVER_URL;
 
@@ -18,61 +25,74 @@ const Notificationscreen = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [showSkeleton, setShowSkeleton] = useState(true);
   const [warningNotifications, setWarningNotifications] = useState([]);
-  const [showReportedNotification, setShowReportedNotification] = useState(false);
+  const [showReportedNotification, setShowReportedNotification] =
+    useState(false);
 
   const fetchNotifications = async () => {
     try {
       const token = await AsyncStorage.getItem('token');
 
       let likeNotifications = [];
-      await axios
-        .post(`${serverUrl}/like-notifications`, { token })
-        .then(res => {
-          if (res.data.status === 'ok') {
-            likeNotifications = res.data.data.flat().filter(notification => notification !== null);
-          } else {
-            Alert.alert('Error', 'Failed to fetch like notifications');
-          }
-        })
+      await axios.post(`${serverUrl}/like-notifications`, {token}).then(res => {
+        if (res.data.status === 'ok') {
+          likeNotifications = res.data.data
+            .flat()
+            .filter(notification => notification !== null);
+        } else {
+          Alert.alert('Error', 'Failed to fetch like notifications');
+        }
+      });
 
       let commentNotifications = [];
       await axios
-        .post(`${serverUrl}/comment-notifications`, { token })
+        .post(`${serverUrl}/comment-notifications`, {token})
         .then(res => {
           if (res.data.status === 'ok') {
-            commentNotifications = res.data.data.flat().filter(notification => notification !== null);
+            commentNotifications = res.data.data
+              .flat()
+              .filter(notification => notification !== null);
           } else {
             Alert.alert('Error', 'Failed to fetch comment notifications');
           }
-        })
+        });
 
       let followNotifications = [];
       await axios
-        .post(`${serverUrl}/follow-notifications`, { token })
+        .post(`${serverUrl}/follow-notifications`, {token})
         .then(res => {
           if (res.data.status === 'ok') {
-            followNotifications = res.data.data.flat().filter(notification => notification !== null);
+            followNotifications = res.data.data
+              .flat()
+              .filter(notification => notification !== null);
           } else {
             Alert.alert('Error', 'Failed to fetch follow notifications');
           }
-        })
-      setFollowNotifs(followNotifications)
+        });
+      setFollowNotifs(followNotifications);
 
       let warningNotifications = [];
       await axios
-        .post(`${serverUrl}/warning-notifications`, { token })
+        .post(`${serverUrl}/warning-notifications`, {token})
         .then(res => {
           if (res.data.status === 'ok') {
-            const warnings = res.data.data.flat().filter(notification => notification !== null);
+            const warnings = res.data.data
+              .flat()
+              .filter(notification => notification !== null);
             setWarningNotifications(warnings);
           } else {
             Alert.alert('Error', 'Failed to fetch warning notifications');
           }
-        })
+        });
 
-      const allNotifications = [...likeNotifications, ...commentNotifications, ...followNotifications].sort((a, b) => {
-        const aDate = a.like?.created_at || a.comment?.created_at || a?.created_at;
-        const bDate = b.like?.created_at || b.comment?.created_at || b?.created_at;
+      const allNotifications = [
+        ...likeNotifications,
+        ...commentNotifications,
+        ...followNotifications,
+      ].sort((a, b) => {
+        const aDate =
+          a.like?.created_at || a.comment?.created_at || a?.created_at;
+        const bDate =
+          b.like?.created_at || b.comment?.created_at || b?.created_at;
         return new Date(bDate) - new Date(aDate);
       });
 
@@ -86,7 +106,7 @@ const Notificationscreen = () => {
   };
 
   useEffect(() => {
-    allNotifications
+    allNotifications;
     fetchNotifications();
   }, []);
 
@@ -128,7 +148,7 @@ const Notificationscreen = () => {
             animation="pulse"
             height={40}
             width="100%"
-            style={[styles.skeleton, { borderRadius: 3 }]}
+            style={[styles.skeleton, {borderRadius: 3}]}
           />
         </View>
       ))}
@@ -140,9 +160,9 @@ const Notificationscreen = () => {
       setShowReportedNotification(true);
       const timer = setTimeout(() => {
         setShowReportedNotification(false);
-      }, 10000); // Notifikasi akan muncul selama 5 detik
+      }, 10000);
 
-      return () => clearTimeout(timer); // Bersihkan timer saat komponen unmount atau warningNotifications berubah
+      return () => clearTimeout(timer);
     }
   }, [warningNotifications]);
 
@@ -150,27 +170,31 @@ const Notificationscreen = () => {
     <SafeAreaView style={styles.container}>
       {showReportedNotification && <ReportedNotification />}
       <ScrollView
-        contentContainerStyle={allNotifications.length === 0 ? styles.centeredContent : null}
+        contentContainerStyle={
+          allNotifications.length === 0 ? styles.centeredContent : null
+        }
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-      >
+        }>
         {showSkeleton ? (
           renderSkeleton()
+        ) : allNotifications.length === 0 ? (
+          <Text style={styles.noNotificationsText}>No notifications</Text>
         ) : (
-          allNotifications.length === 0 ? (
-            <Text style={styles.noNotificationsText}>No notifications</Text>
-          ) : (
-            allNotifications.map((notification, index) => (
+          <View style={styles.notificationContainer}>
+            {allNotifications.map((notification, index) =>
               notification.like ? (
                 <LikeNotification key={index} likeNotification={notification} />
               ) : notification.comment ? (
-                <CommentNotification key={index} commentNotification={notification} />
+                <CommentNotification
+                  key={index}
+                  commentNotification={notification}
+                />
               ) : (
                 <FollowNotification key={index} followNotif={notification} />
-              )
-            ))
-          )
+              ),
+            )}
+          </View>
         )}
       </ScrollView>
     </SafeAreaView>
@@ -181,6 +205,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
+  },
+  notificationContainer: {
+    flexGrow: 1,
   },
   noNotificationsText: {
     textAlign: 'center',

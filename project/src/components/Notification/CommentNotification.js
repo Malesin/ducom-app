@@ -1,12 +1,19 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, SafeAreaView } from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  SafeAreaView,
+} from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import DefaultAvatar from '../../assets/profilepic.png';
-import { useNavigation } from '@react-navigation/native';
-import { formatNotification } from '../../pages/Home/formatNotification';
-import { createThumbnail } from 'react-native-create-thumbnail';
+import {useNavigation} from '@react-navigation/native';
+import {formatNotification} from '../../pages/Home/formatNotification';
+import {createThumbnail} from 'react-native-create-thumbnail';
 
-const CommentNotification = ({ commentNotification }) => {
+const CommentNotification = ({commentNotification}) => {
   const navigation = useNavigation();
   const [thumbnail, setThumbnail] = useState(null);
 
@@ -25,7 +32,7 @@ const CommentNotification = ({ commentNotification }) => {
     }
   };
 
-  const formatDate = (dateString) => {
+  const formatDate = dateString => {
     const date = new Date(dateString);
     const now = new Date();
     const diffInSeconds = Math.floor((now - date) / 1000);
@@ -63,11 +70,14 @@ const CommentNotification = ({ commentNotification }) => {
 
   useEffect(() => {
     const generateThumbnail = async () => {
-      if (commentNotification?.post?.media && commentNotification.post.media.length > 0) {
+      if (
+        commentNotification?.post?.media &&
+        commentNotification.post.media.length > 0
+      ) {
         const media = commentNotification.post.media[0];
         if (media.type === 'video' && media.uri) {
           try {
-            const { path } = await createThumbnail({ url: media.uri });
+            const {path} = await createThumbnail({url: media.uri});
             setThumbnail(path);
           } catch (error) {
             console.log('Error generating thumbnail:', error);
@@ -83,35 +93,54 @@ const CommentNotification = ({ commentNotification }) => {
     <SafeAreaView style={styles.card}>
       <TouchableOpacity onPress={handleCommentNotification}>
         <View style={styles.notificationRow}>
-          <MaterialCommunityIcons name="comment-text-outline" size={15} style={styles.icon} />
-          <Image source={commentNotification.comment.user.profilePicture ? { uri: commentNotification.comment.user.profilePicture } : DefaultAvatar} style={styles.avatar} />
+          <MaterialCommunityIcons
+            name="comment-text-outline"
+            size={15}
+            style={styles.icon}
+          />
+          <Image
+            source={
+              commentNotification.comment.user.profilePicture
+                ? {uri: commentNotification.comment.user.profilePicture}
+                : DefaultAvatar
+            }
+            style={styles.avatar}
+          />
           <View style={styles.textContainer}>
             <View style={styles.nameRow}>
-              <Text style={styles.nameAt}>{commentNotification.comment.user.name}</Text>
+              <Text style={styles.nameAt}>
+                {commentNotification.comment.user.name}
+              </Text>
               <Text style={styles.dot}> • </Text>
-              <Text style={styles.userNameAt}>@{commentNotification.comment.user.username}</Text>
+              <Text style={styles.userNameAt}>
+                @{commentNotification.comment.user.username}
+              </Text>
               <Text style={styles.dot}> • </Text>
-              <Text style={styles.date}>{formatDate(commentNotification.comment.created_at)}</Text>
+              <Text style={styles.date}>
+                {formatDate(commentNotification.comment.created_at)}
+              </Text>
             </View>
             <View style={styles.commentRowContainer}>
               <View style={styles.commentRow}>
-                <Text style={styles.comment}>
-                  Commented on your post:
-                </Text>
-                <Text style={styles.commentDescription} >
+                <Text style={styles.comment}>Commented on your post:</Text>
+                <Text style={styles.commentDescription}>
                   {commentNotification.post.description.slice(0, 20)}
-                  {commentNotification.post.description.length > 20 ? '...' : ''}
+                  {commentNotification.post.description.length > 20
+                    ? '...'
+                    : ''}
                 </Text>
               </View>
               <View style={styles.postMediaContainer}>
                 <Image
                   source={
-                    commentNotification?.post?.media && commentNotification.post.media.length > 0
-                    && (commentNotification.post.media[0].type === 'video'
-                      ? { uri: thumbnail }
-                      : { uri: commentNotification.post.media[0].uri })
+                    commentNotification?.post?.media &&
+                    commentNotification.post.media.length > 0 &&
+                    (commentNotification.post.media[0].type === 'video'
+                      ? {uri: thumbnail}
+                      : {uri: commentNotification.post.media[0].uri})
                   }
-                  style={styles.postImage} />
+                  style={styles.postImage}
+                />
               </View>
             </View>
           </View>
@@ -124,30 +153,23 @@ const CommentNotification = ({ commentNotification }) => {
 const styles = StyleSheet.create({
   card: {
     backgroundColor: '#fff',
-    padding: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 1,
+    paddingVertical: 10,
+    paddingHorizontal: 10,
     width: '100%',
-    maxWidth: 800,
-    borderColor: '#E1E8ED',
-    borderWidth: 1,
   },
   notificationRow: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   icon: {
-    marginRight: 10,
-    color: '#000'
+    marginRight: 8,
+    color: '#000',
   },
   avatar: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    marginRight: 12,
+    marginRight: 10,
   },
   textContainer: {
     flex: 1,
@@ -156,7 +178,7 @@ const styles = StyleSheet.create({
   nameRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 2,
+    marginBottom: 1,
   },
   nameAt: {
     fontSize: 12,
@@ -194,7 +216,7 @@ const styles = StyleSheet.create({
   postImage: {
     width: 43,
     height: 43,
-    marginRight: 5
+    marginRight: 5,
   },
   commentRow: {
     flexDirection: 'column',
@@ -203,4 +225,3 @@ const styles = StyleSheet.create({
 });
 
 export default CommentNotification;
-
