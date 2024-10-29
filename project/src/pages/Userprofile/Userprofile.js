@@ -11,7 +11,7 @@ import {
   ToastAndroid
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect } from '@react-navigation/native';
 import { Skeleton } from 'react-native-elements';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'; // Tambahkan ini
 const verifiedIcon = <MaterialIcons name="verified" size={18} color="#699BF7" />;
