@@ -5,6 +5,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../../config';
+import { useColorScheme } from 'react-native';
 const serverUrl = config.SERVER_URL;
 
 const ReportedUser = ({ report }) => {
@@ -22,6 +23,7 @@ const ReportedUser = ({ report }) => {
     });
     const reasonText = reportDetails.reason.join(', \n');
     const reportCateogry = capitalizeFirstLetter(reportDetails.category);
+    const colorScheme = useColorScheme();
 
     // console.log(report)
 
@@ -113,8 +115,9 @@ const ReportedUser = ({ report }) => {
                         <Text style={styles.modalText}>Report User</Text>
                         <Text style={styles.modalsubtitle}>Send a warning message to the user</Text>
                         <TextInput
-                            style={[styles.input, { height: Math.max(40, inputHeight) }]}
+                            style={[styles.input, { height: Math.max(40, inputHeight), color: colorScheme === 'dark' ? '#000000' : '#000000' }]}
                             placeholder="Enter your message"
+                            placeholderTextColor={colorScheme === 'dark' ? '#cccccc' : '#888888'}
                             value={reportText}
                             onChangeText={setReportText}
                             multiline={true}
