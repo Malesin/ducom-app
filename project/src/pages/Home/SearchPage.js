@@ -40,6 +40,7 @@ const SearchPage = ({ navigation }) => {
             console.error(error)
         }
     }
+    
     const searchUser = useCallback(async () => {
         const token = await AsyncStorage.getItem('token');
         setIsLoading(true); // Set loading to true

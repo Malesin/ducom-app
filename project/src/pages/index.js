@@ -9,22 +9,22 @@ import CreatePost from './Home/CreatePost';
 import Forgotpassword from './Auth/Forgotpassword';
 import OTPScreen from './Auth/OTPScreen';
 import CreatePassword from './Auth/CreatePassword';
-import FAQscreen from './Settings/FAQscreen';
+import FAQscreen from './Settings/Support/FAQscreen';
 import Marksscreen from './Other/Marksscreen';
 import ReportScreen from './Other/ReportScreen';
 import Settingsscreen from './Settings/Settingsscreen';
-import AccountLists from './Settings/AccountLists';
-import DeactivatedorDeletedAccounts from './Settings/DeactivatedorDeletedAccounts';
-import ReportsManagement from './Settings/ReportsManagement';
-import AccountPrivacy from './Settings/AccountPrivacy';
-import AccountInformation from './Settings/AccountInformation';
-import UpdatePassword from './Settings/UpdatePassword';
+import AccountLists from './Settings/Admin/AccountLists';
+import DeactivatedorDeletedAccounts from './Settings/Admin/DeactivatedorDeletedAccounts';
+import ReportsManagement from './Settings/Admin/ReportsManagement';
+import AccountPrivacy from './Settings/Privacy/AccountPrivacy';
+import AccountInformation from './Settings/Profile/AccountInformation';
+import UpdatePassword from './Settings/Profile/UpdatePassword';
 import Profilescreen from './Profile/Profilescreen';
 import FollowerPage from './Home/FollowerPage';
 import FollowingPage from './Home/FollowingPage';
 import Notificationscreen from './Home/Notificationscreen';
 import formatNotification from './Home/formatNotification';
-import TermsandConditionscreen from './Settings/TermsandConditionscreen';
+import TermsandConditionscreen from './Settings/Profile/TermsandConditionscreen';
 import Likescreen from './Profile/Likescreen';
 import Mediascreen from './Profile/Mediascreen';
 import Postscreen from './Profile/Postscreen';
@@ -34,10 +34,10 @@ import Userprofile from './Userprofile/Userprofile';
 import Userpost from './Userprofile/Userpost';
 import Userreply from './Userprofile/Userreply';
 import Usermedia from './Userprofile/Usermedia';
-import BlockedUsers from './Settings/BlockedUsers';
-import MutedUsers from './Settings/MutedUsers';
-import DeactiveDeleteAccount from './Settings/DeactiveDeleteAccount';
-import VerifyAccount from './Settings/VerifyAccount';
+import BlockedUsers from './Settings/Privacy/BlockedUsers';
+import MutedUsers from './Settings/Privacy/MutedUsers';
+import DeactiveDeleteAccount from './Settings/Profile/DeactiveDeleteAccount';
+import VerifyAccount from './Settings/Profile/VerifyAccount';
 
 export {
   Splashscreen,
@@ -79,5 +79,5 @@ export {
   MutedUsers,
   DeactiveDeleteAccount,
   VerifyAccount,
-  formatNotification
+  formatNotification,
 };
