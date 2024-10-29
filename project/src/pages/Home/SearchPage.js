@@ -7,6 +7,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../../config';
+import { useColorScheme } from 'react-native';
 
 const serverUrl = config.SERVER_URL;
 
@@ -17,6 +18,7 @@ const SearchPage = ({ navigation }) => {
     const [myData, setMyData] = useState([]);
     const [debounceTimeout, setDebounceTimeout] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
+    const colorScheme = useColorScheme(); 
 
     const textInputRef = useRef(null);
 
@@ -96,10 +98,11 @@ const SearchPage = ({ navigation }) => {
                     <TextInput
                         ref={textInputRef}
                         placeholder="Search"
-                        style={styles.searchInput}
+                        style={[styles.searchInput, { color: colorScheme === 'dark' ? '#000000' : '#000' }]} 
                         value={searchText}
                         onChangeText={setSearchText}
                         keyboardType="default"
+                        placeholderTextColor={colorScheme === 'dark' ? '#cccccc' : '#888888'} 
                     />
                 </View>
                 {searchText.length > 0 && (

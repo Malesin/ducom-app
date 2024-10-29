@@ -13,8 +13,8 @@ import {
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { Skeleton } from 'react-native-elements';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-const verifiedIcon = <Icon name="verified" size={18} color="#699BF7" />;
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons'; // Tambahkan ini
+const verifiedIcon = <MaterialIcons name="verified" size={18} color="#699BF7" />;
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../../config';
@@ -29,6 +29,8 @@ const Userprofile = ({ userIdPost, navigation, idUser }) => {
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
   const [followersCount, setFollowersCount] = useState(0);
+  const [isMuted, setIsMuted] = useState(false); // Tambahkan state untuk mute
+  const [isBlocked, setIsBlocked] = useState(false); // Tambahkan state isBlocked untuk melacak status block
 
   useEffect(() => {
     navigation.setOptions({ title: '' });
@@ -68,7 +70,7 @@ const Userprofile = ({ userIdPost, navigation, idUser }) => {
   }
 
   useEffect(() => {
-    getData();
+    getData();``
   }, []);
 
   useFocusEffect(
@@ -98,8 +100,14 @@ const Userprofile = ({ userIdPost, navigation, idUser }) => {
   };
 
   const handleDropdownItemPress = item => {
+    if (item === 'Mute') {
+      muteUser(); // Panggil fungsi muteUser saat item Mute ditekan
+    }
+    if (item === 'Block') {
+      blockUser(); // Panggil fungsi blockUser saat item Block ditekan
+    }
     if (item === 'Report') {
-      navigation.navigate('Report');
+      navigation.navigate('Report', { reportPostId: userIdPost }); // Direct ke ReportScreen
     }
     console.log(item);
     toggleDropdown();
@@ -138,6 +146,60 @@ const Userprofile = ({ userIdPost, navigation, idUser }) => {
     }
   };
 
+  const muteUser = async () => {
+    const token = await AsyncStorage.getItem('token');
+    try {
+      if (!isMuted) {
+        const mute = await axios.post(`${serverUrl}/mute-user`, {
+          token: token,
+          muteUserId: userIdPost,
+        });
+        console.log(mute.data);
+        setIsMuted(true); // Update state ke muted
+        ToastAndroid.show("User berhasil dimute", ToastAndroid.SHORT); // Menambahkan toast berhasil
+      } else {
+        const unmute = await axios.post(`${serverUrl}/unmute-user`, {
+          token: token,
+          unmuteUserId: userIdPost,
+        });
+        console.log(unmute.data);
+        setIsMuted(false); // Update state ke unmuted
+        ToastAndroid.show("Anda berhasil unmute user ini", ToastAndroid.SHORT); // Menambahkan toast berhasil unmute
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  const blockUser = async () => {
+    const token = await AsyncStorage.getItem('token');
+    try {
+        const type = 'Block';
+        const typing = 'blocking';
+        const typed = 'Blocked';
+        if (!isBlocked) { // Tambahkan state isBlocked untuk melacak status block
+            const block = await axios.post(`${serverUrl}/block-user`, {
+                token: token,
+                blockUserId: userIdPost
+            });
+            console.log(block.data);
+            setIsBlocked(true); // Update state ke blocked
+            ToastAndroid.show("User berhasil diblokir", ToastAndroid.SHORT); // Menambahkan toast berhasil
+            navigation.goBack(); // Menutup halaman setelah diblokir
+        } else {
+            const unblock = await axios.post(`${serverUrl}/unblock-user`, {
+                token: token,
+                unblockUserId: userIdPost
+            });
+            console.log(unblock.data);
+            setIsBlocked(false); // Update state ke unblocked
+            ToastAndroid.show("Anda berhasil membuka blokir user ini", ToastAndroid.SHORT); // Menambahkan toast berhasil unblocked
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
+};
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.bannerContainer}>
@@ -161,13 +223,12 @@ const Userprofile = ({ userIdPost, navigation, idUser }) => {
                 <TouchableOpacity
                   style={styles.dropdownItem}
                   onPress={() => handleDropdownItemPress('Mute')}>
-                  <MaterialCommunityIcons
-                    name="volume-mute"
-                    size={20}
-                    color="#000"
-                    style={styles.dropdownIcon}
-                  />
-                  <Text style={styles.dropdownItemText}>Mute</Text>
+                  {isMuted ? ( // Menambahkan ikon setelah mute
+                    <MaterialIcons name="volume-up" size={20} color="#000" />
+                  ) : ( // Menambahkan ikon sebelum mute
+                    <MaterialIcons name="volume-off" size={20} color="#000" />
+                  )}
+                  <Text style={styles.dropdownItemText}>{isMuted ? 'Unmute' : 'Mute'}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.dropdownItem}
@@ -522,6 +583,11 @@ const styles = StyleSheet.create({
   },
   dropdownIcon: {
     marginRight: 10,
+  },
+  unmuteIcon: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
   },
 });
 
