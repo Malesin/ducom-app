@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity, Modal, TextInput, SafeAreaView, Alert, ScrollView } from 'react-native';
 import ProfileImage from '../../assets/iya.png';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -6,29 +6,63 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../../config';
 import { useColorScheme } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 const serverUrl = config.SERVER_URL;
 
-const ReportedUser = ({ report }) => {
+const ReportedUser = ({ report, handleDeleteReport }) => {
+    const navigator = useNavigation();
+
     const capitalizeFirstLetter = (string) => {
         return string.charAt(0).toUpperCase() + string.slice(1);
     };
+
     const [modalVisible, setModalVisible] = useState(false);
     const [reportText, setReportText] = useState('');
     const [inputHeight, setInputHeight] = useState(40);
     const [reportDetailsVisible, setReportDetailsVisible] = useState(false);
+    const [idUser, setIdUser] = useState(false);
+    const [profilePicture, setProfilePicture] = useState(false);
+    const [amIAdmin, setAmIAdmin] = useState(false);
+    const [isMuteds, setIsMuteds] = useState(false);
+    const [isBlockeds, setIsBlockeds] = useState(false);
     const [reportDetails, setReportDetails] = useState({
         category: report.category,
         commentProof: report.commentProof,
         reason: report.reason
     });
+    const reportId = report.id
     const reasonText = reportDetails.reason.join(', \n');
     const reportCateogry = capitalizeFirstLetter(reportDetails.category);
     const colorScheme = useColorScheme();
+    
+    const getData = async () => {
+        const token = await AsyncStorage.getItem('token');
+        try {
+            await axios
+                .post(`${serverUrl}/userdata`, { token: token })
+                .then(res => {
+                    if (res.data.status == 'ok') {
+                        const data = res.data.data;
+                        setIdUser(data._id);
+                        setProfilePicture(data.profilePicture);
+                        setAmIAdmin(data.isAdmin)
+                        setIsMuteds(data.mutedUsers)
+                        setIsBlockeds(data.blockedUsers)
+                    }
+                })
+        } catch (error) {
+            console.error(error)
+        }
+    }
 
-    // console.log(report)
+    useEffect(() => {
+        getData()
+    }, [])
+
 
     const handleReportPress = () => {
         setModalVisible(true);
+        console.log(report)
     };
 
     const handleCancel = () => {
@@ -40,14 +74,14 @@ const ReportedUser = ({ report }) => {
         const token = await AsyncStorage.getItem('token');
         try {
             await axios
-            .post(`${serverUrl}/send-warning`, {
-                token: token,
-                userId: report?.userId,
-                message: reportText
-            })
-            .then(res => {
-                console.log(res.data)
-            })
+                .post(`${serverUrl}/send-warning`, {
+                    token: token,
+                    userId: report?.userId,
+                    message: reportText
+                })
+                .then(res => {
+                    console.log(res.data)
+                })
         } catch (error) {
             console.error(error)
         } finally {
@@ -57,26 +91,64 @@ const ReportedUser = ({ report }) => {
         }
     };
 
-    const handleDeletePress = () => {
-        Alert.alert(
-            "Delete Report",
-            "Are you sure you want to delete this report?",
-            [
-                {
-                    text: "Cancel",
-                    style: "cancel"
-                },
-                { text: "OK", onPress: () => console.log("Report Deleted") }
-            ]
-        );
-    };
-
     const handleViewPress = () => {
         setReportDetailsVisible(true);
     };
 
-    const handleDeletePostOrComment = () => {
-        console.log("Viewing Post")
+    const handleViewPostOrComment = async () => {
+        const token = await AsyncStorage.getItem('token');
+        try {
+            await axios
+                .post(`${serverUrl}/find-post`, {
+                    token: token,
+                    postId: report.postId
+                })
+                .then(res => {
+                    const data = res.data.data
+
+                    const totalComments = data.comments.length + data.comments.reduce((acc, comment) => acc + comment.replies.length, 0);
+
+                    const dataTweet = {
+                        id: data._id,
+                        userAvatar: data.user.profilePicture,
+                        userName: data.user.name,
+                        userHandle: data.user.username,
+                        postDate: data.created_at,
+                        content: data.description,
+                        media: Array.isArray(data.media)
+                            ? data.media.map(mediaItem => ({
+                                type: mediaItem.type,
+                                uri: mediaItem.uri,
+                            }))
+                            : [],
+                        likesCount: data.likes.length,
+                        commentsCount: totalComments,
+                        bookMarksCount: data.bookmarks.length,
+                        repostsCount: data.reposts.length,
+                        isLiked: data.likes.some(like => like._id === idUser),
+                        isBookmarked: data.bookmarks.some(bookmark => bookmark.user === idUser),
+                        isReposted: data.reposts.some(repost => repost.user === idUser),
+                        isMuted: isMuteds.some(isMuted => isMuted === data.user._id),
+                        isBlocked: isBlockeds.some(isBlocked => isBlocked === data.user._id),
+                        userIdPost: data.user._id,
+                        idUser: idUser,
+                        userEmailPost: data.user.email,
+                        profilePicture: profilePicture,
+                        commentsEnabled: data.commentsEnabled,
+                        isAdmin: data.user.isAdmin,
+                        amIAdmin: amIAdmin
+                    };
+
+                    navigator.navigate('ViewPost', {
+                        tweet: dataTweet,
+                        // comments,
+                        focusCommentInput: true,
+                    });
+
+                })
+        } catch (error) {
+            console.error(error)
+        }
     };
 
     return (
@@ -99,7 +171,7 @@ const ReportedUser = ({ report }) => {
                 <TouchableOpacity style={styles.iconButton} onPress={handleReportPress}>
                     <MaterialIcons name="report" size={23} color="#FFC300" />
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.iconButton} onPress={handleDeletePress}>
+                <TouchableOpacity style={styles.iconButton} onPress={() => handleDeleteReport(reportId)}>
                     <MaterialIcons name="delete-forever" size={23} color="#C70039" />
                 </TouchableOpacity>
             </View>
@@ -178,9 +250,9 @@ const ReportedUser = ({ report }) => {
                                     Close
                                 </Text>
                             </TouchableOpacity>
-                            <TouchableOpacity style={styles.buttonSend} onPress={handleDeletePostOrComment}>
+                            <TouchableOpacity style={styles.buttonSend} onPress={handleViewPostOrComment}>
                                 <Text style={styles.buttonTextSend}>
-                                    Delete
+                                    View
                                 </Text>
                             </TouchableOpacity>
                         </View>

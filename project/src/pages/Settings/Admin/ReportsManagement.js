@@ -1,35 +1,44 @@
 import { SafeAreaView, StyleSheet, Text, View, ScrollView, RefreshControl, ToastAndroid, Alert } from 'react-native'
 import { Skeleton } from 'react-native-elements';
 import React, { useState, useEffect, useCallback } from 'react';
-import Usercard from '../../components/Admin/Usercard'
+import ReportedUser from '../../../components/Admin/ReportedUser';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-import config from '../../config';
+import config from '../../../config';
 const serverUrl = config.SERVER_URL;
 
-const AccountLists = () => {
-    const [allUsers, setAllUsers] = useState([]);
+const ReportsManagement = () => {
+
+    const [reportUsers, setReportUsers] = useState([]);
     const [refreshing, setRefreshing] = useState(false);
     const [showSkeleton, setShowSkeleton] = useState(true);
 
     useEffect(() => {
-        FetchAllUsers()
+        FetchReports()
     }, [])
 
-    const FetchAllUsers = async () => {
+    const FetchReports = async () => {
         setShowSkeleton(true);
         const token = await AsyncStorage.getItem('token');
         try {
-            const response = await axios.post(`${serverUrl}/all-users`, { token: token });
-            const respAll = response.data.data || []; // Pastikan respAll adalah array
-            const formattedAll = respAll.map(user => ({
-                id: user._id,
-                name: user.name,
-                username: user.username,
-                profilePicture: user.profilePicture,
+            const response = await axios.post(`${serverUrl}/show-reports`, { token: token });
+            const resp = response.data.data || [];
+            const formatted = resp.map(report => ({
+                id: report._id,
+                postId: report.reportedPost?._id || report.relatedPost?._id,
+                category: report.category,
+                userId: report.reportedEntity.user._id,
+                name: report.reportedEntity.user.name,
+                username: report.reportedEntity.user.username,
+                usernamePost: report.relatedPost?.user?.username || '',
+                profilePicPost: report.relatedPost?.user?.profilePicture || '',
+                profilePicture: report.reportedEntity.user.profilePicture,
+                bio: report.reportedEntity.description || '',
+                commentProof: report.reportedEntity.comment || '',
+                reason: report.reportCategoryDescriptions
             }));
             setShowSkeleton(false);
-            return formattedAll; // Pastikan mengembalikan array
+            return formatted; // Pastikan mengembalikan array
         } catch (error) {
             setShowSkeleton(false);
             console.error(error);
@@ -38,26 +47,26 @@ const AccountLists = () => {
     }
 
     useEffect(() => {
-        const loadAllUsers = async () => {
+        const loadReportUsers = async () => {
             setRefreshing(true);
-            const newAllUsers = await FetchAllUsers();
-            setAllUsers(newAllUsers)
+            const newReportUsers = await FetchReports();
+            setReportUsers(newReportUsers)
             setRefreshing(false);
         };
-        loadAllUsers();
+        loadReportUsers();
     }, []);
 
     const onRefresh = useCallback(async () => {
         setRefreshing(true);
-        const newAllUsers = await FetchAllUsers();
-        setAllUsers(newAllUsers)
+        const newReportUsers = await FetchReports();
+        setReportUsers(newReportUsers)
         setRefreshing(false);
     }, []);
 
-    const handleDeleteUser = async (idUser) => {
+    const handleDeleteReport = async (reportId) => {
         const token = await AsyncStorage.getItem('token');
         try {
-            Alert.alert('Delete User', 'Are you sure want to delete this user?', [
+            Alert.alert('Delete Report', 'Are you sure want to delete this report?', [
                 {
                     text: 'Cancel',
                     onPress: () => null,
@@ -66,16 +75,21 @@ const AccountLists = () => {
                 {
                     text: 'Delete',
                     onPress: async () => {
-                        await axios
-                            .post(`${serverUrl}/deleteUser-byAdmin`, {
-                                token: token,
-                                idUser: idUser
-                            })
-                            .then(res => {
-                                console.log(res.data)
-                                ToastAndroid.show('User successfully deleted', ToastAndroid.SHORT);
-                            })
-                        await onRefresh();
+                        try {
+                            await axios
+                                .post(`${serverUrl}/delete-report`, {
+                                    token: token,
+                                    reportId: reportId
+                                })
+                                .then(res => {
+                                    console.log(res.data)
+                                    ToastAndroid.show('Report successfully deleted', ToastAndroid.SHORT);
+                                })
+                            await onRefresh();
+                        } catch (error) {
+                            console.error(error)
+                            ToastAndroid.show('Something error, try again later', ToastAndroid.SHORT);
+                        }
                     },
                 },
             ]);
@@ -125,11 +139,11 @@ const AccountLists = () => {
                 {showSkeleton ? (
                     renderSkeleton()
                 ) : (
-                    allUsers && allUsers.length === 0 ? (
-                        <Text style={styles.noAllUsersText}>No Users accounts</Text>
+                    reportUsers && reportUsers.length === 0 ? (
+                        <Text style={styles.noReportUsersText}>No Users accounts</Text>
                     ) : (
-                        allUsers && allUsers.map((user, index) => ( // Tambahkan pengecekan allUsers
-                            <Usercard key={index} user={user} handleDeleteUser={handleDeleteUser} />
+                        reportUsers && reportUsers.map((report, index) => (
+                            <ReportedUser key={index} report={report} handleDeleteReport={handleDeleteReport} />
                         ))
                     )
                 )}
@@ -138,14 +152,14 @@ const AccountLists = () => {
     )
 }
 
-export default AccountLists
+export default ReportsManagement
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#f5f5f5',
     },
-    noAllUsersText: {
+    noReportUsersText: {
         textAlign: 'center',
         marginTop: 20,
         fontSize: 16,

@@ -29,7 +29,7 @@ import BottomTabNavigator from './BottomTabNavigator';
 import DrawerNavigator from './DrawerNavigator';
 import UserTopTabNavigator from './UserTopTabNavigator';
 import TopTabNavigator from './TopTabNavigator';
-import DeactiveDeleteAccount from '../pages/Settings/DeactiveDeleteAccount';
+import DeactiveDeleteAccount from '../pages/Settings/Profile/DeactiveDeleteAccount';
 import FollowTopTabNavigator from './FollowTopTabNavigator';
 
 const Stack = createNativeStackNavigator();
