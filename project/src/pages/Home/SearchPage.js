@@ -17,6 +17,7 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../../config';
+import { useColorScheme } from 'react-native';
 
 const serverUrl = config.SERVER_URL;
 
@@ -26,8 +27,15 @@ const SearchPage = ({navigation}) => {
   const [myData, setMyData] = useState([]);
   const [debounceTimeout, setDebounceTimeout] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-
   const textInputRef = useRef(null);
+
+const SearchPage = ({ navigation }) => {
+    const [searchText, setSearchText] = useState('');
+    const [searchs, setSearchs] = useState([]);
+    const [myData, setMyData] = useState([]);
+    const [debounceTimeout, setDebounceTimeout] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
+    const colorScheme = useColorScheme(); 
 
   const handleSearchPress = () => {
     if (textInputRef.current) {
@@ -46,27 +54,27 @@ const SearchPage = ({navigation}) => {
     } catch (error) {
       console.error(error);
     }
-  };
-  const searchUser = useCallback(async () => {
-    const token = await AsyncStorage.getItem('token');
-    setIsLoading(true); // Set loading to true
-    try {
-      await axios
-        .post(`${serverUrl}/search-user`, {
-          token: token,
-          query: searchText,
-        })
-        .then(res => {
-          if (res.data.status == 'ok') {
-            setSearchs(res.data.data);
-          }
-        });
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsLoading(false); // Set loading to false after data is fetched
-    }
-  }, [searchText]);
+  };    
+    const searchUser = useCallback(async () => {
+        const token = await AsyncStorage.getItem('token');
+        setIsLoading(true); // Set loading to true
+        try {
+            await axios
+                .post(`${serverUrl}/search-user`, {
+                    token: token,
+                    query: searchText
+                })
+                .then(res => {
+                    if (res.data.status == 'ok') {
+                        setSearchs(res.data.data);
+                    }
+                })
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsLoading(false); // Set loading to false after data is fetched
+        }
+    }, [searchText]);
 
   useEffect(() => {
     getData();
@@ -86,7 +94,6 @@ const SearchPage = ({navigation}) => {
   const handleBackPress = () => {
     navigation.navigate('Home');
   };
-
   return (
     <SafeAreaView style={styles.searchContainer}>
       <View style={styles.headerSearchContainer}>

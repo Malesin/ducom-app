@@ -3,10 +3,10 @@ import { SafeAreaView, StyleSheet, Text, View, Image, TextInput, TouchableOpacit
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-import config from '../../config';
+import config from '../../../config';
 import { Skeleton } from 'react-native-elements';
 import { Alert } from 'react-native';
-import DefaultAvatar from '../../assets/profilepic.png';
+import DefaultAvatar from '../../../assets/profilepic.png';
 
 const serverUrl = config.SERVER_URL;
 

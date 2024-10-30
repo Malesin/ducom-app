@@ -1,15 +1,48 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
-import ProfileImage from '../assets/iya.png';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, Text, View, Image, TouchableOpacity, ToastAndroid } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import FollowSheet from './FollowSheet';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import config from '../config';
+const serverUrl = config.SERVER_URL;
 
-const FollowCard = ({ followText, followingText, removeButtonText, message, username }) => {
-    const [isFollowing, setIsFollowing] = useState(true);
+const FollowCard = ({ followText, followingText, removeButtonText, message, data, myId }) => {
+    const [isFollowing, setIsFollowing] = useState(false);
     const [isModalVisible, setIsModalVisible] = useState(false);
+    
+    useEffect(() => {
+        const isFollow = data.followers.some(follow => follow === myId)
+        setIsFollowing(isFollow)
+    }, [])
 
-    const handleFollowToggle = () => {
-        setIsFollowing(!isFollowing);
+    const handleFollowToggle = async () => {
+        try {
+            const token = await AsyncStorage.getItem('token');
+            if (isFollowing) {
+                await axios
+                    .post(`${serverUrl}/unfollow`, {
+                        token: token,
+                        unfollowUserId: data._id
+                    })
+                    .then(res => {
+                        console.log(res.data);
+                    })
+            } else {
+                await axios.post(`${serverUrl}/follow`, {
+                    token: token,
+                    followUserId: data._id
+                })
+                    .then(res => {
+                        console.log(res.data);
+                    })
+            }
+            setIsFollowing(!isFollowing);
+        } catch (error) {
+            setIsFollowing(isFollowing);
+            console.error(error);
+            ToastAndroid.show("Something Error, Try Again Later", ToastAndroid.SHORT); // Menambahkan toast error
+        }
     };
 
     const handleMorePress = () => {
@@ -23,10 +56,13 @@ const FollowCard = ({ followText, followingText, removeButtonText, message, user
     return (
         <View style={styles.container}>
             <Image
-                source={ProfileImage}
+                source={
+                    data?.profilePicture
+                        ? { uri: data?.profilePicture }
+                        : require('../assets/profilepic.png')}
                 style={styles.profileImage}
             />
-            <Text style={styles.username}>mikadotjees</Text>
+            <Text style={styles.username}>{data?.username}</Text>
             <TouchableOpacity
                 style={[styles.messageButton, isFollowing && styles.followingButton]}
                 onPress={handleFollowToggle}
@@ -44,7 +80,7 @@ const FollowCard = ({ followText, followingText, removeButtonText, message, user
                 onRemove={() => {
                     handleCloseModal();
                 }}
-                username={username}
+                username={data?.username}
                 removeButtonText={removeButtonText}
                 message={message}
             />

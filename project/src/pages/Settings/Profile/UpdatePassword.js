@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import config from '../../config';
+import config from '../../../config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useColorScheme } from 'react-native';
@@ -74,8 +74,8 @@ const UpdatePassword = ({ navigation }) => {
     }
   }, [oldPassword, newPassword, verifyNewPassword]);
 
-  const inputTextColor = colorScheme === 'dark' ? '#000000' : '#000000';
-  const placeholderTextColor = colorScheme === 'dark' ? '#000000' : '#000000';
+  const inputTextColor = colorScheme === 'dark' ? '#000000' : '#888888';
+  const placeholderTextColor = colorScheme === 'dark' ? '#cccccc' : '#888888';
 
   return (
     <SafeAreaView style={styles.container}>

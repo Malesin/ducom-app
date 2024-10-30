@@ -10,8 +10,8 @@ import {
 import { Skeleton } from 'react-native-elements';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-import config from '../../config';
-import BlockCard from '../../components/BlockCard';
+import config from '../../../config';
+import BlockCard from '../../../components/BlockCard';
 import { ToastAndroid } from 'react-native'; 
 
 const serverUrl = config.SERVER_URL;

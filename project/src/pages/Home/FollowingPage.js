@@ -1,22 +1,63 @@
-import { SafeAreaView, ScrollView, StyleSheet, Text } from 'react-native'
-import React from 'react'
 import FollowCard from '../../components/FollowCard'
+import { SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { useFocusEffect } from '@react-navigation/native';
+import React, { useState, useEffect, useCallback } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import config from '../../config';
+const serverUrl = config.SERVER_URL;
+
 
 const FollowingPage = () => {
-    const username = "mikadotjees";
+    const [dataFollowing, setDataFollowing] = useState([])
+    const [myId, setMyId] = useState()
+
+    const getDataFollowing = async () => {
+        try {
+            const token = await AsyncStorage.getItem('token');
+            await axios
+                .post(`${serverUrl}/show-following`, {
+                    token: token
+                })
+                .then(res => {
+                    const dataFollow = res.data.data.following
+                    setDataFollowing(dataFollow)
+
+                    const myUserId = res.data.myId
+                    setMyId(myUserId)
+                })
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
+    useEffect(() => {
+        getDataFollowing()
+    }, [])
+
+    useFocusEffect(
+        useCallback(() => {
+            getDataFollowing();
+        }, []),
+    );
 
     return (
         <SafeAreaView style={styles.container}>
             <ScrollView contentContainerStyle={styles.scrollView}>
-                <FollowCard
-                    followText="Follow Back"
-                    followingText="Following"
-                    removeButtonText="Unfollow"
-                    message={
-                        <Text style={styles.boldUsername}>{username}</Text>
-                    }
-                    username={username}
-                />
+                {dataFollowing.map((data, index) => (
+                    <View key={index}>
+                        <FollowCard
+                            followText="Follow Back"
+                            followingText="Following"
+                            removeButtonText="Unfollow"
+                            message={
+                                <Text style={styles.boldUsername}>{data?.username}</Text>
+                            }
+                            data={data}
+                            myId={myId}
+                        />
+                    </View>
+                ))}
             </ScrollView>
         </SafeAreaView>
     )

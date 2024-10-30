@@ -8,10 +8,10 @@ import {
   View,
 } from 'react-native';
 import { Skeleton } from 'react-native-elements';
-import MuteCard from '../../components/MuteCard';
+import MuteCard from '../../../components/MuteCard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-import config from '../../config';
+import config from '../../../config';
 import { ToastAndroid } from 'react-native';
 
 const serverUrl = config.SERVER_URL;
