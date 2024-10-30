@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   icon: {
-    marginRight: 8,
+    marginRight: 8 ,
     color: '#000',
   },
   avatar: {

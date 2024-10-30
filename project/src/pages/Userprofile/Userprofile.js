@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {
   SafeAreaView,
   View,
@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   Modal,
   TouchableWithoutFeedback,
-  ToastAndroid
+  ToastAndroid,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useFocusEffect } from '@react-navigation/native';
@@ -20,7 +20,7 @@ import axios from 'axios';
 import config from '../../config';
 const serverUrl = config.SERVER_URL;
 
-const Userprofile = ({ userIdPost, navigation, idUser }) => {
+const Userprofile = ({userIdPost, navigation, idUser}) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [banner, setBanner] = useState(false);
   const [profilePicture, setProfilePicture] = useState(false);
@@ -33,7 +33,7 @@ const Userprofile = ({ userIdPost, navigation, idUser }) => {
   const [isBlocked, setIsBlocked] = useState(false); // Tambahkan state isBlocked untuk melacak status block
 
   useEffect(() => {
-    navigation.setOptions({ title: '' });
+    navigation.setOptions({title: ''});
   }, [navigation]);
 
   const getData = async () => {
@@ -46,28 +46,28 @@ const Userprofile = ({ userIdPost, navigation, idUser }) => {
       });
       const user = userResponse.data.data;
       setUserData(user);
-      const isFollow = user.followers.some(follow => follow === idUser)
-      setIsFollowing(isFollow)
+      const isFollow = user.followers.some(follow => follow === idUser);
+      setIsFollowing(isFollow);
 
       if (user.username) {
-        navigation.setOptions({ title: `@${user.username}` });
+        navigation.setOptions({title: `@${user.username}`});
       }
 
       if (user.bannerPicture) {
-        const banner = { uri: user.bannerPicture };
+        const banner = {uri: user.bannerPicture};
         setBanner(banner);
         console.log('Banner Berhasil Diambil');
       }
 
       if (user.profilePicture) {
-        const profile = { uri: user.profilePicture };
+        const profile = {uri: user.profilePicture};
         setProfilePicture(profile);
         console.log('Foto Profil Berhasil Diambil');
       }
     } catch (error) {
       console.error('Error:', error);
     }
-  }
+  };
 
   useEffect(() => {
     getData();``
@@ -128,13 +128,13 @@ const Userprofile = ({ userIdPost, navigation, idUser }) => {
       if (isFollowing) {
         const unfollow = await axios.post(`${serverUrl}/unfollow`, {
           token: token,
-          unfollowUserId: userIdPost
+          unfollowUserId: userIdPost,
         });
         console.log(unfollow.data);
       } else {
         const follow = await axios.post(`${serverUrl}/follow`, {
           token: token,
-          followUserId: userIdPost
+          followUserId: userIdPost,
         });
         console.log(follow.data);
       }
@@ -142,7 +142,7 @@ const Userprofile = ({ userIdPost, navigation, idUser }) => {
     } catch (error) {
       setIsFollowing(isFollowing);
       console.error(error);
-      ToastAndroid.show("Something Error, Try Again Later", ToastAndroid.SHORT); // Menambahkan toast error
+      ToastAndroid.show('Something Error, Try Again Later', ToastAndroid.SHORT); // Menambahkan toast error
     }
   };
 
@@ -260,7 +260,9 @@ const Userprofile = ({ userIdPost, navigation, idUser }) => {
           <View style={styles.profilePictureContainer}>
             <TouchableOpacity onPress={openModal}>
               <Image
-                source={profilePicture || require('../../assets/profilepic.png')}
+                source={
+                  profilePicture || require('../../assets/profilepic.png')
+                }
                 style={styles.profile}
               />
             </TouchableOpacity>
@@ -273,18 +275,20 @@ const Userprofile = ({ userIdPost, navigation, idUser }) => {
                     animation="pulse"
                     height={18}
                     width={30}
-                    style={[styles.skeleton, { borderRadius: 3 }]}
+                    style={[styles.skeleton, {borderRadius: 3}]}
                   />
                   <Skeleton
                     animation="pulse"
                     height={14}
                     width={60}
-                    style={[styles.skeleton, { borderRadius: 3 }]}
+                    style={[styles.skeleton, {borderRadius: 3}]}
                   />
                 </>
               ) : (
                 <>
-                  <Text style={styles.statNumber}>{userData?.postCount || 0}</Text>
+                  <Text style={styles.statNumber}>
+                    {userData?.postCount || 0}
+                  </Text>
                   <Text style={styles.statLabel}>Posts</Text>
                 </>
               )}
@@ -296,18 +300,20 @@ const Userprofile = ({ userIdPost, navigation, idUser }) => {
                     animation="pulse"
                     height={18}
                     width={30}
-                    style={[styles.skeleton, { borderRadius: 3 }]}
+                    style={[styles.skeleton, {borderRadius: 3}]}
                   />
                   <Skeleton
                     animation="pulse"
                     height={14}
                     width={60}
-                    style={[styles.skeleton, { borderRadius: 3 }]}
+                    style={[styles.skeleton, {borderRadius: 3}]}
                   />
                 </>
               ) : (
                 <>
-                  <Text style={styles.statNumber}>{userData ? userData?.followers.length : 0}</Text>
+                  <Text style={styles.statNumber}>
+                    {userData ? userData?.followers.length : 0}
+                  </Text>
                   <Text style={styles.statLabel}>Followers</Text>
                 </>
               )}
@@ -319,18 +325,20 @@ const Userprofile = ({ userIdPost, navigation, idUser }) => {
                     animation="pulse"
                     height={18}
                     width={30}
-                    style={[styles.skeleton, { borderRadius: 3 }]}
+                    style={[styles.skeleton, {borderRadius: 3}]}
                   />
                   <Skeleton
                     animation="pulse"
                     height={14}
                     width={60}
-                    style={[styles.skeleton, { borderRadius: 3 }]}
+                    style={[styles.skeleton, {borderRadius: 3}]}
                   />
                 </>
               ) : (
                 <>
-                  <Text style={styles.statNumber}>{userData ? userData?.following.length : 0}</Text>
+                  <Text style={styles.statNumber}>
+                    {userData ? userData?.following.length : 0}
+                  </Text>
                   <Text style={styles.statLabel}>Following</Text>
                 </>
               )}
@@ -345,7 +353,7 @@ const Userprofile = ({ userIdPost, navigation, idUser }) => {
                   animation="pulse"
                   height={20}
                   width={150}
-                  style={[styles.skeleton, { borderRadius: 3 }]}
+                  style={[styles.skeleton, {borderRadius: 3}]}
                 />
               ) : (
                 <Text style={styles.name}>{userData?.name}</Text>
@@ -359,7 +367,7 @@ const Userprofile = ({ userIdPost, navigation, idUser }) => {
                 animation="pulse"
                 height={14}
                 width={100}
-                style={[styles.skeleton, { borderRadius: 3 }]}
+                style={[styles.skeleton, {borderRadius: 3}]}
               />
             ) : (
               <Text style={styles.username}>@{userData?.username}</Text>
@@ -369,7 +377,7 @@ const Userprofile = ({ userIdPost, navigation, idUser }) => {
                 animation="pulse"
                 height={13}
                 width={200}
-                style={[styles.skeleton, { borderRadius: 3 }]}
+                style={[styles.skeleton, {borderRadius: 3}]}
               />
             ) : (
               <Text style={styles.description}>
@@ -382,14 +390,17 @@ const Userprofile = ({ userIdPost, navigation, idUser }) => {
               animation="pulse"
               height={30}
               width={150}
-              style={[styles.skeleton, { borderRadius: 20, marginRight: 15 }]}
+              style={[styles.skeleton, {borderRadius: 20, marginRight: 15}]}
             />
           ) : (
             <TouchableOpacity
               style={[styles.editButton, isFollowing && styles.followingButton]}
-              onPress={handleFollowPress}
-            >
-              <Text style={[styles.editButtonText, isFollowing && styles.followingButtonText]}>
+              onPress={handleFollowPress}>
+              <Text
+                style={[
+                  styles.editButtonText,
+                  isFollowing && styles.followingButtonText,
+                ]}>
                 {isFollowing ? 'Following' : 'Follow'}
               </Text>
             </TouchableOpacity>
@@ -479,7 +490,6 @@ const styles = StyleSheet.create({
   userInfoContainer: {
     marginTop: 10,
     marginBottom: 10,
-
   },
   nameContainer: {
     flexDirection: 'row',
@@ -493,8 +503,8 @@ const styles = StyleSheet.create({
     marginRight: 5,
   },
   verifiedIcon: {
-    marginLeft: 5,
-    marginTop: 3
+    paddingVertical: 3,
+    paddingHorizontal: 5,
   },
   username: {
     fontSize: 14,
@@ -564,7 +574,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 7,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.8,
     shadowRadius: 2,
     elevation: 5,
