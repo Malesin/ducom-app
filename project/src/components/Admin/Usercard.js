@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 const Usercard = ({ user, handleDeleteUser }) => {
-    const idUser = user?.id
+    const userId = user?.id
     return (
         <View style={styles.container}>
             <Image
@@ -18,7 +18,7 @@ const Usercard = ({ user, handleDeleteUser }) => {
                 <Text style={styles.userhandle}>@{user?.username}</Text>
             </View>
             <View style={styles.iconContainer}>
-                <TouchableOpacity style={styles.iconButton} onPress={() => handleDeleteUser(idUser)}>
+                <TouchableOpacity style={styles.iconButton} onPress={() => handleDeleteUser(userId)}>
                     <MaterialIcons name="delete" size={25} color="#C70039" />
                 </TouchableOpacity>
             </View>

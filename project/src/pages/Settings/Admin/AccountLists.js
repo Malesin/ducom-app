@@ -1,43 +1,35 @@
 import { SafeAreaView, StyleSheet, Text, View, ScrollView, RefreshControl, ToastAndroid, Alert } from 'react-native'
 import { Skeleton } from 'react-native-elements';
 import React, { useState, useEffect, useCallback } from 'react';
-import ReportedUser from './../../components/Admin/ReportedUser';
+import Usercard from '../../../components/Admin/Usercard'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-import config from '../../config';
+import config from '../../../config';
 const serverUrl = config.SERVER_URL;
 
-const ReportsManagement = () => {
-
-    const [reportUsers, setReportUsers] = useState([]);
+const AccountLists = () => {
+    const [allUsers, setAllUsers] = useState([]);
     const [refreshing, setRefreshing] = useState(false);
     const [showSkeleton, setShowSkeleton] = useState(true);
 
     useEffect(() => {
-        FetchReports()
+        FetchAllUsers()
     }, [])
 
-    const FetchReports = async () => {
+    const FetchAllUsers = async () => {
         setShowSkeleton(true);
         const token = await AsyncStorage.getItem('token');
         try {
-            const response = await axios.post(`${serverUrl}/show-reports`, { token: token });
-            const resp = response.data.data || [];
-            const formatted = resp.map(report => ({
-                id: report._id,
-                category: report.category,
-                userId: report.reportedEntity.user._id,
-                name: report.reportedEntity.user.name,
-                username: report.reportedEntity.user.username,
-                usernamePost: report.relatedPost?.user?.username || '',
-                profilePicPost: report.relatedPost?.user?.profilePicture || '',
-                profilePicture: report.reportedEntity.user.profilePicture,
-                bio: report.reportedEntity.description || '',
-                commentProof: report.reportedEntity.comment || '',
-                reason: report.reportCategoryDescriptions
+            const response = await axios.post(`${serverUrl}/all-users`, { token: token });
+            const respAll = response.data.data || []; // Pastikan respAll adalah array
+            const formattedAll = respAll.map(user => ({
+                id: user._id,
+                name: user.name,
+                username: user.username,
+                profilePicture: user.profilePicture,
             }));
             setShowSkeleton(false);
-            return formatted; // Pastikan mengembalikan array
+            return formattedAll; // Pastikan mengembalikan array
         } catch (error) {
             setShowSkeleton(false);
             console.error(error);
@@ -46,23 +38,23 @@ const ReportsManagement = () => {
     }
 
     useEffect(() => {
-        const loadReportUsers = async () => {
+        const loadAllUsers = async () => {
             setRefreshing(true);
-            const newReportUsers = await FetchReports();
-            setReportUsers(newReportUsers)
+            const newAllUsers = await FetchAllUsers();
+            setAllUsers(newAllUsers)
             setRefreshing(false);
         };
-        loadReportUsers();
+        loadAllUsers();
     }, []);
 
     const onRefresh = useCallback(async () => {
         setRefreshing(true);
-        const newReportUsers = await FetchReports();
-        setReportUsers(newReportUsers)
+        const newAllUsers = await FetchAllUsers();
+        setAllUsers(newAllUsers)
         setRefreshing(false);
     }, []);
 
-    const handleDeleteReport = async (idUser) => {
+    const handleDeleteUser = async (userId) => {
         const token = await AsyncStorage.getItem('token');
         try {
             Alert.alert('Delete User', 'Are you sure want to delete this user?', [
@@ -77,7 +69,7 @@ const ReportsManagement = () => {
                         await axios
                             .post(`${serverUrl}/deleteUser-byAdmin`, {
                                 token: token,
-                                idUser: idUser
+                                userId: userId
                             })
                             .then(res => {
                                 console.log(res.data)
@@ -133,11 +125,11 @@ const ReportsManagement = () => {
                 {showSkeleton ? (
                     renderSkeleton()
                 ) : (
-                    reportUsers && reportUsers.length === 0 ? (
-                        <Text style={styles.noReportUsersText}>No Users accounts</Text>
+                    allUsers && allUsers.length === 0 ? (
+                        <Text style={styles.noAllUsersText}>No Users accounts</Text>
                     ) : (
-                        reportUsers && reportUsers.map((report, index) => (
-                            <ReportedUser key={index} report={report} handleDeleteReport={handleDeleteReport} />
+                        allUsers && allUsers.map((user, index) => ( // Tambahkan pengecekan allUsers
+                            <Usercard key={index} user={user} handleDeleteUser={handleDeleteUser} />
                         ))
                     )
                 )}
@@ -146,14 +138,14 @@ const ReportsManagement = () => {
     )
 }
 
-export default ReportsManagement
+export default AccountLists
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#f5f5f5',
     },
-    noReportUsersText: {
+    noAllUsersText: {
         textAlign: 'center',
         marginTop: 20,
         fontSize: 16,

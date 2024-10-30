@@ -180,16 +180,24 @@ const RegisterScreen = ({ navigation }) => {
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.title}>Sign Up</Text>
         <TextInput
-          style={[styles.input, errors.name ? styles.errorInput : null]}
+          style={[
+            styles.input,
+            errors.name ? styles.errorInput : null,
+            { color: colorScheme === 'dark' ? '#000000' : '#000' },
+          ]}
           onChangeText={text => setName(text.slice(0, 40))}
           value={name}
           placeholder="Name"
           autoCapitalize="words"
-          placeholderTextColor={colorScheme === 'dark' ? '#cccccc' : '#888888'}
+          placeholderTextColor={colorScheme === 'dark' ? '#000000' : '#888888'}
         />
         {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
         <TextInput
-          style={[styles.input, errors.username ? styles.errorInput : null]}
+          style={[
+            styles.input,
+            errors.username ? styles.errorInput : null,
+            { color: colorScheme === 'dark' ? '#000000' : '#000' },
+          ]}
           onChangeText={text => setUsername(text.slice(0, 15))}
           value={username}
           placeholder="Username"
@@ -200,7 +208,11 @@ const RegisterScreen = ({ navigation }) => {
           <Text style={styles.errorText}>{errors.username}</Text>
         )}
         <TextInput
-          style={[styles.input, errors.email ? styles.errorInput : null]}
+          style={[
+            styles.input,
+            errors.email ? styles.errorInput : null,
+            { color: colorScheme === 'dark' ? '#000000' : '#000' },
+          ]}
           onChangeText={text => setEmail(text)}
           value={email}
           placeholder="Email"
@@ -216,7 +228,10 @@ const RegisterScreen = ({ navigation }) => {
             errors.password ? styles.errorInput : null,
           ]}>
           <TextInput
-            style={styles.passwordInput}
+            style={[
+              styles.passwordInput,
+              { color: colorScheme === 'dark' ? '#000000' : '#000' },
+            ]}
             onChangeText={text => setPassword(text.slice(0, 25))}
             value={password}
             placeholder="Password"
@@ -245,7 +260,10 @@ const RegisterScreen = ({ navigation }) => {
             errors.confirmpassword ? styles.errorInput : null,
           ]}>
           <TextInput
-            style={styles.passwordInput}
+            style={[
+              styles.passwordInput,
+              { color: colorScheme === 'dark' ? '#000000' : '#000' },
+            ]}
             onChangeText={text => setConfirmPassword(text.slice(0, 25))}
             value={confirmpassword}
             placeholder="Confirm Password"

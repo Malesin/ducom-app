@@ -49,7 +49,7 @@ export default function Profilescreen() {
         if (user.profilePicture) {
           setProfilePicture({uri: user.profilePicture});
         }
-      }, 2500);
+      }, 1000);
     } catch (error) {
       console.error('Error occurred:', error);
     }
@@ -205,11 +205,9 @@ export default function Profilescreen() {
                   </>
                 ) : (
                   <>
-                    <TouchableOpacity
-                      onPress={() => navigation.navigate('Follow')}>
-                      <Text style={styles.statNumber}>
-                        {userData ? userData?.followers.length : 0}
-                      </Text>
+
+                    <TouchableOpacity onPress={() => navigation.navigate('Follow', { username: userData?.username })}>
+                      <Text style={styles.statNumber}>{userData ? userData?.followers.length : 0}</Text>
                       <Text style={styles.statLabel}>Followers</Text>
                     </TouchableOpacity>
                   </>
@@ -233,11 +231,8 @@ export default function Profilescreen() {
                   </>
                 ) : (
                   <>
-                    <TouchableOpacity
-                      onPress={() => navigation.navigate('Follow')}>
-                      <Text style={styles.statNumber}>
-                        {userData ? userData?.following.length : 0}
-                      </Text>
+                    <TouchableOpacity onPress={() => navigation.navigate('Follow', { username: userData?.username })}>
+                      <Text style={styles.statNumber}>{userData ? userData?.following.length : 0}</Text>
                       <Text style={styles.statLabel}>Following</Text>
                     </TouchableOpacity>
                   </>

@@ -13,7 +13,7 @@ import {
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
-import config from '../../config';
+import config from '../../../config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Skeleton } from 'react-native-elements';
 

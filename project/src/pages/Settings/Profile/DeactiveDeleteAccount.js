@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { SafeAreaView, StyleSheet, Text, View, Pressable, TouchableOpacity } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import DeleteInfo from '../../components/DeleteInfo';
+import DeleteInfo from '../../../components/DeleteInfo';
 
 const DeactiveDeleteAccount = ({ navigation }) => {
   const [selectedOption, setSelectedOption] = useState(null);
