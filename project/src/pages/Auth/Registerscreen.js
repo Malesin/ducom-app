@@ -189,7 +189,7 @@ const RegisterScreen = ({ navigation }) => {
           value={name}
           placeholder="Name"
           autoCapitalize="words"
-          placeholderTextColor={colorScheme === 'dark' ? '#000000' : '#888888'}
+          placeholderTextColor={colorScheme === 'dark' ? '#cccccc' : '#888888'}
         />
         {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
         <TextInput
