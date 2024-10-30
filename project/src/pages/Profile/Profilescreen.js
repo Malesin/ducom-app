@@ -349,7 +349,7 @@ const styles = StyleSheet.create({
   profileContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: 15,
     paddingVertical: 10,
   },
   profile: {
@@ -362,7 +362,6 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   userInfoContainer: {
-    paddingHorizontal: 3,
     paddingVertical: 5,
   },
   name: {
@@ -409,7 +408,7 @@ const styles = StyleSheet.create({
   },
   statItem: {
     alignItems: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: 15,
   },
   statNumber: {
     fontSize: 18,
