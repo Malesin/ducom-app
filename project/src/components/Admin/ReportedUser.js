@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity, Modal, TextInput, SafeAreaView, Alert, ScrollView } from 'react-native';
 import ProfileImage from '../../assets/iya.png';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import { useColorScheme } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../../config';
-import { useColorScheme } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 const serverUrl = config.SERVER_URL;
 
 const ReportedUser = ({ report, handleDeleteReport }) => {
