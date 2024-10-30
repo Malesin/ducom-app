@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, {useState, useEffect, useCallback, useRef} from 'react';
 import {
   SafeAreaView,
   View,
@@ -13,11 +13,11 @@ import {
   ScrollView,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import {useNavigation, useFocusEffect} from '@react-navigation/native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import config from '../../config';
-import { Skeleton } from 'react-native-elements';
+import {Skeleton} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const verifiedIcon = <Icon name="verified" size={18} color="#699BF7" />;
@@ -36,7 +36,7 @@ export default function Profilescreen() {
   async function getData() {
     try {
       const token = await AsyncStorage.getItem('token');
-      const userResponse = await axios.post(`${serverUrl}/userdata`, { token });
+      const userResponse = await axios.post(`${serverUrl}/userdata`, {token});
       const user = userResponse.data.data;
 
       // delay 3 detik sebelum mengatur data
@@ -44,10 +44,10 @@ export default function Profilescreen() {
         setUserData(user);
 
         if (user.bannerPicture) {
-          setBanner({ uri: user.bannerPicture });
+          setBanner({uri: user.bannerPicture});
         }
         if (user.profilePicture) {
-          setProfilePicture({ uri: user.profilePicture });
+          setProfilePicture({uri: user.profilePicture});
         }
       }, 2500);
     } catch (error) {
@@ -62,7 +62,7 @@ export default function Profilescreen() {
   useFocusEffect(
     useCallback(() => {
       getData();
-    }, [])
+    }, []),
   );
 
   const openModal = () => {
@@ -92,7 +92,7 @@ export default function Profilescreen() {
     }
   };
 
-  const handleDropdownItemPress = (item) => {
+  const handleDropdownItemPress = item => {
     if (item === 'Need Help') {
       navigation.navigate('FAQ');
     } else if (item === 'Settings and Support') {
@@ -111,9 +111,12 @@ export default function Profilescreen() {
           />
           <TouchableOpacity
             style={styles.settingsButton}
-            onPress={toggleDropdown}
-          >
-            <MaterialCommunityIcons name="dots-vertical" size={30} color="#000" />
+            onPress={toggleDropdown}>
+            <MaterialCommunityIcons
+              name="dots-vertical"
+              size={30}
+              color="#000"
+            />
           </TouchableOpacity>
           {dropdownVisible && (
             <TouchableWithoutFeedback onPress={toggleDropdown}>
@@ -121,8 +124,7 @@ export default function Profilescreen() {
                 <View style={styles.dropdownMenu}>
                   <TouchableOpacity
                     style={styles.dropdownItem}
-                    onPress={() => handleDropdownItemPress('Need Help')}
-                  >
+                    onPress={() => handleDropdownItemPress('Need Help')}>
                     <MaterialCommunityIcons
                       name="information"
                       size={20}
@@ -133,8 +135,9 @@ export default function Profilescreen() {
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={styles.dropdownItem}
-                    onPress={() => handleDropdownItemPress('Settings and Support')}
-                  >
+                    onPress={() =>
+                      handleDropdownItemPress('Settings and Support')
+                    }>
                     <MaterialCommunityIcons
                       name="cog"
                       size={20}
@@ -151,7 +154,9 @@ export default function Profilescreen() {
             <View style={styles.profilePictureContainer}>
               <TouchableOpacity onPress={openModal}>
                 <Image
-                  source={profilePicture || require('../../assets/profilepic.png')}
+                  source={
+                    profilePicture || require('../../assets/profilepic.png')
+                  }
                   style={styles.profile}
                 />
               </TouchableOpacity>
@@ -164,18 +169,20 @@ export default function Profilescreen() {
                       animation="pulse"
                       height={18}
                       width={30}
-                      style={[styles.skeleton, { borderRadius: 3 }]}
+                      style={[styles.skeleton, {borderRadius: 3}]}
                     />
                     <Skeleton
                       animation="pulse"
                       height={14}
                       width={60}
-                      style={[styles.skeleton, { borderRadius: 3 }]}
+                      style={[styles.skeleton, {borderRadius: 3}]}
                     />
                   </>
                 ) : (
                   <>
-                    <Text style={styles.statNumber}>{userData?.postCount || 0}</Text>
+                    <Text style={styles.statNumber}>
+                      {userData?.postCount || 0}
+                    </Text>
                     <Text style={styles.statLabel}>Posts</Text>
                   </>
                 )}
@@ -187,19 +194,22 @@ export default function Profilescreen() {
                       animation="pulse"
                       height={18}
                       width={30}
-                      style={[styles.skeleton, { borderRadius: 3 }]}
+                      style={[styles.skeleton, {borderRadius: 3}]}
                     />
                     <Skeleton
                       animation="pulse"
                       height={14}
                       width={60}
-                      style={[styles.skeleton, { borderRadius: 3 }]}
+                      style={[styles.skeleton, {borderRadius: 3}]}
                     />
                   </>
                 ) : (
                   <>
-                    <TouchableOpacity onPress={() => navigation.navigate('Follow')}>
-                      <Text style={styles.statNumber}>{userData ? userData?.followers.length : 0}</Text>
+                    <TouchableOpacity
+                      onPress={() => navigation.navigate('Follow')}>
+                      <Text style={styles.statNumber}>
+                        {userData ? userData?.followers.length : 0}
+                      </Text>
                       <Text style={styles.statLabel}>Followers</Text>
                     </TouchableOpacity>
                   </>
@@ -212,19 +222,22 @@ export default function Profilescreen() {
                       animation="pulse"
                       height={18}
                       width={30}
-                      style={[styles.skeleton, { borderRadius: 3 }]}
+                      style={[styles.skeleton, {borderRadius: 3}]}
                     />
                     <Skeleton
                       animation="pulse"
                       height={14}
                       width={60}
-                      style={[styles.skeleton, { borderRadius: 3 }]}
+                      style={[styles.skeleton, {borderRadius: 3}]}
                     />
                   </>
                 ) : (
                   <>
-                    <TouchableOpacity onPress={() => navigation.navigate('Follow')}>
-                      <Text style={styles.statNumber}>{userData ? userData?.following.length : 0}</Text>
+                    <TouchableOpacity
+                      onPress={() => navigation.navigate('Follow')}>
+                      <Text style={styles.statNumber}>
+                        {userData ? userData?.following.length : 0}
+                      </Text>
                       <Text style={styles.statLabel}>Following</Text>
                     </TouchableOpacity>
                   </>
@@ -240,7 +253,7 @@ export default function Profilescreen() {
                     animation="pulse"
                     height={20}
                     width={150}
-                    style={[styles.skeleton, { borderRadius: 3 }]}
+                    style={[styles.skeleton, {borderRadius: 3}]}
                   />
                 ) : (
                   <Text style={styles.name}>{userData?.name}</Text>
@@ -254,7 +267,7 @@ export default function Profilescreen() {
                   animation="pulse"
                   height={14}
                   width={100}
-                  style={[styles.skeleton, { borderRadius: 3 }]}
+                  style={[styles.skeleton, {borderRadius: 3}]}
                 />
               ) : (
                 <Text style={styles.username}>@{userData?.username}</Text>
@@ -264,7 +277,7 @@ export default function Profilescreen() {
                   animation="pulse"
                   height={13}
                   width={200}
-                  style={[styles.skeleton, { borderRadius: 3 }]}
+                  style={[styles.skeleton, {borderRadius: 3}]}
                 />
               ) : (
                 <Text style={styles.description}>
@@ -278,13 +291,12 @@ export default function Profilescreen() {
                 height={28}
                 width={120}
                 borderRadius={14}
-                style={[styles.skeleton, { marginRight: 14, borderRadius: 3 }]}
+                style={[styles.skeleton, {marginRight: 14, borderRadius: 3}]}
               />
             ) : (
               <TouchableOpacity
                 style={styles.editButton}
-                onPress={() => navigation.navigate('EditProfile')}
-              >
+                onPress={() => navigation.navigate('EditProfile')}>
                 <Text style={styles.editButtonText}>Edit Profile</Text>
               </TouchableOpacity>
             )}
@@ -294,13 +306,15 @@ export default function Profilescreen() {
             visible={modalVisible}
             transparent
             onRequestClose={closeModal}
-            animationType="fade"
-          >
+            animationType="fade">
             <TouchableWithoutFeedback onPress={closeModal}>
               <View style={styles.modalBackground}>
                 <View style={styles.modalContainer}>
                   {modalImageSource && (
-                    <Image source={modalImageSource} style={styles.previewImage} />
+                    <Image
+                      source={modalImageSource}
+                      style={styles.previewImage}
+                    />
                   )}
                 </View>
               </View>
@@ -335,8 +349,8 @@ const styles = StyleSheet.create({
   profileContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 30,
-    paddingVertical: 10
+    paddingHorizontal: 20,
+    paddingVertical: 10,
   },
   profile: {
     width: 83,
@@ -348,8 +362,8 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   userInfoContainer: {
-    paddingHorizontal: 10,
-    paddingVertical: 10
+    paddingHorizontal: 3,
+    paddingVertical: 5,
   },
   name: {
     fontSize: 17,
@@ -391,11 +405,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     paddingVertical: 10,
-    paddingHorizontal: 10
+    paddingHorizontal: 10,
   },
   statItem: {
     alignItems: 'center',
-    paddingHorizontal: 20
+    paddingHorizontal: 20,
   },
   statNumber: {
     fontSize: 18,
