@@ -10,7 +10,7 @@ const serverUrl = config.SERVER_URL;
 const FollowCard = ({ followText, followingText, removeButtonText, message, data, myId }) => {
     const [isFollowing, setIsFollowing] = useState(false);
     const [isModalVisible, setIsModalVisible] = useState(false);
-    
+
     useEffect(() => {
         const isFollow = data.followers.some(follow => follow === myId)
         setIsFollowing(isFollow)
