@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { Image, StyleSheet, View, Text } from 'react-native';
-import { Profilescreen, Notificationscreen } from '../pages';
+import { CommunityScreen, Notificationscreen } from '../pages';
 import DrawerNavigator from './DrawerNavigator';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useFocusEffect } from '@react-navigation/native';
@@ -87,6 +87,11 @@ function BottomTabNavigator() {
                   style={[styles.icon, { tintColor: undefined }]}
                 />
               );
+            } else if (route.name === 'Community') {
+              iconName = 'group';
+              return (
+                <MaterialIcons name={iconName} size={iconSize} color={color} />
+              );
             }
           },
           tabBarLabel: () => null,
@@ -99,6 +104,7 @@ function BottomTabNavigator() {
           tabBarInactiveTintColor: 'gray',
         })}>
         <Tab.Screen name="HomeTab" component={DrawerNavigator} />
+        <Tab.Screen name="Community" component={DrawerNavigator} />
         <Tab.Screen
           name="Notification"
           component={Notificationscreen}

@@ -8,6 +8,7 @@ import {
   FAQscreen,
   Marksscreen,
   Settingsscreen,
+  CommunityScreen,
 } from '../pages';
 
 import logo from './../assets/logo1.png';
@@ -27,11 +28,13 @@ const SettingsStackNavigator = () => {
   );
 };
 
-const DrawerNavigator = ({ navigation }) => {
+const DrawerNavigator = ({ navigation, route }) => {
+  const isCommunityTab = route?.name === 'Community';
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Drawer.Navigator
-        initialRouteName="Home"
+        initialRouteName={isCommunityTab ? "CommunityHome" : "Home"}
         screenOptions={{
           headerTitle: () => (
             <View style={styles.headerTitleContainer}>
@@ -63,13 +66,25 @@ const DrawerNavigator = ({ navigation }) => {
             color: 'black',
           }),
         }}>
+        {!isCommunityTab && (
+          <Drawer.Screen
+            name="Home"
+            component={Homescreen}
+            options={{
+              drawerLabel: 'Home',
+              drawerIcon: ({ color }) => (
+                <MaterialIcons name="home" size={24} color={color} />
+              ),
+            }}
+          />
+        )}
         <Drawer.Screen
-          name="Home"
-          component={Homescreen}
+          name="CommunityHome"
+          component={CommunityScreen}
           options={{
-            drawerLabel: 'Home',
+            drawerLabel: 'Community',
             drawerIcon: ({ color }) => (
-              <MaterialIcons name="home" size={24} color={color} />
+              <MaterialIcons name="group" size={24} color={color} />
             ),
           }}
         />

@@ -34,6 +34,7 @@ const Userprofile = ({userIdPost, navigation, idUser}) => {
 
   useEffect(() => {
     navigation.setOptions({title: ''});
+    console.log()
   }, [navigation]);
 
   const getData = async () => {
@@ -45,10 +46,9 @@ const Userprofile = ({userIdPost, navigation, idUser}) => {
         userId: userIdPost,
       });
       const user = userResponse.data.data;
-      setUserData(user);
-      console.log("user:",userIdPost)
-      const isFollow = user.followers.some(follow => follow === idUser);
+      const isFollow = user?.followers.some(follow => follow._id === idUser);
       setIsFollowing(isFollow);
+      setUserData(user);
 
       if (user.username) {
         navigation.setOptions({title: `@${user.username}`});

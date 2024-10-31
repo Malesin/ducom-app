@@ -38,6 +38,12 @@ import BlockedUsers from './Settings/Privacy/BlockedUsers';
 import MutedUsers from './Settings/Privacy/MutedUsers';
 import DeactiveDeleteAccount from './Settings/Profile/DeactiveDeleteAccount';
 import VerifyAccount from './Settings/Profile/VerifyAccount';
+import CommunityScreen from './Community/CommunityScreen';
+import CommunityPost from './Community/CommunityPost';
+import CommunityMedia from './Community/CommunityMedia';
+import CommunityAbout from './Community/CommunityAbout';
+import ViewCommunity from './Community/ViewCommunity';
+
 
 export {
   Splashscreen,
@@ -80,4 +86,9 @@ export {
   DeactiveDeleteAccount,
   VerifyAccount,
   formatNotification,
+  CommunityAbout,
+  CommunityMedia,
+  CommunityPost,
+  CommunityScreen,
+  ViewCommunity,
 };

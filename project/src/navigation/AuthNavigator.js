@@ -22,6 +22,11 @@ import {
   AccountLists,
   ReportsManagement,
   DeactivatedorDeletedAccounts,
+  CommunityPost,
+  CommunityAbout,
+  CommunityMedia,
+  CommunityScreen,
+  ViewCommunity,
 } from '../pages';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -181,6 +186,26 @@ export default function MainNavigation() {
             headerShown: true,
             title: route.params?.choice === 'delete' ? 'Delete Account' : 'Deactivate Account'
           })}
+        />
+        <Stack.Screen
+          name="CommunityPost"
+          component={CommunityPost}
+          options={{ headerShown: true, title: 'Community Post' }}
+        />
+        <Stack.Screen
+          name="CommunityAbout"
+          component={CommunityAbout}
+          options={{ headerShown: true, title: 'Community About' }}
+        />
+        <Stack.Screen
+          name="CommunityMedia"
+          component={CommunityMedia}
+          options={{ headerShown: true, title: 'Community Media' }}
+        />
+        <Stack.Screen
+          name="ViewCommunity"
+          component={ViewCommunity}
+          options={{ headerShown: true, title: 'Community' }}
         />
       </Stack.Navigator>
     </NavigationContainer>

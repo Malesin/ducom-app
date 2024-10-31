@@ -40,7 +40,6 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
   const [showBottomSheet, setShowBottomSheet] = useState(false);
 
   const navigator = useNavigation();
-
   const handleProfilePress = () => {
     if (tweet?.userIdPost === tweet?.idUser) {
       navigator.navigate('Profile');

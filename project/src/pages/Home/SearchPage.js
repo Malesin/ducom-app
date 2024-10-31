@@ -113,17 +113,18 @@ const SearchPage = ({ navigation }) => {
             <MaterialIcons
               name="search"
               size={20}
-              color="gray"
+              color={colorScheme === 'dark' ? '#ccc' : 'gray'}
               style={styles.searchIcon}
             />
           </TouchableOpacity>
           <TextInput
             ref={textInputRef}
             placeholder="Search"
-            style={styles.searchInput}
+            style={[styles.searchInput, { color: colorScheme === 'dark' ? '#000000' : '#000' }]}
             value={searchText}
             onChangeText={setSearchText}
             keyboardType="default"
+            placeholderTextColor={colorScheme === 'dark' ? '#cccccc' : '#888888'}
           />
         </View>
         {searchText.length > 0 && (
@@ -180,8 +181,7 @@ const SearchPage = ({ navigation }) => {
             <Text style={styles.notFoundText}>User not found</Text>
           )
         ) : null}
-        {/* <Text style={styles.searchedText}>Recently Searched</Text> */}
-      </ScrollView>
+      </ScrollView> 
     </SafeAreaView>
   );
 }
