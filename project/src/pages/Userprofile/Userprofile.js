@@ -46,6 +46,7 @@ const Userprofile = ({userIdPost, navigation, idUser}) => {
       });
       const user = userResponse.data.data;
       setUserData(user);
+      console.log("user:",userIdPost)
       const isFollow = user.followers.some(follow => follow === idUser);
       setIsFollowing(isFollow);
 
@@ -80,8 +81,8 @@ const Userprofile = ({userIdPost, navigation, idUser}) => {
   );
 
   useEffect(() => {
-    if (userData.followersCount) {
-      setFollowersCount(userData.followersCount);
+    if (userData?.followersCount) {
+      setFollowersCount(userData?.followersCount);
     }
   }, [userData]);
 

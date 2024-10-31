@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 
 import SearchedCard from '../../components/SearchedCard';
-import React, {useState, useRef, useEffect, useCallback} from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import ProfilePicture from '../../assets/iya.png';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -21,21 +21,15 @@ import { useColorScheme } from 'react-native';
 
 const serverUrl = config.SERVER_URL;
 
-const SearchPage = ({navigation}) => {
+
+const SearchPage = ({ navigation }) => {
   const [searchText, setSearchText] = useState('');
   const [searchs, setSearchs] = useState([]);
   const [myData, setMyData] = useState([]);
   const [debounceTimeout, setDebounceTimeout] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const colorScheme = useColorScheme();
   const textInputRef = useRef(null);
-
-const SearchPage = ({ navigation }) => {
-    const [searchText, setSearchText] = useState('');
-    const [searchs, setSearchs] = useState([]);
-    const [myData, setMyData] = useState([]);
-    const [debounceTimeout, setDebounceTimeout] = useState(null);
-    const [isLoading, setIsLoading] = useState(false);
-    const colorScheme = useColorScheme(); 
 
   const handleSearchPress = () => {
     if (textInputRef.current) {
@@ -46,7 +40,7 @@ const SearchPage = ({ navigation }) => {
   const getData = async () => {
     const token = await AsyncStorage.getItem('token');
     try {
-      await axios.post(`${serverUrl}/userdata`, {token: token}).then(res => {
+      await axios.post(`${serverUrl}/userdata`, { token: token }).then(res => {
         if (res.data.status == 'ok') {
           setMyData(res.data.data);
         }
@@ -54,27 +48,27 @@ const SearchPage = ({ navigation }) => {
     } catch (error) {
       console.error(error);
     }
-  };    
-    const searchUser = useCallback(async () => {
-        const token = await AsyncStorage.getItem('token');
-        setIsLoading(true); // Set loading to true
-        try {
-            await axios
-                .post(`${serverUrl}/search-user`, {
-                    token: token,
-                    query: searchText
-                })
-                .then(res => {
-                    if (res.data.status == 'ok') {
-                        setSearchs(res.data.data);
-                    }
-                })
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setIsLoading(false); // Set loading to false after data is fetched
-        }
-    }, [searchText]);
+  };
+  const searchUser = useCallback(async () => {
+    const token = await AsyncStorage.getItem('token');
+    setIsLoading(true); // Set loading to true
+    try {
+      await axios
+        .post(`${serverUrl}/search-user`, {
+          token: token,
+          query: searchText
+        })
+        .then(res => {
+          if (res.data.status == 'ok') {
+            setSearchs(res.data.data);
+          }
+        })
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false); // Set loading to false after data is fetched
+    }
+  }, [searchText]);
 
   useEffect(() => {
     getData();
@@ -94,6 +88,18 @@ const SearchPage = ({ navigation }) => {
   const handleBackPress = () => {
     navigation.navigate('Home');
   };
+
+  const handlePress = async (search) => {
+    if (search._id === myData._id) {
+      navigation.navigate('Profile');
+    } else {
+      navigation.navigate('Userprofile', {
+        userIdPost: search._id,
+        idUser: myData._id
+      });
+    }
+  }
+
   return (
     <SafeAreaView style={styles.searchContainer}>
       <View style={styles.headerSearchContainer}>
@@ -161,7 +167,7 @@ const SearchPage = ({ navigation }) => {
               )
               .map((search, index) => (
                 <View key={index} style={styles.cardWrapper}>
-                  <TouchableOpacity>
+                  <TouchableOpacity onPress={() => handlePress(search)}>
                     <SearchedCard
                       search={search}
                       myData={myData}
@@ -178,7 +184,7 @@ const SearchPage = ({ navigation }) => {
       </ScrollView>
     </SafeAreaView>
   );
-};
+}
 
 export default SearchPage;
 
