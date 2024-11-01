@@ -97,7 +97,6 @@ const FollowNotification = ({followNotif}) => {
       follow => follow === followNotif?.user,
     );
     setIsFollowing(follow);
-    console.log('followNotif:', followNotif);
   }, []);
 
   return (

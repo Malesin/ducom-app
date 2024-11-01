@@ -7,11 +7,14 @@ const serverUrl = config.SERVER_URL;
 export const formatNotification = async notification => {
   try {
     const token = await AsyncStorage.getItem('token');
-    const response = await axios.post(`${serverUrl}/userdata`, {token: token});
-    const {data} = response.data;
+    const response = await axios.post(`${serverUrl}/userdata`, { token: token });
+    const { data } = response.data;
 
     const idUser = data._id;
     const profilePicture = data.profilePicture;
+    const amIAdmin = data.isAdmin
+    const isMuteds = data.mutedUsers
+    const isBlockeds = data.blockedUsers
     const post = notification.post;
 
     const totalComments =
@@ -27,18 +30,25 @@ export const formatNotification = async notification => {
       content: post.description,
       media: Array.isArray(post.media)
         ? post.media.map(mediaItem => ({
-            type: mediaItem.type,
-            uri: mediaItem.uri,
-          }))
+          type: mediaItem.type,
+          uri: mediaItem.uri,
+        }))
         : [],
       likesCount: post.likes.length,
       commentsCount: totalComments,
       bookMarksCount: post.bookmarks.length,
+      repostsCount: post.reposts.length,
       isLiked: post.likes.some(like => like._id === idUser),
       isBookmarked: post.bookmarks.some(bookmark => bookmark.user === idUser),
+      isReposted: post.reposts.some(repost => repost.user === idUser),
+      isMuted: isMuteds.some(isMuted => isMuted === post.user._id),
+      isBlocked: isBlockeds.some(isBlocked => isBlocked === post.user._id),
       userIdPost: post.user._id,
       idUser: idUser,
       profilePicture: profilePicture,
+      commentsEnabled: post.commentsEnabled,
+      isAdmin: post.user.isAdmin,
+      amIAdmin: amIAdmin
     };
   } catch (error) {
     console.error('Error formatting notification:', error);
