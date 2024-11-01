@@ -6,18 +6,21 @@ import {
   SafeAreaView,
   Text,
   ActivityIndicator,
+  TouchableOpacity,
 } from 'react-native';
 import TweetCard from '../../components/TweetCard';
 import axios from 'axios';
 import config from '../../config';
 import { Skeleton } from 'react-native-elements';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
 
 const serverUrl = config.SERVER_URL;
 
 const Usermedia = ({ userIdPost, profilePicture }) => {
   const [tweets, setTweets] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigation = useNavigation();
 
   const fetchTweets = useCallback(async () => {
     try {
@@ -124,6 +127,10 @@ const Usermedia = ({ userIdPost, profilePicture }) => {
     </>
   );
 
+  const handleProfilePress = (tweet) => {
+    navigation.navigate('ViewPost', { tweet });
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       {loading ? (
@@ -133,7 +140,9 @@ const Usermedia = ({ userIdPost, profilePicture }) => {
           {Array.isArray(tweets) && tweets.length > 0 ? (
             tweets.map((tweet, index) => (
               <View key={index} style={styles.tweetContainer}>
-                <TweetCard tweet={tweet} />
+                <TouchableOpacity onPress={() => handleProfilePress(tweet)}>
+                  <TweetCard tweet={tweet} />
+                </TouchableOpacity>
               </View>
             ))
           ) : (

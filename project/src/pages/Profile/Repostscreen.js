@@ -6,17 +6,19 @@ import {
     Alert,
     SafeAreaView,
     Text,
+    TouchableOpacity,
 } from 'react-native';
 import TweetCard from '../../components/TweetCard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import config from '../../config';
 import { Skeleton } from 'react-native-elements';
 
 const serverUrl = config.SERVER_URL;
 
-function Repostscreen({ navigation }) {
+function Repostscreen() {
+    const navigation = useNavigation();
     const [tweets, setTweets] = useState([]);
     const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(true);
@@ -126,6 +128,10 @@ function Repostscreen({ navigation }) {
         </>
     );
 
+    const handleProfilePress = (tweet) => {
+        navigation.navigate('ViewPost', { tweet });
+    };
+
     return (
         <SafeAreaView style={styles.container}>
             {loading ? (
@@ -146,7 +152,9 @@ function Repostscreen({ navigation }) {
                     {Array.isArray(tweets) && tweets.length > 0 ? (
                         tweets.map((tweet, index) => (
                             <View key={index} style={styles.tweetContainer}>
-                                <TweetCard tweet={tweet} />
+                                <TouchableOpacity onPress={() => handleProfilePress(tweet)}>
+                                    <TweetCard tweet={tweet} />
+                                </TouchableOpacity>
                             </View>
                         ))
                     ) : (

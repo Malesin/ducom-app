@@ -15,6 +15,7 @@ const serverUrl = config.SERVER_URL;
 import TopTabNavigator from './TopTabNavigator';
 
 import profileImage from './../assets/profilepic.png';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const Tab = createBottomTabNavigator();
 
@@ -88,9 +89,8 @@ function BottomTabNavigator() {
                 />
               );
             } else if (route.name === 'Community') {
-              iconName = 'group';
               return (
-                <MaterialIcons name={iconName} size={iconSize} color={color} />
+                <MaterialCommunityIcons name="account-group" size={iconSize} color={color} />
               );
             }
           },

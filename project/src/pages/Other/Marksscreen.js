@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   RefreshControl,
   Dimensions,
+  TouchableOpacity,
 } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
 import TweetCard from '../../components/TweetCard';
@@ -189,6 +190,14 @@ const Marksscreen = ({ navigation }) => {
     loadInitialTweets();
   }, [fetchTweets]);
 
+  const handlePostPress = (tweet) => {
+    navigation.navigate('ViewPost', {
+      tweet,
+      comments: [], // Anda bisa menambahkan data komentar jika ada
+      focusCommentInput: false,
+    });
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       {!isConnected && (
@@ -220,7 +229,9 @@ const Marksscreen = ({ navigation }) => {
           ) : (
             tweets.map((tweet, index) => (
               <View key={index} style={styles.tweetContainer}>
-                <TweetCard tweet={tweet} />
+                <TouchableOpacity onPress={() => handlePostPress(tweet)}>
+                  <TweetCard tweet={tweet} />
+                </TouchableOpacity>
               </View>
             ))
           )

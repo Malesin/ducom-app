@@ -32,7 +32,7 @@ import Repostscreen from './Profile/Repostscreen';
 import EditProfilePage from './Profile/EditProfilePage';
 import Userprofile from './Userprofile/Userprofile';
 import Userpost from './Userprofile/Userpost';
-import Userreply from './Userprofile/Userreply';
+import Userrepost from './Userprofile/Userrepost';
 import Usermedia from './Userprofile/Usermedia';
 import BlockedUsers from './Settings/Privacy/BlockedUsers';
 import MutedUsers from './Settings/Privacy/MutedUsers';
@@ -79,7 +79,7 @@ export {
   EditProfilePage,
   Userprofile,
   Userpost,
-  Userreply,
+  Userrepost,
   Usermedia,
   BlockedUsers,
   MutedUsers,
