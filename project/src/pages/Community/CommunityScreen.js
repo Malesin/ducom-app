@@ -1,12 +1,12 @@
 import { View, Text } from 'react-native'
 import React from 'react'
+import CommunityCard from '../../components/CommunityCard'
 
-const CommunityScreen = () => {
+export default function CommunityScreen() {
   return (
     <View>
       <Text>CommunityScreen</Text>
+      <CommunityCard />
     </View>
   )
 }
-
-export default CommunityScreen
