@@ -11,7 +11,6 @@ function UserTopTabNavigator({ route, navigation }) {
   const [refreshing, setRefreshing] = useState(false);
   const [isScrollTop, setIsScrollTop] = useState(true);
   const { userIdPost, profilePicture, username, idUser, isAdmin, amIAdmin, tweet, isUserProfile } = route.params;
-console.log(idUser)
   useEffect(() => {
     if (username) {
       navigation.setOptions({ title: `@${username}` });
@@ -123,7 +122,7 @@ console.log(idUser)
                 enabled={isScrollTop}
               />
             }>
-            {refreshing ? renderSkeleton() : <Userrepost />}
+            {refreshing ? renderSkeleton() : <Userrepost userIdPost={userIdPost} />}
           </Tabs.ScrollView>
         </Tabs.Tab>
         <Tabs.Tab name="Media">
