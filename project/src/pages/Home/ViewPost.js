@@ -24,9 +24,9 @@ import config from '../../config';
 import Video from 'react-native-video';
 import { createThumbnail } from 'react-native-create-thumbnail';
 import CommentCard from '../../components/CommentCard';
-import BottomSheet from '../../components/BottomSheet'; 
+import BottomSheet from '../../components/BottomSheet';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import {Skeleton} from 'react-native-elements'; 
+import { Skeleton } from 'react-native-elements';
 const verifiedIcon = <Icon name="verified" size={16} color="#699BF7" />;
 
 const serverUrl = config.SERVER_URL;
@@ -43,7 +43,7 @@ const ViewPost = ({ route }) => {
   const [likesCount, setLikesCount] = useState(tweet.likesCount);
   const [bookmarked, setBookmarked] = useState(tweet.isBookmarked);
   const [bookmarksCount, setBookmarksCount] = useState(tweet.bookMarksCount);
-  const [reposted, setReposted] = useState(false);
+  const [reposted, setReposted] = useState(tweet?.isReposted || false);
   const [repostsCount, setRepostsCount] = useState(0);
   const [profilePicture, setProfilePicture] = useState(tweet.profilePicture);
   const [modalVisible, setModalVisible] = useState(false);
@@ -63,7 +63,7 @@ const ViewPost = ({ route }) => {
   const [refreshing, setRefreshing] = useState(false);
   const [showBottomSheet, setShowBottomSheet] = useState(false);
   const [isEnabledComm, setIsEnabledComm] = useState(true);
-  const [loading, setLoading] = useState(true); 
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (focusCommentInput && textInputRef.current) {
@@ -92,7 +92,7 @@ const ViewPost = ({ route }) => {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setLoading(false); 
+      setLoading(false);
     }, 10000);
 
     fetchComments();
@@ -195,15 +195,47 @@ const ViewPost = ({ route }) => {
     }
   };
 
-  const handleRepost = () => {
-    if (reposted) {
-      setReposted(false);
-      setRepostsCount(prevRepostsCount => prevRepostsCount - 1);
-    } else {
-      setReposted(true);
-      setRepostsCount(prevRepostsCount => prevRepostsCount + 1);
+  const handleRepost = async () => {
+    const token = await AsyncStorage.getItem('token');
+    try {
+      if (reposted) {
+        setReposted(false);
+        setRepostsCount(prevRepostsCount => prevRepostsCount - 1);
+        await axios
+          .post(`${serverUrl}/unrepost-post`, {
+            token: token,
+            postId: tweet.id
+          })
+          .then(res => {
+            if (res.data.status !== 'ok') {
+              setReposted(true);
+              setRepostsCount(prevRepostsCount => prevRepostsCount + 1);
+              console.log('Error in unrepost response data:', res.data);
+            }
+          })
+      } else {
+        setReposted(true);
+        setRepostsCount(prevRepostsCount => prevRepostsCount + 1);
+        await axios
+          .post(`${serverUrl}/repost-post`, {
+            token: token,
+            postId: tweet.id
+          })
+          .then(res => {
+            if (res.data.status !== 'ok') {
+              setReposted(false);
+              setRepostsCount(prevRepostsCount => prevRepostsCount - 1);
+              console.log('Error in repost response data:', res.data);
+            }
+          })
+      }
+    } catch (error) {
+      console.error('Error reposting:', error);
+      setReposted(!reposted);
+      setRepostsCount(prevRepostsCount => reposted ? prevRepostsCount + 1 : prevRepostsCount - 1);
     }
   };
+
 
   const handleShare = async () => {
     try {
@@ -290,7 +322,7 @@ const ViewPost = ({ route }) => {
       }));
       setComments(formattedComments || []);
       setVisibleComments(3);
-      setLoading(false); 
+      setLoading(false);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -312,7 +344,7 @@ const ViewPost = ({ route }) => {
   }, []);
 
   const onRefresh = useCallback(async () => {
-    setLoading(true); 
+    setLoading(true);
     const timer = setTimeout(() => {
       setLoading(false);
     }, 2000);
@@ -321,7 +353,7 @@ const ViewPost = ({ route }) => {
     isEnabledComment();
     setShowBottomSheet(false);
 
-    return () => clearTimeout(timer); 
+    return () => clearTimeout(timer);
   }, [fetchComments]);
 
   const onDeleteSuccess = () => {
@@ -379,7 +411,7 @@ const ViewPost = ({ route }) => {
 
   const onRefreshPage = () => {
     setRefreshing(true);
-    setShowBottomSheet(false);  
+    setShowBottomSheet(false);
     onRefresh();
   };
 
@@ -410,7 +442,7 @@ const ViewPost = ({ route }) => {
         <Skeleton
           animation="pulse"
           height={30}
-          width={10} 
+          width={10}
           style={styles.skeletonVertical}
           borderRadius={3}
         />
@@ -419,37 +451,37 @@ const ViewPost = ({ route }) => {
         animation="pulse"
         height={20}
         width="80%"
-        style={[styles.skeleton, {borderRadius: 3}]}
+        style={[styles.skeleton, { borderRadius: 3 }]}
       />
       <Skeleton
         animation="pulse"
         height={200}
         width="100%"
-        style={[styles.skeleton, {borderRadius: 8, marginTop: 10}]}
+        style={[styles.skeleton, { borderRadius: 8, marginTop: 10 }]}
       />
       <Skeleton
         animation="pulse"
         height={17}
         width="50%"
-        style={[styles.skeleton, {borderRadius: 3, marginTop: 10}]}
+        style={[styles.skeleton, { borderRadius: 3, marginTop: 10 }]}
       />
       <Skeleton
         animation="pulse"
         height={1}
         width="100%"
-        style={[styles.skeleton, {borderRadius: 3, marginTop: 5}]}
+        style={[styles.skeleton, { borderRadius: 3, marginTop: 5 }]}
       />
       <Skeleton
         animation="pulse"
         height={16}
         width="58%"
-        style={[styles.skeleton, {borderRadius: 3, marginTop: 5}]}
+        style={[styles.skeleton, { borderRadius: 3, marginTop: 5 }]}
       />
       <Skeleton
         animation="pulse"
         height={1}
         width="100%"
-        style={[styles.skeleton, {borderRadius: 3, marginTop: 5}]}
+        style={[styles.skeleton, { borderRadius: 3, marginTop: 5 }]}
       />
       <View style={styles.skeletonIconRow}>
         <Skeleton
@@ -485,14 +517,14 @@ const ViewPost = ({ route }) => {
           circle
           height={20}
           width={20}
-          style={styles.skeletonIcon} 
+          style={styles.skeletonIcon}
         />
       </View>
       <Skeleton
         animation="pulse"
         height={1}
         width="100%"
-        style={[styles.skeleton, {borderRadius: 3, marginTop: 5}]} 
+        style={[styles.skeleton, { borderRadius: 3, marginTop: 5 }]}
       />
     </View>
   );
@@ -504,7 +536,7 @@ const ViewPost = ({ route }) => {
       ) : (
         <ScrollView
           style={styles.scrollContainer}
-          contentContainerStyle={{paddingBottom: 50}}
+          contentContainerStyle={{ paddingBottom: 50 }}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }>
@@ -513,7 +545,7 @@ const ViewPost = ({ route }) => {
               <Image
                 source={
                   tweet.userAvatar
-                    ? {uri: tweet.userAvatar}
+                    ? { uri: tweet.userAvatar }
                     : require('../../assets/profilepic.png')
                 }
                 style={styles.avatar}
@@ -523,7 +555,7 @@ const ViewPost = ({ route }) => {
                   <Text
                     style={[
                       styles.userName,
-                      {color: colorScheme === 'dark' ? '#000000' : '#000'},
+                      { color: colorScheme === 'dark' ? '#000000' : '#000' },
                     ]}>
                     {tweet.userName}
                   </Text>
@@ -535,10 +567,7 @@ const ViewPost = ({ route }) => {
                 <Text
                   style={[
                     styles.userHandle,
-                    {color: colorScheme === 'dark' ? '#ccc' : 'gray'},
-                         
-                         
-
+                    { color: colorScheme === 'dark' ? '#ccc' : 'gray' }
                   ]}>
                   @{tweet.userHandle}
                 </Text>
@@ -563,7 +592,7 @@ const ViewPost = ({ route }) => {
                     onPress={() => handleMediaPress(mediaItem.uri)}>
                     {mediaItem.type === 'image' ? (
                       <Image
-                        source={{uri: mediaItem.uri}}
+                        source={{ uri: mediaItem.uri }}
                         style={
                           tweet.media.length === 1
                             ? styles.singleMediaImage
@@ -576,7 +605,7 @@ const ViewPost = ({ route }) => {
                         onPress={() => handleMediaPress(mediaItem.uri)}
                         style={styles.videoContainer}>
                         <Image
-                          source={{uri: thumbnails[mediaItem.uri]}}
+                          source={{ uri: thumbnails[mediaItem.uri] }}
                           style={
                             tweet.media.length === 1
                               ? styles.singleMediaVideo
@@ -688,8 +717,8 @@ const ViewPost = ({ route }) => {
           </View>
         </ScrollView>
       )}
-      <View style={[styles.inputContainer, {height: inputHeight}]}>
-        <Image source={{uri: profilePicture}} style={styles.profilePicture} />
+      <View style={[styles.inputContainer, { height: inputHeight }]}>
+        <Image source={{ uri: profilePicture }} style={styles.profilePicture} />
 
         {isEnabledComm ? (
           <>
@@ -1029,19 +1058,19 @@ const styles = StyleSheet.create({
   },
   skeletonTextContainer: {
     flex: 1,
-    marginLeft: 10, 
+    marginLeft: 10,
   },
   skeleton: {
     marginBottom: 10,
   },
   skeletonIconRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between', 
+    justifyContent: 'space-between',
     alignItems: 'center',
-    width: '100%', 
+    width: '100%',
   },
   skeletonIcon: {
-    marginHorizontal: 5, 
+    marginHorizontal: 5,
   },
   skeletonVertical: {
     position: 'absolute',

@@ -30,9 +30,14 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
     const token = await AsyncStorage.getItem('token');
     try {
       const respMyData = await axios.post(`${serverUrl}/userdata`, { token: token });
+
       const { data } = respMyData.data;
+      const idUser = data._id;
+      const profilePicture = data.profilePicture;
+      const amIAdmin = data.isAdmin
       const isMuteds = data.mutedUsers
       const isBlockeds = data.blockedUsers
+
       const pinPost = await axios.post(`${serverUrl}/showPinPost-byId`, {
         token: token,
         userId: userIdPost,
@@ -60,8 +65,10 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
         likesCount: postPin.likes.length,
         commentsCount: totalComments,
         bookMarksCount: postPin.bookmarks.length,
+        repostsCount: postPin.reposts.length,
         isLiked: postPin.likes.some(like => like._id === idUser),
         isBookmarked: postPin.bookmarks.some(bookmark => bookmark.user === idUser),
+        isReposted: postPin.reposts.some(repost => repost.user === idUser),
         isMuted: isMuteds.some(isMuted => isMuted === postPin.user._id),
         isBlocked: isBlockeds.some(isBlocked => isBlocked === postPin.user._id),
         userIdPost: postPin.user._id,
@@ -89,9 +96,14 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
     const token = await AsyncStorage.getItem('token');
     try {
       const respMyData = await axios.post(`${serverUrl}/userdata`, { token: token });
+
       const { data } = respMyData.data;
+      const idUser = data._id;
+      const profilePicture = data.profilePicture;
+      const amIAdmin = data.isAdmin
       const isMuteds = data.mutedUsers
       const isBlockeds = data.blockedUsers
+
       const respTweet = await axios.post(`${serverUrl}/userId-posts`, {
         token: token,
         userId: userIdPost,
@@ -101,33 +113,38 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
 
       const formattedTweets = dataTweet
         .filter(post => post.user !== null)
-        .map(post => ({
-          id: post._id,
-          userAvatar: post.user.profilePicture,
-          userName: post.user.name,
-          userHandle: post.user.username,
-          postDate: post.created_at,
-          content: post.description,
-          media: Array.isArray(post.media)
-            ? post.media.map(mediaItem => ({
-              type: mediaItem.type,
-              uri: mediaItem.uri,
-            }))
-            : [],
-          likesCount: post.likes.length,
-          commentsCount: post.comments.length,
-          bookMarksCount: post.bookmarks.length,
-          isLiked: post.likes.some(like => like._id === idUser),
-          isBookmarked: post.bookmarks.some(
-            bookmark => bookmark.user === userIdPost,
-          ),
-          isMuted: isMuteds.some(isMuted => isMuted === post.user._id),
-          isBlocked: isBlockeds.some(isBlocked => isBlocked === post.user._id), userIdPost: post.user._id,
-          profilePicture: profilePicture,
-          commentsEnabled: post.commentsEnabled,
-          isAdmin: post.user.isAdmin,
-          amIAdmin: amIAdmin
-        }));
+        .map(post => {
+          const totalComments = post.comments.length + post.comments.reduce((acc, comment) => acc + comment.replies.length, 0);
+          return {
+            id: post._id,
+            userAvatar: post.user.profilePicture,
+            userName: post.user.name,
+            userHandle: post.user.username,
+            postDate: post.created_at,
+            content: post.description,
+            media: Array.isArray(post.media)
+              ? post.media.map(mediaItem => ({
+                type: mediaItem.type,
+                uri: mediaItem.uri,
+              }))
+              : [],
+            likesCount: post.likes.length,
+            commentsCount: totalComments,
+            bookMarksCount: post.bookmarks.length,
+            repostsCount: post.reposts.length,
+            isLiked: post.likes.some(like => like._id === idUser),
+            isBookmarked: post.bookmarks.some(bookmark => bookmark.user === idUser),
+            isReposted: post.reposts.some(repost => repost.user === idUser),
+            isMuted: isMuteds.some(isMuted => isMuted === post.user._id),
+            isBlocked: isBlockeds.some(isBlocked => isBlocked === post.user._id),
+            userIdPost: post.user._id,
+            idUser: idUser,
+            profilePicture: profilePicture,
+            commentsEnabled: post.commentsEnabled,
+            isAdmin: post.user.isAdmin,
+            amIAdmin: amIAdmin
+          };
+        });
 
       return formattedTweets;
     } catch (error) {

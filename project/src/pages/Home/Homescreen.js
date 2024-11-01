@@ -67,8 +67,8 @@ const HomeScreen = ({ navigation }) => {
     try {
       const token = await AsyncStorage.getItem('token');
       const response = await axios.post(`${serverUrl}/userdata`, { token: token });
-      const { data, status } = response.data;
-      const emailUser = data.email;
+
+      const { data } = response.data;
       const idUser = data._id;
       const profilePicture = data.profilePicture;
       const amIAdmin = data.isAdmin
@@ -109,8 +109,6 @@ const HomeScreen = ({ navigation }) => {
             isBlocked: isBlockeds.some(isBlocked => isBlocked === post.user._id),
             userIdPost: post.user._id,
             idUser: idUser,
-            userEmailPost: post.user.email,
-            emailUser: emailUser,
             profilePicture: profilePicture,
             commentsEnabled: post.commentsEnabled,
             isAdmin: post.user.isAdmin,
@@ -132,7 +130,6 @@ const HomeScreen = ({ navigation }) => {
       const token = await AsyncStorage.getItem('token');
       const response = await axios.post(`${serverUrl}/userdata`, { token: token });
       const { data, status } = response.data;
-      const emailUser = data.email;
       const idUser = data._id;
       const profilePicture = data.profilePicture;
       const amIAdmin = data.isAdmin
@@ -180,8 +177,6 @@ const HomeScreen = ({ navigation }) => {
         isBlocked: isBlockeds.some(isBlocked => isBlocked === postPin.user._id),
         userIdPost: postPin.user._id,
         idUser: idUser,
-        userEmailPost: postPin.user.email,
-        emailUser: emailUser,
         profilePicture: profilePicture,
         commentsEnabled: postPin.commentsEnabled,
         pinnedBy: pinnedBy,
@@ -221,10 +216,8 @@ const HomeScreen = ({ navigation }) => {
     const comments = await fetchComments(tweet.id);
     const postId = tweet.id;
     const idUser = tweet.idUser
-    const emailUser = tweet.emailUser
-    const userEmailPost = tweet.userEmailPost
     const focusCommentInput = true
-    navigation.navigate('ViewPost', { tweet, comments, postId, idUser, userEmailPost, emailUser, focusCommentInput });
+    navigation.navigate('ViewPost', { tweet, comments, postId, idUser, focusCommentInput });
   };
 
   const onRefresh = useCallback(async () => {
