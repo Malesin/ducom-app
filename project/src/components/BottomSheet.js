@@ -4,6 +4,7 @@ import {
   View,
   TouchableOpacity,
   SafeAreaView,
+  Modal
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
@@ -25,6 +26,7 @@ const BottomSheet = ({
   viewPost,
   handlePin,
   handlePinUser,
+  duration
 }) => {
   const navigation = useNavigation();
   const [isPin, setIsPin] = useState(false)
@@ -33,6 +35,7 @@ const BottomSheet = ({
   const [isPinUser, setIsPinUser] = useState(false)
   const [isCommentDisabled, setIsCommentDisabled] = useState(false);
   const [isViewPost, setIsViewPost] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
     setIsPin(handlePin)
@@ -57,7 +60,7 @@ const BottomSheet = ({
   };
 
   {/* PIN POST AT HOMESCREEN */ }
-  const pinPost = async () => {
+  const pinPost = async (duration) => {
     const token = await AsyncStorage.getItem('token');
     try {
       const type = 'Pin'
@@ -67,7 +70,7 @@ const BottomSheet = ({
         const pinPost = await axios.post(`${serverUrl}/posts/pin`, {
           token: token,
           postId: tweet?.id,
-          duration: 8
+          duration: duration
         })
         onCloseResp({
           status: pinPost.data.status,
@@ -92,6 +95,10 @@ const BottomSheet = ({
       console.error('Error: ', error);
     }
   }
+
+  const handlePinPost = () => {
+    setModalVisible(true);
+  };
   {/* PIN POST AT HOMESCREEN */ }
 
   {/* PIN POST AT POSTSCREEN  */ }
@@ -240,19 +247,19 @@ const BottomSheet = ({
     <SafeAreaView style={styles.container}>
 
       {!isViewPost ? (<>
-        {isAdmin ? (<>
+        {isAdmin && (<>
           <View style={styles.optionRow}>
             {/* PIN POST AT HOMESCREEN */}
-            <TouchableOpacity style={styles.option} onPress={pinPost}>
+            <TouchableOpacity style={styles.option} onPress={handlePinPost}>
               <MaterialCommunityIcons name="pin" size={24} color="#333" />
               <Text style={styles.optionText}>
                 {isPin ? 'Unpin' : 'Pin'} @{tweet.userName}
               </Text>
             </TouchableOpacity>
           </View>
-        </>) : null}
+        </>)}
 
-        {!isOwn ? (<>
+        {!isOwn && (<>
           <View style={styles.optionRow}>
             <TouchableOpacity style={styles.option} onPress={muteUser}>
               {tweet.isMuted ? (
@@ -263,9 +270,9 @@ const BottomSheet = ({
               <Text style={styles.optionText}>{tweet.isMuted ? 'Unmute' : 'Mute'} @{tweet.userName}</Text>
             </TouchableOpacity>
           </View>
-        </>) : null}
+        </>)}
 
-        {isUserProfile ? (<>
+        {isUserProfile && (<>
           <View style={styles.optionRow}>
             {/* PIN POST AT POSTSCREEN  */}
             <TouchableOpacity style={styles.option} onPress={pinPostUser}>
@@ -275,7 +282,7 @@ const BottomSheet = ({
               </Text>
             </TouchableOpacity>
           </View>
-        </>) : null}
+        </>)}
 
         {isAdmin || isOwn ? (<>
           <View style={styles.optionRow}>
@@ -297,7 +304,7 @@ const BottomSheet = ({
           </View>
         </>) : null}
 
-        {!isOwn ? (<>
+        {!isOwn && (<>
           <View style={styles.optionRow}>
             <TouchableOpacity style={styles.option} onPress={blockUser}>
               <MaterialIcons name="block" size={24} color="#333" />
@@ -313,7 +320,7 @@ const BottomSheet = ({
               <Text style={styles.optionTextReport}>Report @{tweet.userName}</Text>
             </TouchableOpacity>
           </View>
-        </>) : null}
+        </>)}
       </>) : (<>
         {isAdmin || isOwn ? (<>
           <View style={styles.optionRow}>
@@ -326,6 +333,34 @@ const BottomSheet = ({
           </View>
         </>) : null}
       </>)}
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Select Pin Duration</Text>
+            <Text style={styles.modalSubtitle}>Choose how long to pin the post:</Text>
+            {['8', '12', '24', '48', '148'].map((duration) => (
+              <TouchableOpacity
+                key={duration}
+                onPress={() => {
+                  pinPost(parseInt(duration));
+                  setModalVisible(false);
+                }}
+              >
+                <Text style={styles.modalOption}>{duration} HOURS</Text>
+              </TouchableOpacity>
+            ))}
+            <TouchableOpacity onPress={() => setModalVisible(false)}>
+              <Text style={styles.modalCancel}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
 
     </SafeAreaView>
   );
@@ -368,6 +403,39 @@ const styles = StyleSheet.create({
     color: '#D60000',
     marginLeft: 16,
     fontWeight: 'bold',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    width: 300,
+    padding: 20,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#333',
+  },
+  modalSubtitle: {
+    fontSize: 14,
+    marginBottom: 20,
+  },
+  modalOption: {
+    fontSize: 16,
+    color: '#007BFF',
+    marginBottom: 10,
+  },
+  modalCancel: {
+    fontSize: 16,
+    color: '#FF0000',
+    marginTop: 20,
   },
 });
 
