@@ -12,11 +12,13 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../../config';
+import {useNavigation} from '@react-navigation/native';
 const serverUrl = config.SERVER_URL;
 
 const FollowNotification = ({followNotif}) => {
   const [isFollowing, setIsFollowing] = useState(false);
-
+  const navigation = useNavigation();
+  console.log();
   const formatDate = dateString => {
     const date = new Date(dateString);
     const now = new Date();
@@ -83,6 +85,13 @@ const FollowNotification = ({followNotif}) => {
     }
   };
 
+  const handleProfilePress = () => {
+    navigation.navigate('Userprofile', {
+      userIdPost: followNotif?.fromUser._id,
+      idUser: followNotif?.user,
+    });
+  };
+
   useEffect(() => {
     const follow = followNotif?.fromUser.followers.some(
       follow => follow === followNotif?.user,
@@ -93,7 +102,9 @@ const FollowNotification = ({followNotif}) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <TouchableOpacity style={styles.contentContainer}>
+      <TouchableOpacity
+        style={styles.contentContainer}
+        onPress={handleProfilePress}>
         <MaterialCommunityIcons name="account-plus" size={15} color={'#000'} />
         <Image
           source={

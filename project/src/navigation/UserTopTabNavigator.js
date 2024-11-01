@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { StyleSheet, View, Dimensions, RefreshControl } from 'react-native';
-import { Usermedia, Userpost, Replyscreen, Userprofile, Repostscreen } from '../pages';
+import { Usermedia, Userpost, Userrepost, Userprofile } from '../pages';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Tabs, MaterialTabBar } from 'react-native-collapsible-tab-view';
 import { Skeleton } from 'react-native-elements';
@@ -123,7 +123,7 @@ console.log(idUser)
                 enabled={isScrollTop}
               />
             }>
-            {refreshing ? renderSkeleton() : <Repostscreen />}
+            {refreshing ? renderSkeleton() : <Userrepost />}
           </Tabs.ScrollView>
         </Tabs.Tab>
         <Tabs.Tab name="Media">

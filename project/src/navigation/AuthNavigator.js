@@ -25,7 +25,6 @@ import {
   CommunityPost,
   CommunityAbout,
   CommunityMedia,
-  CommunityScreen,
   ViewCommunity,
 } from '../pages';
 import { NavigationContainer } from '@react-navigation/native';
