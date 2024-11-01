@@ -110,7 +110,6 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
       });
 
       const dataTweet = respTweet.data.data;
-
       const formattedTweets = dataTweet
         .filter(post => post.user !== null)
         .map(post => {
