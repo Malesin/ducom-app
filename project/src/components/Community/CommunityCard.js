@@ -72,10 +72,7 @@ const CommunityCard = () => {
           color="#000"
         />
         <TouchableOpacity onPress={handlePress}>
-          <Text style={styles.userName}>Nama Komunitas</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={handlePress}>
-          <Text style={styles.userHandle}>@nama_komunitas</Text>
+          <Text style={styles.userHandle}>nama_komunitas</Text>
         </TouchableOpacity>
       </View>
       <Text style={styles.communityDescription}>
@@ -128,15 +125,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  userName: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#040608',
-    paddingHorizontal: 5,
-  },
   userHandle: {
     color: '#718096',
     fontSize: 14,
+    paddingHorizontal: 5,
   },
   communityDescription: {
     fontSize: 14,
