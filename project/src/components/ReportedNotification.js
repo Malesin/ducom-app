@@ -1,23 +1,35 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {StyleSheet, Text, View, Animated, Modal, TouchableOpacity} from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Animated,
+  Modal,
+  TouchableOpacity,
+  Image,
+} from 'react-native';
+import ProfilePicture from '../assets/iya.png';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import {useNavigation} from '@react-navigation/native';
 
 const ReportedNotification = () => {
   const slideAnim = useRef(new Animated.Value(-50)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const [modalVisible, setModalVisible] = useState(false);
-  const [adminMessage, setAdminMessage] = useState("Admin Kontol");
+  const [adminMessage, setAdminMessage] = useState('Admin Kontol');
+  const navigation = useNavigation();
 
   useEffect(() => {
     Animated.parallel([
       Animated.timing(slideAnim, {
         toValue: 0,
-        duration: 500,
+        duration: 700,
         useNativeDriver: true,
       }),
       Animated.timing(fadeAnim, {
         toValue: 1,
-        duration: 500,
+        duration: 300,
         useNativeDriver: true,
       }),
     ]).start();
@@ -48,7 +60,7 @@ const ReportedNotification = () => {
           been reported for violating community guidelines.
         </Text>
         <TouchableOpacity onPress={handleClick}>
-          <Text style={styles.link}>Click Here</Text>
+          <Text style={styles.link}>See Why?</Text>
         </TouchableOpacity>
       </Animated.View>
 
@@ -59,7 +71,54 @@ const ReportedNotification = () => {
         onRequestClose={() => setModalVisible(false)}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalMessage}>{adminMessage}</Text>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalMessage}>We Removed Your Content</Text>
+              <Text style={styles.modalDate}>4 November 2024</Text>
+            </View>
+            <View style={styles.separator} />
+            <View style={styles.reasonContainer}>
+              <View style={styles.separator} />
+              <Text style={styles.reasonTitle}>Why this happened</Text>
+              <Text style={styles.reasonMessage}>
+                It looks like you threatened or harassed others, or targeted
+                them with content or messages that shame or disrespect them.
+              </Text>
+              <View style={styles.reasonMessageContainer}>
+                <Image source={ProfilePicture} style={styles.profileImage} />
+                <Text style={styles.userInfo}>mikadotjees</Text>
+                <Text style={styles.userMessage}>kys</Text>
+              </View>
+              <Text style={styles.profileMessage}>
+                You shared this on your profile
+              </Text>
+              <Text style={styles.guidelineMessage}>
+                This goes against our Community Guidelines
+              </Text>
+              <TouchableOpacity
+                style={styles.seeRuleButton}
+                onPress={() => navigation.navigate('Termsandcondition')}>
+                <View style={styles.seeRuleContent}>
+                  <MaterialCommunityIcons
+                    name="note-text-outline"
+                    size={24}
+                    color="#000"
+                  />
+                  <Text style={styles.seeRuleText}>See rule</Text>
+                </View>
+                <MaterialCommunityIcons
+                  name="chevron-right"
+                  size={24}
+                  color="#000"
+                />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.separator} />
+            <View style={styles.adminMessageContainer}>
+              <Text style={styles.adminMessageTitle}>
+                Message from Admin :{' '}
+              </Text>
+              <Text style={styles.adminMessage}>{adminMessage}</Text>
+            </View>
             <TouchableOpacity
               style={styles.closeButton}
               onPress={() => setModalVisible(false)}>
@@ -104,24 +163,127 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalContent: {
-    width: '80%',
+    width: '90%',
     backgroundColor: '#FFF',
     padding: 20,
     borderRadius: 10,
-    alignItems: 'center',
+    alignItems: 'flex-start',
+  },
+  modalHeader: {
+    marginBottom: 10,
   },
   modalMessage: {
-    fontSize: 16,
-    marginBottom: 20,
-    textAlign: 'center',
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'left',
+    color: '#000',
+  },
+  modalDate: {
+    fontSize: 14,
+    textAlign: 'left',
+    color: '#000',
   },
   closeButton: {
     backgroundColor: '#007BFF',
     padding: 10,
     borderRadius: 5,
+    width: '100%',
   },
   closeButtonText: {
     color: '#FFF',
     fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  separator: {
+    height: 1,
+    backgroundColor: '#DDD',
+    width: '100%',
+    marginVertical: 5,
+  },
+  reasonContainer: {
+    alignItems: 'flex-start',
+  },
+  reasonTitle: {
+    fontSize: 15,
+    color: '#000',
+    fontWeight: 'bold',
+    textAlign: 'left',
+    marginVertical: 5,
+  },
+  reasonMessage: {
+    fontSize: 14,
+    color: '#000',
+    marginBottom: 5,
+  },
+  reasonMessageContainer: {
+    padding: 10,
+    alignItems: 'center',
+    flexDirection: 'row',
+    borderWidth: 1,
+    borderColor: '#DDD',
+    borderRadius: 10,
+    width: '100%',
+  },
+  profileImage: {
+    width: 30,
+    height: 30,
+    borderRadius: 20,
+    marginRight: 10,
+  },
+  userInfo: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#000',
+  },
+  userMessage: {
+    fontSize: 14,
+    color: '#000',
+    paddingHorizontal: 5,
+  },
+  profileMessage: {
+    fontSize: 14,
+    color: '#000',
+    marginVertical: 5,
+    marginBottom: 5,
+  },
+  guidelineMessage: {
+    fontSize: 14,
+    color: '#000',
+    marginBottom: 10,
+  },
+  seeRuleButton: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    marginBottom: 10,
+    padding: 5,
+    borderRadius: 30,
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+  },
+  seeRuleContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  seeRuleText: {
+    color: '#000',
+    paddingHorizontal: 5,
+  },
+  adminMessageContainer: {
+    marginTop: 5,
+    alignItems: 'flex-start',
+  },
+  adminMessage: {
+    fontSize: 14,
+    color: '#000',
+    textAlign: 'left',
+    marginBottom: 10,
+  },
+  adminMessageTitle: {
+    fontSize: 14,
+    color: '#000',
+    fontWeight: 'bold',
+    textAlign: 'left',
   },
 });
