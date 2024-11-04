@@ -103,8 +103,25 @@ function BottomTabNavigator() {
           tabBarActiveTintColor: 'black',
           tabBarInactiveTintColor: 'gray',
         })}>
-        <Tab.Screen name="HomeTab" component={DrawerNavigator} />
-        <Tab.Screen name="Community" component={CommunityScreen} />
+        <Tab.Screen 
+          name="Community" 
+          component={CommunityScreen} 
+          options={{
+            headerShown: true,
+            headerTitle: 'Community',
+            headerStyle: {
+              backgroundColor: '#fff',
+              borderBottomWidth: 1,
+              borderBottomColor: '#e1e8ed',
+            },
+            headerTitleAlign: 'center',
+            headerTitleStyle: {
+              fontSize: 20,
+              color: 'black',
+              fontWeight: 'bold',
+            },
+          }}
+        />
         <Tab.Screen
           name="Notification"
           component={Notificationscreen}
@@ -149,12 +166,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   headerIcon: {
-    marginRight: 8,
+    paddingRight: 5,
   },
   headerTitle: {
     fontSize: 18,
     color: 'black',
     fontWeight: 'bold',
+  },
+  headerLeftContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 });
 

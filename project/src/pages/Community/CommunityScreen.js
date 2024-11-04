@@ -59,6 +59,10 @@ const CommunityScreen = () => {
   );
 };
 
+CommunityScreen.navigationOptions = {
+  headerTitle: 'Community',
+};
+
 export default CommunityScreen;
 
 const styles = StyleSheet.create({
