@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, Image, TouchableOpacity, Modal, TextInput, Safe
 import ProfileImage from '../../assets/iya.png';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { useColorScheme } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../../config';
@@ -59,6 +59,13 @@ const ReportedUser = ({ report, handleDeleteReport }) => {
         getData()
     }, [])
 
+    useFocusEffect(
+        React.useCallback(() => {
+            // Reset state when screen is focused
+            setReportDetailsVisible(false);
+            setModalVisible(false);
+        }, [])
+    );
 
     const handleReportPress = () => {
         setModalVisible(true);

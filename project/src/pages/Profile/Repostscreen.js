@@ -63,7 +63,7 @@ function Repostscreen() {
                       repostsCount: post.reposts.length,
                       isLiked: post.likes.some(like => like._id === idUser),
                       isBookmarked: post.bookmarks.some(bookmark => bookmark.user === idUser),
-                      isReposted: post.reposts.some(repost => repost.user === idUser),
+                      isReposted: post.reposts.some(repost => repost.user._id === idUser),
                       isMuted: isMuteds.some(isMuted => isMuted === post.user._id),
                       isBlocked: isBlockeds.some(isBlocked => isBlocked === post.user._id),
                       userIdPost: post.user._id,
