@@ -20,8 +20,8 @@ import AccountPrivacy from './Settings/Privacy/AccountPrivacy';
 import AccountInformation from './Settings/Profile/AccountInformation';
 import UpdatePassword from './Settings/Profile/UpdatePassword';
 import Profilescreen from './Profile/Profilescreen';
-import FollowerPage from './Home/FollowerPage';
-import FollowingPage from './Home/FollowingPage';
+import FollowerPage from './Profile/FollowerPage';
+import FollowingPage from './Profile/FollowingPage';
 import Notificationscreen from './Home/Notificationscreen';
 import formatNotification from './Home/formatNotification';
 import TermsandConditionscreen from './Settings/Profile/TermsandConditionscreen';
@@ -32,6 +32,8 @@ import Repostscreen from './Profile/Repostscreen';
 import EditProfilePage from './Profile/EditProfilePage';
 import Userprofile from './Userprofile/Userprofile';
 import Userpost from './Userprofile/Userpost';
+import UserFollower from './Userprofile/UserFollower';
+import UserFollowing from './Userprofile/UserFollowing';
 import Userrepost from './Userprofile/Userrepost';
 import Usermedia from './Userprofile/Usermedia';
 import BlockedUsers from './Settings/Privacy/BlockedUsers';
@@ -70,6 +72,8 @@ export {
   Profilescreen,
   FollowerPage,
   FollowingPage,
+  UserFollower,
+  UserFollowing,
   Notificationscreen,
   TermsandConditionscreen,
   Likescreen,

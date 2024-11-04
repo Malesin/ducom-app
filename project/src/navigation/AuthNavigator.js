@@ -26,6 +26,8 @@ import {
   CommunityAbout,
   CommunityMedia,
   ViewCommunity,
+  UserFollower,
+  UserFollowing,
 } from '../pages';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -127,6 +129,16 @@ export default function MainNavigation() {
           component={UserTopTabNavigator}
           options={{ headerShown: true, title: 'User Profile' }}
           initialParams={{ userIdPost: '', username: '' }}
+        />
+        <Stack.Screen
+          name="UserFollower"
+          component={UserFollower}
+          options={{ headerShown: true, title: 'User Follower' }}
+        />
+        <Stack.Screen
+          name="UserFollowing"
+          component={UserFollowing}
+          options={{ headerShown: true, title: 'User Following' }}
         />
         <Stack.Screen
           name="DrawerNavigator"

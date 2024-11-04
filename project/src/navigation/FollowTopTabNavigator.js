@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import FollowerPage from '../pages/Home/FollowerPage';
-import FollowingPage from '../pages/Home/FollowingPage';
+import FollowerPage from '../pages/Profile/FollowerPage';
+import FollowingPage from '../pages/Profile/FollowingPage';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';

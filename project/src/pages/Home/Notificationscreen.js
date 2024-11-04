@@ -106,7 +106,6 @@ const Notificationscreen = () => {
   };
 
   useEffect(() => {
-    allNotifications;
     fetchNotifications();
   }, []);
 
@@ -158,11 +157,7 @@ const Notificationscreen = () => {
   useEffect(() => {
     if (warningNotifications.length > 0) {
       setShowReportedNotification(true);
-      const timer = setTimeout(() => {
-        setShowReportedNotification(false);
-      }, 10000);
-
-      return () => clearTimeout(timer);
+      return;
     }
   }, [warningNotifications]);
 
