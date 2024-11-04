@@ -4,8 +4,6 @@ import { createMaterialTopTabNavigator } from '@react-navigation/material-top-ta
 import FollowerPage from '../pages/Profile/FollowerPage';
 import FollowingPage from '../pages/Profile/FollowingPage';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
 import config from '../config';
 const serverUrl = config.SERVER_URL;
 
