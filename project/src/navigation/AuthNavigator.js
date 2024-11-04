@@ -35,11 +35,14 @@ import UserTopTabNavigator from './UserTopTabNavigator';
 import TopTabNavigator from './TopTabNavigator';
 import DeactiveDeleteAccount from '../pages/Settings/Profile/DeactiveDeleteAccount';
 import FollowTopTabNavigator from './FollowTopTabNavigator';
+import CommunityTabNavigator from './CommunityTabNavigator';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const Stack = createNativeStackNavigator();
 
 export default function MainNavigation() {
-  return (
+  return (  
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Splash">
         <Stack.Screen
@@ -203,10 +206,33 @@ export default function MainNavigation() {
         />
         <Stack.Screen
           name="ViewCommunity"
-          component={ViewCommunity}
-          options={{ headerShown: true, title: 'Community' }}
+          component={CommunityTabNavigator}
+          options={({ navigation }) => ({
+            headerShown: true,
+            headerTitle: 'Community',
+            headerTitleAlign: 'center',
+            headerLeft: () => (
+              <TouchableOpacity onPress={() => navigation.goBack()} style={styles.iconContainer}>
+                <Icon name="arrow-back" size={24} color="#000" />
+              </TouchableOpacity>
+            ),
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            },
+          })}
         />
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
+
+const styles = StyleSheet.create({
+  iconContainer: {
+    marginLeft: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    elevation: 5, // Untuk Android
+  },
+});

@@ -2,8 +2,11 @@ import React from 'react';
 import {View, Text, FlatList, StyleSheet, SafeAreaView} from 'react-native';
 import CommunityExplore from '../../components/Community/CommunityExplore';
 import CommunityCard from '../../components/Community/CommunityCard';
+import { useNavigation } from '@react-navigation/native';
 
 const CommunityScreen = () => {
+  const navigation = useNavigation();
+
   const data = [
     {
       id: '1',
@@ -53,7 +56,7 @@ const CommunityScreen = () => {
         />
       </View>
       <View style={styles.communityCardContainer}>
-        <CommunityCard />
+        <CommunityCard navigation={navigation} />
       </View>
     </SafeAreaView>
   );

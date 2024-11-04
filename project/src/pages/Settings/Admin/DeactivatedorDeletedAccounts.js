@@ -105,8 +105,10 @@ const DeactivatedorDeletedAccounts = () => {
                                 .then(res => {
                                     console.log(res.data)
                                     ToastAndroid.show('User successfully reactivate', ToastAndroid.SHORT);
+                                    setAllUsers(prevUsers => prevUsers.map(user => 
+                                        user.id === userId ? { ...user, isDeactivated: false } : user
+                                    ));
                                 })
-                            await onRefresh();
                         },
                     },
                 ]);
@@ -128,8 +130,10 @@ const DeactivatedorDeletedAccounts = () => {
                                 .then(res => {
                                     console.log(res.data)
                                     ToastAndroid.show('User successfully reactivate from delete', ToastAndroid.SHORT);
+                                    setAllUsers(prevUsers => prevUsers.map(user => 
+                                        user.id === userId ? { ...user, isDeleted: false } : user
+                                    ));
                                 })
-                            await onRefresh();
                         },
                     },
                 ]);
