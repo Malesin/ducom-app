@@ -104,7 +104,7 @@ function BottomTabNavigator() {
           tabBarInactiveTintColor: 'gray',
         })}>
         <Tab.Screen name="HomeTab" component={DrawerNavigator} />
-        <Tab.Screen name="Community" component={DrawerNavigator} />
+        <Tab.Screen name="Community" component={CommunityScreen} />
         <Tab.Screen
           name="Notification"
           component={Notificationscreen}

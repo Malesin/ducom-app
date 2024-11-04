@@ -4,7 +4,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 
 const { height } = Dimensions.get('window');
 
-const PostSheet = () => {
+const PostSheet = ({ onOptionSelect }) => {
     const [visible, setVisible] = useState(false);
     const [selectedOption, setSelectedOption] = useState('everyone'); // State to track selected radio option
     const [animationValue] = useState(new Animated.Value(height));
@@ -26,6 +26,11 @@ const PostSheet = () => {
         }).start(() => setVisible(false));
     };
 
+    const handleOptionSelect = (option) => {
+        setSelectedOption(option);
+        onOptionSelect(option === 'everyone');
+    };
+
     return (
         <View style={styles.container}>
             <TouchableOpacity onPress={openBottomSheet} style={styles.openButton}>
@@ -44,7 +49,7 @@ const PostSheet = () => {
                         </Text>
 
                         {/* Option 1: Everyone */}
-                        <TouchableOpacity style={styles.option} onPress={() => setSelectedOption('everyone')}>
+                        <TouchableOpacity style={styles.option} onPress={() => handleOptionSelect('everyone')}>
                             <MaterialCommunityIcons name="earth" size={25} color="#001374" />
                             <Text style={styles.optionText}>Everyone</Text>
                             <View style={styles.radioCircle}>
@@ -53,7 +58,7 @@ const PostSheet = () => {
                         </TouchableOpacity>
 
                         {/* Option 2: Only Me */}
-                        <TouchableOpacity style={styles.option} onPress={() => setSelectedOption('onlyme')}>
+                        <TouchableOpacity style={styles.option} onPress={() => handleOptionSelect('onlyme')}>
                             <MaterialCommunityIcons name="account-circle" size={25} color="#001374" />
                             <Text style={styles.optionText}>Only me</Text>
                             <View style={styles.radioCircle}>
