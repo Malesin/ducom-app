@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const CommunityCard = () => {
+const CommunityCard = ({ navigation }) => {
   const [liked, setLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(0);
   const [bookmarked, setBookmarked] = useState(false);
@@ -53,7 +53,7 @@ const CommunityCard = () => {
   };
 
   const handlePress = () => {
-    console.log('konsol');
+    navigation.navigate('ViewCommunity');
   };
 
   const InteractionButton = ({icon, color, count, onPress}) => (
