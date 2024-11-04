@@ -106,7 +106,6 @@ const Notificationscreen = () => {
   };
 
   useEffect(() => {
-    allNotifications;
     fetchNotifications();
   }, []);
 
