@@ -40,6 +40,7 @@ const CreatePost = ({ route, navigation }) => {
   const [UploadProgress, setUploadProgress] = useState(0);
   const [IsUploading, SetIsUploading] = useState(false);
   const [isPostSheetVisible, setIsPostSheetVisible] = useState(false);
+  const [commentsEnabled, setCommentsEnabled] = useState(true);
   const closePostSheet = () => setIsPostSheetVisible(false);
   const colorScheme = useColorScheme();
   const styles = getStyles(colorScheme);
@@ -168,6 +169,7 @@ const CreatePost = ({ route, navigation }) => {
             token: token,
             media: mediaData.map(item => `${item.url}|${item.type}`).join(','),
             description: newPostText,
+            commentsEnabled: commentsEnabled
           });
 
           if (postResponse.data.status === 'ok') {
@@ -186,6 +188,7 @@ const CreatePost = ({ route, navigation }) => {
         const postResponse = await axios.post(`${serverUrl}/create-post`, {
           token: token,
           description: newPostText,
+          commentsEnabled: commentsEnabled
         });
 
         if (postResponse.data.status === 'ok') {
@@ -204,7 +207,7 @@ const CreatePost = ({ route, navigation }) => {
       SetIsUploading(false);
     }
   };
-
+  
   const compressMedia = async (uri, mediaType) => {
     if (mediaType === 'image/heic' || mediaType === 'image/heif') {
       try {
@@ -316,7 +319,7 @@ const CreatePost = ({ route, navigation }) => {
     const options = {
       mediaType: 'mixed',
       selectionLimit: 4,
-      allowedFileTypes: ['jpeg', 'jpg', 'png'], 
+      allowedFileTypes: ['jpeg', 'jpg', 'png'],
       saveToPhotos: true,
     };
 
@@ -471,6 +474,7 @@ const CreatePost = ({ route, navigation }) => {
             <PostSheet
               isPostSheetVisible={isPostSheetVisible}
               closePostSheet={closePostSheet}
+              onOptionSelect={setCommentsEnabled}
             />
             <Button
               icon={<Icon name="camera" size={24} color="#000" />}
