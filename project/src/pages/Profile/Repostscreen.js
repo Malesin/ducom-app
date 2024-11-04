@@ -41,7 +41,7 @@ function Repostscreen() {
             const dataTweet = responseTweet.data.data;
 
             const formattedTweets = dataTweet
-                .filter(post => post.user !== null) 
+                .filter(post => post.user !== null)
                 .map(post => {
                     const totalComments = post.comments.length + post.comments.reduce((acc, comment) => acc + comment.replies.length, 0);
                     return {
@@ -73,8 +73,7 @@ function Repostscreen() {
                       isAdmin: post.user.isAdmin,
                       amIAdmin: amIAdmin
                     };
-                  });
-
+                });            
             return formattedTweets;
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -83,6 +82,8 @@ function Repostscreen() {
             setLoadingMore(false);
         }
     }, [navigation]);
+
+    console.log(tweets)
 
     useFocusEffect(
         useCallback(() => {
