@@ -1,12 +1,12 @@
 import React from 'react';
-import AuthNavigator from './src/navigation/AuthNavigator';
+import MainNavigator from './src/navigation/MainNavigator';
 import Toast from 'react-native-toast-message';
 
 const App = () => {
   return (
     <>
-        <AuthNavigator />
-        <Toast />
+      <MainNavigator />
+      <Toast />
     </>
   );
 };

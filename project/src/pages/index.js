@@ -45,6 +45,7 @@ import CommunityPost from './Community/CommunityPost';
 import CommunityMedia from './Community/CommunityMedia';
 import CommunityAbout from './Community/CommunityAbout';
 import ViewCommunity from './Community/ViewCommunity';
+import CreateCommunity from './Community/CreateCommunity';
 
 
 export {
@@ -95,4 +96,5 @@ export {
   CommunityPost,
   CommunityScreen,
   ViewCommunity,
+  CreateCommunity,
 };

@@ -1,11 +1,22 @@
-import React from 'react';
-import {View, Text, FlatList, StyleSheet, SafeAreaView} from 'react-native';
+import React, {useState} from 'react';
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  SafeAreaView,
+  TouchableOpacity,
+} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
 import CommunityExplore from '../../components/Community/CommunityExplore';
 import CommunityCard from '../../components/Community/CommunityCard';
-import { useNavigation } from '@react-navigation/native';
 
 const CommunityScreen = () => {
   const navigation = useNavigation();
+
+  const handlePress = () => {
+    navigation.navigate('CreateCommunity');
+  };
 
   const data = [
     {
@@ -58,6 +69,12 @@ const CommunityScreen = () => {
       <View style={styles.communityCardContainer}>
         <CommunityCard navigation={navigation} />
       </View>
+
+      <View style={styles.fabContainer}>
+        <TouchableOpacity onPress={handlePress} style={styles.mainButton}>
+          <Text style={styles.mainButtonText}>+</Text>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 };
@@ -92,5 +109,34 @@ const styles = StyleSheet.create({
     flex: 1,
     borderBottomWidth: 1,
     borderColor: '#ccc',
+  },
+  fabContainer: {
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+    alignItems: 'center',
+    zIndex: 2,
+  },
+  mainButton: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#001374',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  mainButtonText: {
+    fontSize: 30,
+    color: 'white',
+  },
+  fab: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#F3F3F3',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 10,
   },
 });

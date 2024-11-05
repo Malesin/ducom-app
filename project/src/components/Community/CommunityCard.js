@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const CommunityCard = ({ navigation }) => {
+const CommunityCard = ({navigation}) => {
   const [liked, setLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(0);
   const [bookmarked, setBookmarked] = useState(false);
@@ -35,16 +35,6 @@ const CommunityCard = ({ navigation }) => {
     } else {
       setBookmarked(true);
       setBookMarksCount(prevBookmarksCount => prevBookmarksCount + 1);
-    }
-  };
-
-  const handleRepost = () => {
-    if (reposted) {
-      setReposted(false);
-      setRepostsCount(prevRepostsCount => prevRepostsCount - 1);
-    } else {
-      setReposted(true);
-      setRepostsCount(prevRepostsCount => prevRepostsCount + 1);
     }
   };
 
@@ -97,12 +87,6 @@ const CommunityCard = ({ navigation }) => {
           count={bookMarksCount}
           onPress={handleBookmark}
         />
-        <InteractionButton
-          icon="repeat-variant"
-          color={reposted ? '#097969' : '#040608'}
-          count={repostsCount}
-          onPress={handleRepost}
-        />
         <TouchableOpacity style={styles.actionButton} onPress={handleShare}>
           <MaterialCommunityIcons
             name="export-variant"
@@ -142,9 +126,10 @@ const styles = StyleSheet.create({
   actionButton: {
     flexDirection: 'row',
     alignItems: 'center',
+    paddingHorizontal: 10,
   },
   actionText: {
-    marginLeft: 4,
+    marginLeft: 3,
     color: '#040608',
   },
 });
