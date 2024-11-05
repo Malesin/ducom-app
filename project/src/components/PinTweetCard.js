@@ -39,8 +39,7 @@ const PinTweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
   const [modalMediaUri, setModalMediaUri] = useState('');
   const [thumbnails, setThumbnails] = useState({});
   const [showBottomSheet, setShowBottomSheet] = useState(false);
-
-
+  const [dataSent, setDataSent] = useState()
   const navigator = useNavigation();
 
   const handleProfilePress = () => {
@@ -62,7 +61,7 @@ const PinTweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
   useEffect(() => {
     const generateThumbnails = async () => {
       const newThumbnails = {};
-      for (const media of tweet.media || []) {
+      for (const media of tweet?.media || []) {
         if (media.type === 'video' && media.uri) {
           try {
             const { path } = await createThumbnail({ url: media.uri });
@@ -75,143 +74,66 @@ const PinTweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
       setThumbnails(newThumbnails);
     };
 
+    const dataSend = async () => {
+      const token = await AsyncStorage.getItem('token');
+      const dataSent = {
+        token: token,
+        postId: tweet.id
+      }
+      setDataSent(dataSent)
+    }
+
     generateThumbnails();
-  }, [tweet.media]);
+    dataSend()
+  }, [tweet?.media]);
 
   const handleLike = async () => {
-    const token = await AsyncStorage.getItem('token');
+    try {
+      setLiked(liked ? false : true);
+      setLikesCount(prevLikesCount => liked ? prevLikesCount - 1 : prevLikesCount + 1);
 
-    if (liked) {
-      setLiked(false);
-      setLikesCount(prevLikesCount => prevLikesCount - 1);
-      try {
-        const response = await axios.post(`${serverUrl}/unlike-post`, {
-          token: token,
-          postId: tweet.id,
-        });
+      await axios.post(`${serverUrl}/${liked ? 'unlike' : 'like'}-post`, dataSent);
 
-        if (response.data.status !== 'ok') {
-          setLiked(true);
-          setLikesCount(prevLikesCount => prevLikesCount + 1);
-          console.log('Error in unlike response data:', response.data.data);
-          Alert.alert('Error', 'Failed to unlike post. Please try again.');
-        }
-      } catch (error) {
-        console.error('Error unliking post:', error.message);
-        setLiked(true);
-        setLikesCount(prevLikesCount => prevLikesCount + 1);
-        Alert.alert('Error', 'Failed to unlike post. Please try again.');
-      }
-    } else {
-      setLiked(true);
-      setLikesCount(prevLikesCount => prevLikesCount + 1);
-      try {
-        const response = await axios.post(`${serverUrl}/like-post`, {
-          token: token,
-          postId: tweet.id,
-        });
+    } catch (error) {
+      console.error(`Error in ${liked ? 'unliking' : 'liking'} post:`, error.message);
+      setLiked(liked ? true : false);
+      setLikesCount(prevLikesCount => liked ? prevLikesCount + 1 : prevLikesCount - 1);
 
-        if (response.data.status !== 'ok') {
-          setLiked(false);
-          setLikesCount(prevLikesCount => prevLikesCount - 1);
-          console.log('Error in like response data:', response.data.data);
-          Alert.alert('Error', 'Failed to like post. Please try again.');
-        }
-      } catch (error) {
-        console.error('Error liking post:', error.message);
-        setLiked(false);
-        setLikesCount(prevLikesCount => prevLikesCount - 1);
-        Alert.alert('Error', 'Failed to like post. Please try again.');
-      }
+      ToastAndroid.show(`Failed to ${liked ? 'unlike' : 'like'} post. Please try again.`, ToastAndroid.SHORT);
     }
   };
 
   const handleBookmark = async () => {
-    const token = await AsyncStorage.getItem('token');
+    try {
+      setBookmarked(bookmarked ? false : true);
+      setBookMarksCount(prevBookmarksCount => bookmarked ? prevBookmarksCount - 1 : prevBookmarksCount + 1);
 
-    if (bookmarked) {
-      setBookmarked(false);
-      setBookMarksCount(prevBookmarksCount => prevBookmarksCount - 1);
-      try {
-        const response = await axios.post(`${serverUrl}/unbookmark-post`, {
-          token: token,
-          postId: tweet.id,
-        });
+      await axios.post(`${serverUrl}/${bookmarked ? 'unbookmark' : 'bookmark'}-post`, dataSent);
 
-        if (response.data.status !== 'ok') {
-          setBookmarked(true);
-          setBookMarksCount(prevBookmarksCount => prevBookmarksCount + 1);
-          console.log('Error in unbookmark response data:', response.data.data);
-        } else {
-          ToastAndroid.show('Post removed from bookmarks!', ToastAndroid.SHORT);
-        }
-      } catch (error) {
-        console.error('Error unbookmarking post:', error.message);
-        setBookmarked(true);
-        setBookMarksCount(prevBookmarksCount => prevBookmarksCount + 1);
-      }
-    } else {
-      setBookmarked(true);
-      setBookMarksCount(prevBookmarksCount => prevBookmarksCount + 1);
-      try {
-        const response = await axios.post(`${serverUrl}/bookmark-post`, {
-          token: token,
-          postId: tweet.id,
-        });
+      ToastAndroid.show(`Post ${bookmarked ? 'removed' : 'added'} from bookmarks!`, ToastAndroid.SHORT);
 
-        if (response.data.status !== 'ok') {
-          setBookmarked(false);
-          setBookMarksCount(prevBookmarksCount => prevBookmarksCount - 1);
-          console.log('Error in bookmark response data:', response.data.data);
-        } else {
-          ToastAndroid.show('Post added to bookmarks!', ToastAndroid.SHORT);
-        }
-      } catch (error) {
-        console.error('Error bookmarking post:', error.message);
-        setBookmarked(false);
-        setBookMarksCount(prevBookmarksCount => prevBookmarksCount - 1);
-      }
+    } catch (error) {
+      console.error(`Error in ${bookmarked ? 'unbookmarking' : 'bookmarking'} post:`, error.message);
+      setBookmarked(bookmarked ? true : false);
+      setBookMarksCount(prevBookmarksCount => bookmarked ? prevBookmarksCount + 1 : prevBookmarksCount - 1);
+
+      ToastAndroid.show(`Failed to ${bookmarked ? 'unbookmark' : 'bookmark'} post. Please try again.`, ToastAndroid.SHORT);
     }
   };
 
   const handleRepost = async () => {
-    const token = await AsyncStorage.getItem('token');
     try {
-      if (reposted) {
-        setReposted(false);
-        setRepostsCount(prevRepostsCount => prevRepostsCount - 1);
-        await axios
-          .post(`${serverUrl}/unrepost-post`, {
-            token: token,
-            postId: tweet.id
-          })
-          .then(res => {
-            if (res.data.status !== 'ok') {
-              setReposted(true);
-              setRepostsCount(prevRepostsCount => prevRepostsCount + 1);
-              console.log('Error in unrepost response data:', res.data);
-            }
-          })
-      } else {
-        setReposted(true);
-        setRepostsCount(prevRepostsCount => prevRepostsCount + 1);
-        await axios
-          .post(`${serverUrl}/repost-post`, {
-            token: token,
-            postId: tweet.id
-          })
-          .then(res => {
-            if (res.data.status !== 'ok') {
-              setReposted(false);
-              setRepostsCount(prevRepostsCount => prevRepostsCount - 1);
-              console.log('Error in repost response data:', res.data);
-            }
-          })
-      }
+      setReposted(reposted ? false : true);
+      setRepostsCount(prevRepostsCount => reposted ? prevRepostsCount - 1 : prevRepostsCount + 1);
+
+      await axios.post(`${serverUrl}/${reposted ? 'unrepost' : 'repost'}-post`, dataSent)
+
     } catch (error) {
-      console.error('Error reposting:', error);
-      setReposted(!reposted);
+      console.error(`Error in ${reposted ? 'unreposting' : 'reposting'} post:`, error.message);
+      setReposted(reposted ? true : false);
       setRepostsCount(prevRepostsCount => reposted ? prevRepostsCount + 1 : prevRepostsCount - 1);
+
+      ToastAndroid.show(`Failed to ${reposted ? 'unrepost' : 'repost'} post. Please try again.`, ToastAndroid.SHORT);
     }
   };
 

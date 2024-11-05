@@ -7,26 +7,28 @@ import {
   View,
   RefreshControl,
 } from 'react-native';
-import {useFocusEffect} from '@react-navigation/native';
-import React, {useState, useEffect, useCallback} from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+import React, { useState, useEffect, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../../config';
-import {Skeleton} from 'react-native-elements';
+import { Skeleton } from 'react-native-elements';
 const serverUrl = config.SERVER_URL;
 
-const UserFollower = () => {
+const UserFollower = ({ route }) => {
   const [dataFollowers, setDataFollowers] = useState([]);
   const [myId, setMyId] = useState();
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const { userId } = route.params;
 
   const getDataFollowers = async () => {
     try {
       const token = await AsyncStorage.getItem('token');
       await axios
-        .post(`${serverUrl}/show-followers`, {
+        .post(`${serverUrl}/show-followers-byId`, {
           token: token,
+          userId: userId,
         })
         .then(res => {
           const dataFollow = res.data.data.followers;
@@ -99,23 +101,23 @@ const UserFollower = () => {
         {loading
           ? renderSkeleton()
           : dataFollowers.map((data, index) => (
-              <View key={index}>
-                <FollowCard
-                  followText="Follow Back"
-                  followingText="Following"
-                  removeButtonText="Remove"
-                  message={
-                    <Text>
-                      We won't tell{' '}
-                      <Text style={styles.boldUsername}>{data?.username}</Text>{' '}
-                      they were removed from your followers.
-                    </Text>
-                  }
-                  data={data}
-                  myId={myId}
-                />
-              </View>
-            ))}
+            <View key={index}>
+              <FollowCard
+                followText="Follow Back"
+                followingText="Following"
+                removeButtonText="Remove"
+                message={
+                  <Text>
+                    We won't tell{' '}
+                    <Text style={styles.boldUsername}>{data?.username}</Text>{' '}
+                    they were removed from your followers.
+                  </Text>
+                }
+                data={data}
+                myId={myId}
+              />
+            </View>
+          ))}
       </ScrollView>
     </SafeAreaView>
   );

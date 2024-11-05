@@ -10,8 +10,8 @@ const serverUrl = config.SERVER_URL;
 const Tab = createMaterialTopTabNavigator();
 
 const UserFollowTopTabNavigator = ({navigation, route}) => {
-  const {username} = route?.params;
-
+  const {username, userId} = route?.params;
+  
   const Header = () => (
     <View style={styles.header}>
       <TouchableOpacity
@@ -32,8 +32,16 @@ const UserFollowTopTabNavigator = ({navigation, route}) => {
           tabBarIndicatorStyle: styles.tabBarIndicator,
           tabBarLabelStyle: styles.tabBarLabel,
         }}>
-        <Tab.Screen name="Followers" component={UserFollower} />
-        <Tab.Screen name="Following" component={UserFollowing} />
+        <Tab.Screen
+          name="Followers"
+          component={UserFollower}
+          initialParams={{ userId }}
+        />
+        <Tab.Screen
+          name="Following"
+          component={UserFollowing}
+          initialParams={{ userId }}
+        />
       </Tab.Navigator>
     </View>
   );

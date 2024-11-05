@@ -324,6 +324,7 @@ const Userprofile = ({userIdPost, navigation, idUser}) => {
                     onPress={() =>
                       navigation.navigate('UserFollow', {
                         username: userData?.username,
+                        userId: userIdPost
                       })
                     }>
                     <Text style={styles.statNumber}>

@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   Text,
@@ -21,6 +21,7 @@ const FollowCard = ({
   myId,
 }) => {
   const [isFollowing, setIsFollowing] = useState(false);
+  const isMyId = myId === data._id
 
   useEffect(() => {
     const isFollow = data.followers.some(follow => follow === myId);
@@ -30,26 +31,20 @@ const FollowCard = ({
   const handleFollowToggle = async () => {
     try {
       const token = await AsyncStorage.getItem('token');
-      if (isFollowing) {
-        await axios
-          .post(`${serverUrl}/unfollow`, {
-            token: token,
-            unfollowUserId: data._id,
-          })
-          .then(res => {
-            console.log(res.data);
-          });
-      } else {
-        await axios
-          .post(`${serverUrl}/follow`, {
-            token: token,
-            followUserId: data._id,
-          })
-          .then(res => {
-            console.log(res.data);
-          });
+      const follow = isFollowing ? 'unfollowUserId' : 'followUserId'
+      const dataSent = {
+        token: token,
+        [follow]: data?._id
       }
       setIsFollowing(!isFollowing);
+      
+      await axios
+        .post(`${serverUrl}/${isFollowing ? 'unfollow' : 'follow'}`, dataSent
+        )
+        .then(res => {
+          console.log(res.data);
+        });
+
     } catch (error) {
       setIsFollowing(isFollowing);
       console.error(error);
@@ -62,23 +57,25 @@ const FollowCard = ({
       <Image
         source={
           data?.profilePicture
-            ? {uri: data?.profilePicture}
+            ? { uri: data?.profilePicture }
             : require('../assets/profilepic.png')
         }
         style={styles.profileImage}
       />
       <Text style={styles.username}>{data?.username}</Text>
-      <TouchableOpacity
-        style={[styles.messageButton, isFollowing && styles.followingButton]}
-        onPress={handleFollowToggle}>
-        <Text
-          style={[
-            styles.messageButtonText,
-            isFollowing && styles.followingButtonText,
-          ]}>
-          {isFollowing ? followingText : followText}
-        </Text>
-      </TouchableOpacity>
+      {!isMyId &&
+        <TouchableOpacity
+          style={[styles.messageButton, isFollowing && styles.followingButton]}
+          onPress={handleFollowToggle}>
+          <Text
+            style={[
+              styles.messageButtonText,
+              isFollowing && styles.followingButtonText,
+            ]}>
+            {isFollowing ? followingText : followText}
+          </Text>
+        </TouchableOpacity>
+      }
     </View>
   );
 };
