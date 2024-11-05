@@ -7,26 +7,28 @@ import {
   View,
   RefreshControl,
 } from 'react-native';
-import {useFocusEffect} from '@react-navigation/native';
-import React, {useState, useEffect, useCallback} from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+import React, { useState, useEffect, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../../config';
-import {Skeleton} from 'react-native-elements';
+import { Skeleton } from 'react-native-elements';
 const serverUrl = config.SERVER_URL;
 
-const UserFollowing = () => {
+const UserFollowing = ({ route }) => {
   const [dataFollowing, setDataFollowing] = useState([]);
   const [myId, setMyId] = useState();
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const { userId } = route.params
 
   const getDataFollowing = async () => {
     try {
       const token = await AsyncStorage.getItem('token');
       await axios
-        .post(`${serverUrl}/show-following`, {
+        .post(`${serverUrl}/show-following-byId`, {
           token: token,
+          userId: userId
         })
         .then(res => {
           const dataFollow = res.data.data.following;
@@ -100,19 +102,19 @@ const UserFollowing = () => {
         {loading
           ? renderSkeleton()
           : dataFollowing.map((data, index) => (
-              <View key={index}>
-                <FollowCard
-                  followText="Follow"
-                  followingText="Following"
-                  removeButtonText="Unfollow"
-                  message={
-                    <Text style={styles.boldUsername}>{data?.username}</Text>
-                  }
-                  data={data}
-                  myId={myId}
-                />
-              </View>
-            ))}
+            <View key={index}>
+              <FollowCard
+                followText="Follow"
+                followingText="Following"
+                removeButtonText="Unfollow"
+                message={
+                  <Text style={styles.boldUsername}>{data?.username}</Text>
+                }
+                data={data}
+                myId={myId}
+              />
+            </View>
+          ))}
       </ScrollView>
     </SafeAreaView>
   );
