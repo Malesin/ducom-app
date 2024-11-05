@@ -25,9 +25,7 @@ import {
   CommunityPost,
   CommunityAbout,
   CommunityMedia,
-  ViewCommunity,
-  UserFollower,
-  UserFollowing,
+  CreateCommunity,
 } from '../pages';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
@@ -39,14 +37,15 @@ import DeactiveDeleteAccount from '../pages/Settings/Profile/DeactiveDeleteAccou
 import FollowTopTabNavigator from './FollowTopTabNavigator';
 import UserFollowTopTabNavigator from './UserFollowTopTabNavigator';
 import CommunityTabNavigator from './CommunityTabNavigator';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-
 
 const Stack = createNativeStackNavigator();
 
+
+
 export default function MainNavigation() {
-  return (  
+  return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Splash">
         <Stack.Screen
@@ -207,6 +206,44 @@ export default function MainNavigation() {
           options={{headerShown: true, title: 'Community Post'}}
         />
         <Stack.Screen
+          name="CreateCommunity"
+          component={CreateCommunity}
+          options={({ navigation }) => ({
+            headerShown: true,
+            title: 'Create New Community',
+            headerTitleAlign: 'left',
+            headerRight: () => (
+              <TouchableOpacity
+                style={{
+                  backgroundColor: '#00137f',
+                  borderRadius: 20,
+                  paddingVertical: 6,
+                  paddingHorizontal: 16,
+                  marginRight: 5,
+                }}
+                onPress={() => {
+                  navigation.navigate('CreateCommunity', {
+                    onCreate: () => {
+                      const { onCreate } = navigation.getParam('onCreate', () => {});
+                      if (onCreate) {
+                        onCreate();
+                      }
+                    },
+                  });
+                }}>
+                <Text
+                  style={{
+                    color: '#fff',
+                    fontSize: 13,
+                    fontWeight: 'bold',
+                  }}>
+                  Create
+                </Text>
+              </TouchableOpacity>
+            ),
+          })}
+        />
+        <Stack.Screen
           name="CommunityAbout"
           component={CommunityAbout}
           options={{headerShown: true, title: 'Community About'}}
@@ -218,14 +255,15 @@ export default function MainNavigation() {
         />
         <Stack.Screen
           name="ViewCommunity"
-
           component={CommunityTabNavigator}
-          options={({ navigation }) => ({
+          options={({navigation}) => ({
             headerShown: true,
             headerTitle: 'Community',
             headerTitleAlign: 'center',
             headerLeft: () => (
-              <TouchableOpacity onPress={() => navigation.goBack()} style={styles.iconContainer}>
+              <TouchableOpacity
+                onPress={() => navigation.goBack()}
+                style={styles.iconContainer}>
                 <Icon name="arrow-back" size={24} color="#000" />
               </TouchableOpacity>
             ),
@@ -243,9 +281,9 @@ const styles = StyleSheet.create({
   iconContainer: {
     marginLeft: 10,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.3,
     shadowRadius: 3,
-    elevation: 5, 
+    elevation: 5,
   },
 });

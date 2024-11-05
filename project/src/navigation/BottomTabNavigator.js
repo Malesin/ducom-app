@@ -1,11 +1,11 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import React, {useState, useCallback, useEffect} from 'react';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import { Image, StyleSheet, View, Text } from 'react-native';
-import { CommunityScreen, Notificationscreen } from '../pages';
+import {Image, StyleSheet, View, Text} from 'react-native';
+import {CommunityScreen, Notificationscreen} from '../pages';
 import DrawerNavigator from './DrawerNavigator';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { useFocusEffect } from '@react-navigation/native';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import {useFocusEffect} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../config';
@@ -36,7 +36,7 @@ function BottomTabNavigator() {
       const user = userResponse.data.data;
 
       if (user.profilePicture) {
-        const profile = { uri: user.profilePicture };
+        const profile = {uri: user.profilePicture};
         setProfilePicture(profile);
         console.log('Image Profile Retrieved Successfully');
       }
@@ -61,14 +61,14 @@ function BottomTabNavigator() {
   useFocusEffect(
     useCallback(() => {
       getData();
-    }, [getData])
+    }, [getData]),
   );
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <GestureHandlerRootView style={{flex: 1}}>
       <Tab.Navigator
-        screenOptions={({ route }) => ({
-          tabBarIcon: ({ color }) => {
+        screenOptions={({route}) => ({
+          tabBarIcon: ({color}) => {
             let iconName;
             const iconSize = 30;
             if (route.name === 'HomeTab') {
@@ -85,12 +85,16 @@ function BottomTabNavigator() {
               return (
                 <Image
                   source={profilePicture || profileImage}
-                  style={[styles.icon, { tintColor: undefined }]}
+                  style={[styles.icon, {tintColor: undefined}]}
                 />
               );
             } else if (route.name === 'Community') {
               return (
-                <MaterialCommunityIcons name="account-group" size={iconSize} color={color} />
+                <MaterialCommunityIcons
+                  name="account-group"
+                  size={iconSize}
+                  color={color}
+                />
               );
             }
           },
@@ -103,9 +107,10 @@ function BottomTabNavigator() {
           tabBarActiveTintColor: 'black',
           tabBarInactiveTintColor: 'gray',
         })}>
-        <Tab.Screen 
-          name="Community" 
-          component={CommunityScreen} 
+        <Tab.Screen name="HomeTab" component={DrawerNavigator} />
+        <Tab.Screen
+          name="Community"
+          component={CommunityScreen}
           options={{
             headerShown: true,
             headerTitle: 'Community',
