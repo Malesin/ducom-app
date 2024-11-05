@@ -42,8 +42,6 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const Stack = createNativeStackNavigator();
 
-
-
 export default function MainNavigation() {
   return (
     <NavigationContainer>
@@ -205,44 +203,7 @@ export default function MainNavigation() {
           component={CommunityPost}
           options={{headerShown: true, title: 'Community Post'}}
         />
-        <Stack.Screen
-          name="CreateCommunity"
-          component={CreateCommunity}
-          options={({ navigation }) => ({
-            headerShown: true,
-            title: 'Create New Community',
-            headerTitleAlign: 'left',
-            headerRight: () => (
-              <TouchableOpacity
-                style={{
-                  backgroundColor: '#00137f',
-                  borderRadius: 20,
-                  paddingVertical: 6,
-                  paddingHorizontal: 16,
-                  marginRight: 5,
-                }}
-                onPress={() => {
-                  navigation.navigate('CreateCommunity', {
-                    onCreate: () => {
-                      const { onCreate } = navigation.getParam('onCreate', () => {});
-                      if (onCreate) {
-                        onCreate();
-                      }
-                    },
-                  });
-                }}>
-                <Text
-                  style={{
-                    color: '#fff',
-                    fontSize: 13,
-                    fontWeight: 'bold',
-                  }}>
-                  Create
-                </Text>
-              </TouchableOpacity>
-            ),
-          })}
-        />
+        <Stack.Screen name="CreateCommunity" component={CreateCommunity} />
         <Stack.Screen
           name="CommunityAbout"
           component={CommunityAbout}

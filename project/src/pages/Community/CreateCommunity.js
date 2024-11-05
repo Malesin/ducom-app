@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 
-const CreateCommunity = ({ navigation }) => {
+const CreateCommunity = ({navigation}) => {
   const [inputNameHeight, setInputNameHeight] = useState(35);
   const [inputHeightDescription, setInputHeightDescription] = useState(35);
   const [inputHeightRules, setInputHeightRules] = useState(100);
@@ -18,20 +18,20 @@ const CreateCommunity = ({ navigation }) => {
   const [newCommunityRules, setNewCommunityRules] = useState('');
 
   const handleCreateCommunity = () => {
-    // Hanya mencetak hasil ke konsol
     console.log('Community created with the following details:');
     console.log('Name:', newCommunityName);
     console.log('Description:', newCommunityDescription);
     console.log('Rules:', newCommunityRules);
-    
-    // Jika ingin menavigasi kembali ke CommunityScreen, uncomment baris berikut
+
     // navigation.navigate('CommunityScreen');
   };
 
   const isFormValid = () => {
-    return newCommunityName.trim() !== '' && 
-           newCommunityDescription.trim() !== '' && 
-           newCommunityRules.trim() !== '';
+    return (
+      newCommunityName.trim() !== '' &&
+      newCommunityDescription.trim() !== '' &&
+      newCommunityRules.trim() !== ''
+    );
   };
 
   useEffect(() => {
@@ -39,15 +39,14 @@ const CreateCommunity = ({ navigation }) => {
       headerRight: () => (
         <TouchableOpacity
           style={{
-            backgroundColor: '#00137f',
+            backgroundColor: isFormValid() ? '#00137f' : '#b0b0b0',
             borderRadius: 20,
             paddingVertical: 6,
             paddingHorizontal: 16,
             marginRight: 5,
           }}
           onPress={handleCreateCommunity}
-          disabled={!isFormValid()} 
-        >
+          disabled={!isFormValid()}>
           <Text
             style={{
               color: '#fff',
@@ -59,7 +58,12 @@ const CreateCommunity = ({ navigation }) => {
         </TouchableOpacity>
       ),
     });
-  }, [navigation, newCommunityName, newCommunityDescription, newCommunityRules]); 
+  }, [
+    navigation,
+    newCommunityName,
+    newCommunityDescription,
+    newCommunityRules,
+  ]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -68,10 +72,13 @@ const CreateCommunity = ({ navigation }) => {
           <Text style={styles.communityNameText}>Community Name</Text>
           <TextInput
             maxLength={30}
-            style={[styles.communityNameInput, { height: Math.max(35, inputNameHeight) }]}
+            style={[
+              styles.communityNameInput,
+              {height: Math.max(35, inputNameHeight)},
+            ]}
             multiline={true}
             onContentSizeChange={e => {
-              const { height } = e.nativeEvent.contentSize;
+              const {height} = e.nativeEvent.contentSize;
               setInputNameHeight(height);
             }}
             value={newCommunityName}
@@ -83,13 +90,18 @@ const CreateCommunity = ({ navigation }) => {
           </Text>
         </View>
         <View style={styles.communityDescription}>
-          <Text style={styles.communityDescriptionText}>Community Description</Text>
+          <Text style={styles.communityDescriptionText}>
+            Community Description
+          </Text>
           <TextInput
             maxLength={150}
-            style={[styles.communityDescriptionInput, { height: Math.max(35, inputHeightDescription) }]}
+            style={[
+              styles.communityDescriptionInput,
+              {height: Math.max(35, inputHeightDescription)},
+            ]}
             multiline={true}
             onContentSizeChange={e => {
-              const { height } = e.nativeEvent.contentSize;
+              const {height} = e.nativeEvent.contentSize;
               setInputHeightDescription(height);
             }}
             value={newCommunityDescription}
@@ -104,11 +116,14 @@ const CreateCommunity = ({ navigation }) => {
           <Text style={styles.communityRulesText}>Community Rules</Text>
           <TextInput
             maxLength={150}
-            style={[styles.communityRulesInput, { height: Math.max(100, inputHeightRules) }]}
+            style={[
+              styles.communityRulesInput,
+              {height: Math.max(100, inputHeightRules)},
+            ]}
             multiline={true}
             textAlignVertical="top"
             onContentSizeChange={e => {
-              const { height } = e.nativeEvent.contentSize;
+              const {height} = e.nativeEvent.contentSize;
               setInputHeightRules(height);
             }}
             value={newCommunityRules}
