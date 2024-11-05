@@ -5,9 +5,13 @@ import FollowSheet from './FollowSheet';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../config';
+import { useNavigation } from '@react-navigation/native';
+
 const serverUrl = config.SERVER_URL;
 
 const FollowCard = ({ followText, followingText, removeButtonText, message, data, myId }) => {
+    const navigation = useNavigation();
+
     const [isFollowing, setIsFollowing] = useState(false);
     const [isModalVisible, setIsModalVisible] = useState(false);
 
@@ -53,16 +57,24 @@ const FollowCard = ({ followText, followingText, removeButtonText, message, data
         setIsModalVisible(false);
     };
 
+    const handleNavigateToUserProfile = () => {
+        navigation.navigate('Userprofile', { userIdPost: data._id, idUser: myId });
+    };
+
     return (
         <View style={styles.container}>
-            <Image
-                source={
-                    data?.profilePicture
-                        ? { uri: data?.profilePicture }
-                        : require('../assets/profilepic.png')}
-                style={styles.profileImage}
-            />
-            <Text style={styles.username}>{data?.username}</Text>
+            <TouchableOpacity onPress={handleNavigateToUserProfile}>
+                <Image
+                    source={
+                        data?.profilePicture
+                            ? { uri: data?.profilePicture }
+                            : require('../assets/profilepic.png')}
+                    style={styles.profileImage}
+                />
+            </TouchableOpacity>
+            <Text style={styles.username} onPress={handleNavigateToUserProfile}>
+                {data?.username}
+            </Text>
             <TouchableOpacity
                 style={[styles.messageButton, isFollowing && styles.followingButton]}
                 onPress={handleFollowToggle}

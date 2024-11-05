@@ -31,7 +31,7 @@ const Userprofile = ({userIdPost, navigation, idUser}) => {
   const [followersCount, setFollowersCount] = useState(0);
   const [isMuted, setIsMuted] = useState(false); // Tambahkan state untuk mute
   const [isBlocked, setIsBlocked] = useState(false); // Tambahkan state isBlocked untuk melacak status block
-
+console.log(idUser)
   useEffect(() => {
     navigation.setOptions({title: ''});
     console.log()

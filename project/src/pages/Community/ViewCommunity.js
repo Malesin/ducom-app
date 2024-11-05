@@ -36,7 +36,7 @@ const ViewCommunity = () => {
             <Text style={styles.joinButtonText}>Join</Text>
           </TouchableOpacity>
         </View>
-        <Text style={styles.bio}>{communityData?.bio || 'Community Bio'}</Text>
+        <Text style={styles.bio}>{communityData?.bio || 'Community bio'}</Text>
       </View>
     </ScrollView>
   );
@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
   },
   bannerContainer: {
     width: '100%',
-    height: 175,
+    height: 185,
   },
   banner: {
     width: '100%',
