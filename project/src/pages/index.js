@@ -46,7 +46,8 @@ import CommunityMedia from './Community/CommunityMedia';
 import CommunityAbout from './Community/CommunityAbout';
 import ViewCommunity from './Community/ViewCommunity';
 import CreateCommunity from './Community/CreateCommunity';
-
+import CommunitySettings from './Community/CommunitySettings';
+import CommunityList from './Community/CommunityList';
 
 export {
   Splashscreen,
@@ -97,4 +98,6 @@ export {
   CommunityScreen,
   ViewCommunity,
   CreateCommunity,
+  CommunitySettings,
+  CommunityList,
 };
