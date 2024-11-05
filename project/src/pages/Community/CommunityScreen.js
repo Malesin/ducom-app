@@ -10,6 +10,7 @@ import {
 import {useNavigation} from '@react-navigation/native';
 import CommunityExplore from '../../components/Community/CommunityExplore';
 import CommunityCard from '../../components/Community/CommunityCard';
+import {ScrollView} from 'react-native-gesture-handler';
 
 const CommunityScreen = () => {
   const navigation = useNavigation();
@@ -71,28 +72,30 @@ const CommunityScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.exploreContainer}>
-        <Text style={styles.exploreText}>Explore</Text>
-        <FlatList
-          data={exploreData}
-          renderItem={({item}) => (
-            <CommunityExplore communityExploreData={item} />
-          )}
-          keyExtractor={item => item.id}
-          horizontal={true}
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{paddingHorizontal: 0}}
-        />
-      </View>
-      <View style={styles.communityCardContainer}>
-        {cardData.map(community => (
-          <CommunityCard
-            key={community.id}
-            navigation={navigation}
-            communityCardData={community}
+      <ScrollView style={{flex: 1}}>
+        <View style={styles.exploreContainer}>
+          <Text style={styles.exploreText}>Explore</Text>
+          <FlatList
+            data={exploreData}
+            renderItem={({item}) => (
+              <CommunityExplore communityExploreData={item} />
+            )}
+            keyExtractor={item => item.id}
+            horizontal={true}
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{paddingHorizontal: 0}}
           />
-        ))}
-      </View>
+        </View>
+        <View style={styles.communityCardContainer}>
+          {cardData.map(community => (
+            <CommunityCard
+              key={community.id}
+              navigation={navigation}
+              communityCardData={community}
+            />
+          ))}
+        </View>
+      </ScrollView>
       <View style={styles.fabContainer}>
         <TouchableOpacity onPress={handlePress} style={styles.mainButton}>
           <Text style={styles.mainButtonText}>+</Text>
