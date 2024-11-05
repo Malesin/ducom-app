@@ -203,7 +203,11 @@ export default function MainNavigation() {
           component={CommunityPost}
           options={{headerShown: true, title: 'Community Post'}}
         />
-        <Stack.Screen name="CreateCommunity" component={CreateCommunity} />
+        <Stack.Screen
+          name="CreateCommunity"
+          component={CreateCommunity}
+          options={{headerShown: true, title: 'Create New Community'}}
+        />
         <Stack.Screen
           name="CommunityAbout"
           component={CommunityAbout}

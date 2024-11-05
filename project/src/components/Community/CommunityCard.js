@@ -5,17 +5,15 @@ import {
   StyleSheet,
   TouchableOpacity,
   SafeAreaView,
-  Share,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const CommunityCard = ({navigation}) => {
+const CommunityCard = ({navigation, communityCardData}) => {
+  const {communityCardName, communityDescription} = communityCardData;
   const [liked, setLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(0);
   const [bookmarked, setBookmarked] = useState(false);
   const [bookMarksCount, setBookMarksCount] = useState(0);
-  const [reposted, setReposted] = useState(false);
-  const [repostsCount, setRepostsCount] = useState(0);
   const [commentsCount] = useState(0);
 
   const handleLike = () => {
@@ -38,10 +36,6 @@ const CommunityCard = ({navigation}) => {
     }
   };
 
-  const handleShare = () => {
-    console.log('share');
-  };
-
   const handlePress = () => {
     navigation.navigate('ViewCommunity');
   };
@@ -62,12 +56,10 @@ const CommunityCard = ({navigation}) => {
           color="#000"
         />
         <TouchableOpacity onPress={handlePress}>
-          <Text style={styles.userHandle}>nama_komunitas</Text>
+          <Text style={styles.userHandle}>{communityCardName}</Text>
         </TouchableOpacity>
       </View>
-      <Text style={styles.communityDescription}>
-        Deskripsi komunitas di sini.
-      </Text>
+      <Text style={styles.communityDescription}>{communityDescription}</Text>
       <View style={styles.actions}>
         <InteractionButton
           icon={liked ? 'heart' : 'heart-outline'}
@@ -87,13 +79,6 @@ const CommunityCard = ({navigation}) => {
           count={bookMarksCount}
           onPress={handleBookmark}
         />
-        <TouchableOpacity style={styles.actionButton} onPress={handleShare}>
-          <MaterialCommunityIcons
-            name="export-variant"
-            size={20}
-            color="#657786"
-          />
-        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
@@ -104,6 +89,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     padding: 10,
     borderColor: '#E1E8ED',
+    borderWidth: 1,
+    borderRadius: 8,
   },
   userInfo: {
     flexDirection: 'row',
