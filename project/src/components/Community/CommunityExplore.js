@@ -9,7 +9,7 @@ import {
   Pressable,
 } from 'react-native';
 import React, {useState, useRef} from 'react';
-import backgroundCommunity from '../../assets/bannerkom.jpeg';
+import backgroundCommunity from '../../assets/eskul/pramukabanner.png';
 import profileCommunity from '../../assets/iya.png';
 import {useNavigation} from '@react-navigation/native';
 

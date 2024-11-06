@@ -1,10 +1,17 @@
-import { StyleSheet, Text, ScrollView, SafeAreaView, View } from 'react-native';
+import { StyleSheet, Text, ScrollView, SafeAreaView, View, TouchableOpacity } from 'react-native';
 import React from 'react';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import { useNavigation } from '@react-navigation/native';
 
 const TermsandConditionsScreen = () => {
+    const navigation = useNavigation();
+
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.header}>
+                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+                    <Icon name="arrow-back" size={24} color="#fff" />
+                </TouchableOpacity>
                 <Text style={styles.headerText}>Terms and Conditions</Text>
             </View>
             <ScrollView contentContainerStyle={styles.scrollView}>
@@ -127,10 +134,15 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     header: {
+        flexDirection: 'row',
+        alignItems: 'center',
         padding: 16,
         backgroundColor: '#0a3e99',
-        alignItems: 'center',
         justifyContent: 'center',
+    },
+    backButton: {
+        position: 'absolute',
+        left: 16,
     },
     headerText: {
         fontSize: 24,

@@ -26,6 +26,8 @@ import {
   CommunityAbout,
   CommunityMedia,
   CreateCommunity,
+  CommunitySettings,
+  CommunityList,
 } from '../pages';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
@@ -217,6 +219,23 @@ export default function MainNavigation() {
           name="CommunityMedia"
           component={CommunityMedia}
           options={{headerShown: true, title: 'Community Media'}}
+        />
+        <Stack.Screen
+          name="CommunityList"
+          component={CommunityList}
+          options={{headerShown: true, title: 'Community List'}}
+        />
+        <Stack.Screen
+          name="CommunitySettings"
+          component={CommunitySettings}
+          options={{
+            headerShown: true,
+            headerTitle: 'Settings',
+            headerTitleAlign: 'left',
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            },
+          }}
         />
         <Stack.Screen
           name="ViewCommunity"
