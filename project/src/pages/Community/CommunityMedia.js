@@ -1,10 +1,11 @@
 import { View, Text } from 'react-native'
 import React from 'react'
+import CommunityCard from '../../components/Community/CommunityCard';
 
-const CommunityMedia = () => {
+const CommunityMedia = ({ navigation }) => {
   return (
     <View>
-      <Text>CommunityMedia</Text>
+      <CommunityCard navigation={navigation} />
     </View>
   )
 }

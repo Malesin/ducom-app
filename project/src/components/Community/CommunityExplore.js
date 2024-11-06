@@ -9,16 +9,19 @@ import {
   Pressable,
 } from 'react-native';
 import React, {useState, useRef} from 'react';
-import backgroundCommunity from '../../assets/bannerkom.jpeg';
+import backgroundCommunity from '../../assets/eskul/pramukabanner.png';
 import profileCommunity from '../../assets/iya.png';
+import {useNavigation} from '@react-navigation/native';
 
 const {height} = Dimensions.get('window');
 
-const CommunityExplore = ({communityName, memberCount, description}) => {
+const CommunityExplore = ({communityExploreData}) => {
+  const {exploreName, memberCount, description} = communityExploreData;
   const containerHeight = useRef(new Animated.Value(height * 0.25)).current;
   const contentPosition = useRef(new Animated.Value(0)).current;
   const buttonOpacity = useRef(new Animated.Value(0)).current;
   const [isPressed, setIsPressed] = useState(false);
+  const navigation = useNavigation();
 
   const handlePress = () => {
     setIsPressed(!isPressed);
@@ -62,6 +65,10 @@ const CommunityExplore = ({communityName, memberCount, description}) => {
     }
   };
 
+  const handlePressJoin = () => {
+    navigation.navigate('ViewCommunity');
+  };
+
   return (
     <Pressable onPress={handlePress}>
       <View style={styles.container}>
@@ -83,9 +90,14 @@ const CommunityExplore = ({communityName, memberCount, description}) => {
                 },
               ]}>
               <View style={styles.infoContainer}>
-                <Text style={styles.communityName}>{communityName}</Text>
+                <Text style={styles.communityName}>{exploreName}</Text>
                 <Text style={styles.memberCount}>{memberCount}</Text>
-                <Text style={styles.description}>{description}</Text>
+                <Text
+                  style={styles.description}
+                  numberOfLines={1.5}
+                  ellipsizeMode="tail">
+                  {description}
+                </Text>
               </View>
               <Animated.View
                 style={[
@@ -94,7 +106,9 @@ const CommunityExplore = ({communityName, memberCount, description}) => {
                     opacity: buttonOpacity,
                   },
                 ]}>
-                <TouchableOpacity style={styles.joinButton}>
+                <TouchableOpacity
+                  style={styles.joinButton}
+                  onPress={handlePressJoin}>
                   <Text style={styles.joinButtonText}>Join</Text>
                 </TouchableOpacity>
               </Animated.View>
@@ -127,7 +141,7 @@ const styles = StyleSheet.create({
   },
   overlayAndContent: {
     position: 'absolute',
-    bottom: -80,
+    bottom: -70,
     left: 0,
     right: 0,
     backgroundColor: 'rgba(0,0,0,0.5)',
@@ -135,7 +149,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flex: 1,
-    padding: 15,
+    padding: 10,
     paddingVertical: 5,
     justifyContent: 'center',
   },
@@ -151,7 +165,7 @@ const styles = StyleSheet.create({
     zIndex: 2,
   },
   infoContainer: {
-    marginTop: -30,
+    marginTop: -20,
     marginBottom: 10,
     alignItems: 'center',
   },
@@ -160,6 +174,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#fff',
     marginBottom: 5,
+    marginTop: 10,
   },
   memberCount: {
     fontSize: 13,

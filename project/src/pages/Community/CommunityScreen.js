@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import {
 import {useNavigation} from '@react-navigation/native';
 import CommunityExplore from '../../components/Community/CommunityExplore';
 import CommunityCard from '../../components/Community/CommunityCard';
+import {ScrollView} from 'react-native-gesture-handler';
 
 const CommunityScreen = () => {
   const navigation = useNavigation();
@@ -18,58 +19,83 @@ const CommunityScreen = () => {
     navigation.navigate('CreateCommunity');
   };
 
-  const data = [
+  const exploreData = [
     {
       id: '1',
-      communityName: 'Komunitas A',
+      exploreName: 'Komunitas A',
       memberCount: '1.2K Members',
-      description: 'Deskripsi komunitas A.',
+      description:
+        'Deskripsi komunitas A. Tempat berkumpulnya para penggemar A.',
     },
     {
       id: '2',
-      communityName: 'Komunitas B',
+      exploreName: 'Komunitas B',
       memberCount: '800 Members',
-      description: 'Deskripsi komunitas B.',
+      description: 'Deskripsi komunitas B. Diskusi tentang topik B.',
     },
     {
       id: '3',
-      communityName: 'Komunitas C',
+      exploreName: 'Komunitas C',
       memberCount: '2.5K Members',
-      description: 'Deskripsi komunitas C.',
+      description: 'Deskripsi komunitas C. Berbagi informasi dan pengalaman.',
     },
     {
       id: '4',
-      communityName: 'Komunitas D',
+      exploreName: 'Komunitas D',
       memberCount: '1K Members',
-      description: 'Deskripsi komunitas D.',
+      description: 'Deskripsi komunitas D. Komunitas untuk para pecinta D.',
     },
   ];
 
-  const renderItem = ({item}) => (
-    <CommunityExplore
-      communityName={item.communityName}
-      memberCount={item.memberCount}
-      description={item.description}
-    />
-  );
+  const cardData = [
+    {
+      id: '1',
+      communityCardName: 'Komunitas A',
+      communityDescription: 'Deskripsi lengkap komunitas A.',
+    },
+    {
+      id: '2',
+      communityCardName: 'Komunitas B',
+      communityDescription: 'Deskripsi lengkap komunitas B.',
+    },
+    {
+      id: '3',
+      communityCardName: 'Komunitas C',
+      communityDescription: 'Deskripsi lengkap komunitas C.',
+    },
+    {
+      id: '4',
+      communityCardName: 'Komunitas D',
+      communityDescription: 'Deskripsi lengkap komunitas D.',
+    },
+  ];
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.exploreContainer}>
-        <Text style={styles.exploreText}>Explore</Text>
-        <FlatList
-          data={data}
-          renderItem={renderItem}
-          keyExtractor={item => item.id}
-          horizontal={true}
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{paddingHorizontal: 0}}
-        />
-      </View>
-      <View style={styles.communityCardContainer}>
-        <CommunityCard navigation={navigation} />
-      </View>
-
+      <ScrollView style={{flex: 1}}>
+        <View style={styles.exploreContainer}>
+          <Text style={styles.exploreText}>Explore</Text>
+          <FlatList
+            data={exploreData}
+            renderItem={({item}) => (
+              <CommunityExplore communityExploreData={item} />
+            )}
+            keyExtractor={item => item.id}
+            horizontal={true}
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{paddingHorizontal: 0}}
+          />
+        </View>
+        <View style={styles.communityCardContainer}>
+          {cardData.map(community => (
+            <CommunityCard
+              key={community.id}
+              navigation={navigation}
+              communityCardData={community}
+            />
+          ))}
+        </View>
+      </ScrollView>
       <View style={styles.fabContainer}>
         <TouchableOpacity onPress={handlePress} style={styles.mainButton}>
           <Text style={styles.mainButtonText}>+</Text>
@@ -78,12 +104,6 @@ const CommunityScreen = () => {
     </SafeAreaView>
   );
 };
-
-CommunityScreen.navigationOptions = {
-  headerTitle: 'Community',
-};
-
-export default CommunityScreen;
 
 const styles = StyleSheet.create({
   container: {
@@ -101,9 +121,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#000',
     marginBottom: 15,
-  },
-  exploreScroll: {
-    paddingVertical: 5,
   },
   communityCardContainer: {
     flex: 1,
@@ -130,13 +147,6 @@ const styles = StyleSheet.create({
     fontSize: 30,
     color: 'white',
   },
-  fab: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#F3F3F3',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
 });
+
+export default CommunityScreen;

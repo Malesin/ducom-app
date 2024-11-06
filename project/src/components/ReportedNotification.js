@@ -11,7 +11,7 @@ import {
 import ProfilePicture from '../assets/iya.png';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useNavigation } from '@react-navigation/native';
+import {useNavigation, useFocusEffect} from '@react-navigation/native';
 
 const ReportedNotification = ({ notif }) => {
   const newNotif = notif[0];
@@ -62,7 +62,13 @@ const ReportedNotification = ({ notif }) => {
     const year = date.getFullYear();
     return `${day} ${month} ${year}`;
   };
-  
+
+  useFocusEffect(
+    React.useCallback(() => {
+      return () => setModalVisible(false);
+    }, [])
+  );
+
   return (
     <>
       <Animated.View
@@ -125,7 +131,10 @@ const ReportedNotification = ({ notif }) => {
               </Text>
               <TouchableOpacity
                 style={styles.seeRuleButton}
-                onPress={() => navigation.navigate('Termsandcondition')}>
+                onPress={() => {
+                  setModalVisible(false);
+                  navigation.navigate('Termsandcondition');
+                }}>
                 <View style={styles.seeRuleContent}>
                   <MaterialCommunityIcons
                     name="note-text-outline"
