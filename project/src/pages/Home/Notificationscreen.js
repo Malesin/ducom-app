@@ -187,7 +187,10 @@ const Notificationscreen = () => {
                   commentNotification={notification}
                 />
               ) : notification.repost ? (
-                <RepostNotification key={index} repostNotification={notification} />
+                <RepostNotification
+                  key={index}
+                  repostNotification={notification}
+                />
               ) : (
                 <FollowNotification key={index} followNotif={notification} />
               ),
