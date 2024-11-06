@@ -13,11 +13,6 @@ import React, {useState, useEffect} from 'react';
 import {useRoute} from '@react-navigation/native';
 import axios from 'axios';
 import config from '../../config';
-import {
-  ALERT_TYPE,
-  Dialog,
-  AlertNotificationRoot,
-} from 'react-native-alert-notification';
 
 const serverUrl = config.SERVER_URL;
 
@@ -42,20 +37,7 @@ const Capthcascreen = ({navigation}) => {
       if (response.data.status === 'ok') {
         console.log('OTP verified successfully');
         setError('');
-        Dialog.show({
-          type: ALERT_TYPE.SUCCESS,
-          title: 'Success',
-          textBody: 'OTP verified successfully',
-          onHide: () => {
-            Dialog.hide();
-            setTimeout(() => {
-              navigation.navigate('CreatePassword', {email});
-            }, 1000);
-          },
-        });
-        setTimeout(() => {
-          Dialog.hide();
-        }, 3000);
+        navigation.navigate('CreatePassword', {email});
       } else if (response.data.status === 'errorExpired') {
         setError('OTP expired. Try to resend the code.');
       } else {
@@ -126,43 +108,37 @@ const Capthcascreen = ({navigation}) => {
   };
 
   return (
-    <AlertNotificationRoot>
-      <SafeAreaView style={styles.container}>
-        <View style={styles.innerContainer}>
-          <Text style={styles.title}>
-            We sent a code to your email. Enter that code to confirm your
-            account
+    <SafeAreaView style={styles.container}>
+      <View style={styles.innerContainer}>
+        <Text style={styles.title}>
+          We sent a code to your email. Enter that code to confirm your account
+        </Text>
+        <TextInput
+          style={[
+            styles.input,
+            error ? styles.inputError : null,
+            {color: colorScheme === 'dark' ? '#000000' : '#000000'},
+          ]}
+          onChangeText={setOtp}
+          value={otp}
+          placeholder="Enter Code"
+          keyboardType="numeric"
+          autoCapitalize="none"
+          maxLength={6}
+          placeholderTextColor={colorScheme === 'dark' ? '#cccccc' : '#888888'}
+        />
+        {error ? <Text style={styles.error}>{error}</Text> : null}
+        <TouchableOpacity style={styles.buttonForgot} onPress={handleVerifyOtp}>
+          <Text style={styles.textForgot}>Continue</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={handleReCode} disabled={isButtonDisabled}>
+          <Text style={styles.hyperlink}>
+            {isButtonDisabled ? `(${formatTime(timer)}) ` : ''}Generate Code OTP
           </Text>
-          <TextInput
-            style={[
-              styles.input,
-              error ? styles.inputError : null,
-              { color: colorScheme === 'dark' ? '#000000' : '#000000' }
-            ]}
-            onChangeText={setOtp}
-            value={otp}
-            placeholder="Enter Code"
-            keyboardType="numeric"
-            autoCapitalize="none"
-            maxLength={6}
-            placeholderTextColor={colorScheme === 'dark' ? '#cccccc' : '#888888'}
-          />
-          {error ? <Text style={styles.error}>{error}</Text> : null}
-          <TouchableOpacity
-            style={styles.buttonForgot}
-            onPress={handleVerifyOtp}>
-            <Text style={styles.textForgot}>Continue</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={handleReCode} disabled={isButtonDisabled}>
-            <Text style={styles.hyperlink}>
-              {isButtonDisabled ? `(${formatTime(timer)}) ` : ''}Generate Code
-              OTP
-            </Text>
-          </TouchableOpacity>
-        </View>
-        <Toast />
-      </SafeAreaView>
-    </AlertNotificationRoot>
+        </TouchableOpacity>
+      </View>
+      <Toast />
+    </SafeAreaView>
   );
 };
 
