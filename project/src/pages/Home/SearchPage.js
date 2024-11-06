@@ -6,23 +6,21 @@ import {
   TouchableOpacity,
   Text,
   ScrollView,
-  Image,
   ActivityIndicator,
+  Animated,
 } from 'react-native';
 
 import SearchedCard from '../../components/SearchedCard';
-import React, { useState, useRef, useEffect, useCallback } from 'react';
-import ProfilePicture from '../../assets/iya.png';
+import React, {useState, useRef, useEffect, useCallback} from 'react';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../../config';
-import { useColorScheme } from 'react-native';
+import {useColorScheme} from 'react-native';
 
 const serverUrl = config.SERVER_URL;
 
-
-const SearchPage = ({ navigation }) => {
+const SearchPage = ({navigation}) => {
   const [searchText, setSearchText] = useState('');
   const [searchs, setSearchs] = useState([]);
   const [myData, setMyData] = useState([]);
@@ -30,6 +28,15 @@ const SearchPage = ({ navigation }) => {
   const [isLoading, setIsLoading] = useState(false);
   const colorScheme = useColorScheme();
   const textInputRef = useRef(null);
+  const slideAnim = useRef(new Animated.Value(-300)).current;
+
+  useEffect(() => {
+    Animated.timing(slideAnim, {
+      toValue: 0,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  }, []);
 
   const handleSearchPress = () => {
     if (textInputRef.current) {
@@ -40,7 +47,7 @@ const SearchPage = ({ navigation }) => {
   const getData = async () => {
     const token = await AsyncStorage.getItem('token');
     try {
-      await axios.post(`${serverUrl}/userdata`, { token: token }).then(res => {
+      await axios.post(`${serverUrl}/userdata`, {token: token}).then(res => {
         if (res.data.status == 'ok') {
           setMyData(res.data.data);
         }
@@ -49,24 +56,25 @@ const SearchPage = ({ navigation }) => {
       console.error(error);
     }
   };
+
   const searchUser = useCallback(async () => {
     const token = await AsyncStorage.getItem('token');
-    setIsLoading(true); // Set loading to true
+    setIsLoading(true);
     try {
       await axios
         .post(`${serverUrl}/search-user`, {
           token: token,
-          query: searchText
+          query: searchText,
         })
         .then(res => {
           if (res.data.status == 'ok') {
             setSearchs(res.data.data);
           }
-        })
+        });
     } catch (error) {
       console.error(error);
     } finally {
-      setIsLoading(false); // Set loading to false after data is fetched
+      setIsLoading(false);
     }
   }, [searchText]);
 
@@ -89,16 +97,16 @@ const SearchPage = ({ navigation }) => {
     navigation.navigate('Home');
   };
 
-  const handlePress = async (search) => {
+  const handlePress = async search => {
     if (search._id === myData._id) {
       navigation.navigate('Profile');
     } else {
       navigation.navigate('Userprofile', {
         userIdPost: search._id,
-        idUser: myData._id
+        idUser: myData._id,
       });
     }
-  }
+  };
 
   return (
     <SafeAreaView style={styles.searchContainer}>
@@ -108,7 +116,13 @@ const SearchPage = ({ navigation }) => {
             <MaterialIcons name="arrow-back" size={22} color="#000" />
           </TouchableOpacity>
         </View>
-        <View style={styles.searchInputContainer}>
+        <Animated.View
+          style={[
+            styles.searchInputContainer,
+            {
+              transform: [{translateX: slideAnim}],
+            },
+          ]}>
           <TouchableOpacity onPress={handleSearchPress}>
             <MaterialIcons
               name="search"
@@ -120,13 +134,18 @@ const SearchPage = ({ navigation }) => {
           <TextInput
             ref={textInputRef}
             placeholder="Search"
-            style={[styles.searchInput, { color: colorScheme === 'dark' ? '#000000' : '#000' }]}
+            style={[
+              styles.searchInput,
+              {color: colorScheme === 'dark' ? '#000000' : '#000'},
+            ]}
             value={searchText}
             onChangeText={setSearchText}
             keyboardType="default"
-            placeholderTextColor={colorScheme === 'dark' ? '#cccccc' : '#888888'}
+            placeholderTextColor={
+              colorScheme === 'dark' ? '#cccccc' : '#888888'
+            }
           />
-        </View>
+        </Animated.View>
         {searchText.length > 0 && (
           <TouchableOpacity
             style={styles.cancelButton}
@@ -181,10 +200,10 @@ const SearchPage = ({ navigation }) => {
             <Text style={styles.notFoundText}>User not found</Text>
           )
         ) : null}
-      </ScrollView> 
+      </ScrollView>
     </SafeAreaView>
   );
-}
+};
 
 export default SearchPage;
 

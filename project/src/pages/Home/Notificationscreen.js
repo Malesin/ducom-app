@@ -16,6 +16,7 @@ import CommentNotification from '../../components/Notification/CommentNotificati
 import {Skeleton} from 'react-native-elements';
 import ReportedNotification from '../../components/ReportedNotification';
 import FollowNotification from '../../components/Notification/FollowNotification';
+import RepostNotification from '../../components/Notification/RepostNotification';
 
 const serverUrl = config.SERVER_URL;
 
@@ -184,6 +185,11 @@ const Notificationscreen = () => {
                 <CommentNotification
                   key={index}
                   commentNotification={notification}
+                />
+              ) : notification.repost ? (
+                <RepostNotification
+                  key={index}
+                  repostNotification={notification}
                 />
               ) : (
                 <FollowNotification key={index} followNotif={notification} />

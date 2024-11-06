@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {
   StyleSheet,
   ScrollView,
@@ -12,7 +12,7 @@ import {
   Text,
 } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
-import { useFocusEffect } from '@react-navigation/native';
+import {useFocusEffect} from '@react-navigation/native';
 import TweetCard from '../../components/TweetCard';
 import PinTweetCard from '../../components/PinTweetCard';
 import Animated, {
@@ -26,14 +26,14 @@ import Animated, {
 } from 'react-native-reanimated';
 import * as ImagePicker from 'react-native-image-picker';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { Skeleton } from 'react-native-elements';
+import {Skeleton} from 'react-native-elements';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../../config';
 
 const serverUrl = config.SERVER_URL;
 
-const HomeScreen = ({ navigation }) => {
+const HomeScreen = ({navigation}) => {
   const [tweets, setTweets] = useState([]);
   const [pintweets, setPinTweets] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
@@ -56,7 +56,6 @@ const HomeScreen = ({ navigation }) => {
     };
   }, []);
 
-
   const fetchTweets = async pageNum => {
     if (!isConnected) {
       setLoading(false);
@@ -66,14 +65,16 @@ const HomeScreen = ({ navigation }) => {
     setLoading(true);
     try {
       const token = await AsyncStorage.getItem('token');
-      const response = await axios.post(`${serverUrl}/userdata`, { token: token });
+      const response = await axios.post(`${serverUrl}/userdata`, {
+        token: token,
+      });
 
-      const { data } = response.data;
+      const {data} = response.data;
       const idUser = data._id;
       const profilePicture = data.profilePicture;
-      const amIAdmin = data.isAdmin
-      const isMuteds = data.mutedUsers
-      const isBlockeds = data.blockedUsers
+      const amIAdmin = data.isAdmin;
+      const isMuteds = data.mutedUsers;
+      const isBlockeds = data.blockedUsers;
 
       const responseTweet = await axios.post(`${serverUrl}/posts`, {
         token: token,
@@ -84,7 +85,12 @@ const HomeScreen = ({ navigation }) => {
       const formattedTweets = dataTweet
         .filter(post => post.user !== null)
         .map(post => {
-          const totalComments = post.comments.length + post.comments.reduce((acc, comment) => acc + comment.replies.length, 0);
+          const totalComments =
+            post.comments.length +
+            post.comments.reduce(
+              (acc, comment) => acc + comment.replies.length,
+              0,
+            );
           return {
             id: post._id,
             userAvatar: post.user.profilePicture,
@@ -94,25 +100,29 @@ const HomeScreen = ({ navigation }) => {
             content: post.description,
             media: Array.isArray(post.media)
               ? post.media.map(mediaItem => ({
-                type: mediaItem.type,
-                uri: mediaItem.uri,
-              }))
+                  type: mediaItem.type,
+                  uri: mediaItem.uri,
+                }))
               : [],
             likesCount: post.likes.length,
             commentsCount: totalComments,
             bookMarksCount: post.bookmarks.length,
             repostsCount: post.reposts.length,
             isLiked: post.likes.some(like => like._id === idUser),
-            isBookmarked: post.bookmarks.some(bookmark => bookmark.user === idUser),
+            isBookmarked: post.bookmarks.some(
+              bookmark => bookmark.user === idUser,
+            ),
             isReposted: post.reposts.some(repost => repost.user === idUser),
             isMuted: isMuteds.some(isMuted => isMuted === post.user._id),
-            isBlocked: isBlockeds.some(isBlocked => isBlocked === post.user._id),
+            isBlocked: isBlockeds.some(
+              isBlocked => isBlocked === post.user._id,
+            ),
             userIdPost: post.user._id,
             idUser: idUser,
             profilePicture: profilePicture,
             commentsEnabled: post.commentsEnabled,
             isAdmin: post.user.isAdmin,
-            amIAdmin: amIAdmin
+            amIAdmin: amIAdmin,
           };
         });
       return formattedTweets;
@@ -128,16 +138,18 @@ const HomeScreen = ({ navigation }) => {
   const fetchPinTweet = async () => {
     try {
       const token = await AsyncStorage.getItem('token');
-      const response = await axios.post(`${serverUrl}/userdata`, { token: token });
-      const { data, status } = response.data;
+      const response = await axios.post(`${serverUrl}/userdata`, {
+        token: token,
+      });
+      const {data, status} = response.data;
       const idUser = data._id;
       const profilePicture = data.profilePicture;
-      const amIAdmin = data.isAdmin
-      const isMuteds = data.mutedUsers
-      const isBlockeds = data.blockedUsers
+      const amIAdmin = data.isAdmin;
+      const isMuteds = data.mutedUsers;
+      const isBlockeds = data.blockedUsers;
 
       const pinPost = await axios.post(`${serverUrl}/posts/pinned`, {
-        token: token
+        token: token,
       });
 
       if (!pinPost.data.data) {
@@ -151,7 +163,12 @@ const HomeScreen = ({ navigation }) => {
       if (!postPin) {
         return null;
       }
-      const totalComments = postPin.comments.length + postPin.comments.reduce((acc, comment) => acc + comment.replies.length, 0);
+      const totalComments =
+        postPin.comments.length +
+        postPin.comments.reduce(
+          (acc, comment) => acc + comment.replies.length,
+          0,
+        );
 
       const pinTweet = {
         id: postPin._id,
@@ -162,16 +179,18 @@ const HomeScreen = ({ navigation }) => {
         content: postPin.description,
         media: Array.isArray(postPin.media)
           ? postPin.media.map(mediaItem => ({
-            type: mediaItem.type,
-            uri: mediaItem.uri,
-          }))
+              type: mediaItem.type,
+              uri: mediaItem.uri,
+            }))
           : [],
         likesCount: postPin.likes.length,
         commentsCount: totalComments,
         bookMarksCount: postPin.bookmarks.length,
         repostsCount: postPin.reposts.length,
         isLiked: postPin.likes.some(like => like._id === idUser),
-        isBookmarked: postPin.bookmarks.some(bookmark => bookmark.user === idUser),
+        isBookmarked: postPin.bookmarks.some(
+          bookmark => bookmark.user === idUser,
+        ),
         isReposted: postPin.reposts.some(repost => repost.user === idUser),
         isMuted: isMuteds.some(isMuted => isMuted === postPin.user._id),
         isBlocked: isBlockeds.some(isBlocked => isBlocked === postPin.user._id),
@@ -181,7 +200,7 @@ const HomeScreen = ({ navigation }) => {
         commentsEnabled: postPin.commentsEnabled,
         pinnedBy: pinnedBy,
         isAdmin: postPin.user.isAdmin,
-        amIAdmin: amIAdmin
+        amIAdmin: amIAdmin,
       };
 
       return pinTweet;
@@ -191,10 +210,10 @@ const HomeScreen = ({ navigation }) => {
     }
   };
 
-  const fetchComments = async (postId) => {
+  const fetchComments = async postId => {
     try {
       const response = await axios.get(`${serverUrl}/comments`, {
-        params: { postId },
+        params: {postId},
       });
       if (response.data.status === 'ok') {
         return response.data.comments;
@@ -208,16 +227,22 @@ const HomeScreen = ({ navigation }) => {
     }
   };
 
-  const handlePostPress = async (tweet) => {
+  const handlePostPress = async tweet => {
     if (!tweet || !tweet.id) {
       console.error('Tweet data is incomplete:', tweet);
       return;
     }
     const comments = await fetchComments(tweet.id);
     const postId = tweet.id;
-    const idUser = tweet.idUser
-    const focusCommentInput = true
-    navigation.navigate('ViewPost', { tweet, comments, postId, idUser, focusCommentInput });
+    const idUser = tweet.idUser;
+    const focusCommentInput = true;
+    navigation.navigate('ViewPost', {
+      tweet,
+      comments,
+      postId,
+      idUser,
+      focusCommentInput,
+    });
   };
 
   const onRefresh = useCallback(async () => {
@@ -233,7 +258,9 @@ const HomeScreen = ({ navigation }) => {
       setPinTweets([]);
       setPinnedTweetId(null);
     }
-    const filteredTweets = newTweets.filter(tweet => tweet.id !== newPinTweet?.id);
+    const filteredTweets = newTweets.filter(
+      tweet => tweet.id !== newPinTweet?.id,
+    );
     setTweets(filteredTweets.slice(0, 4));
     setRefreshing(false);
     setShowSkeleton(false);
@@ -288,7 +315,9 @@ const HomeScreen = ({ navigation }) => {
         setPinTweets([]);
         setPinnedTweetId(null);
       }
-      const filteredTweets = initialTweets.filter(tweet => tweet.id !== initialPinTweets?.id);
+      const filteredTweets = initialTweets.filter(
+        tweet => tweet.id !== initialPinTweets?.id,
+      );
       setTweets(filteredTweets.slice(0, 5));
       setLoading(false);
       setShowSkeleton(false);
@@ -305,7 +334,7 @@ const HomeScreen = ({ navigation }) => {
         }
       };
       checkLoginStatus();
-    }, [])
+    }, []),
   );
 
   const onPostSuccess = () => {
@@ -319,7 +348,7 @@ const HomeScreen = ({ navigation }) => {
       mediaType: 'photo',
       saveToPhotos: true,
     };
-    
+
     ImagePicker.launchCamera(options, response => {
       if (response.didCancel) {
         console.log('User cancelled photo');
@@ -329,13 +358,12 @@ const HomeScreen = ({ navigation }) => {
       } else {
         const uri = response.assets[0].uri;
         console.log('Captured image URI:', uri);
-        navigation.navigate('CreatePost', { mediaUri: uri, mediaType: 'photo' });
+        navigation.navigate('CreatePost', {mediaUri: uri, mediaType: 'photo'});
       }
     });
   };
 
-
-  const FloatingActionButton = ({ isExpanded, index, iconName, onPress }) => {
+  const FloatingActionButton = ({isExpanded, index, iconName, onPress}) => {
     const animatedStyles = useAnimatedStyle(() => {
       const moveValue = isExpanded.value ? OFFSET * index : 0;
       const translateValue = withSpring(-moveValue, SPRING_CONFIG);
@@ -344,8 +372,8 @@ const HomeScreen = ({ navigation }) => {
 
       return {
         transform: [
-          { translateY: translateValue },
-          { scale: withDelay(delay, withTiming(scaleValue)) },
+          {translateY: translateValue},
+          {scale: withDelay(delay, withTiming(scaleValue))},
         ],
         backgroundColor: isExpanded.value ? '#F3F3F3' : '#F3F3F3',
       };
@@ -377,7 +405,6 @@ const HomeScreen = ({ navigation }) => {
     isExpanded.value = !isExpanded.value;
   };
 
-
   const plusIconStyle = useAnimatedStyle(() => {
     const moveValue = interpolate(Number(isExpanded.value), [0, 1], [0, 2]);
     const translateValue = withTiming(moveValue);
@@ -385,8 +412,8 @@ const HomeScreen = ({ navigation }) => {
 
     return {
       transform: [
-        { translateX: translateValue },
-        { rotate: withTiming(rotateValue) },
+        {translateX: translateValue},
+        {rotate: withTiming(rotateValue)},
       ],
     };
   });
@@ -396,7 +423,9 @@ const HomeScreen = ({ navigation }) => {
       setLoadingMore(true);
       const moreTweets = await fetchTweets(page + 1);
       const newTweets = moreTweets.filter(
-        tweet => !tweets.some(existingTweet => existingTweet.id === tweet.id) && tweet.id !== pinnedTweetId,
+        tweet =>
+          !tweets.some(existingTweet => existingTweet.id === tweet.id) &&
+          tweet.id !== pinnedTweetId,
       );
       if (newTweets.length > 0) {
         setTweets(prevTweets => [...prevTweets, ...newTweets.slice(0, 5)]);
@@ -439,13 +468,13 @@ const HomeScreen = ({ navigation }) => {
             animation="pulse"
             height={20}
             width="75%"
-            style={[styles.skeleton, { borderRadius: 3 }]}
+            style={[styles.skeleton, {borderRadius: 3}]}
           />
           <Skeleton
             animation="pulse"
             height={200}
             width="100%"
-            style={[styles.skeleton, { borderRadius: 7 }]}
+            style={[styles.skeleton, {borderRadius: 7}]}
           />
         </View>
       ))}
@@ -469,8 +498,8 @@ const HomeScreen = ({ navigation }) => {
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
-        onScroll={({ nativeEvent }) => {
-          const { contentOffset, layoutMeasurement, contentSize } = nativeEvent;
+        onScroll={({nativeEvent}) => {
+          const {contentOffset, layoutMeasurement, contentSize} = nativeEvent;
           const contentHeight = contentSize.height;
           const viewportHeight = layoutMeasurement.height;
           const scrollPosition = contentOffset.y + viewportHeight;
@@ -486,14 +515,22 @@ const HomeScreen = ({ navigation }) => {
             {pintweets.map((tweet, index) => (
               <View key={index} style={styles.tweetContainer}>
                 <TouchableOpacity onPress={() => handlePostPress(tweet)}>
-                  <PinTweetCard tweet={tweet} onRefreshPage={onRefreshPage} isUserProfile={false} />
+                  <PinTweetCard
+                    tweet={tweet}
+                    onRefreshPage={onRefreshPage}
+                    isUserProfile={false}
+                  />
                 </TouchableOpacity>
               </View>
             ))}
             {tweets.map((tweet, index) => (
               <View key={index} style={styles.tweetContainer}>
                 <TouchableOpacity onPress={() => handlePostPress(tweet)}>
-                  <TweetCard tweet={tweet} onRefreshPage={onRefreshPage} isUserProfile={false} />
+                  <TweetCard
+                    tweet={tweet}
+                    onRefreshPage={onRefreshPage}
+                    isUserProfile={false}
+                  />
                 </TouchableOpacity>
               </View>
             ))}
@@ -520,20 +557,18 @@ const HomeScreen = ({ navigation }) => {
           isExpanded={isExpanded}
           index={2}
           iconName={'feather'}
-          onPress={() => navigation.navigate('CreatePost', { onPostSuccess })}
+          onPress={() => navigation.navigate('CreatePost', {onPostSuccess})}
         />
       </View>
     </SafeAreaView>
   );
 };
 
-
 const SPRING_CONFIG = {
   duration: 1200,
   overshootClamping: true,
   dampingRatio: 0.8,
 };
-
 
 const OFFSET = 60;
 
@@ -542,8 +577,8 @@ const AnimatedPressable = Animated.createAnimatedComponent(TouchableOpacity);
 const mainButtonStyles = StyleSheet.create({
   button: {
     zIndex: 1,
-    height: 66,
-    width: 66,
+    height: 60,
+    width: 60,
     borderRadius: 100,
     backgroundColor: '#001374',
     display: 'flex',
@@ -551,13 +586,12 @@ const mainButtonStyles = StyleSheet.create({
     alignItems: 'center',
   },
   content: {
-    fontSize: 45,
+    fontSize: 30,
     color: 'white',
     lineHeight: 60,
     marginBottom: 1,
   },
 });
-
 
 const styles = StyleSheet.create({
   container: {
@@ -622,7 +656,7 @@ const styles = StyleSheet.create({
   },
   shadow: {
     shadowColor: '#171717',
-    shadowOffset: { width: -0.5, height: 3.5 },
+    shadowOffset: {width: -0.5, height: 3.5},
     shadowOpacity: 0.2,
     shadowRadius: 3,
   },
@@ -647,6 +681,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 });
-
 
 export default HomeScreen;
