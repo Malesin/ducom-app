@@ -29,8 +29,8 @@ import {
   CommunitySettings,
   CommunityList,
 } from '../pages';
-import {NavigationContainer} from '@react-navigation/native';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import BottomTabNavigator from './BottomTabNavigator';
 import DrawerNavigator from './DrawerNavigator';
 import UserTopTabNavigator from './UserTopTabNavigator';
@@ -39,7 +39,7 @@ import DeactiveDeleteAccount from '../pages/Settings/Profile/DeactiveDeleteAccou
 import FollowTopTabNavigator from './FollowTopTabNavigator';
 import UserFollowTopTabNavigator from './UserFollowTopTabNavigator';
 import CommunityTabNavigator from './CommunityTabNavigator';
-import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const Stack = createNativeStackNavigator();
@@ -51,148 +51,148 @@ export default function MainNavigation() {
         <Stack.Screen
           name="Splash"
           component={Splashscreen}
-          options={{headerShown: false}}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name="Auths"
           component={Authscreen}
-          options={{headerShown: false}}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name="Signin"
           component={Signinscreen}
-          options={{headerShown: false}}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name="Register"
           component={Registerscreen}
-          options={{headerShown: false}}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name="Forgotpass"
           component={Forgotpassword}
-          options={{headerShown: true, title: 'Find Your Account'}}
+          options={{ headerShown: true, title: 'Find Your Account' }}
         />
         <Stack.Screen
           name="OTPScreen"
           component={OTPScreen}
-          options={{headerShown: true, title: 'Confirm Your Account'}}
+          options={{ headerShown: true, title: 'Confirm Your Account' }}
         />
         <Stack.Screen
           name="CreatePassword"
           component={CreatePassword}
-          options={{headerShown: true, title: 'Create New Password'}}
+          options={{ headerShown: true, title: 'Create New Password' }}
         />
         <Stack.Screen
           name="Termsandcondition"
           component={TermsandConditionscreen}
-          options={{headerShown: false}}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name="Home"
           component={BottomTabNavigator}
-          options={{headerShown: false}}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name="SearchPage"
           component={SearchPage}
-          options={{headerShown: false}}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name="ViewPost"
           component={ViewPost}
-          options={{headerShown: true, title: 'Post'}}
+          options={{ headerShown: true, title: 'Post' }}
         />
         <Stack.Screen
           name="Report"
           component={ReportScreen}
-          options={{headerShown: true, title: 'Report'}}
+          options={{ headerShown: true, title: 'Report' }}
         />
         <Stack.Screen
           name="CreatePost"
           component={CreatePost}
-          options={{headerShown: true, title: 'Create Post'}}
+          options={{ headerShown: true, title: 'Create Post' }}
         />
         <Stack.Screen
           name="Profile"
           component={TopTabNavigator}
-          options={{headerShown: true}}
+          options={{ headerShown: true }}
         />
         <Stack.Screen
           name="Follow"
           component={FollowTopTabNavigator}
-          options={{headerShown: false}}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name="EditProfile"
           component={EditProfilePage}
-          options={{headerShown: true, title: 'Edit Profile'}}
+          options={{ headerShown: true, title: 'Edit Profile' }}
         />
         <Stack.Screen
           name="Userprofile"
           component={UserTopTabNavigator}
-          options={{headerShown: true, title: 'User Profile'}}
-          initialParams={{userIdPost: '', username: ''}}
+          options={{ headerShown: true, title: 'User Profile' }}
+          initialParams={{ userIdPost: '', username: '' }}
         />
         <Stack.Screen
           name="UserFollow"
           component={UserFollowTopTabNavigator}
-          options={{headerShown: false, title: 'User Follow'}}
+          options={{ headerShown: false, title: 'User Follow' }}
         />
         <Stack.Screen
           name="DrawerNavigator"
           component={DrawerNavigator}
-          options={{headerShown: false}}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name="AccountInformation"
           component={AccountInformation}
-          options={{headerShown: true, title: 'Account Information'}}
+          options={{ headerShown: true, title: 'Account Information' }}
         />
         <Stack.Screen
           name="UpdatePassword"
           component={UpdatePassword}
-          options={{headerShown: true, title: 'Update Password'}}
+          options={{ headerShown: true, title: 'Update Password' }}
         />
         <Stack.Screen
           name="AccountPrivacy"
           component={AccountPrivacy}
-          options={{headerShown: true, title: 'Account Privacy'}}
+          options={{ headerShown: true, title: 'Account Privacy' }}
         />
         <Stack.Screen
           name="BlockedUsers"
           component={BlockedUsers}
-          options={{headerShown: true, title: 'Blocked Accounts'}}
+          options={{ headerShown: true, title: 'Blocked Accounts' }}
         />
         <Stack.Screen
           name="MutedUsers"
           component={MutedUsers}
-          options={{headerShown: true, title: 'Muted Accounts'}}
+          options={{ headerShown: true, title: 'Muted Accounts' }}
         />
         <Stack.Screen
           name="DeactiveDeleteAccount"
           component={DeactiveDeleteAccount}
-          options={{headerShown: true, title: 'Deactivate or Delete Account'}}
+          options={{ headerShown: true, title: 'Deactivate or Delete Account' }}
         />
         <Stack.Screen
           name="AccountLists"
           component={AccountLists}
-          options={{headerShown: true, title: 'All Users'}}
+          options={{ headerShown: true, title: 'All Users' }}
         />
         <Stack.Screen
           name="ReportsManagement"
           component={ReportsManagement}
-          options={{headerShown: true, title: 'All Reports'}}
+          options={{ headerShown: true, title: 'All Reports' }}
         />
         <Stack.Screen
           name="DeactivateorDeletedAccounts"
           component={DeactivatedorDeletedAccounts}
-          options={{headerShown: true, title: 'All Account Status'}}
+          options={{ headerShown: true, title: 'All Account Status' }}
         />
         <Stack.Screen
           name="VerifyAccount"
           component={VerifyAccount}
-          options={({route}) => ({
+          options={({ route }) => ({
             headerShown: true,
             title:
               route.params?.choice === 'delete'
@@ -203,22 +203,21 @@ export default function MainNavigation() {
         <Stack.Screen
           name="CommunityPost"
           component={CommunityPost}
-          options={{headerShown: true, title: 'Community Post'}}
+          options={{ headerShown: true, title: 'Community Post' }}
         />
         <Stack.Screen
           name="CreateCommunity"
           component={CreateCommunity}
-          options={{headerShown: true, title: 'Create New Community'}}
-        />
+          options={{ headerShown: true, title: 'Create New Community' }} />
         <Stack.Screen
           name="CommunityAbout"
           component={CommunityAbout}
-          options={{headerShown: true, title: 'Community About'}}
+          options={{ headerShown: true, title: 'Community About' }}
         />
         <Stack.Screen
           name="CommunityMedia"
           component={CommunityMedia}
-          options={{headerShown: true, title: 'Community Media'}}
+          options={{ headerShown: true, title: 'Community Media' }}
         />
         <Stack.Screen
           name="CommunityList"
@@ -240,7 +239,7 @@ export default function MainNavigation() {
         <Stack.Screen
           name="ViewCommunity"
           component={CommunityTabNavigator}
-          options={({navigation}) => ({
+          options={({ navigation }) => ({
             headerShown: true,
             headerTitle: 'Community',
             headerTitleAlign: 'center',
@@ -265,7 +264,7 @@ const styles = StyleSheet.create({
   iconContainer: {
     marginLeft: 10,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 3,
     elevation: 5,

@@ -48,11 +48,6 @@ const PinTweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
     } else {
       navigator.navigate('Userprofile', {
         userIdPost: tweet.userIdPost,
-        profilePicture: tweet.profilePicture,
-        idUser: tweet.idUser,
-        isAdmin: tweet.isAdmin,
-        amIAdmin: tweet.amIAdmin,
-        tweet: tweet,
         isUserProfile: isUserProfile
       });
     }
@@ -373,7 +368,7 @@ const PinTweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
         />
 
         <InteractionButton
-          icon="message-reply-outline"
+          icon={tweet?.commentsEnabled ? "message-reply-outline" : "message-off-outline"}
           color="#040608"
           count={commentsCount}
           onPress={() => handleCommentPress()}

@@ -22,21 +22,49 @@ const ReportsManagement = () => {
         const token = await AsyncStorage.getItem('token');
         try {
             const response = await axios.post(`${serverUrl}/show-reports`, { token: token });
-            const resp = response.data.data || [];
-            const formatted = resp.map(report => ({
-                id: report._id,
-                postId: report.reportedPost?._id || report.relatedPost?._id,
-                category: report.category,
-                userId: report.reportedEntity.user._id,
-                name: report.reportedEntity.user.name,
-                username: report.reportedEntity.user.username,
-                usernamePost: report.relatedPost?.user?.username || '',
-                profilePicPost: report.relatedPost?.user?.profilePicture || '',
-                profilePicture: report.reportedEntity.user.profilePicture,
-                bio: report.reportedEntity.description || '',
-                commentProof: report.reportedEntity.comment || '',
-                reason: report.reportCategoryDescriptions
-            }));
+            const resp = response.data.data;
+            const formatted = resp.map(report => {
+                const userId = report.reportedEntity?.user?._id || report.reportedEntity?._id || '';
+                const name = report.reportedEntity?.user?.name || report.reportedEntity?.name || '';
+                const username = report.reportedEntity?.user?.username || report.reportedEntity?.username || '';
+                const usernamePost = report.relatedPost?.user?.username || '';
+                const profilePicPost = report.relatedPost?.user?.profilePicture || '';
+                const profilePicture = report.reportedEntity?.user?.profilePicture || report.reportedEntity?.profilePicture || '';
+                const bio = report.reportedEntity?.description || '';
+                const commentProof = report.reportedEntity?.comment || '';
+                const reason = report.reportCategoryDescriptions;
+                const reportedAt = report.reported_at;
+                const reporterName = report.reporterUser?.name || '';
+                const reporterUsername = report.reporterUser?.username || '';
+                const reporterProfilePicture = report.reporterUser?.profilePicture || '';
+                const myId = report.myId
+
+                // Validasi untuk memastikan username adalah string sebelum menggunakan charAt
+                if (typeof username === 'string' && username.length > 0) {
+                    const firstChar = username.charAt(0);
+                    // Lakukan sesuatu dengan firstChar jika diperlukan
+                }
+
+                return {
+                    id: report._id,
+                    postId: report.reportedPost?._id || report.relatedPost?._id,
+                    category: report.category,
+                    userId,
+                    name,
+                    username,
+                    usernamePost,
+                    profilePicPost,
+                    profilePicture,
+                    bio,
+                    commentProof,
+                    reason,
+                    reportedAt,
+                    reporterName,
+                    reporterUsername,
+                    reporterProfilePicture,
+                    myId
+                };
+            });
             setShowSkeleton(false);
             return formatted; // Pastikan mengembalikan array
         } catch (error) {

@@ -19,7 +19,7 @@ const serverUrl = config.SERVER_URL;
 
 const ReportScreen = () => {
   const route = useRoute();
-  const { reportPostId } = route.params;
+  const { reportPostId, reportUserId } = route.params;
   const [checkedItems, setCheckedItems] = useState({});
   const navigation = useNavigation();
 
@@ -66,7 +66,7 @@ const ReportScreen = () => {
           token: token,
           reportPostId: reportPostId,
           // reportCommentId: reportCommentId, // FOR REPORT COMMENT
-          // reportUserId: reportUserId, // FOR REPORT USER
+          reportUserId: reportUserId, // FOR REPORT USER
           reportCategory: reportCategory
         })
         .then(res => {
