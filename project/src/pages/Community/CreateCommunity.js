@@ -7,7 +7,6 @@ import {
   TextInput,
   View,
   TouchableOpacity,
-  Dimensions,
 } from 'react-native';
 import Animated, {
   useAnimatedGestureHandler,
@@ -18,23 +17,32 @@ import Animated, {
 } from 'react-native-reanimated';
 import {PanGestureHandler} from 'react-native-gesture-handler';
 
-const SCREEN_WIDTH = Dimensions.get('window').width;
 const DELETE_THRESHOLD = -75;
 
 const SwipeableRule = ({rule, index, updateRule, onDelete}) => {
   const translateX = useSharedValue(0);
+  const isRemoving = useSharedValue(false);
 
   const panGesture = useAnimatedGestureHandler({
     onStart: (_, context) => {
+      isRemoving.value = false;
       context.x = translateX.value;
     },
     onActive: (event, context) => {
-      const newValue = context.x + event.translationX;
-      translateX.value = Math.min(0, Math.max(newValue, -100)); // Limit swipe
+      if (!isRemoving.value) {
+        const newValue = context.x + event.translationX;
+        translateX.value = Math.min(0, Math.max(newValue, -100));
+      }
     },
     onEnd: () => {
       if (translateX.value < DELETE_THRESHOLD) {
-        translateX.value = withSpring(-100);
+        isRemoving.value = true;
+        translateX.value = withSpring(-100, {}, finished => {
+          if (finished) {
+            runOnJS(onDelete)(index);
+            translateX.value = 0;
+          }
+        });
       } else {
         translateX.value = withSpring(0);
       }
@@ -154,10 +162,9 @@ const CreateCommunity = ({navigation}) => {
   };
 
   const deleteRule = index => {
-    if (rules.length > 1) {
-      const newRules = rules.filter((_, i) => i !== index);
-      setRules(newRules);
-    }
+    const newRules = [...rules];
+    newRules.splice(index, 1);
+    setRules(newRules);
   };
 
   return (
