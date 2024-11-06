@@ -115,8 +115,16 @@ const ReportedNotification = ({ notif }) => {
               </Text>
               <View style={styles.reasonMessageContainer}>
                 <Image source={ProfilePicture} style={styles.profileImage} />
-                <Text style={styles.userInfo}>{newNotif?.report.reportedPost.user.username}</Text>
-                <Text style={styles.userMessage}>{newNotif?.report.reportedPost.description || ''}</Text>
+                <Text style={styles.userInfo}>
+                  {newNotif?.relatedPost?.user?.username 
+                  ?? newNotif?.report?.reportedPost?.user?.username 
+                  ?? 'Unknown User'}
+                </Text>
+                <Text style={styles.userMessage}>
+                  {newNotif?.relatedPost?.description 
+                  ?? newNotif?.report?.reportedPost?.description 
+                  ?? 'No description available'}
+                </Text>
               </View>
               <Text style={styles.profileMessage}>
                 You shared this on your profile
