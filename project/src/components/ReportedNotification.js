@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -11,13 +11,14 @@ import {
 import ProfilePicture from '../assets/iya.png';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useNavigation} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 
-const ReportedNotification = () => {
+const ReportedNotification = ({ notif }) => {
+  const newNotif = notif[0];
   const slideAnim = useRef(new Animated.Value(-50)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const [modalVisible, setModalVisible] = useState(false);
-  const [adminMessage, setAdminMessage] = useState('Admin Kontol');
+  const [adminMessage, setAdminMessage] = useState(newNotif?.message);
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -38,14 +39,37 @@ const ReportedNotification = () => {
   const handleClick = () => {
     setModalVisible(true);
   };
+  const reasonText = newNotif?.reportCategoryDescriptions.join(', \n');
 
+  const formatDate = dateString => {
+    const date = new Date(dateString);
+    const day = date.getDate().toString().padStart(2, '0');
+    const monthNames = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
+    ];
+    const month = monthNames[date.getMonth()];
+    const year = date.getFullYear();
+    return `${day} ${month} ${year}`;
+  };
+  
   return (
     <>
       <Animated.View
         style={[
           styles.container,
           {
-            transform: [{translateY: slideAnim}],
+            transform: [{ translateY: slideAnim }],
             opacity: fadeAnim,
           },
         ]}>
@@ -72,8 +96,8 @@ const ReportedNotification = () => {
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalMessage}>We Removed Your Content</Text>
-              <Text style={styles.modalDate}>4 November 2024</Text>
+              <Text style={styles.modalMessage}>We are warning you</Text>
+              <Text style={styles.modalDate}>{formatDate(newNotif?.created_at)}</Text>
             </View>
             <View style={styles.separator} />
             <View style={styles.reasonContainer}>
@@ -85,14 +109,19 @@ const ReportedNotification = () => {
               </Text>
               <View style={styles.reasonMessageContainer}>
                 <Image source={ProfilePicture} style={styles.profileImage} />
-                <Text style={styles.userInfo}>mikadotjees</Text>
-                <Text style={styles.userMessage}>kys</Text>
+                <Text style={styles.userInfo}>{newNotif?.report.reportedPost.user.username}</Text>
+                <Text style={styles.userMessage}>{newNotif?.report.reportedPost.description || ''}</Text>
               </View>
               <Text style={styles.profileMessage}>
                 You shared this on your profile
               </Text>
               <Text style={styles.guidelineMessage}>
                 This goes against our Community Guidelines
+              </Text>
+              <Text style={styles.reasonTitle}>Reports: </Text>
+
+              <Text style={styles.guidelineMessage}>
+                {reasonText}
               </Text>
               <TouchableOpacity
                 style={styles.seeRuleButton}
@@ -168,9 +197,6 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 10,
     alignItems: 'flex-start',
-  },
-  modalHeader: {
-    marginBottom: 10,
   },
   modalMessage: {
     fontSize: 20,
@@ -273,6 +299,7 @@ const styles = StyleSheet.create({
   adminMessageContainer: {
     marginTop: 5,
     alignItems: 'flex-start',
+    marginBottom: 10
   },
   adminMessage: {
     fontSize: 14,

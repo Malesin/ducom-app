@@ -47,11 +47,6 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
     } else {
       navigator.navigate('Userprofile', {
         userIdPost: tweet?.userIdPost,
-        profilePicture: tweet?.profilePicture,
-        idUser: tweet?.idUser,
-        isAdmin: tweet?.isAdmin,
-        amIAdmin: tweet?.amIAdmin,
-        tweet: tweet,
         isUserProfile: isUserProfile
       });
     }
@@ -77,7 +72,7 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
       const token = await AsyncStorage.getItem('token');
       const dataSent = {
         token: token,
-        postId: tweet.id
+        postId: tweet?.id
       }
       setDataSent(dataSent)
     }

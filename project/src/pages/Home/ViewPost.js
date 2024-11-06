@@ -34,18 +34,17 @@ const serverUrl = config.SERVER_URL;
 const ViewPost = ({ route }) => {
   const {
     tweet,
-    comments: initialComments,
     focusCommentInput,
     isUserProfile,
   } = route?.params || {};
 
-  const [liked, setLiked] = useState(tweet.isLiked);
-  const [likesCount, setLikesCount] = useState(tweet.likesCount);
-  const [bookmarked, setBookmarked] = useState(tweet.isBookmarked);
-  const [bookmarksCount, setBookmarksCount] = useState(tweet.bookMarksCount);
-  const [reposted, setReposted] = useState(tweet?.isReposted || false);
+  const [liked, setLiked] = useState(false);
+  const [likesCount, setLikesCount] = useState(0);
+  const [bookmarked, setBookmarked] = useState(false);
+  const [bookMarksCount, setBookMarksCount] = useState(0);
+  const [reposted, setReposted] = useState(false);
   const [repostsCount, setRepostsCount] = useState(0);
-  const [profilePicture, setProfilePicture] = useState(tweet.profilePicture);
+  const profilePicture = tweet?.profilePicture;
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState(null);
   const [thumbnails, setThumbnails] = useState({});
@@ -53,7 +52,7 @@ const ViewPost = ({ route }) => {
   const [isTyping, setIsTyping] = useState(false);
   const [isReplying, setIsReplying] = useState(false);
   const [comment, setComment] = useState('');
-  const [comments, setComments] = useState(initialComments || []);
+  const [comments, setComments] = useState([]);
   const [replyToCommentId, setReplyToCommentId] = useState(null);
   const textInputRef = React.createRef();
   const [visibleComments, setVisibleComments] = useState(3);
@@ -64,6 +63,8 @@ const ViewPost = ({ route }) => {
   const [showBottomSheet, setShowBottomSheet] = useState(false);
   const [isEnabledComm, setIsEnabledComm] = useState(true);
   const [loading, setLoading] = useState(true);
+  const [dataSent, setDataSent] = useState()
+  const isOwner = tweet?.userIdPost === tweet?.idUser
 
   useEffect(() => {
     if (focusCommentInput && textInputRef.current) {
@@ -74,7 +75,7 @@ const ViewPost = ({ route }) => {
   useEffect(() => {
     const generateThumbnails = async () => {
       const newThumbnails = {};
-      for (const media of tweet.media || []) {
+      for (const media of tweet?.media || []) {
         if (media.type === 'video' && media.uri) {
           try {
             const { path } = await createThumbnail({ url: media.uri });
@@ -87,8 +88,41 @@ const ViewPost = ({ route }) => {
       setThumbnails(newThumbnails);
     };
 
+    const dataSend = async () => {
+      const token = await AsyncStorage.getItem('token');
+      const dataSent = {
+        token: token,
+        postId: tweet?.id
+      }
+      setDataSent(dataSent)
+    }
+
+    const checkIsEd = async () => {
+      if (!dataSent) return;
+
+      try {
+        await axios
+          .post(`${serverUrl}/check-is-ed`, dataSent)
+          .then(res => {
+            const data = res.data.data
+            setLiked(data.isLiked)
+            setLikesCount(data.likedLength)
+
+            setBookmarked(data.isBookmarked)
+            setBookMarksCount(data.bookmarkedLength)
+
+            setReposted(data.isReposted)
+            setRepostsCount(data.repostedLength)
+          })
+      } catch (error) {
+        console.error("Error in checkIsEd:", error);
+      }
+    }
+    checkIsEd()
+
     generateThumbnails();
-  }, [tweet.media]);
+    dataSend()
+  }, [tweet?.media, dataSent]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -102,140 +136,56 @@ const ViewPost = ({ route }) => {
   }, [fetchComments]);
 
   const handleLike = async () => {
-    const token = await AsyncStorage.getItem('token');
-
-    if (liked) {
-      await handleUnlike();
-    } else {
-      try {
-        const response = await axios.post(`${serverUrl}/like-post`, {
-          token: token,
-          postId: tweet.id,
-        });
-
-        if (response.data.status === 'ok') {
-          setLiked(true);
-          setLikesCount(prevLikesCount => prevLikesCount + 1);
-        } else {
-          console.log('Error in like response data:', response.data.data);
-          Alert.alert('Error', 'Failed to like post. Please try again.');
-        }
-      } catch (error) {
-        console.error('Error liking post:', error.message);
-        Alert.alert('Error', 'Failed to like post. Please try again.');
-      }
-    }
-  };
-
-  const handleUnlike = async () => {
-    const token = await AsyncStorage.getItem('token');
-
+    console.log('Like button pressed');
     try {
-      const response = await axios.post(`${serverUrl}/unlike-post`, {
-        token: token,
-        postId: tweet.id,
-      });
+      setLiked(liked ? false : true);
+      setLikesCount(prevLikesCount => liked ? prevLikesCount - 1 : prevLikesCount + 1);
 
-      if (response.data.status === 'ok') {
-        setLiked(false);
-        setLikesCount(prevLikesCount => prevLikesCount - 1);
-      } else {
-        console.log('Error in unlike response data:', response.data.data);
-        Alert.alert('Error', 'Failed to unlike post. Please try again.');
-      }
+      await axios.post(`${serverUrl}/${liked ? 'unlike' : 'like'}-post`, dataSent);
+
     } catch (error) {
-      console.error('Error unliking post:', error.message);
-      Alert.alert('Error', 'Failed to unlike post. Please try again.');
+      console.error(`Error in ${liked ? 'unliking' : 'liking'} post:`, error.message);
+      setLiked(liked ? true : false);
+      setLikesCount(prevLikesCount => liked ? prevLikesCount + 1 : prevLikesCount - 1);
+
+      ToastAndroid.show(`Failed to ${liked ? 'unlike' : 'like'} post. Please try again.`, ToastAndroid.SHORT);
     }
   };
 
   const handleBookmark = async () => {
-    const token = await AsyncStorage.getItem('token');
-
-    if (bookmarked) {
-      await handleUnbookmark();
-    } else {
-      try {
-        const response = await axios.post(`${serverUrl}/bookmark-post`, {
-          token: token,
-          postId: tweet.id,
-        });
-
-        if (response.data.status === 'ok') {
-          setBookmarked(true);
-          setBookmarksCount(prevBookmarksCount => prevBookmarksCount + 1);
-          ToastAndroid.show('Post added to bookmarks!', ToastAndroid.SHORT);
-        } else {
-          console.log('Error in bookmark response data:', response.data.data);
-        }
-      } catch (error) {
-        console.error('Error bookmarking post:', error.message);
-      }
-    }
-  };
-
-  const handleUnbookmark = async () => {
-    const token = await AsyncStorage.getItem('token');
-
+    console.log('Bookmark button pressed');
     try {
-      const response = await axios.post(`${serverUrl}/unbookmark-post`, {
-        token: token,
-        postId: tweet.id,
-      });
+      setBookmarked(bookmarked ? false : true);
+      setBookMarksCount(prevBookmarksCount => bookmarked ? prevBookmarksCount - 1 : prevBookmarksCount + 1);
 
-      if (response.data.status === 'ok') {
-        setBookmarked(false);
-        setBookmarksCount(prevBookmarksCount => prevBookmarksCount - 1);
-        ToastAndroid.show('Post removed from bookmarks!', ToastAndroid.SHORT);
-      } else {
-        console.log('Error in unbookmark response data:', response.data.data);
-      }
+      await axios.post(`${serverUrl}/${bookmarked ? 'unbookmark' : 'bookmark'}-post`, dataSent);
+
+      ToastAndroid.show(`Post ${bookmarked ? 'removed' : 'added'} from bookmarks!`, ToastAndroid.SHORT);
+
     } catch (error) {
-      console.error('Error unbookmarking post:', error.message);
+      console.error(`Error in ${bookmarked ? 'unbookmarking' : 'bookmarking'} post:`, error.message);
+      setBookmarked(bookmarked ? true : false);
+      setBookMarksCount(prevBookmarksCount => bookmarked ? prevBookmarksCount + 1 : prevBookmarksCount - 1);
+
+      ToastAndroid.show(`Failed to ${bookmarked ? 'unbookmark' : 'bookmark'} post. Please try again.`, ToastAndroid.SHORT);
     }
   };
 
   const handleRepost = async () => {
-    const token = await AsyncStorage.getItem('token');
     try {
-      if (reposted) {
-        setReposted(false);
-        setRepostsCount(prevRepostsCount => prevRepostsCount - 1);
-        await axios
-          .post(`${serverUrl}/unrepost-post`, {
-            token: token,
-            postId: tweet.id
-          })
-          .then(res => {
-            if (res.data.status !== 'ok') {
-              setReposted(true);
-              setRepostsCount(prevRepostsCount => prevRepostsCount + 1);
-              console.log('Error in unrepost response data:', res.data);
-            }
-          })
-      } else {
-        setReposted(true);
-        setRepostsCount(prevRepostsCount => prevRepostsCount + 1);
-        await axios
-          .post(`${serverUrl}/repost-post`, {
-            token: token,
-            postId: tweet.id
-          })
-          .then(res => {
-            if (res.data.status !== 'ok') {
-              setReposted(false);
-              setRepostsCount(prevRepostsCount => prevRepostsCount - 1);
-              console.log('Error in repost response data:', res.data);
-            }
-          })
-      }
+      setReposted(reposted ? false : true);
+      setRepostsCount(prevRepostsCount => reposted ? prevRepostsCount - 1 : prevRepostsCount + 1);
+
+      await axios.post(`${serverUrl}/${reposted ? 'unrepost' : 'repost'}-post`, dataSent)
+
     } catch (error) {
-      console.error('Error reposting:', error);
-      setReposted(!reposted);
+      console.error(`Error in ${reposted ? 'unreposting' : 'reposting'} post:`, error.message);
+      setReposted(reposted ? true : false);
       setRepostsCount(prevRepostsCount => reposted ? prevRepostsCount + 1 : prevRepostsCount - 1);
+
+      ToastAndroid.show(`Failed to ${reposted ? 'unrepost' : 'repost'} post. Please try again.`, ToastAndroid.SHORT);
     }
   };
-
 
   const handleShare = async () => {
     try {
@@ -274,11 +224,6 @@ const ViewPost = ({ route }) => {
     return `${hours}:${minutes} ${day} ${month} ${year}`;
   };
 
-  const InteractionButton = ({ icon, color, onPress }) => (
-    <TouchableOpacity style={styles.actionButton} onPress={onPress}>
-      <MaterialCommunityIcons name={icon} size={20} color={color} />
-    </TouchableOpacity>
-  );
   const handleMediaPress = mediaItem => {
     setSelectedMedia(mediaItem);
     setModalVisible(true);
@@ -401,6 +346,7 @@ const ViewPost = ({ route }) => {
   };
 
   const handleReplyIconPress = () => {
+    console.log('Reply button pressed');
     setIsReplying(true);
     setReplyToCommentId(null);
     setPlaceholder('Add Comments');
@@ -633,7 +579,7 @@ const ViewPost = ({ route }) => {
                 Comments{' '}
               </Text>
               <Text style={styles.interactionText}>
-                <Text style={styles.interactionNumber}>{bookmarksCount}</Text>{' '}
+                <Text style={styles.interactionNumber}>{bookMarksCount}</Text>{' '}
                 Bookmarks{' '}
               </Text>
               <Text style={styles.interactionText}>
@@ -641,25 +587,35 @@ const ViewPost = ({ route }) => {
               </Text>
             </View>
             <View style={styles.actions}>
-              <InteractionButton
-                icon={liked ? 'heart' : 'heart-outline'}
-                color={liked ? '#E0245E' : '#040608'}
-                onPress={handleLike}
-              />
-              <InteractionButton
-                icon={
-                  isEnabledComm
-                    ? 'message-reply-outline'
-                    : 'message-off-outline'
-                }
-                color="#040608"
-                onPress={handleReplyIconPress}
-              />
-              <InteractionButton
-                icon={bookmarked ? 'bookmark' : 'bookmark-outline'}
-                color={bookmarked ? '#00c5ff' : '#040608'}
-                onPress={handleBookmark}
-              />
+              <TouchableOpacity
+                style={styles.actionButton}
+                onPress={handleLike}>
+                <MaterialCommunityIcons
+                  name={liked ? 'heart' : 'heart-outline'}
+                  size={20}
+                  color={liked ? '#E0245E' : '#040608'}
+                />
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.actionButton}
+                onPress={handleReplyIconPress}>
+                <MaterialCommunityIcons
+                  name={isEnabledComm ? 'message-reply-outline' : 'message-off-outline'}
+                  size={20}
+                  color="#040608"
+                />
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.actionButton}
+                onPress={handleBookmark}>
+                <MaterialCommunityIcons
+                  name={bookmarked ? 'bookmark' : 'bookmark-outline'}
+                  size={20}
+                  color={bookmarked ? '#00c5ff' : '#040608'}
+                />
+              </TouchableOpacity>
               <TouchableOpacity
                 style={styles.actionButton}
                 onPress={handleRepost}>
@@ -720,7 +676,7 @@ const ViewPost = ({ route }) => {
       <View style={[styles.inputContainer, { height: inputHeight }]}>
         <Image source={{ uri: profilePicture }} style={styles.profilePicture} />
 
-        {isEnabledComm ? (
+        {isEnabledComm || isOwner || tweet?.amIAdmin ? (
           <>
             <TextInput
               ref={textInputRef}

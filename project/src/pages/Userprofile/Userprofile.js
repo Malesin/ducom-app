@@ -111,7 +111,7 @@ const Userprofile = ({userIdPost, navigation, idUser}) => {
       blockUser();
     }
     if (item === 'Report') {
-      navigation.navigate('Report', {reportPostId: userIdPost});
+      navigation.navigate('Report', {reportUserId: userIdPost});
     }
     console.log(item);
     toggleDropdown();

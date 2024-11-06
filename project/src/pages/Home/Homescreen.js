@@ -66,6 +66,7 @@ const HomeScreen = ({ navigation }) => {
     setLoading(true);
     try {
       const token = await AsyncStorage.getItem('token');
+      console.log(token)
       const response = await axios.post(`${serverUrl}/userdata`, { token: token });
 
       const { data } = response.data;

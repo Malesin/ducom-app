@@ -13,7 +13,10 @@ const ReportedUser = ({ report, handleDeleteReport }) => {
     const navigator = useNavigation();
 
     const capitalizeFirstLetter = (string) => {
-        return string.charAt(0).toUpperCase() + string.slice(1);
+        if (typeof string === 'string' && string.length > 0) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+        return ''; // Kembalikan string kosong jika input tidak valid
     };
 
     const [modalVisible, setModalVisible] = useState(false);
@@ -25,6 +28,7 @@ const ReportedUser = ({ report, handleDeleteReport }) => {
     const [amIAdmin, setAmIAdmin] = useState(false);
     const [isMuteds, setIsMuteds] = useState(false);
     const [isBlockeds, setIsBlockeds] = useState(false);
+    const [category, setCategory] = useState(false);
     const [reportDetails, setReportDetails] = useState({
         category: report.category,
         commentProof: report.commentProof,
@@ -32,9 +36,9 @@ const ReportedUser = ({ report, handleDeleteReport }) => {
     });
     const reportId = report.id
     const reasonText = reportDetails.reason.join(', \n');
-    const reportCateogry = capitalizeFirstLetter(reportDetails.category);
+    const reportCategory = capitalizeFirstLetter(reportDetails.category);
     const colorScheme = useColorScheme();
-    
+
     const getData = async () => {
         const token = await AsyncStorage.getItem('token');
         try {
@@ -57,6 +61,14 @@ const ReportedUser = ({ report, handleDeleteReport }) => {
 
     useEffect(() => {
         getData()
+
+        if (reportCategory == 'Comment') {
+            setCategory('Comment on post')
+        } else if (reportCategory == 'Post') {
+            setCategory('Reported Content')
+        } else if (reportCategory == 'User') {
+            setCategory('User')
+        }
     }, [])
 
     useFocusEffect(
@@ -84,7 +96,8 @@ const ReportedUser = ({ report, handleDeleteReport }) => {
                 .post(`${serverUrl}/send-warning`, {
                     token: token,
                     userId: report?.userId,
-                    message: reportText
+                    message: reportText,
+                    report: report?.id
                 })
                 .then(res => {
                     console.log(res.data)
@@ -105,54 +118,62 @@ const ReportedUser = ({ report, handleDeleteReport }) => {
     const handleViewPostOrComment = async () => {
         const token = await AsyncStorage.getItem('token');
         try {
-            await axios
-                .post(`${serverUrl}/find-post`, {
-                    token: token,
-                    postId: report.postId
-                })
-                .then(res => {
-                    const data = res.data.data
 
-                    const totalComments = data.comments.length + data.comments.reduce((acc, comment) => acc + comment.replies.length, 0);
+            if (reportCategory == 'User') {
+                navigator.navigate('Userprofile', {
+                    userIdPost: report?.userId,
+                    idUser: report?.myId,
+                });
+            } else {
+                await axios
+                    .post(`${serverUrl}/find-post`, {
+                        token: token,
+                        postId: report.postId
+                    })
+                    .then(res => {
+                        const data = res.data.data
 
-                    const dataTweet = {
-                        id: data._id,
-                        userAvatar: data.user.profilePicture,
-                        userName: data.user.name,
-                        userHandle: data.user.username,
-                        postDate: data.created_at,
-                        content: data.description,
-                        media: Array.isArray(data.media)
-                            ? data.media.map(mediaItem => ({
-                                type: mediaItem.type,
-                                uri: mediaItem.uri,
-                            }))
-                            : [],
-                        likesCount: data.likes.length,
-                        commentsCount: totalComments,
-                        bookMarksCount: data.bookmarks.length,
-                        repostsCount: data.reposts.length,
-                        isLiked: data.likes.some(like => like._id === idUser),
-                        isBookmarked: data.bookmarks.some(bookmark => bookmark.user === idUser),
-                        isReposted: data.reposts.some(repost => repost.user === idUser),
-                        isMuted: isMuteds.some(isMuted => isMuted === data.user._id),
-                        isBlocked: isBlockeds.some(isBlocked => isBlocked === data.user._id),
-                        userIdPost: data.user._id,
-                        idUser: idUser,
-                        userEmailPost: data.user.email,
-                        profilePicture: profilePicture,
-                        commentsEnabled: data.commentsEnabled,
-                        isAdmin: data.user.isAdmin,
-                        amIAdmin: amIAdmin
-                    };
+                        const totalComments = data.comments.length + data.comments.reduce((acc, comment) => acc + comment.replies.length, 0);
 
-                    navigator.navigate('ViewPost', {
-                        tweet: dataTweet,
-                        // comments,
-                        focusCommentInput: true,
-                    });
+                        const dataTweet = {
+                            id: data._id,
+                            userAvatar: data.user.profilePicture,
+                            userName: data.user.name,
+                            userHandle: data.user.username,
+                            postDate: data.created_at,
+                            content: data.description,
+                            media: Array.isArray(data.media)
+                                ? data.media.map(mediaItem => ({
+                                    type: mediaItem.type,
+                                    uri: mediaItem.uri,
+                                }))
+                                : [],
+                            likesCount: data.likes.length,
+                            commentsCount: totalComments,
+                            bookMarksCount: data.bookmarks.length,
+                            repostsCount: data.reposts.length,
+                            isLiked: data.likes.some(like => like._id === idUser),
+                            isBookmarked: data.bookmarks.some(bookmark => bookmark.user === idUser),
+                            isReposted: data.reposts.some(repost => repost.user === idUser),
+                            isMuted: isMuteds.some(isMuted => isMuted === data.user._id),
+                            isBlocked: isBlockeds.some(isBlocked => isBlocked === data.user._id),
+                            userIdPost: data.user._id,
+                            idUser: idUser,
+                            userEmailPost: data.user.email,
+                            profilePicture: profilePicture,
+                            commentsEnabled: data.commentsEnabled,
+                            isAdmin: data.user.isAdmin,
+                            amIAdmin: amIAdmin
+                        };
 
-                })
+                        navigator.navigate('ViewPost', {
+                            tweet: dataTweet,
+                            focusCommentInput: true,
+                        });
+
+                    })
+            }
+
         } catch (error) {
             console.error(error)
         }
@@ -229,8 +250,8 @@ const ReportedUser = ({ report, handleDeleteReport }) => {
                 <View style={styles.modalContainer}>
                     <View style={styles.modalView}>
                         <Text style={styles.modalText}>Report Details</Text>
-                        <Text style={styles.modalsubtitle}>Reported Category: {reportCateogry}</Text>
-                        <Text style={styles.modalsubtitle}>{reportDetails.category == 'comment' ? 'Comment on post' : 'Reported Content'}: </Text>
+                        <Text style={styles.modalsubtitle}>Reported Category: {reportCategory}</Text>
+                        <Text style={styles.modalsubtitle}>{category}: </Text>
                         <View style={styles.reportContentContainer}>
                             <Image
                                 source={

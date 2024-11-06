@@ -163,7 +163,7 @@ const Notificationscreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      {showReportedNotification && <ReportedNotification />}
+      {showReportedNotification && <ReportedNotification notif={warningNotifications} />}
       <ScrollView
         contentContainerStyle={
           allNotifications.length === 0 ? styles.centeredContent : null
