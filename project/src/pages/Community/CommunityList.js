@@ -3,7 +3,7 @@ import React from 'react'
 
 const CommunityList = () => {
   return (
-    <View>
+    <View style={styles.container}>
       <Text>CommunityList</Text>
     </View>
   )
@@ -11,4 +11,9 @@ const CommunityList = () => {
 
 export default CommunityList
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+})

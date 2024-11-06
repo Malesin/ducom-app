@@ -10,10 +10,11 @@ import {
   Image,
   Animated,
   TouchableWithoutFeedback,
+  Modal,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import ImagePicker from 'react-native-image-crop-picker';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 
 const CommunitySettings = () => {
   const navigation = useNavigation();
@@ -26,6 +27,9 @@ const CommunitySettings = () => {
   const [profileBackground, setProfileBackground] = useState(null);
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const dropdownAnimation = useRef(new Animated.Value(0)).current;
+  const [isDataChanged, setIsDataChanged] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalImageSource, setModalImageSource] = useState(null);
 
   const toggleEditing = (field) => {
     if (field === 'name') {
@@ -75,28 +79,67 @@ const CommunitySettings = () => {
     }
   };
 
+  useFocusEffect(
+    React.useCallback(() => {
+      navigation.setOptions({
+        headerRight: () => (
+          <TouchableOpacity
+            style={[
+              styles.saveButton,
+              { backgroundColor: isDataChanged ? '#001374' : '#ccc' },
+            ]}
+            onPress={isDataChanged ? handleSave : null}
+            disabled={!isDataChanged}
+          >
+            <Text style={styles.saveButtonText}>Save</Text>
+          </TouchableOpacity>
+        ),
+      });
+    }, [navigation, isDataChanged])
+  );
+
+  const handleSave = () => {
+    // Logic to save changes
+    console.log('Saving changes...');
+    setIsDataChanged(false);
+  };
+
+  const openModal = (imageSource) => {
+    setModalImageSource(imageSource);
+    setModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
+    setModalImageSource(null);
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.bannerContainer}>
-        <ImageBackground
-          source={banner}
-          style={styles.banner}
-          resizeMode="cover"
-          imageStyle={styles.bannerImage}
-        >
-          <TouchableOpacity style={styles.editIcon} onPress={() => selectImage(setBanner)}>
-            <MaterialCommunityIcons name="pencil" size={24} color="#fff" />
-          </TouchableOpacity>
-          <View style={styles.avatarContainer}>
-            <Image
-              source={profilePicture}
-              style={styles.avatar}
-            />
-            <TouchableOpacity style={styles.avatarEditIcon} onPress={() => selectImage(setProfilePicture)}>
-              <MaterialCommunityIcons name="pencil" size={20} color="#fff" />
+        <TouchableOpacity onPress={() => openModal(banner)}>
+          <ImageBackground
+            source={banner}
+            style={styles.banner}
+            resizeMode="cover"
+            imageStyle={styles.bannerImage}
+          >
+            <TouchableOpacity style={styles.editIcon} onPress={() => selectImage(setBanner)}>
+              <MaterialCommunityIcons name="pencil" size={24} color="#fff" />
             </TouchableOpacity>
-          </View>
-        </ImageBackground>
+            <View style={styles.avatarContainer}>
+              <TouchableOpacity onPress={() => openModal(profilePicture)}>
+                <Image
+                  source={profilePicture}
+                  style={styles.avatar}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.avatarEditIcon} onPress={() => selectImage(setProfilePicture)}>
+                <MaterialCommunityIcons name="pencil" size={20} color="#fff" />
+              </TouchableOpacity>
+            </View>
+          </ImageBackground>
+        </TouchableOpacity>
       </View>
 
       <View style={styles.section}>
@@ -246,6 +289,26 @@ const CommunitySettings = () => {
           <Text style={styles.deleteButtonText}>Delete Community</Text>
         </TouchableOpacity>
       </View>
+
+      <Modal
+        visible={modalVisible}
+        transparent
+        onRequestClose={closeModal}
+        animationType="fade"
+      >
+        <TouchableWithoutFeedback onPress={closeModal}>
+          <View style={styles.modalBackground}>
+            <View style={styles.modalContainer}>
+              {modalImageSource && (
+                <Image
+                  source={modalImageSource}
+                  style={styles.previewImage}
+                />
+              )}
+            </View>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
     </ScrollView>
   );
 };
@@ -273,18 +336,30 @@ const styles = StyleSheet.create({
   editIcon: {
     padding: 10,
   },
-  infoContainer: {
-    paddingVertical: 15,
-    paddingHorizontal: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e1e8ed',
+  avatarContainer: {
+    position: 'absolute',
+    bottom: -3,
+    left: '54%',
+    transform: [{ translateX: -50 }],
+    alignItems: 'center',
   },
-  bioContainer: {
-    paddingVertical: 15,
-    paddingHorizontal: 12,
-    borderBottomWidth: 4,
-    borderBottomColor: '#D9D9D9',
-
+  avatar: {
+    bottom: -15,
+    left: '54%',
+    transform: [{ translateX: -50 }],
+    width: 80,
+    height: 80,
+    borderRadius: 50,
+    borderWidth: 3,
+    borderColor: '#fff',
+  },
+  avatarEditIcon: {
+    position: 'absolute',
+    bottom: -10,
+    right: 0,
+    backgroundColor: '#d3d3d3',
+    borderRadius: 10,
+    padding: 2,
   },
   section: {
     marginBottom: 14,
@@ -295,25 +370,47 @@ const styles = StyleSheet.create({
     color: '#001374',
     marginBottom: 2,
   },
-  label: {
-    fontSize: 12,
-    color: '#686868',
-    marginTop: 1,
+  infoContainer: {
+    paddingVertical: 15,
+    paddingHorizontal: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e1e8ed',
   },
   infoRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-    infoText: {
+  infoText: {
     fontSize: 16,
     color: '#000',
     flex: 1,
+  },
+  label: {
+    fontSize: 12,
+    color: '#686868',
+    marginTop: 1,
+  },
+  bioContainer: {
+    paddingVertical: 15,
+    paddingHorizontal: 12,
+    borderBottomWidth: 4,
+    borderBottomColor: '#D9D9D9',
   },
   bioText: {
     fontSize: 14,
     color: '#000',
     flex: 1,
+  },
+  saveButtonInline: {
+    backgroundColor: '#001374',
+    paddingHorizontal: 15,
+    borderRadius: 30,
+    paddingVertical: 5,
+  },
+  saveButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
   profileBackground: {
     flexDirection: 'row',
@@ -329,113 +426,12 @@ const styles = StyleSheet.create({
   },
   galleryButtonText: {
     color: '#000000',
-    marginLeft: 8,    
-  },
-  rulesContainer: {
-    paddingLeft: 10,
-    marginBottom: 10,
-  },
-  rule: {
-    fontSize: 14,
-    marginBottom: 5,
-  },
-  separator: {
-    height: 1,
-    backgroundColor: '#ccc',
-    marginVertical: 10,
-  },
-  saveButtonInline: {
-    backgroundColor: '#001374',
-    paddingHorizontal: 15,
-    borderRadius: 30,
-    paddingVertical: 5,
-  },
-  saveButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
+    marginLeft: 8,
   },
   lineSeparator: {
     borderBottomWidth: 4,
     borderBottomColor: '#D9D9D9',
     marginVertical: 3,
-  },
-  userAccountContainer: {
-    flexDirection: 'row',
-    paddingLeft: 10,
-    alignItems: 'center',
-    marginTop: 10,
-    marginBottom: 10,
-  },
-  userAccountText: {
-    fontSize: 16,
-    color: '#000',
-    fontWeight: 'bold',
-    marginLeft: 8,
-  },
-  deleteButton: {
-    backgroundColor: '#D3D3D3',
-    paddingVertical: 12,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  deleteButtonText: {
-    color: '#B62A2A',
-    fontWeight: 'bold',
-    fontSize: 17,
-  },
-  avatar: {
-
-    bottom: -15,
-    left: '54%',
-    transform: [{ translateX: -50 }],
-    width: 80,
-    height: 80,
-    borderRadius: 50,
-    borderWidth: 3,
-    borderColor: '#fff',
-  },
-  avatarContainer: {
-    position: 'absolute',
-    bottom: -3,
-    left: '54%',
-    transform: [{ translateX: -50 }],
-    alignItems: 'center',
-  },
-  avatarEditIcon: {
-    position: 'absolute',
-    bottom: -10,
-    right: 0,
-    backgroundColor: '#d3d3d3',
-    borderRadius: 10,
-    padding: 2,
-  },
-  ruleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  ruleIcon: {
-    width: 30,
-    height: 30,
-  },
-  ruleNumber: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#000000a',
-  },
-  ruleTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#000000',
-    marginBottom: 5,
-  },
-  ruleDescription: {
-    fontSize: 14,
-    color: '#686868',
-  },
-  ruleTextContainer: {
-    flex: 1,
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -464,6 +460,99 @@ const styles = StyleSheet.create({
   dropdownItemText: {
     fontSize: 15,
     color: '#000',
+  },
+  rulesContainer: {
+    paddingLeft: 10,
+    marginBottom: 10,
+  },
+  ruleRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginVertical: 10,
+  },
+  ruleIcon: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: '#f0f0f0',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 10,
+  },
+  ruleNumber: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#000000',
+  },
+  ruleTextContainer: {
+    flex: 1,
+  },
+  ruleTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#000000',
+    marginBottom: 5,
+  },
+  ruleDescription: {
+    fontSize: 14,
+    color: '#686868',
+  },
+  userAccountContainer: {
+    flexDirection: 'row',
+    paddingLeft: 10,
+    alignItems: 'center',
+    marginTop: 10,
+    marginBottom: 10,
+  },
+  userAccountText: {
+    fontSize: 16,
+    color: '#000',
+    fontWeight: 'bold',
+    marginLeft: 8,
+  },
+  deleteButton: {
+    backgroundColor: '#D3D3D3',
+    paddingVertical: 12,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  deleteButtonText: {
+    color: '#B62A2A',
+    fontWeight: 'bold',
+    fontSize: 17,
+  },
+  separator: {
+    height: 1,
+    backgroundColor: '#ccc',
+    marginVertical: 10,
+  },
+  saveButton: {
+    backgroundColor: '#fff',
+    paddingVertical: 7,
+    paddingHorizontal: 18,
+    borderRadius: 50,
+  },
+  saveButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  modalBackground: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.8)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContainer: {
+    width: 300,
+    height: 300,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  previewImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'contain',
   },
 });
 

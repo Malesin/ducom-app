@@ -31,14 +31,14 @@ const handleSettingsPress= () => {
     <ScrollView style={styles.container}>
       <View style={styles.bannerContainer}>
         <Image
-          source={communityData?.banner ? { uri: communityData.banner } : require('../../assets/banner.png')}
+          source={communityData?.banner ? { uri: communityData.banner } : require('../../assets/iya.png')}
           style={styles.banner}
         />
       </View>
       <View style={styles.infoContainer}>
         <View style={styles.nameContainer}>
           <Text style={styles.name}>{communityData?.name || 'Community Name'}</Text>
-          <TouchableOpacity style={styles.joinButton} onPress={handleSettingsPress}>
+          <TouchableOpacity style={styles.settingsButton} onPress={handleSettingsPress}>
             <Text style={styles.settings}>Settings</Text>
           </TouchableOpacity>
         </View>
@@ -79,12 +79,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  joinButton: {
+  settingsButton: {
     backgroundColor: '#E1E8ED',
     borderColor: '#000',
     borderWidth: 1,
-    paddingVertical: 7,
-    paddingHorizontal: 47,
+    paddingVertical: 5,
+    paddingHorizontal: 37,
     borderRadius: 100,
     marginLeft: 10,
   },

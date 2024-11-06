@@ -1,10 +1,11 @@
 import { View, Text } from 'react-native'
 import React from 'react'
+import CommunityCard from '../../components/Community/CommunityCard'
 
-const CommunityPost = () => {
+const CommunityPost = ({ navigation }) => {
   return (
     <View>
-      <Text>CommunityPost</Text>
+      <CommunityCard navigation={navigation} />
     </View>
   )
 }

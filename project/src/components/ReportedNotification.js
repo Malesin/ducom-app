@@ -11,7 +11,7 @@ import {
 import ProfilePicture from '../assets/iya.png';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useFocusEffect} from '@react-navigation/native';
 
 const ReportedNotification = () => {
   const slideAnim = useRef(new Animated.Value(-50)).current;
@@ -38,6 +38,12 @@ const ReportedNotification = () => {
   const handleClick = () => {
     setModalVisible(true);
   };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      return () => setModalVisible(false);
+    }, [])
+  );
 
   return (
     <>
@@ -96,7 +102,10 @@ const ReportedNotification = () => {
               </Text>
               <TouchableOpacity
                 style={styles.seeRuleButton}
-                onPress={() => navigation.navigate('Termsandcondition')}>
+                onPress={() => {
+                  setModalVisible(false);
+                  navigation.navigate('Termsandcondition');
+                }}>
                 <View style={styles.seeRuleContent}>
                   <MaterialCommunityIcons
                     name="note-text-outline"
