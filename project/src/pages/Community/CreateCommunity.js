@@ -249,6 +249,7 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   communityNameInput: {
+    marginTop: 5,
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 5,
@@ -268,6 +269,7 @@ const styles = StyleSheet.create({
     color: '#000',
   },
   communityDescriptionInput: {
+    marginTop: 5,
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 5,
@@ -332,6 +334,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   ruleContainer: {
+    marginTop: 5,
     backgroundColor: 'white',
     padding: 10,
     borderRadius: 5,
