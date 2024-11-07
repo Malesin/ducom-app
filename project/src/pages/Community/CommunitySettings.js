@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, {useState, useRef} from 'react';
 import {
   View,
   Text,
@@ -14,16 +14,20 @@ import {
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import ImagePicker from 'react-native-image-crop-picker';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import {useNavigation, useFocusEffect} from '@react-navigation/native';
 
 const CommunitySettings = () => {
   const navigation = useNavigation();
   const [isEditingName, setIsEditingName] = useState(false);
   const [isEditingBio, setIsEditingBio] = useState(false);
   const [communityName, setCommunityName] = useState('Gerakan Pramuka Dugam');
-  const [communityBio, setCommunityBio] = useState('Lorem Ipsum is simply dummy text of the printing and typesetting industry...');
+  const [communityBio, setCommunityBio] = useState(
+    'Lorem Ipsum is simply dummy text of the printing and typesetting industry...',
+  );
   const [banner, setBanner] = useState(require('../../assets/iya.png'));
-  const [profilePicture, setProfilePicture] = useState(require('../../assets/avatar.png'));
+  const [profilePicture, setProfilePicture] = useState(
+    require('../../assets/avatar.png'),
+  );
   const [profileBackground, setProfileBackground] = useState(null);
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const dropdownAnimation = useRef(new Animated.Value(0)).current;
@@ -31,7 +35,7 @@ const CommunitySettings = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalImageSource, setModalImageSource] = useState(null);
 
-  const toggleEditing = (field) => {
+  const toggleEditing = field => {
     if (field === 'name') {
       setIsEditingName(!isEditingName);
       if (isEditingBio) setIsEditingBio(false);
@@ -46,7 +50,7 @@ const CommunitySettings = () => {
     setIsEditingBio(false);
   };
 
-  const selectImage = (setImage) => {
+  const selectImage = setImage => {
     ImagePicker.openPicker({
       width: 400,
       height: 400,
@@ -55,7 +59,7 @@ const CommunitySettings = () => {
     })
       .then(image => {
         console.log('Image selected:', image);
-        setImage({ uri: image.path });
+        setImage({uri: image.path});
       })
       .catch(error => {
         console.error('Error selecting image:', error);
@@ -86,16 +90,15 @@ const CommunitySettings = () => {
           <TouchableOpacity
             style={[
               styles.saveButton,
-              { backgroundColor: isDataChanged ? '#001374' : '#ccc' },
+              {backgroundColor: isDataChanged ? '#001374' : '#ccc'},
             ]}
             onPress={isDataChanged ? handleSave : null}
-            disabled={!isDataChanged}
-          >
+            disabled={!isDataChanged}>
             <Text style={styles.saveButtonText}>Save</Text>
           </TouchableOpacity>
         ),
       });
-    }, [navigation, isDataChanged])
+    }, [navigation, isDataChanged]),
   );
 
   const handleSave = () => {
@@ -104,7 +107,7 @@ const CommunitySettings = () => {
     setIsDataChanged(false);
   };
 
-  const openModal = (imageSource) => {
+  const openModal = imageSource => {
     setModalImageSource(imageSource);
     setModalVisible(true);
   };
@@ -122,19 +125,19 @@ const CommunitySettings = () => {
             source={banner}
             style={styles.banner}
             resizeMode="cover"
-            imageStyle={styles.bannerImage}
-          >
-            <TouchableOpacity style={styles.editIcon} onPress={() => selectImage(setBanner)}>
+            imageStyle={styles.bannerImage}>
+            <TouchableOpacity
+              style={styles.editIcon}
+              onPress={() => selectImage(setBanner)}>
               <MaterialCommunityIcons name="pencil" size={24} color="#fff" />
             </TouchableOpacity>
             <View style={styles.avatarContainer}>
               <TouchableOpacity onPress={() => openModal(profilePicture)}>
-                <Image
-                  source={profilePicture}
-                  style={styles.avatar}
-                />
+                <Image source={profilePicture} style={styles.avatar} />
               </TouchableOpacity>
-              <TouchableOpacity style={styles.avatarEditIcon} onPress={() => selectImage(setProfilePicture)}>
+              <TouchableOpacity
+                style={styles.avatarEditIcon}
+                onPress={() => selectImage(setProfilePicture)}>
                 <MaterialCommunityIcons name="pencil" size={20} color="#fff" />
               </TouchableOpacity>
             </View>
@@ -157,12 +160,18 @@ const CommunitySettings = () => {
               <Text style={styles.infoText}>{communityName}</Text>
             )}
             {isEditingName ? (
-              <TouchableOpacity style={styles.saveButtonInline} onPress={() => toggleEditing('name')}>
+              <TouchableOpacity
+                style={styles.saveButtonInline}
+                onPress={() => toggleEditing('name')}>
                 <Text style={styles.saveButtonText}>Save</Text>
               </TouchableOpacity>
             ) : (
               <TouchableOpacity onPress={() => toggleEditing('name')}>
-                <MaterialCommunityIcons name="chevron-right" size={25} color="#000" />
+                <MaterialCommunityIcons
+                  name="chevron-right"
+                  size={25}
+                  color="#000"
+                />
               </TouchableOpacity>
             )}
           </View>
@@ -174,20 +183,26 @@ const CommunitySettings = () => {
               <TextInput
                 style={styles.bioText}
                 value={communityBio}
-                onChangeText={setCommunityBio}  
+                onChangeText={setCommunityBio}
                 autoFocus={true}
                 multiline={true}
               />
-            ) : (   
+            ) : (
               <Text style={styles.bioText}>{communityBio}</Text>
             )}
             {isEditingBio ? (
-              <TouchableOpacity style={styles.saveButtonInline} onPress={() => toggleEditing('bio')}>
+              <TouchableOpacity
+                style={styles.saveButtonInline}
+                onPress={() => toggleEditing('bio')}>
                 <Text style={styles.saveButtonText}>Save</Text>
               </TouchableOpacity>
             ) : (
               <TouchableOpacity onPress={() => toggleEditing('bio')}>
-                <MaterialCommunityIcons name="chevron-right" size={25} color="#000" />
+                <MaterialCommunityIcons
+                  name="chevron-right"
+                  size={25}
+                  color="#000"
+                />
               </TouchableOpacity>
             )}
           </View>
@@ -201,12 +216,14 @@ const CommunitySettings = () => {
           {profileBackground && (
             <ImageBackground
               source={profileBackground}
-              style={{ width: '100%', height: 200 }}
+              style={{width: '100%', height: 200}}
               resizeMode="cover"
             />
           )}
         </View>
-        <TouchableOpacity style={styles.galleryButton} onPress={() => selectImage(setProfileBackground)}>
+        <TouchableOpacity
+          style={styles.galleryButton}
+          onPress={() => selectImage(setProfileBackground)}>
           <MaterialCommunityIcons name="image-outline" size={24} color="#000" />
           <Text style={styles.galleryButtonText}>Select from Gallery</Text>
         </TouchableOpacity>
@@ -217,17 +234,31 @@ const CommunitySettings = () => {
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Community Rules</Text>
           <TouchableOpacity onPress={toggleDropdown}>
-            <MaterialCommunityIcons name="dots-horizontal" size={30} color="#000" />
+            <MaterialCommunityIcons
+              name="dots-horizontal"
+              size={30}
+              color="#000"
+            />
           </TouchableOpacity>
         </View>
         {dropdownVisible && (
           <View style={styles.dropdownMenu}>
             <TouchableOpacity style={styles.dropdownItem}>
-              <MaterialCommunityIcons name="pencil" size={20} color="#000" style={styles.dropdownIcon} />
+              <MaterialCommunityIcons
+                name="pencil"
+                size={20}
+                color="#000"
+                style={styles.dropdownIcon}
+              />
               <Text style={styles.dropdownItemText}>Edit Rules</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.dropdownItem}>
-              <MaterialCommunityIcons name="delete" size={20} color="red" style={styles.dropdownIcon} />
+              <MaterialCommunityIcons
+                name="delete"
+                size={20}
+                color="red"
+                style={styles.dropdownIcon}
+              />
               <Text style={styles.dropdownItemText}>Delete Rules</Text>
             </TouchableOpacity>
           </View>
@@ -239,7 +270,10 @@ const CommunitySettings = () => {
             </View>
             <View style={styles.ruleTextContainer}>
               <Text style={styles.ruleTitle}>Be kind and respectful.</Text>
-              <Text style={styles.ruleDescription}>Not everyone is on the same technical level. Respect and encourage the questions of others.</Text>
+              <Text style={styles.ruleDescription}>
+                Not everyone is on the same technical level. Respect and
+                encourage the questions of others.
+              </Text>
             </View>
           </View>
           <View style={styles.ruleRow}>
@@ -248,7 +282,9 @@ const CommunitySettings = () => {
             </View>
             <View style={styles.ruleTextContainer}>
               <Text style={styles.ruleTitle}>Keep post on topic.</Text>
-              <Text style={styles.ruleDescription}>Stay on topic. Do not hijack another user's thread.</Text>
+              <Text style={styles.ruleDescription}>
+                Stay on topic. Do not hijack another user's thread.
+              </Text>
             </View>
           </View>
           <View style={styles.ruleRow}>
@@ -257,7 +293,10 @@ const CommunitySettings = () => {
             </View>
             <View style={styles.ruleTextContainer}>
               <Text style={styles.ruleTitle}>No selling or promoting.</Text>
-              <Text style={styles.ruleDescription}>No selling or promoting of any kind. This is strictly a technical support group only.</Text>
+              <Text style={styles.ruleDescription}>
+                No selling or promoting of any kind. This is strictly a
+                technical support group only.
+              </Text>
             </View>
           </View>
           <View style={styles.ruleRow}>
@@ -266,7 +305,9 @@ const CommunitySettings = () => {
             </View>
             <View style={styles.ruleTextContainer}>
               <Text style={styles.ruleTitle}>Explore and share.</Text>
-              <Text style={styles.ruleDescription}>Explore ideas and share knowledge.</Text>
+              <Text style={styles.ruleDescription}>
+                Explore ideas and share knowledge.
+              </Text>
             </View>
           </View>
         </View>
@@ -277,12 +318,19 @@ const CommunitySettings = () => {
         <Text style={styles.sectionTitle}>User Account</Text>
         <TouchableOpacity
           style={styles.userAccountContainer}
-          onPress={() => navigation.navigate('CommunityList')}
-        >
-          <MaterialCommunityIcons name="shield-account" size={26} color="#000" />
+          onPress={() => navigation.navigate('CommunityList')}>
+          <MaterialCommunityIcons
+            name="shield-account"
+            size={26}
+            color="#000"
+          />
           <Text style={styles.userAccountText}>User List</Text>
-          <View style={{ flex: 1, alignItems: 'flex-end' }}>
-            <MaterialCommunityIcons name="chevron-right" size={25} color="#000" />
+          <View style={{flex: 1, alignItems: 'flex-end'}}>
+            <MaterialCommunityIcons
+              name="chevron-right"
+              size={25}
+              color="#000"
+            />
           </View>
         </TouchableOpacity>
         <TouchableOpacity style={styles.deleteButton}>
@@ -294,16 +342,12 @@ const CommunitySettings = () => {
         visible={modalVisible}
         transparent
         onRequestClose={closeModal}
-        animationType="fade"
-      >
+        animationType="fade">
         <TouchableWithoutFeedback onPress={closeModal}>
           <View style={styles.modalBackground}>
             <View style={styles.modalContainer}>
               {modalImageSource && (
-                <Image
-                  source={modalImageSource}
-                  style={styles.previewImage}
-                />
+                <Image source={modalImageSource} style={styles.previewImage} />
               )}
             </View>
           </View>
@@ -340,13 +384,13 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: -3,
     left: '54%',
-    transform: [{ translateX: -50 }],
+    transform: [{translateX: -50}],
     alignItems: 'center',
   },
   avatar: {
     bottom: -15,
     left: '54%',
-    transform: [{ translateX: -50 }],
+    transform: [{translateX: -50}],
     width: 80,
     height: 80,
     borderRadius: 50,
