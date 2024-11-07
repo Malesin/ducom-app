@@ -11,6 +11,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../config';
 import { useNavigation } from '@react-navigation/native';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 const serverUrl = config.SERVER_URL;
 
@@ -56,6 +57,11 @@ const FollowCard = ({ followText, followingText, removeButtonText, message, data
 
     const handleNavigateToUserProfile = () => {
         navigation.navigate('Userprofile', { userIdPost: data._id, idUser: myId });
+    };
+
+    const handleMorePress = () => {
+        console.log('More options pressed');
+        setIsModalVisible(true);
     };
 
     return (
