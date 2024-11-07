@@ -1,5 +1,5 @@
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -16,21 +16,23 @@ import {
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Video from 'react-native-video';
-import { createThumbnail } from 'react-native-create-thumbnail';
+import {createThumbnail} from 'react-native-create-thumbnail';
 import DefaultAvatar from '../assets/profilepic.png';
 import BottomSheet from './BottomSheet';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 import axios from 'axios';
 import config from '../config';
 const serverUrl = config.SERVER_URL;
 const verifiedIcon = <Icon name="verified" size={16} color="#699BF7" />;
 
-const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
+const TweetCard = ({tweet, onRefreshPage, comments, isUserProfile}) => {
   const [liked, setLiked] = useState(tweet?.isLiked || false);
   const [likesCount, setLikesCount] = useState(tweet?.likesCount || 0);
   const [bookmarked, setBookmarked] = useState(tweet?.isBookmarked || false);
-  const [bookMarksCount, setBookMarksCount] = useState(tweet?.bookMarksCount || 0);
+  const [bookMarksCount, setBookMarksCount] = useState(
+    tweet?.bookMarksCount || 0,
+  );
   const [reposted, setReposted] = useState(tweet?.isReposted || false);
   const [repostsCount, setRepostsCount] = useState(tweet?.repostsCount || 0);
   const [commentsCount] = useState(tweet?.commentsCount || 0);
@@ -38,7 +40,7 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
   const [modalMediaUri, setModalMediaUri] = useState('');
   const [thumbnails, setThumbnails] = useState({});
   const [showBottomSheet, setShowBottomSheet] = useState(false);
-  const [dataSent, setDataSent] = useState()
+  const [dataSent, setDataSent] = useState();
   const navigator = useNavigation();
 
   const handleProfilePress = () => {
@@ -47,7 +49,7 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
     } else {
       navigator.navigate('Userprofile', {
         userIdPost: tweet?.userIdPost,
-        isUserProfile: isUserProfile
+        isUserProfile: isUserProfile,
       });
     }
   };
@@ -58,7 +60,7 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
       for (const media of tweet?.media || []) {
         if (media.type === 'video' && media.uri) {
           try {
-            const { path } = await createThumbnail({ url: media.uri });
+            const {path} = await createThumbnail({url: media.uri});
             newThumbnails[media.uri] = path;
           } catch (error) {
             console.log('Error generating thumbnail:', error);
@@ -72,62 +74,103 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
       const token = await AsyncStorage.getItem('token');
       const dataSent = {
         token: token,
-        postId: tweet?.id
-      }
-      setDataSent(dataSent)
-    }
+        postId: tweet?.id,
+      };
+      setDataSent(dataSent);
+    };
 
     generateThumbnails();
-    dataSend()
+    dataSend();
   }, [tweet?.media]);
 
   const handleLike = async () => {
     try {
       setLiked(liked ? false : true);
-      setLikesCount(prevLikesCount => liked ? prevLikesCount - 1 : prevLikesCount + 1);
+      setLikesCount(prevLikesCount =>
+        liked ? prevLikesCount - 1 : prevLikesCount + 1,
+      );
 
-      await axios.post(`${serverUrl}/${liked ? 'unlike' : 'like'}-post`, dataSent);
-
+      await axios.post(
+        `${serverUrl}/${liked ? 'unlike' : 'like'}-post`,
+        dataSent,
+      );
     } catch (error) {
-      console.error(`Error in ${liked ? 'unliking' : 'liking'} post:`, error.message);
+      console.error(
+        `Error in ${liked ? 'unliking' : 'liking'} post:`,
+        error.message,
+      );
       setLiked(liked ? true : false);
-      setLikesCount(prevLikesCount => liked ? prevLikesCount + 1 : prevLikesCount - 1);
+      setLikesCount(prevLikesCount =>
+        liked ? prevLikesCount + 1 : prevLikesCount - 1,
+      );
 
-      ToastAndroid.show(`Failed to ${liked ? 'unlike' : 'like'} post. Please try again.`, ToastAndroid.SHORT);
+      ToastAndroid.show(
+        `Failed to ${liked ? 'unlike' : 'like'} post. Please try again.`,
+        ToastAndroid.SHORT,
+      );
     }
   };
 
   const handleBookmark = async () => {
     try {
       setBookmarked(bookmarked ? false : true);
-      setBookMarksCount(prevBookmarksCount => bookmarked ? prevBookmarksCount - 1 : prevBookmarksCount + 1);
+      setBookMarksCount(prevBookmarksCount =>
+        bookmarked ? prevBookmarksCount - 1 : prevBookmarksCount + 1,
+      );
 
-      await axios.post(`${serverUrl}/${bookmarked ? 'unbookmark' : 'bookmark'}-post`, dataSent);
+      await axios.post(
+        `${serverUrl}/${bookmarked ? 'unbookmark' : 'bookmark'}-post`,
+        dataSent,
+      );
 
-      ToastAndroid.show(`Post ${bookmarked ? 'removed' : 'added'} from bookmarks!`, ToastAndroid.SHORT);
-
+      ToastAndroid.show(
+        `Post ${bookmarked ? 'removed' : 'added'} from bookmarks!`,
+        ToastAndroid.SHORT,
+      );
     } catch (error) {
-      console.error(`Error in ${bookmarked ? 'unbookmarking' : 'bookmarking'} post:`, error.message);
+      console.error(
+        `Error in ${bookmarked ? 'unbookmarking' : 'bookmarking'} post:`,
+        error.message,
+      );
       setBookmarked(bookmarked ? true : false);
-      setBookMarksCount(prevBookmarksCount => bookmarked ? prevBookmarksCount + 1 : prevBookmarksCount - 1);
+      setBookMarksCount(prevBookmarksCount =>
+        bookmarked ? prevBookmarksCount + 1 : prevBookmarksCount - 1,
+      );
 
-      ToastAndroid.show(`Failed to ${bookmarked ? 'unbookmark' : 'bookmark'} post. Please try again.`, ToastAndroid.SHORT);
+      ToastAndroid.show(
+        `Failed to ${
+          bookmarked ? 'unbookmark' : 'bookmark'
+        } post. Please try again.`,
+        ToastAndroid.SHORT,
+      );
     }
   };
 
   const handleRepost = async () => {
     try {
       setReposted(reposted ? false : true);
-      setRepostsCount(prevRepostsCount => reposted ? prevRepostsCount - 1 : prevRepostsCount + 1);
+      setRepostsCount(prevRepostsCount =>
+        reposted ? prevRepostsCount - 1 : prevRepostsCount + 1,
+      );
 
-      await axios.post(`${serverUrl}/${reposted ? 'unrepost' : 'repost'}-post`, dataSent)
-
+      await axios.post(
+        `${serverUrl}/${reposted ? 'unrepost' : 'repost'}-post`,
+        dataSent,
+      );
     } catch (error) {
-      console.error(`Error in ${reposted ? 'unreposting' : 'reposting'} post:`, error.message);
+      console.error(
+        `Error in ${reposted ? 'unreposting' : 'reposting'} post:`,
+        error.message,
+      );
       setReposted(reposted ? true : false);
-      setRepostsCount(prevRepostsCount => reposted ? prevRepostsCount + 1 : prevRepostsCount - 1);
+      setRepostsCount(prevRepostsCount =>
+        reposted ? prevRepostsCount + 1 : prevRepostsCount - 1,
+      );
 
-      ToastAndroid.show(`Failed to ${reposted ? 'unrepost' : 'repost'} post. Please try again.`, ToastAndroid.SHORT);
+      ToastAndroid.show(
+        `Failed to ${reposted ? 'unrepost' : 'repost'} post. Please try again.`,
+        ToastAndroid.SHORT,
+      );
     }
   };
 
@@ -202,7 +245,7 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
     return `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
   };
 
-  const renderMediaItem = ({ item }) => {
+  const renderMediaItem = ({item}) => {
     if (!item.uri) {
       return null;
     }
@@ -213,8 +256,8 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
           ? styles.singleMediaVideo
           : styles.singleMediaImage
         : item.type === 'video'
-          ? styles.tweetVideo
-          : styles.tweetImage;
+        ? styles.tweetVideo
+        : styles.tweetImage;
 
     return (
       <TouchableOpacity
@@ -222,7 +265,7 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
         style={styles.mediaContainer}>
         {item.type === 'image' ? (
           <Image
-            source={{ uri: item.uri }}
+            source={{uri: item.uri}}
             style={mediaStyle}
             onError={() => console.log('Failed to load image')}
           />
@@ -230,7 +273,7 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
           <TouchableOpacity
             onPress={() => openMediaPreview(item.uri)}
             style={styles.videoContainer}>
-            <Image source={{ uri: thumbnails[item.uri] }} style={mediaStyle} />
+            <Image source={{uri: thumbnails[item.uri]}} style={mediaStyle} />
             <MaterialCommunityIcons
               name="play-circle-outline"
               size={40}
@@ -243,7 +286,7 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
     );
   };
 
-  const onDel = async (respdel) => {
+  const onDel = async respdel => {
     try {
       if (respdel === 'ok') {
         ToastAndroid.show('Tweet Successfully Deleted', ToastAndroid.SHORT);
@@ -258,12 +301,18 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
     }
   };
 
-  const onResp = async (resp) => {
+  const onResp = async resp => {
     try {
       if (resp.status == `ok${resp.type}`) {
-        ToastAndroid.show(`Tweet Successfully ${resp.typed}`, ToastAndroid.SHORT);
+        ToastAndroid.show(
+          `Tweet Successfully ${resp.typed}`,
+          ToastAndroid.SHORT,
+        );
       } else if (resp.status == `okUn${resp.type}`) {
-        ToastAndroid.show(`Tweet Successfully Un${resp.typed}`, ToastAndroid.SHORT);
+        ToastAndroid.show(
+          `Tweet Successfully Un${resp.typed}`,
+          ToastAndroid.SHORT,
+        );
       } else {
         console.error(`Error in ${resp.typing} response data:`, resp.status);
         Alert.alert('Error', `Failed to ${resp.type} post. Please try again.`);
@@ -272,25 +321,38 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
       console.error(`Error ${resp.type}:`, error.message);
       Alert.alert('Error', `Failed to ${resp.type}. Please try again.`);
     }
-  }
+  };
 
   return (
     <SafeAreaView style={styles.card}>
       <View style={styles.userInfo}>
         <TouchableOpacity onPress={handleProfilePress}>
           <Image
-            source={tweet?.userAvatar ? { uri: tweet?.userAvatar } : DefaultAvatar}
+            source={
+              tweet?.userAvatar ? {uri: tweet?.userAvatar} : DefaultAvatar
+            }
             style={styles.avatar}
           />
         </TouchableOpacity>
         <View style={styles.userDetails}>
           <TouchableOpacity onPress={handleProfilePress}>
-            <Text style={styles.userName}>{tweet?.userName}</Text>
+            <Text
+              style={styles.userName}
+              numberOfLines={1}
+              ellipsizeMode="tail">
+              {tweet?.userName?.length > 15
+                ? `${tweet?.userName.substring(0, 20)}...`
+                : tweet?.userName}
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={handleProfilePress}>
-            <Text style={styles.userHandle}>@{tweet?.userHandle}</Text>
+            <Text style={styles.userHandle} ellipsizeMode="tail">
+              @{tweet?.userHandle}
+            </Text>
           </TouchableOpacity>
-          {tweet?.isAdmin ? (<Text style={styles.verifiedIcon}>{verifiedIcon}</Text>) : null}
+          {tweet?.isAdmin ? (
+            <Text style={styles.verifiedIcon}>{verifiedIcon}</Text>
+          ) : null}
           <Text style={styles.postDate}>{formatDate(tweet?.postDate)}</Text>
         </View>
         <View style={styles.optionsContainer}>
@@ -314,15 +376,15 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
           </TouchableWithoutFeedback>
           <View style={styles.bottomSheetContainer}>
             <BottomSheet
-              onCloseDel={(respdel) => {
+              onCloseDel={respdel => {
                 setShowBottomSheet(false);
                 onRefreshPage();
-                onDel(respdel)
+                onDel(respdel);
               }}
-              onCloseResp={(resp) => {
+              onCloseResp={resp => {
                 setShowBottomSheet(false);
                 onRefreshPage();
-                onResp(resp)
+                onResp(resp);
               }}
               tweet={tweet}
               onRefreshPage={onRefreshPage}
@@ -333,7 +395,9 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
           </View>
         </Modal>
       </View>
-      {tweet?.content ? <Text style={styles.tweetText}>{tweet?.content}</Text> : null}
+      {tweet?.content ? (
+        <Text style={styles.tweetText}>{tweet?.content}</Text>
+      ) : null}
       {tweet?.media && tweet?.media?.length > 0 ? (
         <FlatList
           data={tweet?.media}
@@ -352,7 +416,11 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
           onPress={handleLike}
         />
         <InteractionButton
-          icon={tweet?.commentsEnabled ? "message-reply-outline" : "message-off-outline"}
+          icon={
+            tweet?.commentsEnabled
+              ? 'message-reply-outline'
+              : 'message-off-outline'
+          }
           color="#040608"
           count={commentsCount}
           onPress={() => handleCommentPress()}
@@ -387,18 +455,18 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
             <View style={styles.modalContainer}>
               {modalMediaUri ? (
                 modalMediaUri.endsWith('.jpg') ||
-                  modalMediaUri.endsWith('.png') ? (
+                modalMediaUri.endsWith('.png') ? (
                   <Image
-                    source={{ uri: modalMediaUri }}
+                    source={{uri: modalMediaUri}}
                     style={styles.modalImage}
                     onError={() => console.log('Failed to load image')}
                   />
                 ) : (
                   <Video
-                    source={{ uri: modalMediaUri }}
+                    source={{uri: modalMediaUri}}
                     style={styles.modalVideo}
                     controls
-                    resizeMode='contain'
+                    resizeMode="contain"
                   />
                 )
               ) : null}
@@ -410,7 +478,7 @@ const TweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
   );
 };
 
-const InteractionButton = ({ icon, color, count, onPress }) => (
+const InteractionButton = ({icon, color, count, onPress}) => (
   <TouchableOpacity style={styles.actionButton} onPress={onPress}>
     <MaterialCommunityIcons name={icon} size={20} color={color} />
     <Text style={styles.actionText}>{count}</Text>
@@ -422,7 +490,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     padding: 10,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 1,
@@ -447,7 +515,7 @@ const styles = StyleSheet.create({
   userInfo: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 5
+    marginTop: 5,
   },
   avatar: {
     width: 35,
@@ -474,7 +542,7 @@ const styles = StyleSheet.create({
   verifiedIcon: {
     marginLeft: -3,
     marginRight: 6,
-    marginTop: 2
+    marginTop: 2,
   },
   postDate: {
     color: '#718096',

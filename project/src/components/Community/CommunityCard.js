@@ -8,8 +8,8 @@ import {
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const CommunityCard = ({navigation, communityCardData}) => {
-  const {communityCardName, communityDescription} = communityCardData;
+const CommunityCard = ({navigation, communityCardData = {}}) => {
+  const {communityCardName = '', communityDescription = ''} = communityCardData;
   const [liked, setLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(0);
   const [bookmarked, setBookmarked] = useState(false);
@@ -42,7 +42,7 @@ const CommunityCard = ({navigation, communityCardData}) => {
 
   const InteractionButton = ({icon, color, count, onPress}) => (
     <TouchableOpacity style={styles.actionButton} onPress={onPress}>
-      <MaterialCommunityIcons name={icon} size={20} color={color} />
+      <MaterialCommunityIcons name={icon} size={20} color={color} /> 
       <Text style={styles.actionText}>{count}</Text>
     </TouchableOpacity>
   );
