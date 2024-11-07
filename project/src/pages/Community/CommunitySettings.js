@@ -233,7 +233,7 @@ const CommunitySettings = () => {
           </View>
         )}
         <View style={styles.rulesContainer}>
-          <View style={styles.ruleRow}>
+          <View style={styles.ruleWrapper}>
             <View style={styles.ruleIcon}>
               <Text style={styles.ruleNumber}>1</Text>
             </View>
@@ -242,7 +242,7 @@ const CommunitySettings = () => {
               <Text style={styles.ruleDescription}>Not everyone is on the same technical level. Respect and encourage the questions of others.</Text>
             </View>
           </View>
-          <View style={styles.ruleRow}>
+          <View style={styles.ruleWrapper}>
             <View style={styles.ruleIcon}>
               <Text style={styles.ruleNumber}>2</Text>
             </View>
@@ -251,7 +251,7 @@ const CommunitySettings = () => {
               <Text style={styles.ruleDescription}>Stay on topic. Do not hijack another user's thread.</Text>
             </View>
           </View>
-          <View style={styles.ruleRow}>
+          <View style={styles.ruleWrapper}>
             <View style={styles.ruleIcon}>
               <Text style={styles.ruleNumber}>3</Text>
             </View>
@@ -260,7 +260,7 @@ const CommunitySettings = () => {
               <Text style={styles.ruleDescription}>No selling or promoting of any kind. This is strictly a technical support group only.</Text>
             </View>
           </View>
-          <View style={styles.ruleRow}>
+          <View style={styles.ruleWrapper}>
             <View style={styles.ruleIcon}>
               <Text style={styles.ruleNumber}>4</Text>
             </View>
@@ -465,7 +465,7 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     marginBottom: 10,
   },
-  ruleRow: {
+  ruleWrapper: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     marginVertical: 10,
