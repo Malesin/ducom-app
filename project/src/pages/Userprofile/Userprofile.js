@@ -31,9 +31,23 @@ const Userprofile = ({userIdPost, navigation}) => {
   const [isMuted, setIsMuted] = useState(false);
   const [isBlocked, setIsBlocked] = useState(false);
 
-  useEffect(() => {
-    navigation.setOptions({title: ''});
-  }, [navigation]);
+  // Fungsi untuk mengosongkan data pengguna
+  const resetUserData = () => {
+    setUserData('');
+    setBanner(false);
+    setProfilePicture(false);
+    setIsFollowing(false);
+    setFollowersCount(0);
+    setIsMuted(false);
+    setIsBlocked(false);
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      resetUserData(); // Panggil fungsi reset
+      getData();
+    }, [userIdPost]) // Tambahkan userIdPost sebagai dependensi
+  );
 
   const getData = async () => {
     try {
@@ -44,12 +58,12 @@ const Userprofile = ({userIdPost, navigation}) => {
         userId: userIdPost,
       });
       const user = userResponse.data.data;
-      const idUser = userResponse.data.myId
+      const idUser = userResponse.data.myId;
       const isFollow = user?.followers.some(follow => follow._id === idUser);
       setIsFollowing(isFollow);
       setUserData(user);
-
-      if (user.username) {
+      console.log(userIdPost);
+      if (user?.username) {
         navigation.setOptions({title: `@${user.username}`});
       }
 
@@ -68,22 +82,6 @@ const Userprofile = ({userIdPost, navigation}) => {
       console.error('Error:', error);
     }
   };
-
-  useEffect(() => {
-    getData();
-  }, []);
-
-  useFocusEffect(
-    useCallback(() => {
-      getData();
-    }, []),
-  );
-
-  useEffect(() => {
-    if (userData?.followersCount) {
-      setFollowersCount(userData?.followersCount);
-    }
-  }, [userData]);
 
   const openModal = () => {
     setModalImageSource(profilePicture);

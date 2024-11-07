@@ -95,8 +95,9 @@ const Usermedia = ({ userIdPost, profilePicture }) => {
   }, [userIdPost]);
 
   useEffect(() => {
+    setLoading(true);
     fetchTweets();
-  }, [fetchTweets]);
+  }, [userIdPost]);
 
   const renderSkeleton = () => (
     <>

@@ -7,7 +7,7 @@ import {
   View,
   RefreshControl,
 } from 'react-native';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import React, { useState, useEffect, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
@@ -21,6 +21,7 @@ const UserFollower = ({ route }) => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const { userId } = route.params;
+  const navigation = useNavigation();
 
   const getDataFollowers = async () => {
     try {

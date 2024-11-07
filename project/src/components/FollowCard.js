@@ -55,7 +55,9 @@ const FollowCard = ({
   };
 
   const handleNavigateToUserProfile = () => {
-    navigation.navigate('Userprofile', { userIdPost: data._id });
+    if (data._id !== myId) {
+      navigation.navigate('Userprofile', { userIdPost: data._id });
+    }
   };
 
   return (

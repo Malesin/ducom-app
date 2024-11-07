@@ -85,16 +85,17 @@ const Userrepost = ({ userIdPost }) => {
 
   useFocusEffect(
     useCallback(() => {
-      if (!isFetched) {
-        (async () => {
-          setLoading(true);
-          const newTweets = await fetchTweets(page);
-          setTweets(newTweets);
-          setIsFetched(true);
-          setLoading(false);
-        })();
-      }
-    }, [fetchTweets, page, isFetched])
+      setLoading(true);
+      setIsFetched(false);
+      setPage(1);
+      setTweets([]);
+      (async () => {
+        const newTweets = await fetchTweets(1);
+        setTweets(newTweets);
+        setIsFetched(true);
+        setLoading(false);
+      })();
+    }, [userIdPost])
   );
 
   const handleLoadMore = async () => {
