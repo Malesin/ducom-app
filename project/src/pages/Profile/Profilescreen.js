@@ -9,7 +9,6 @@ import {
   Modal,
   TouchableWithoutFeedback,
   Animated,
-  RefreshControl,
   ScrollView,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';

@@ -10,7 +10,7 @@ import {
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import DefaultAvatar from '../../assets/profilepic.png';
 import {useNavigation} from '@react-navigation/native';
-import {formatNotification} from '../../pages/Home/formatNotification';
+import {formatNotification} from '../../pages/Notification/formatNotification';
 import {createThumbnail} from 'react-native-create-thumbnail';
 
 const CommentNotification = ({commentNotification}) => {

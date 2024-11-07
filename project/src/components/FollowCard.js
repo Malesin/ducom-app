@@ -16,11 +16,11 @@ import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 const serverUrl = config.SERVER_URL;
 
 const FollowCard = ({ followText, followingText, removeButtonText, message, data, myId }) => {
-    const navigation = useNavigation();
+  const navigation = useNavigation();
 
-    const [isFollowing, setIsFollowing] = useState(false);
-    const [isModalVisible, setIsModalVisible] = useState(false);
-    const isMyId = myId === data._id
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const isMyId = myId === data._id
 
   useEffect(() => {
     const isFollow = data.followers.some(follow => follow === myId);
@@ -36,7 +36,7 @@ const FollowCard = ({ followText, followingText, removeButtonText, message, data
         [follow]: data?._id
       }
       setIsFollowing(!isFollowing);
-      
+
       await axios
         .post(`${serverUrl}/${isFollowing ? 'unfollow' : 'follow'}`, dataSent
         )
@@ -51,13 +51,13 @@ const FollowCard = ({ followText, followingText, removeButtonText, message, data
     }
   };
 
-    const handleCloseModal = () => {
-        setIsModalVisible(false);
-    };
+  const handleCloseModal = () => {
+    setIsModalVisible(false);
+  };
 
-    const handleNavigateToUserProfile = () => {
-        navigation.navigate('Userprofile', { userIdPost: data._id, idUser: myId });
-    };
+  const handleNavigateToUserProfile = () => {
+    navigation.navigate('Userprofile', { userIdPost: data._id, idUser: myId });
+  };
 
     const handleMorePress = () => {
         console.log('More options pressed');

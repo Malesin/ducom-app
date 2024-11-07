@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import {View, Text, StyleSheet} from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 const CommunityAbout = () => {
@@ -7,25 +7,29 @@ const CommunityAbout = () => {
     <View style={styles.container}>
       <Text style={styles.header}>Community Info</Text>
       <View style={styles.infoRow}>
-        <MaterialIcons name="person" size={24} color="black" />
+        <MaterialIcons name="person" size={22} color="black" />
         <Text style={styles.infoText}>Only admin can post</Text>
       </View>
       <View style={styles.infoRow}>
-        <MaterialIcons name="group" size={24} color="black" />
-        <Text style={styles.infoText}>Only members can give likes and replies</Text>
+        <MaterialIcons name="group" size={22} color="black" />
+        <Text style={styles.infoText}>
+          Only members can give likes and replies
+        </Text>
       </View>
       <View style={styles.infoRow}>
-        <MaterialIcons name="public" size={24} color="black" />
-        <Text style={styles.infoText}>All Communities are publicly visible.</Text>
+        <MaterialIcons name="public" size={22} color="black" />
+        <Text style={styles.infoText}>
+          All Communities are publicly visible.
+        </Text>
       </View>
       <View style={styles.infoRow}>
-        <MaterialIcons name="event" size={24} color="black" />
+        <MaterialIcons name="event" size={22} color="black" />
         <Text style={styles.createAt}>
           Created April 4, 2024
           <Text style={styles.username}> by @dugam_official</Text>
         </Text>
         <View style={styles.verified}>
-        <MaterialIcons name="check-circle" size={24} color="blue" />
+          <MaterialIcons name="verified" size={20} color="#699BF7" />
         </View>
       </View>
       <View style={styles.separator} />
@@ -38,7 +42,10 @@ const CommunityAbout = () => {
           </View>
           <View style={styles.ruleTextContainer}>
             <Text style={styles.ruleTitle}>Be kind and respectful.</Text>
-            <Text style={styles.ruleDescription}>Not everyone is on the same technical level. Respect and encourage the questions of others.</Text>
+            <Text style={styles.ruleDescription}>
+              Not everyone is on the same technical level. Respect and encourage
+              the questions of others.
+            </Text>
           </View>
         </View>
         <View style={styles.ruleWrapper}>
@@ -47,7 +54,9 @@ const CommunityAbout = () => {
           </View>
           <View style={styles.ruleTextContainer}>
             <Text style={styles.ruleTitle}>Keep post on topic.</Text>
-            <Text style={styles.ruleDescription}>Stay on topic. Do not hijack another user's thread.</Text>
+            <Text style={styles.ruleDescription}>
+              Stay on topic. Do not hijack another user's thread.
+            </Text>
           </View>
         </View>
         <View style={styles.ruleWrapper}>
@@ -56,7 +65,10 @@ const CommunityAbout = () => {
           </View>
           <View style={styles.ruleTextContainer}>
             <Text style={styles.ruleTitle}>No selling or promoting.</Text>
-            <Text style={styles.ruleDescription}>No selling or promoting of any kind. This is strictly a technical support group only.</Text>
+            <Text style={styles.ruleDescription}>
+              No selling or promoting of any kind. This is strictly a technical
+              support group only.
+            </Text>
           </View>
         </View>
         <View style={styles.ruleWrapper}>
@@ -65,7 +77,9 @@ const CommunityAbout = () => {
           </View>
           <View style={styles.ruleTextContainer}>
             <Text style={styles.ruleTitle}>Explore and share.</Text>
-            <Text style={styles.ruleDescription}>Explore ideas and share knowledge.</Text>
+            <Text style={styles.ruleDescription}>
+              Explore ideas and share knowledge.
+            </Text>
           </View>
         </View>
       </View>
@@ -76,7 +90,7 @@ const CommunityAbout = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 17 ,
+    padding: 17,
     backgroundColor: 'white',
   },
   header: {
@@ -93,7 +107,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginVertical: 5,
-    paddingLeft: 13 ,
+    paddingLeft: 13,
   },
   infoText: {
     marginLeft: 10,
@@ -114,7 +128,7 @@ const styles = StyleSheet.create({
   },
   ruleDescription: {
     fontSize: 14,
-    color: 'black', 
+    color: 'black',
   },
   separator: {
     borderBottomWidth: 1,

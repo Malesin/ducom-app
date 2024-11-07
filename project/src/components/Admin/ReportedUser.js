@@ -11,7 +11,6 @@ const serverUrl = config.SERVER_URL;
 
 const ReportedUser = ({ report, handleDeleteReport }) => {
     const navigator = useNavigation();
-
     const capitalizeFirstLetter = (string) => {
         if (typeof string === 'string' && string.length > 0) {
             return string.charAt(0).toUpperCase() + string.slice(1);
@@ -81,7 +80,6 @@ const ReportedUser = ({ report, handleDeleteReport }) => {
 
     const handleReportPress = () => {
         setModalVisible(true);
-        console.log(report)
     };
 
     const handleCancel = () => {

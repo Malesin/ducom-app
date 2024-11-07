@@ -4,8 +4,9 @@ import {
   Text,
   View,
   TouchableOpacity,
-  ToastAndroid 
+  ToastAndroid
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
@@ -13,11 +14,11 @@ import config from '../config';
 
 const serverUrl = config.SERVER_URL;
 
-const CommentSheet = ({ commentId, postId, token, idUser, userIdPost, onDeleteSuccess, onClose, parentCommentId, amIAdmin }) => {
+const CommentSheet = ({ commentId, postId, token, idUser, userIdPost, onDeleteSuccess, onClose, parentCommentId, amIAdmin, childComment }) => {
 
+  const navigation = useNavigation();
   const [isOwn, setIsOwn] = useState(false)
   const [isAdmin, setIsAdmin] = useState(amIAdmin)
-
   useEffect(() => {
 
     if (idUser == userIdPost) {
@@ -38,12 +39,12 @@ const CommentSheet = ({ commentId, postId, token, idUser, userIdPost, onDeleteSu
         token: token,
         postId: postId,
         commentId: parentCommentId || commentId,
-        replyId: parentCommentId ? commentId : null
+        replyId: parentCommentId && commentId
       });
 
       if (response.data.status === 'ok') {
-        console.log('Comment Berhasil Dihapus');
-        ToastAndroid.show('Komentar berhasil dihapus', ToastAndroid.SHORT);
+        console.log('Comment was deleted successfully');
+        ToastAndroid.show('Comment was deleted successfully', ToastAndroid.SHORT);
         onDeleteSuccess();
         onClose();
       } else {
@@ -54,24 +55,12 @@ const CommentSheet = ({ commentId, postId, token, idUser, userIdPost, onDeleteSu
     }
   };
 
-  const reportComment = async () => {
-    // try {
-    //   const response = await axios.post(`${serverUrl}/report-comment`, {
-    //     token: token,
-    //     postId: postId,
-    //     commentId: commentId,
-    //     reporterEmail: emailUser
-    //   });
+  const commentReport = childComment ? 'reportCommentId' : 'reportParentCommentId'
 
-    //   if (response.data.status === 'ok') {
-    //     console.log('Comment reported successfully');
-    //     ToastAndroid.show('Komentar berhasil dilaporkan', ToastAndroid.SHORT);
-    //   } else {
-    //     console.error('Failed to report comment:', response.data.message);
-    //   }
-    // } catch (error) {
-    //   console.error('Error reporting comment: ', error);
-    // }
+  const reportComment = async () => {
+    navigation.navigate('Report', {
+      [commentReport]: childComment ? commentId : parentCommentId
+    })
     console.log("report comment")
   };
 
