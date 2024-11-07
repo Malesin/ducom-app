@@ -359,12 +359,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 15,
-    paddingVertical: 10,
+    paddingVertical: 5,
   },
   profile: {
-    width: 83,
-    height: 82,
-    borderRadius: 40,
+    width: 80,
+    height: 80,
+    borderRadius: 100,
   },
   profileInfoContainer: {
     flexDirection: 'column',
@@ -379,14 +379,13 @@ const styles = StyleSheet.create({
   },
   userInfoContainer: {
     flex: 1,
-    marginTop: 10,
-    marginBottom: 10,
-    marginRight: 10,
+    paddingVertical: 5,
   },
   nameContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     width: '100%',
+    paddingVertical: 5,
   },
   name: {
     fontSize: 17,
