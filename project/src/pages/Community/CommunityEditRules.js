@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -15,29 +15,26 @@ import Animated, {
   withSpring,
   runOnJS,
 } from 'react-native-reanimated';
-import {PanGestureHandler} from 'react-native-gesture-handler';
+import { PanGestureHandler } from 'react-native-gesture-handler';
 
 const DELETE_THRESHOLD = -75;
 
-const SwipeableRule = ({rule, index, updateRule, onDelete, canDelete}) => {
+const SwipeableRule = ({ rule, index, updateRule, onDelete }) => {
   const translateX = useSharedValue(0);
   const isRemoving = useSharedValue(false);
 
   const panGesture = useAnimatedGestureHandler({
     onStart: (_, context) => {
-      if (!canDelete) return; 
       isRemoving.value = false;
       context.x = translateX.value;
     },
-    onActive: (event, context) => {
-      if (!canDelete) return; 
+    onActive: (event, context) => { 
       if (!isRemoving.value) {
         const newValue = context.x + event.translationX;
         translateX.value = Math.min(0, Math.max(newValue, -100));
       }
     },
     onEnd: () => {
-      if (!canDelete) return; 
       if (translateX.value < DELETE_THRESHOLD) {
         isRemoving.value = true;
         translateX.value = withSpring(-100, {}, finished => {
@@ -54,14 +51,13 @@ const SwipeableRule = ({rule, index, updateRule, onDelete, canDelete}) => {
 
   const rStyle = useAnimatedStyle(() => {
     return {
-      transform: [{translateX: translateX.value}],
+      transform: [{ translateX: translateX.value }],
     };
   });
 
   const deleteButtonStyle = useAnimatedStyle(() => {
     return {
-      transform: [{translateX: translateX.value + 100}],
-      opacity: canDelete ? 1 : 0, 
+      transform: [{ translateX: translateX.value + 100 }],
     };
   });
 
@@ -69,18 +65,17 @@ const SwipeableRule = ({rule, index, updateRule, onDelete, canDelete}) => {
     <View style={styles.ruleWrapper}>
       <Animated.View style={[styles.deleteButton, deleteButtonStyle]}>
         <TouchableOpacity
-          onPress={() => canDelete && onDelete(index)}
-          style={styles.deleteButtonInner}
-          disabled={!canDelete}>
+          onPress={() => onDelete(index)}
+          style={styles.deleteButtonInner}>
           <Text style={styles.deleteButtonText}>Delete</Text>
         </TouchableOpacity>
       </Animated.View>
-      <PanGestureHandler onGestureEvent={panGesture} enabled={canDelete}>
+      <PanGestureHandler onGestureEvent={panGesture}>
         <Animated.View style={[styles.ruleContainer, rStyle]}>
           <Text style={styles.ruleNumber}>Rule {index + 1}</Text>
           <TextInput
             maxLength={150}
-            style={[styles.communityRulesInputTitle, {height: 35}]}
+            style={[styles.communityRulesInputTitle, { height: 35 }]}
             placeholder="Title"
             placeholderTextColor="#b6b6b6"
             value={rule.title}
@@ -88,7 +83,7 @@ const SwipeableRule = ({rule, index, updateRule, onDelete, canDelete}) => {
           />
           <TextInput
             maxLength={150}
-            style={[styles.communityRulesInputDescription, {height: 100}]}
+            style={[styles.communityRulesInputDescription, { height: 100 }]}
             placeholder="Description"
             placeholderTextColor="#b6b6b6"
             multiline={true}
@@ -102,55 +97,8 @@ const SwipeableRule = ({rule, index, updateRule, onDelete, canDelete}) => {
   );
 };
 
-const CreateCommunity = ({navigation}) => {
-  const [inputNameHeight, setInputNameHeight] = useState(35);
-  const [inputHeightDescription, setInputHeightDescription] = useState(35);
-  const [rules, setRules] = useState([{title: '', description: ''}]);
-  const [newCommunityName, setNewCommunityName] = useState('');
-  const [newCommunityDescription, setNewCommunityDescription] = useState('');
-
-  const handleCreateCommunity = () => {
-    console.log('Community created with the following details:');
-    console.log('Name:', newCommunityName);
-    console.log('Description:', newCommunityDescription);
-    console.log('Rules:', rules);
-  };
-
-  const isFormValid = () => {
-    return (
-      newCommunityName.trim() !== '' &&
-      newCommunityDescription.trim() !== '' &&
-      rules.every(
-        rule => rule.title.trim() !== '' && rule.description.trim() !== '',
-      )
-    );
-  };
-
-  useEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        <TouchableOpacity
-          style={{
-            backgroundColor: isFormValid() ? '#00137f' : '#b0b0b0',
-            borderRadius: 20,
-            paddingVertical: 6,
-            paddingHorizontal: 16,
-            marginRight: 5,
-          }}
-          onPress={handleCreateCommunity}
-          disabled={!isFormValid()}>
-          <Text
-            style={{
-              color: '#fff',
-              fontSize: 13,
-              fontWeight: 'bold',
-            }}>
-            Create
-          </Text>
-        </TouchableOpacity>
-      ),
-    });
-  }, [navigation, newCommunityName, newCommunityDescription, rules]);
+const CommunityEditRules = ({ navigation }) => {
+  const [rules, setRules] = useState([{ title: '', description: '' }]);
 
   const addNewRule = () => {
     if (rules.length < 5) {
@@ -161,7 +109,7 @@ const CreateCommunity = ({navigation}) => {
   const updateRule = (index, field, value) => {
     const updatedRules = rules.map((rule, i) => {
       if (i === index) {
-        return {...rule, [field]: value};
+        return { ...rule, [field]: value };
       }
       return rule;
     });
@@ -176,53 +124,46 @@ const CreateCommunity = ({navigation}) => {
     }
   };
 
+  const handleSaveRules = () => {
+    console.log('Rules saved:', rules);
+    // Implement logic to save rules, e.g., API call
+  };
+
+  const isFormValid = () => {
+    return rules.every(
+      rule => rule.title.trim() !== '' && rule.description.trim() !== ''
+    );
+  };
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity
+          style={{
+            backgroundColor: isFormValid() ? '#00137f' : '#b0b0b0',
+            borderRadius: 20,
+            paddingVertical: 6,
+            paddingHorizontal: 16,
+            marginRight: 5,
+          }}
+          onPress={handleSaveRules}
+          disabled={!isFormValid()}>
+          <Text
+            style={{
+              color: '#fff',
+              fontSize: 13,
+              fontWeight: 'bold',
+            }}>
+            Save
+          </Text>
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation, rules]);
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
-        <View style={styles.communityName}>
-          <Text style={styles.communityNameText}>Community Name</Text>
-          <TextInput
-            maxLength={30}
-            style={[
-              styles.communityNameInput,
-              {height: Math.max(35, inputNameHeight)},
-            ]}
-            multiline={true}
-            onContentSizeChange={e => {
-              const {height} = e.nativeEvent.contentSize;
-              setInputNameHeight(height);
-            }}
-            value={newCommunityName}
-            onChangeText={setNewCommunityName}
-          />
-          <Text style={styles.communityNameSubText}>
-            Name must be between 3 and 30 characters and can't include symbols,
-            hashtags or @username.
-          </Text>
-        </View>
-        <View style={styles.communityDescription}>
-          <Text style={styles.communityDescriptionText}>
-            Community Description
-          </Text>
-          <TextInput
-            maxLength={150}
-            style={[
-              styles.communityDescriptionInput,
-              {height: Math.max(35, inputHeightDescription)},
-            ]}
-            multiline={true}
-            onContentSizeChange={e => {
-              const {height} = e.nativeEvent.contentSize;
-              setInputHeightDescription(height);
-            }}
-            value={newCommunityDescription}
-            onChangeText={setNewCommunityDescription}
-          />
-          <Text style={styles.communityDescriptionSubText}>
-            A strong description describes your Community and makes people know
-            the purpose of the Community you created.
-          </Text>
-        </View>
         <View style={styles.communityRules}>
           <Text style={styles.communityRulesText}>Community Rules</Text>
           {rules.map((rule, index) => (
@@ -232,7 +173,6 @@ const CreateCommunity = ({navigation}) => {
               index={index}
               updateRule={updateRule}
               onDelete={deleteRule}
-              canDelete={rules.length > 1}
             />
           ))}
           <Text style={styles.communityRulesSubText}>
@@ -258,46 +198,6 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     backgroundColor: '#f5f5f5',
-  },
-  communityName: {
-    marginBottom: 20,
-  },
-  communityNameText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#000',
-  },
-  communityNameInput: {
-    marginTop: 5,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-    padding: 10,
-    backgroundColor: '#f6f6f6',
-  },
-  communityNameSubText: {
-    fontSize: 12,
-    color: '#888',
-  },
-  communityDescription: {
-    marginBottom: 20,
-  },
-  communityDescriptionText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#000',
-  },
-  communityDescriptionInput: {
-    marginTop: 5,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-    padding: 10,
-    backgroundColor: '#f6f6f6',
-  },
-  communityDescriptionSubText: {
-    fontSize: 12,
-    color: '#888',
   },
   communityRules: {
     marginBottom: 15,
@@ -368,6 +268,18 @@ const styles = StyleSheet.create({
     color: '#000',
     marginBottom: 5,
   },
+  communityRulesInputTitle: {
+    borderColor: '#ccc',
+    borderRadius: 5,
+    padding: 10,
+    backgroundColor: '#f6f6f6',
+  },
+  communityRulesInputDescription: {
+    borderColor: '#ccc',
+    borderRadius: 5,
+    padding: 10,
+    backgroundColor: '#f6f6f6',
+  },
 });
 
-export default CreateCommunity;
+export default CommunityEditRules;

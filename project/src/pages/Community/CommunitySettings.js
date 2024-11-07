@@ -243,23 +243,13 @@ const CommunitySettings = () => {
         </View>
         {dropdownVisible && (
           <View style={styles.dropdownMenu}>
-            <TouchableOpacity style={styles.dropdownItem}>
-              <MaterialCommunityIcons
-                name="pencil"
-                size={20}
-                color="#000"
-                style={styles.dropdownIcon}
-              />
+            <TouchableOpacity style={styles.dropdownItem} onPress={() => navigation.navigate('CommunityEditRules')}>
+              <MaterialCommunityIcons name="pencil" size={20} color="#000" style={styles.dropdownIcon} />
               <Text style={styles.dropdownItemText}>Edit Rules</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.dropdownItem}>
-              <MaterialCommunityIcons
-                name="delete"
-                size={20}
-                color="red"
-                style={styles.dropdownIcon}
-              />
-              <Text style={styles.dropdownItemText}>Delete Rules</Text>
+              <MaterialCommunityIcons name="delete" size={20} color="red" style={styles.dropdownIcon} />
+              <Text style={styles.dropdownItemText}>Delete Rules</Text> 
             </TouchableOpacity>
           </View>
         )}

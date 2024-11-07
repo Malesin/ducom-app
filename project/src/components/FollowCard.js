@@ -11,6 +11,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../config';
 import { useNavigation } from '@react-navigation/native';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 const serverUrl = config.SERVER_URL;
 
@@ -58,32 +59,48 @@ const FollowCard = ({ followText, followingText, removeButtonText, message, data
     navigation.navigate('Userprofile', { userIdPost: data._id, idUser: myId });
   };
 
-  return (
-    <View style={styles.container}>
-      <TouchableOpacity onPress={handleNavigateToUserProfile}>
-        <Image
-          source={
-            data?.profilePicture
-              ? { uri: data?.profilePicture }
-              : require('../assets/profilepic.png')}
-          style={styles.profileImage}
-        />
-      </TouchableOpacity>
-      <Text style={styles.username} onPress={handleNavigateToUserProfile}>
-        {data?.username}
-      </Text>
-      {!isMyId && (<>
-        <TouchableOpacity
-          style={[styles.messageButton, isFollowing && styles.followingButton]}
-          onPress={handleFollowToggle}
-        >
-          <Text style={[styles.messageButtonText, isFollowing && styles.followingButtonText]}>
-            {isFollowing ? followingText : followText}
-          </Text>
-        </TouchableOpacity>
-      </>)}
-    </View>
-  );
+    const handleMorePress = () => {
+        console.log('More options pressed');
+        setIsModalVisible(true);
+    };
+
+    return (
+        <View style={styles.container}>
+            <TouchableOpacity onPress={handleNavigateToUserProfile}>
+                <Image  
+                    source={
+                        data?.profilePicture
+                            ? { uri: data?.profilePicture }
+                            : require('../assets/profilepic.png')}
+                    style={styles.profileImage}
+                />
+            </TouchableOpacity>
+            <Text style={styles.username} onPress={handleNavigateToUserProfile}>
+                {data?.username}
+            </Text>
+            <TouchableOpacity
+                style={[styles.messageButton, isFollowing && styles.followingButton]}
+                onPress={handleFollowToggle}
+            >
+                <Text style={[styles.messageButtonText, isFollowing && styles.followingButtonText]}>
+                    {isFollowing ? followingText : followText}
+                </Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.iconButton} onPress={handleMorePress}>
+                <MaterialIcons name="more-horiz" size={20} color="#000" />
+            </TouchableOpacity>
+            <FollowSheet
+                isVisible={isModalVisible}
+                onClose={handleCloseModal}
+                onRemove={() => {
+                    handleCloseModal();
+                }}
+                username={data?.username}
+                removeButtonText={removeButtonText}
+                message={message}
+            />
+        </View>
+    );
 };
 
 export default FollowCard;
