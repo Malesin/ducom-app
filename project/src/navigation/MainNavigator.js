@@ -28,6 +28,7 @@ import {
   CreateCommunity,
   CommunitySettings,
   CommunityList,
+  CommunityEditRules,
 } from '../pages';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -223,6 +224,11 @@ export default function MainNavigation() {
           name="CommunityList"
           component={CommunityList}
           options={{headerShown: true, title: 'Community List'}}
+        />
+        <Stack.Screen
+          name="CommunityEditRules"
+          component={CommunityEditRules}
+          options={{ headerShown: true, title: 'Edit Rules' }}
         />
         <Stack.Screen
           name="CommunitySettings"

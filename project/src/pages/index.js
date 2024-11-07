@@ -48,6 +48,7 @@ import ViewCommunity from './Community/ViewCommunity';
 import CreateCommunity from './Community/CreateCommunity';
 import CommunitySettings from './Community/CommunitySettings';
 import CommunityList from './Community/CommunityList';
+import CommunityEditRules from './Community/CommunityEditRules';
 
 export {
   Splashscreen,
@@ -100,4 +101,5 @@ export {
   CreateCommunity,
   CommunitySettings,
   CommunityList,
+  CommunityEditRules,
 };
