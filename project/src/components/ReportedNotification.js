@@ -11,7 +11,7 @@ import {
 import ProfilePicture from '../assets/iya.png';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useNavigation, useFocusEffect} from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 
 const ReportedNotification = ({ notif }) => {
   const newNotif = notif[0];
@@ -115,8 +115,16 @@ const ReportedNotification = ({ notif }) => {
               </Text>
               <View style={styles.reasonMessageContainer}>
                 <Image source={ProfilePicture} style={styles.profileImage} />
-                <Text style={styles.userInfo}>{newNotif?.report.reportedPost.user.username}</Text>
-                <Text style={styles.userMessage}>{newNotif?.report.reportedPost.description || ''}</Text>
+                <Text style={styles.userInfo}>
+                  {newNotif?.relatedPost?.user?.username
+                    ?? newNotif?.report?.reportedPost?.user?.username
+                    ?? 'Unknown User'}
+                </Text>
+                <Text style={styles.userMessage}>
+                  {newNotif?.relatedPost?.description
+                    ?? newNotif?.report?.reportedPost?.description
+                    ?? 'No description available'}
+                </Text>
               </View>
               <Text style={styles.profileMessage}>
                 You shared this on your profile

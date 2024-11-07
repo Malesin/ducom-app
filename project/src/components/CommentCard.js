@@ -37,6 +37,7 @@ const CommentCard = ({
   parentCommentId,
   isAdmin,
   amIAdmin,
+  childComment
 }) => {
   const [isLiked, setIsLiked] = useState(isLikedCom);
   const [showReplies, setShowReplies] = useState(false);
@@ -190,6 +191,7 @@ const CommentCard = ({
                       parentCommentId={commentId}
                       isAdmin={isAdmin}
                       amIAdmin={amIAdmin}
+                      childComment={true}
                     />
                   </View>
                 ))}
@@ -241,6 +243,7 @@ const CommentCard = ({
               parentCommentId={parentCommentId}
               isAdmin={isAdmin}
               amIAdmin={amIAdmin}
+              childComment={childComment}
             />
           </View>
         </Modal>

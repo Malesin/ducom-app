@@ -15,11 +15,11 @@ import { useNavigation } from '@react-navigation/native';
 const serverUrl = config.SERVER_URL;
 
 const FollowCard = ({ followText, followingText, removeButtonText, message, data, myId }) => {
-    const navigation = useNavigation();
+  const navigation = useNavigation();
 
-    const [isFollowing, setIsFollowing] = useState(false);
-    const [isModalVisible, setIsModalVisible] = useState(false);
-    const isMyId = myId === data._id
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const isMyId = myId === data._id
 
   useEffect(() => {
     const isFollow = data.followers.some(follow => follow === myId);
@@ -35,7 +35,7 @@ const FollowCard = ({ followText, followingText, removeButtonText, message, data
         [follow]: data?._id
       }
       setIsFollowing(!isFollowing);
-      
+
       await axios
         .post(`${serverUrl}/${isFollowing ? 'unfollow' : 'follow'}`, dataSent
         )
@@ -50,51 +50,40 @@ const FollowCard = ({ followText, followingText, removeButtonText, message, data
     }
   };
 
-    const handleCloseModal = () => {
-        setIsModalVisible(false);
-    };
+  const handleCloseModal = () => {
+    setIsModalVisible(false);
+  };
 
-    const handleNavigateToUserProfile = () => {
-        navigation.navigate('Userprofile', { userIdPost: data._id, idUser: myId });
-    };
+  const handleNavigateToUserProfile = () => {
+    navigation.navigate('Userprofile', { userIdPost: data._id, idUser: myId });
+  };
 
-    return (
-        <View style={styles.container}>
-            <TouchableOpacity onPress={handleNavigateToUserProfile}>
-                <Image  
-                    source={
-                        data?.profilePicture
-                            ? { uri: data?.profilePicture }
-                            : require('../assets/profilepic.png')}
-                    style={styles.profileImage}
-                />
-            </TouchableOpacity>
-            <Text style={styles.username} onPress={handleNavigateToUserProfile}>
-                {data?.username}
-            </Text>
-            <TouchableOpacity
-                style={[styles.messageButton, isFollowing && styles.followingButton]}
-                onPress={handleFollowToggle}
-            >
-                <Text style={[styles.messageButtonText, isFollowing && styles.followingButtonText]}>
-                    {isFollowing ? followingText : followText}
-                </Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.iconButton} onPress={handleMorePress}>
-                <MaterialIcons name="more-horiz" size={20} color="#000" />
-            </TouchableOpacity>
-            <FollowSheet
-                isVisible={isModalVisible}
-                onClose={handleCloseModal}
-                onRemove={() => {
-                    handleCloseModal();
-                }}
-                username={data?.username}
-                removeButtonText={removeButtonText}
-                message={message}
-            />
-        </View>
-    );
+  return (
+    <View style={styles.container}>
+      <TouchableOpacity onPress={handleNavigateToUserProfile}>
+        <Image
+          source={
+            data?.profilePicture
+              ? { uri: data?.profilePicture }
+              : require('../assets/profilepic.png')}
+          style={styles.profileImage}
+        />
+      </TouchableOpacity>
+      <Text style={styles.username} onPress={handleNavigateToUserProfile}>
+        {data?.username}
+      </Text>
+      {!isMyId && (<>
+        <TouchableOpacity
+          style={[styles.messageButton, isFollowing && styles.followingButton]}
+          onPress={handleFollowToggle}
+        >
+          <Text style={[styles.messageButtonText, isFollowing && styles.followingButtonText]}>
+            {isFollowing ? followingText : followText}
+          </Text>
+        </TouchableOpacity>
+      </>)}
+    </View>
+  );
 };
 
 export default FollowCard;

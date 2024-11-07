@@ -19,10 +19,10 @@ const serverUrl = config.SERVER_URL;
 
 const ReportScreen = () => {
   const route = useRoute();
-  const { reportPostId, reportUserId } = route.params;
+  const { reportPostId, reportUserId, reportCommentId, reportParentCommentId } = route.params;
   const [checkedItems, setCheckedItems] = useState({});
   const navigation = useNavigation();
-
+console.log(reportCommentId)
   const handleCheckboxPress = item => {
     setCheckedItems(prevState => ({
       ...prevState,
@@ -65,7 +65,8 @@ const ReportScreen = () => {
         .post(`${serverUrl}/report`, {
           token: token,
           reportPostId: reportPostId,
-          // reportCommentId: reportCommentId, // FOR REPORT COMMENT
+          reportCommentId: reportParentCommentId, // FOR REPORT COMMENT
+          reportParentCommentId: reportCommentId, // FOR REPORT CHILD COMMENT
           reportUserId: reportUserId, // FOR REPORT USER
           reportCategory: reportCategory
         })
