@@ -15,6 +15,7 @@ import {
 import React, {useState} from 'react';
 import axios from 'axios';
 import config from '../../config';
+import { useFocusEffect } from '@react-navigation/native';
 
 const serverUrl = config.SERVER_URL;
 
@@ -23,6 +24,12 @@ const Forgotpassword = ({navigation}) => {
   const [error, setError] = useState('');
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const colorScheme = useColorScheme();
+
+  useFocusEffect(
+    React.useCallback(() => {
+      setIsButtonDisabled(false);
+    }, [])
+  );
 
   const handleContinue = async () => {
     setIsButtonDisabled(true);

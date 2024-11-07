@@ -17,7 +17,7 @@ const CommunityCard = ({navigation, communityCardData = {}}) => {
   const [commentsCount] = useState(0);
 
   const handleLike = () => {
-    if (liked) {
+    if (liked) {  
       setLiked(false);
       setLikesCount(prevLikesCount => prevLikesCount - 1);
     } else {
@@ -42,7 +42,7 @@ const CommunityCard = ({navigation, communityCardData = {}}) => {
 
   const InteractionButton = ({icon, color, count, onPress}) => (
     <TouchableOpacity style={styles.actionButton} onPress={onPress}>
-      <MaterialCommunityIcons name={icon} size={20} color={color} />
+      <MaterialCommunityIcons name={icon} size={20} color={color} /> 
       <Text style={styles.actionText}>{count}</Text>
     </TouchableOpacity>
   );

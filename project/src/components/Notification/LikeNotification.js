@@ -11,7 +11,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import DefaultAvatar from '../../assets/profilepic.png';
 import PostImage from '../../assets/iya.png';
 import {useNavigation} from '@react-navigation/native';
-import {formatNotification} from '../../pages/Home/formatNotification';
+import {formatNotification} from '../../pages/Notification/formatNotification';
 import {createThumbnail} from 'react-native-create-thumbnail';
 
 const LikeNotification = ({likeNotification}) => {
