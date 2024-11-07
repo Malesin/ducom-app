@@ -1,0 +1,9 @@
+const deleteRule = index => {
+  // ... existing code ...
+  if (rules.length > 1) {
+    const newRules = [...rules];
+    newRules.splice(index, 1);
+    setRules(newRules);
+  }
+  // ... existing code ...
+}; 
