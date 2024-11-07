@@ -14,9 +14,6 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import {useFocusEffect} from '@react-navigation/native';
 import {Skeleton} from 'react-native-elements';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-const verifiedIcon = (
-  <MaterialIcons name="verified" size={18} color="#699BF7" />
-);
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../../config';
@@ -36,7 +33,6 @@ const Userprofile = ({userIdPost, navigation, idUser}) => {
 
   useEffect(() => {
     navigation.setOptions({title: ''});
-    console.log();
   }, [navigation]);
 
   const getData = async () => {
@@ -74,7 +70,6 @@ const Userprofile = ({userIdPost, navigation, idUser}) => {
 
   useEffect(() => {
     getData();
-    ``;
   }, []);
 
   useFocusEffect(
@@ -178,9 +173,6 @@ const Userprofile = ({userIdPost, navigation, idUser}) => {
   const blockUser = async () => {
     const token = await AsyncStorage.getItem('token');
     try {
-      const type = 'Block';
-      const typing = 'blocking';
-      const typed = 'Blocked';
       if (!isBlocked) {
         const block = await axios.post(`${serverUrl}/block-user`, {
           token: token,
@@ -229,7 +221,7 @@ const Userprofile = ({userIdPost, navigation, idUser}) => {
               <View style={styles.dropdownMenu}>
                 <TouchableOpacity
                   style={styles.dropdownItem}
-                  onPress={() => handleDropdownItemPress('Mute')}>
+                  onPress={() => handleDropdownItemPress(' Mute')}>
                   {isMuted ? (
                     <MaterialIcons name="volume-up" size={20} color="#000" />
                   ) : (
@@ -322,9 +314,9 @@ const Userprofile = ({userIdPost, navigation, idUser}) => {
                 <>
                   <TouchableOpacity
                     onPress={() =>
-                      navigation.navigate('UserFollow', {
+                      navigation.navigate('User Follow', {
                         username: userData?.username,
-                        userId: userIdPost
+                        userId: userIdPost,
                       })
                     }>
                     <Text style={styles.statNumber}>
@@ -355,7 +347,7 @@ const Userprofile = ({userIdPost, navigation, idUser}) => {
                 <>
                   <TouchableOpacity
                     onPress={() =>
-                      navigation.navigate('UserFollow', {
+                      navigation.navigate('User Follow', {
                         username: userData?.username,
                       })
                     }>
@@ -372,19 +364,7 @@ const Userprofile = ({userIdPost, navigation, idUser}) => {
         <View style={styles.userInfoWrapper}>
           <View style={styles.userInfoContainer}>
             <View style={styles.nameContainer}>
-              {!userData ? (
-                <Skeleton
-                  animation="pulse"
-                  height={20}
-                  width={150}
-                  style={[styles.skeleton, {borderRadius: 3}]}
-                />
-              ) : (
-                <Text style={styles.name}>{userData?.name}</Text>
-              )}
-              {userData?.isAdmin && (
-                <Text style={styles.verifiedIcon}>{verifiedIcon}</Text>
-              )}
+              <Text style={styles.name}>{userData?.name}</Text>
             </View>
             {!userData ? (
               <Skeleton
@@ -394,7 +374,22 @@ const Userprofile = ({userIdPost, navigation, idUser}) => {
                 style={[styles.skeleton, {borderRadius: 3}]}
               />
             ) : (
-              <Text style={styles.username}>@{userData?.username}</Text>
+              <View style={styles.usernameContainer}>
+                <Text
+                  style={styles.username}
+                  numberOfLines={1}
+                  ellipsizeMode="tail">
+                  @{userData?.username}
+                </Text>
+                {userData?.isAdmin && (
+                  <MaterialIcons
+                    name="verified"
+                    size={18}
+                    color="#699BF7"
+                    style={styles.verifiedIcon}
+                  />
+                )}
+              </View>
             )}
             {!userData ? (
               <Skeleton
@@ -404,7 +399,10 @@ const Userprofile = ({userIdPost, navigation, idUser}) => {
                 style={[styles.skeleton, {borderRadius: 3}]}
               />
             ) : (
-              <Text style={styles.description}>
+              <Text
+                style={styles.description}
+                numberOfLines={2}
+                ellipsizeMode="tail">
                 {userData?.bio || 'No Description'}
               </Text>
             )}
@@ -417,17 +415,22 @@ const Userprofile = ({userIdPost, navigation, idUser}) => {
               style={[styles.skeleton, {borderRadius: 20, marginRight: 15}]}
             />
           ) : (
-            <TouchableOpacity
-              style={[styles.editButton, isFollowing && styles.followingButton]}
-              onPress={handleFollowPress}>
-              <Text
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
                 style={[
-                  styles.editButtonText,
-                  isFollowing && styles.followingButtonText,
-                ]}>
-                {isFollowing ? 'Following' : 'Follow'}
-              </Text>
-            </TouchableOpacity>
+                  styles.editButton,
+                  isFollowing && styles.followingButton,
+                ]}
+                onPress={handleFollowPress}>
+                <Text
+                  style={[
+                    styles.editButtonText,
+                    isFollowing && styles.followingButtonText,
+                  ]}>
+                  {isFollowing ? 'Following' : 'Follow'}
+                </Text>
+              </TouchableOpacity>
+            </View>
           )}
         </View>
       </View>
@@ -473,7 +476,6 @@ const styles = StyleSheet.create({
   profileContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 6,
     paddingHorizontal: 10,
   },
   profile: {
@@ -511,46 +513,57 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginLeft: 20,
+    marginRight: 20,
   },
   userInfoContainer: {
+    flex: 1,
     marginTop: 10,
     marginBottom: 10,
+    marginRight: 10,
   },
   nameContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    width: '100%',
   },
   name: {
     fontSize: 17,
     fontWeight: 'bold',
     color: '#000',
-    marginBottom: 5,
     marginRight: 5,
+    flex: 1,
+  },
+  usernameContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 5,
   },
   verifiedIcon: {
-    paddingVertical: 3,
+    paddingVertical: 5,
     paddingHorizontal: 5,
   },
   username: {
     fontSize: 14,
     color: '#00c5ff',
-    marginBottom: 5,
   },
   description: {
     fontSize: 13,
     color: '#000',
+    flexShrink: 1,
+  },
+  buttonContainer: {
+    width: 120,
+    alignSelf: 'flex-start',
+    marginVertical: 10,
   },
   editButton: {
-    alignSelf: 'flex-start',
     backgroundColor: '#001374',
     borderColor: '#000',
     borderWidth: 1,
     paddingVertical: 5,
-    paddingHorizontal: 50,
     borderRadius: 100,
-    marginTop: 20,
-    marginBottom: 20,
-    marginRight: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   editButtonText: {
     fontSize: 13,
@@ -619,10 +632,10 @@ const styles = StyleSheet.create({
   dropdownIcon: {
     marginRight: 10,
   },
-  unmuteIcon: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
+  skeletonContainer: {
+    flex: 1,
+    marginRight: 10,
   },
 });
+
 export default Userprofile;
