@@ -19,7 +19,7 @@ import axios from 'axios';
 import config from '../../config';
 const serverUrl = config.SERVER_URL;
 
-const Userprofile = ({userIdPost, navigation, idUser}) => {
+const Userprofile = ({userIdPost, navigation}) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [banner, setBanner] = useState(false);
   const [profilePicture, setProfilePicture] = useState(false);
@@ -44,6 +44,7 @@ const Userprofile = ({userIdPost, navigation, idUser}) => {
         userId: userIdPost,
       });
       const user = userResponse.data.data;
+      const idUser = userResponse.data.myId
       const isFollow = user?.followers.some(follow => follow._id === idUser);
       setIsFollowing(isFollow);
       setUserData(user);
@@ -123,6 +124,8 @@ const Userprofile = ({userIdPost, navigation, idUser}) => {
     });
 
     try {
+      setIsFollowing(!isFollowing);
+
       const token = await AsyncStorage.getItem('token');
       if (isFollowing) {
         const unfollow = await axios.post(`${serverUrl}/unfollow`, {
@@ -137,7 +140,6 @@ const Userprofile = ({userIdPost, navigation, idUser}) => {
         });
         console.log(follow.data);
       }
-      setIsFollowing(!isFollowing);
     } catch (error) {
       setIsFollowing(isFollowing);
       console.error(error);
@@ -314,7 +316,7 @@ const Userprofile = ({userIdPost, navigation, idUser}) => {
                 <>
                   <TouchableOpacity
                     onPress={() =>
-                      navigation.navigate('User Follow', {
+                      navigation.navigate('UserFollow', {
                         username: userData?.username,
                         userId: userIdPost,
                       })
@@ -347,8 +349,9 @@ const Userprofile = ({userIdPost, navigation, idUser}) => {
                 <>
                   <TouchableOpacity
                     onPress={() =>
-                      navigation.navigate('User Follow', {
+                      navigation.navigate('UserFollow', {
                         username: userData?.username,
+                        userId: userIdPost,
                       })
                     }>
                     <Text style={styles.statNumber}>

@@ -49,7 +49,7 @@ import CreateCommunity from './Community/CreateCommunity';
 import CommunitySettings from './Community/CommunitySettings';
 import CommunityList from './Community/CommunityList';
 import CommunityEditRules from './Community/CommunityEditRules';
-
+import NewUserProfile from './Userprofile/NewUserProfile';
 export {
   Splashscreen,
   Authscreen,
@@ -102,4 +102,5 @@ export {
   CommunitySettings,
   CommunityList,
   CommunityEditRules,
+  NewUserProfile,
 };
