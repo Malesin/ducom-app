@@ -518,9 +518,9 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   avatar: {
-    width: 35,
+    width: 40,
     height: 40,
-    borderRadius: 20,
+    borderRadius: 100,
     marginRight: 12,
   },
   userDetails: {
