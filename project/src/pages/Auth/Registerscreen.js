@@ -7,14 +7,14 @@ import {
   ScrollView,
   useColorScheme,
 } from 'react-native';
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Toast from 'react-native-toast-message';
 import axios from 'axios';
 import config from '../../config';
 const serverUrl = config.SERVER_URL;
 
-const RegisterScreen = ({ navigation }) => {
+const RegisterScreen = ({navigation}) => {
   const [name, setName] = useState('');
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
@@ -112,13 +112,13 @@ const RegisterScreen = ({ navigation }) => {
     setErrors(newErrors);
 
     if (valid) {
-      const userData = { name, username, email, password };
+      const userData = {name, username, email, password};
 
       setTimeout(() => {
         axios
           .post(`${serverUrl}/register`, userData)
           .then(res => {
-            const { status } = res.data;
+            const {status} = res.data;
             switch (status) {
               case 'ok':
                 Toast.show({
@@ -183,7 +183,7 @@ const RegisterScreen = ({ navigation }) => {
           style={[
             styles.input,
             errors.name ? styles.errorInput : null,
-            { color: colorScheme === 'dark' ? '#000000' : '#000' },
+            {color: colorScheme === 'dark' ? '#000000' : '#000'},
           ]}
           onChangeText={text => setName(text.slice(0, 40))}
           value={name}
@@ -196,7 +196,7 @@ const RegisterScreen = ({ navigation }) => {
           style={[
             styles.input,
             errors.username ? styles.errorInput : null,
-            { color: colorScheme === 'dark' ? '#000000' : '#000' },
+            {color: colorScheme === 'dark' ? '#000000' : '#000'},
           ]}
           onChangeText={text => setUsername(text.slice(0, 15))}
           value={username}
@@ -211,7 +211,7 @@ const RegisterScreen = ({ navigation }) => {
           style={[
             styles.input,
             errors.email ? styles.errorInput : null,
-            { color: colorScheme === 'dark' ? '#000000' : '#000' },
+            {color: colorScheme === 'dark' ? '#000000' : '#000'},
           ]}
           onChangeText={text => setEmail(text)}
           value={email}
@@ -230,7 +230,7 @@ const RegisterScreen = ({ navigation }) => {
           <TextInput
             style={[
               styles.passwordInput,
-              { color: colorScheme === 'dark' ? '#000000' : '#000' },
+              {color: colorScheme === 'dark' ? '#000000' : '#000'},
             ]}
             onChangeText={text => setPassword(text.slice(0, 25))}
             value={password}
@@ -262,7 +262,7 @@ const RegisterScreen = ({ navigation }) => {
           <TextInput
             style={[
               styles.passwordInput,
-              { color: colorScheme === 'dark' ? '#000000' : '#000' },
+              {color: colorScheme === 'dark' ? '#000000' : '#000'},
             ]}
             onChangeText={text => setConfirmPassword(text.slice(0, 25))}
             value={confirmpassword}
@@ -312,7 +312,7 @@ const RegisterScreen = ({ navigation }) => {
           Already signed up?{' '}
           <Text
             style={styles.loginLink}
-            onPress={() => navigation.navigate('Signin')}>
+            onPress={() => navigation.navigate('Homescreen')}>
             Log In
           </Text>
         </Text>

@@ -19,22 +19,25 @@ import {PanGestureHandler} from 'react-native-gesture-handler';
 
 const DELETE_THRESHOLD = -75;
 
-const SwipeableRule = ({rule, index, updateRule, onDelete}) => {
+const SwipeableRule = ({rule, index, updateRule, onDelete, canDelete}) => {
   const translateX = useSharedValue(0);
   const isRemoving = useSharedValue(false);
 
   const panGesture = useAnimatedGestureHandler({
     onStart: (_, context) => {
+      if (!canDelete) return; 
       isRemoving.value = false;
       context.x = translateX.value;
     },
     onActive: (event, context) => {
+      if (!canDelete) return; 
       if (!isRemoving.value) {
         const newValue = context.x + event.translationX;
         translateX.value = Math.min(0, Math.max(newValue, -100));
       }
     },
     onEnd: () => {
+      if (!canDelete) return; 
       if (translateX.value < DELETE_THRESHOLD) {
         isRemoving.value = true;
         translateX.value = withSpring(-100, {}, finished => {
@@ -58,6 +61,7 @@ const SwipeableRule = ({rule, index, updateRule, onDelete}) => {
   const deleteButtonStyle = useAnimatedStyle(() => {
     return {
       transform: [{translateX: translateX.value + 100}],
+      opacity: canDelete ? 1 : 0, 
     };
   });
 
@@ -65,12 +69,13 @@ const SwipeableRule = ({rule, index, updateRule, onDelete}) => {
     <View style={styles.ruleWrapper}>
       <Animated.View style={[styles.deleteButton, deleteButtonStyle]}>
         <TouchableOpacity
-          onPress={() => onDelete(index)}
-          style={styles.deleteButtonInner}>
+          onPress={() => canDelete && onDelete(index)}
+          style={styles.deleteButtonInner}
+          disabled={!canDelete}>
           <Text style={styles.deleteButtonText}>Delete</Text>
         </TouchableOpacity>
       </Animated.View>
-      <PanGestureHandler onGestureEvent={panGesture}>
+      <PanGestureHandler onGestureEvent={panGesture} enabled={canDelete}>
         <Animated.View style={[styles.ruleContainer, rStyle]}>
           <Text style={styles.ruleNumber}>Rule {index + 1}</Text>
           <TextInput
@@ -162,6 +167,7 @@ const CreateCommunity = ({navigation}) => {
   };
 
   const deleteRule = index => {
+    if (rules.length <= 1) return;
     const newRules = [...rules];
     newRules.splice(index, 1);
     setRules(newRules);
@@ -223,6 +229,7 @@ const CreateCommunity = ({navigation}) => {
               index={index}
               updateRule={updateRule}
               onDelete={deleteRule}
+              canDelete={rules.length > 1}
             />
           ))}
           <Text style={styles.communityRulesSubText}>
