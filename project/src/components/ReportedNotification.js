@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   StyleSheet,
   Text,
@@ -13,7 +13,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useNavigation, useFocusEffect} from '@react-navigation/native';
 
-const ReportedNotification = ({ notif }) => {
+const ReportedNotification = ({notif}) => {
   const newNotif = notif[0];
   const slideAnim = useRef(new Animated.Value(-50)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -66,7 +66,7 @@ const ReportedNotification = ({ notif }) => {
   useFocusEffect(
     React.useCallback(() => {
       return () => setModalVisible(false);
-    }, [])
+    }, []),
   );
 
   return (
@@ -75,7 +75,7 @@ const ReportedNotification = ({ notif }) => {
         style={[
           styles.container,
           {
-            transform: [{ translateY: slideAnim }],
+            transform: [{translateY: slideAnim}],
             opacity: fadeAnim,
           },
         ]}>
@@ -103,7 +103,9 @@ const ReportedNotification = ({ notif }) => {
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalMessage}>We are warning you</Text>
-              <Text style={styles.modalDate}>{formatDate(newNotif?.created_at)}</Text>
+              <Text style={styles.modalDate}>
+                {formatDate(newNotif?.created_at)}
+              </Text>
             </View>
             <View style={styles.separator} />
             <View style={styles.reasonContainer}>
@@ -115,8 +117,16 @@ const ReportedNotification = ({ notif }) => {
               </Text>
               <View style={styles.reasonMessageContainer}>
                 <Image source={ProfilePicture} style={styles.profileImage} />
-                <Text style={styles.userInfo}>{newNotif?.report.reportedPost.user.username}</Text>
-                <Text style={styles.userMessage}>{newNotif?.report.reportedPost.description || ''}</Text>
+                <Text style={styles.userInfo}>
+                  {newNotif?.relatedPost?.user?.username ??
+                    newNotif?.report?.reportedPost?.user?.username ??
+                    'Unknown User'}
+                </Text>
+                <Text style={styles.userMessage}>
+                  {newNotif?.relatedPost?.description ??
+                    newNotif?.report?.reportedPost?.description ??
+                    'No description available'}
+                </Text>
               </View>
               <Text style={styles.profileMessage}>
                 You shared this on your profile
@@ -126,9 +136,7 @@ const ReportedNotification = ({ notif }) => {
               </Text>
               <Text style={styles.reasonTitle}>Reports: </Text>
 
-              <Text style={styles.guidelineMessage}>
-                {reasonText}
-              </Text>
+              <Text style={styles.guidelineMessage}>{reasonText}</Text>
               <TouchableOpacity
                 style={styles.seeRuleButton}
                 onPress={() => {
@@ -308,7 +316,7 @@ const styles = StyleSheet.create({
   adminMessageContainer: {
     marginTop: 5,
     alignItems: 'flex-start',
-    marginBottom: 10
+    marginBottom: 10,
   },
   adminMessage: {
     fontSize: 14,

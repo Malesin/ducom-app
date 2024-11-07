@@ -261,7 +261,7 @@ const HomeScreen = ({navigation}) => {
     const filteredTweets = newTweets.filter(
       tweet => tweet.id !== newPinTweet?.id,
     );
-    setTweets(filteredTweets.slice(0, 4));
+    setTweets(filteredTweets.slice(0, 6));
     setRefreshing(false);
     setShowSkeleton(false);
   }, [isConnected]);

@@ -17,7 +17,7 @@ const CommunityCard = ({navigation, communityCardData = {}}) => {
   const [commentsCount] = useState(0);
 
   const handleLike = () => {
-    if (liked) {
+    if (liked) {  
       setLiked(false);
       setLikesCount(prevLikesCount => prevLikesCount - 1);
     } else {

@@ -264,7 +264,7 @@ const CommunitySettings = () => {
           </View>
         )}
         <View style={styles.rulesContainer}>
-          <View style={styles.ruleRow}>
+          <View style={styles.ruleWrapper}>
             <View style={styles.ruleIcon}>
               <Text style={styles.ruleNumber}>1</Text>
             </View>
@@ -276,7 +276,7 @@ const CommunitySettings = () => {
               </Text>
             </View>
           </View>
-          <View style={styles.ruleRow}>
+          <View style={styles.ruleWrapper}>
             <View style={styles.ruleIcon}>
               <Text style={styles.ruleNumber}>2</Text>
             </View>
@@ -287,7 +287,7 @@ const CommunitySettings = () => {
               </Text>
             </View>
           </View>
-          <View style={styles.ruleRow}>
+          <View style={styles.ruleWrapper}>
             <View style={styles.ruleIcon}>
               <Text style={styles.ruleNumber}>3</Text>
             </View>
@@ -299,7 +299,7 @@ const CommunitySettings = () => {
               </Text>
             </View>
           </View>
-          <View style={styles.ruleRow}>
+          <View style={styles.ruleWrapper}>
             <View style={styles.ruleIcon}>
               <Text style={styles.ruleNumber}>4</Text>
             </View>
@@ -509,7 +509,7 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     marginBottom: 10,
   },
-  ruleRow: {
+  ruleWrapper: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     marginVertical: 10,
