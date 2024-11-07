@@ -144,7 +144,6 @@ const CommunitySettings = () => {
           </ImageBackground>
         </TouchableOpacity>
       </View>
-
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Community Account</Text>
         <View style={styles.infoContainer}>

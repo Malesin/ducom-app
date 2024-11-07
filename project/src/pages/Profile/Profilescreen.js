@@ -19,7 +19,6 @@ import config from '../../config';
 import {Skeleton} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-const verifiedIcon = <Icon name="verified" size={18} color="#699BF7" />;
 const serverUrl = config.SERVER_URL;
 
 export default function Profilescreen() {
@@ -204,9 +203,15 @@ export default function Profilescreen() {
                   </>
                 ) : (
                   <>
-
-                    <TouchableOpacity onPress={() => navigation.navigate('Follow', { username: userData?.username })}>
-                      <Text style={styles.statNumber}>{userData ? userData?.followers.length : 0}</Text>
+                    <TouchableOpacity
+                      onPress={() =>
+                        navigation.navigate('Follow', {
+                          username: userData?.username,
+                        })
+                      }>
+                      <Text style={styles.statNumber}>
+                        {userData ? userData?.followers.length : 0}
+                      </Text>
                       <Text style={styles.statLabel}>Followers</Text>
                     </TouchableOpacity>
                   </>
@@ -230,8 +235,15 @@ export default function Profilescreen() {
                   </>
                 ) : (
                   <>
-                    <TouchableOpacity onPress={() => navigation.navigate('Follow', { username: userData?.username })}>
-                      <Text style={styles.statNumber}>{userData ? userData?.following.length : 0}</Text>
+                    <TouchableOpacity
+                      onPress={() =>
+                        navigation.navigate('Follow', {
+                          username: userData?.username,
+                        })
+                      }>
+                      <Text style={styles.statNumber}>
+                        {userData ? userData?.following.length : 0}
+                      </Text>
                       <Text style={styles.statLabel}>Following</Text>
                     </TouchableOpacity>
                   </>
@@ -252,9 +264,6 @@ export default function Profilescreen() {
                 ) : (
                   <Text style={styles.name}>{userData?.name}</Text>
                 )}
-                {userData?.isAdmin && (
-                  <Text style={styles.verifiedIcon}>{verifiedIcon}</Text>
-                )}
               </View>
               {!userData ? (
                 <Skeleton
@@ -264,7 +273,12 @@ export default function Profilescreen() {
                   style={[styles.skeleton, {borderRadius: 3}]}
                 />
               ) : (
-                <Text style={styles.username}>@{userData?.username}</Text>
+                <View style={styles.usernameContainer}>
+                  <Text style={styles.username}>@{userData?.username}</Text>
+                  {userData?.isAdmin && (
+                    <Icon name="verified" size={18} color="#699BF7" />
+                  )}
+                </View>
               )}
               {!userData ? (
                 <Skeleton
@@ -288,14 +302,15 @@ export default function Profilescreen() {
                 style={[styles.skeleton, {marginRight: 14, borderRadius: 3}]}
               />
             ) : (
-              <TouchableOpacity
-                style={styles.editButton}
-                onPress={() => navigation.navigate('EditProfile')}>
-                <Text style={styles.editButtonText}>Edit Profile</Text>
-              </TouchableOpacity>
+              <View style={styles.buttonContainer}>
+                <TouchableOpacity
+                  style={styles.editButton}
+                  onPress={() => navigation.navigate('EditProfile')}>
+                  <Text style={styles.editButtonText}>Edit Profile</Text>
+                </TouchableOpacity>
+              </View>
             )}
           </View>
-          {/*  */}
           <Modal
             visible={modalVisible}
             transparent
@@ -344,50 +359,71 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 15,
-    paddingVertical: 10,
+    paddingVertical: 5,
   },
   profile: {
-    width: 83,
-    height: 82,
-    borderRadius: 40,
+    width: 80,
+    height: 80,
+    borderRadius: 100,
   },
   profileInfoContainer: {
     flexDirection: 'column',
     alignItems: 'flex-start',
   },
+  userInfoWrapper: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginLeft: 20,
+    marginRight: 20,
+  },
   userInfoContainer: {
+    flex: 1,
+    paddingVertical: 5,
+  },
+  nameContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
     paddingVertical: 5,
   },
   name: {
     fontSize: 17,
     fontWeight: 'bold',
     color: '#000',
-    marginBottom: 5,
     marginRight: 5,
+    flex: 1,
+  },
+  usernameContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 5,
   },
   verifiedIcon: {
-    marginLeft: -1,
-    marginTop: -3,
+    paddingVertical: 5,
+    paddingHorizontal: 5,
   },
   username: {
     fontSize: 14,
     color: '#00c5ff',
-    marginBottom: 5,
   },
   description: {
     fontSize: 13,
     color: '#000',
   },
-  editButton: {
+  buttonContainer: {
+    width: 120,
     alignSelf: 'flex-start',
+    marginVertical: 10,
+  },
+  editButton: {
     backgroundColor: '#E1E8ED',
     borderColor: '#000',
     borderWidth: 1,
-    paddingVertical: 10,
-    paddingHorizontal: 30,
+    paddingVertical: 5,
     borderRadius: 100,
-    marginTop: 20,
-    marginRight: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   editButtonText: {
     fontSize: 13,
@@ -435,7 +471,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     width: 180,
     elevation: 10,
-
     padding: 10,
   },
   dropdownItem: {
@@ -471,16 +506,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 10,
-  },
-  userInfoWrapper: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: 10,
-    marginLeft: 20,
-  },
-  nameContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
   },
 });
