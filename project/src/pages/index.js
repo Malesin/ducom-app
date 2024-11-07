@@ -50,7 +50,7 @@ import CommunitySettings from './Community/CommunitySettings';
 import CommunityList from './Community/CommunityList';
 import CommunityEditRules from './Community/CommunityEditRules';
 
-export {
+  export {
   Splashscreen,
   Authscreen,
   Signinscreen,

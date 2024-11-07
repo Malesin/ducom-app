@@ -19,7 +19,7 @@ import axios from 'axios';
 import config from '../../config';
 const serverUrl = config.SERVER_URL;
 
-const Userprofile = ({userIdPost, navigation, idUser}) => {
+const Userprofile = ({userIdPost, navigation}) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [banner, setBanner] = useState(false);
   const [profilePicture, setProfilePicture] = useState(false);
@@ -31,9 +31,23 @@ const Userprofile = ({userIdPost, navigation, idUser}) => {
   const [isMuted, setIsMuted] = useState(false);
   const [isBlocked, setIsBlocked] = useState(false);
 
-  useEffect(() => {
-    navigation.setOptions({title: ''});
-  }, [navigation]);
+  // Fungsi untuk mengosongkan data pengguna
+  const resetUserData = () => {
+    setUserData('');
+    setBanner(false);
+    setProfilePicture(false);
+    setIsFollowing(false);
+    setFollowersCount(0);
+    setIsMuted(false);
+    setIsBlocked(false);
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      resetUserData(); // Panggil fungsi reset
+      getData();
+    }, [userIdPost]) // Tambahkan userIdPost sebagai dependensi
+  );
 
   const getData = async () => {
     try {
@@ -44,11 +58,12 @@ const Userprofile = ({userIdPost, navigation, idUser}) => {
         userId: userIdPost,
       });
       const user = userResponse.data.data;
+      const idUser = userResponse.data.myId;
       const isFollow = user?.followers.some(follow => follow._id === idUser);
       setIsFollowing(isFollow);
       setUserData(user);
-
-      if (user.username) {
+      console.log(userIdPost);
+      if (user?.username) {
         navigation.setOptions({title: `@${user.username}`});
       }
 
@@ -67,22 +82,6 @@ const Userprofile = ({userIdPost, navigation, idUser}) => {
       console.error('Error:', error);
     }
   };
-
-  useEffect(() => {
-    getData();
-  }, []);
-
-  useFocusEffect(
-    useCallback(() => {
-      getData();
-    }, []),
-  );
-
-  useEffect(() => {
-    if (userData?.followersCount) {
-      setFollowersCount(userData?.followersCount);
-    }
-  }, [userData]);
 
   const openModal = () => {
     setModalImageSource(profilePicture);
@@ -123,6 +122,8 @@ const Userprofile = ({userIdPost, navigation, idUser}) => {
     });
 
     try {
+      setIsFollowing(!isFollowing);
+
       const token = await AsyncStorage.getItem('token');
       if (isFollowing) {
         const unfollow = await axios.post(`${serverUrl}/unfollow`, {
@@ -137,7 +138,6 @@ const Userprofile = ({userIdPost, navigation, idUser}) => {
         });
         console.log(follow.data);
       }
-      setIsFollowing(!isFollowing);
     } catch (error) {
       setIsFollowing(isFollowing);
       console.error(error);
@@ -314,7 +314,7 @@ const Userprofile = ({userIdPost, navigation, idUser}) => {
                 <>
                   <TouchableOpacity
                     onPress={() =>
-                      navigation.navigate('User Follow', {
+                      navigation.navigate('UserFollow', {
                         username: userData?.username,
                         userId: userIdPost,
                       })
@@ -347,8 +347,9 @@ const Userprofile = ({userIdPost, navigation, idUser}) => {
                 <>
                   <TouchableOpacity
                     onPress={() =>
-                      navigation.navigate('User Follow', {
+                      navigation.navigate('UserFollow', {
                         username: userData?.username,
+                        userId: userIdPost,
                       })
                     }>
                     <Text style={styles.statNumber}>

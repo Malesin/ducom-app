@@ -50,12 +50,14 @@ const FollowCard = ({
     } catch (error) {
       setIsFollowing(isFollowing);
       console.error(error);
-      ToastAndroid.show('Something Error, Try Again Later', ToastAndroid.SHORT); // Menambahkan toast error
+      ToastAndroid.show('Something Error, Try Again Later', ToastAndroid.SHORT);
     }
   };
 
   const handleNavigateToUserProfile = () => {
-    navigation.navigate('Userprofile', {userIdPost: data._id, idUser: myId});
+    if (data._id !== myId) {
+      navigation.navigate('Userprofile', { userIdPost: data._id });
+    }
   };
 
   return (
@@ -73,17 +75,16 @@ const FollowCard = ({
       <Text style={styles.username} onPress={handleNavigateToUserProfile}>
         {data?.username}
       </Text>
-      <TouchableOpacity
-        style={[styles.messageButton, isFollowing && styles.followingButton]}
-        onPress={handleFollowToggle}>
-        <Text
-          style={[
-            styles.messageButtonText,
-            isFollowing && styles.followingButtonText,
-          ]}>
-          {isFollowing ? followingText : followText}
-        </Text>
-      </TouchableOpacity>
+      {!isMyId && (<>
+        <TouchableOpacity
+          style={[styles.messageButton, isFollowing && styles.followingButton]}
+          onPress={handleFollowToggle}
+        >
+          <Text style={[styles.messageButtonText, isFollowing && styles.followingButtonText]}>
+            {isFollowing ? followingText : followText}
+          </Text>
+        </TouchableOpacity>
+      </>)}
     </View>
   );
 };

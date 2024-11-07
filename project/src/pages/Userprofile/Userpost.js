@@ -245,37 +245,39 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
 
   useFocusEffect(
     useCallback(() => {
-      if (!isFetched) {
-        (async () => {
-          setLoading(true);
-          const newTweets = await fetchTweets(page);
-          const initialPinTweets = await fetchPinTweet();
+      setLoading(true);
+      setIsFetched(false);
+      setPage(1);
+      setTweets([]);
+      setPinTweets([]);
+      (async () => {
+        const newTweets = await fetchTweets(1);
+        const initialPinTweets = await fetchPinTweet();
 
-          if (newTweets === "You are blocked by this user" || initialPinTweets === "You are blocked by this user") {
-            setTweets("You are blocked by this user");
-            setLoading(false);
-            return;
-          } else if (newTweets === "You have blocked this user" || initialPinTweets === "You have blocked this user") {
-            setTweets("You have blocked this user");
-            setLoading(false);
-            return;
-          }
-
-          if (initialPinTweets) {
-            setPinTweets([initialPinTweets]);
-            setPinnedTweetId(initialPinTweets.id);
-          } else {
-            setPinTweets([]);
-            setPinnedTweetId(null);
-          }
-
-          const filteredTweets = newTweets.filter(tweet => tweet.id !== initialPinTweets?.id);
-          setTweets(filteredTweets.slice(0, 5));
-          setIsFetched(true);
+        if (newTweets === "You are blocked by this user" || initialPinTweets === "You are blocked by this user") {
+          setTweets("You are blocked by this user");
           setLoading(false);
-        })();
-      }
-    }, [fetchTweets, page, isFetched]),
+          return;
+        } else if (newTweets === "You have blocked this user" || initialPinTweets === "You have blocked this user") {
+          setTweets("You have blocked this user");
+          setLoading(false);
+          return;
+        }
+
+        if (initialPinTweets) {
+          setPinTweets([initialPinTweets]);
+          setPinnedTweetId(initialPinTweets.id);
+        } else {
+          setPinTweets([]);
+          setPinnedTweetId(null);
+        }
+
+        const filteredTweets = newTweets.filter(tweet => tweet.id !== initialPinTweets?.id);
+        setTweets(filteredTweets.slice(0, 5));
+        setIsFetched(true);
+        setLoading(false);
+      })();
+    }, [userIdPost])
   );
 
   const handlePostPress = (tweet) => {
