@@ -17,13 +17,13 @@ function UserTopTabNavigator({ route, navigation }) {
     }
   }, [username, navigation]);
 
-  useEffect(() => {
-    const resetData = () => {
-      console.log('Data direset');
-    };
+  // useEffect(() => {
+  //   const resetData = () => {
+  //     console.log('Data direset');
+  //   };
 
-    resetData();
-  }, [userIdPost, profilePicture, idUser, isAdmin, amIAdmin, tweet, isUserProfile]);
+  //   resetData();
+  // }, [userIdPost, profilePicture, idUser, isAdmin, amIAdmin, tweet, isUserProfile]);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);

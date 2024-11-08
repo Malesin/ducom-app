@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -8,12 +8,12 @@ import {
   TouchableOpacity,
   Image,
 } from 'react-native';
-import ProfilePicture from '../assets/iya.png';
+import ProfilePicture from '../assets/profilepic.png';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 
-const ReportedNotification = ({notif}) => {
+const ReportedNotification = ({ notif }) => {
   const newNotif = notif[0];
   const slideAnim = useRef(new Animated.Value(-50)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -75,7 +75,7 @@ const ReportedNotification = ({notif}) => {
         style={[
           styles.container,
           {
-            transform: [{translateY: slideAnim}],
+            transform: [{ translateY: slideAnim }],
             opacity: fadeAnim,
           },
         ]}>
@@ -116,16 +116,22 @@ const ReportedNotification = ({notif}) => {
                 them with content or messages that shame or disrespect them.
               </Text>
               <View style={styles.reasonMessageContainer}>
-                <Image source={ProfilePicture} style={styles.profileImage} />
+                <Image
+                  source={
+                    newNotif?.relatedPost?.user?.profilePicture
+                      ? { uri: newNotif?.relatedPost?.user?.profilePicture }
+                      : ProfilePicture
+                  }
+                  style={styles.profileImage} />
                 <Text style={styles.userInfo}>
                   {newNotif?.relatedPost?.user?.username
                     ?? newNotif?.report?.reportedPost?.user?.username
-                    ?? 'Unknown User'}
+                    ?? 'Post Deleted'}
                 </Text>
                 <Text style={styles.userMessage}>
                   {newNotif?.relatedPost?.description
                     ?? newNotif?.report?.reportedPost?.description
-                    ?? 'No description available'}
+                    ?? ''}
                 </Text>
               </View>
               <Text style={styles.profileMessage}>

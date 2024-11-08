@@ -20,9 +20,8 @@ import {useColorScheme} from 'react-native';
 
 const serverUrl = config.SERVER_URL;
 
-const SearchPage = ({navigation, route}) => {
-  const { search } = route.params;
-  const [searchText, setSearchText] = useState(search || '');
+const SearchPage = ({navigation}) => {
+  const [searchText, setSearchText] = useState('');
   const [searchs, setSearchs] = useState([]);
   const [myData, setMyData] = useState([]);
   const [debounceTimeout, setDebounceTimeout] = useState(null);
@@ -101,7 +100,7 @@ const SearchPage = ({navigation, route}) => {
   const handlePress = async search => {
     if (search._id === myData._id) {
       navigation.navigate('Profile');
-    } else if (search._id !== route.params.userIdPost) {
+    } else {
       navigation.navigate('Userprofile', {
         userIdPost: search._id,
         idUser: myData._id,
