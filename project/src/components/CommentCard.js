@@ -37,7 +37,7 @@ const CommentCard = ({
   parentCommentId,
   isAdmin,
   amIAdmin,
-  childComment
+  childComment = false
 }) => {
   const [isLiked, setIsLiked] = useState(isLikedCom);
   const [showReplies, setShowReplies] = useState(false);

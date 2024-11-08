@@ -197,7 +197,7 @@ const CreatePost = ({route, navigation}) => {
             },
           },
         );
-
+        
         if (uploadResponseVideos.data.status === 'ok') {
           const mediaDataVideos = uploadResponseVideos.data.data;
           setDataVideo(mediaDataVideos);

@@ -19,10 +19,9 @@ const serverUrl = config.SERVER_URL;
 
 const ReportScreen = () => {
   const route = useRoute();
-  const { reportPostId, reportUserId, reportCommentId, reportParentCommentId } = route.params;
+  const { reportPostId, reportUserId, commentId, report } = route.params;
   const [checkedItems, setCheckedItems] = useState({});
   const navigation = useNavigation();
-console.log(reportCommentId)
   const handleCheckboxPress = item => {
     setCheckedItems(prevState => ({
       ...prevState,
@@ -32,6 +31,9 @@ console.log(reportCommentId)
 
   const handleSubmit = async () => {
     const token = await AsyncStorage.getItem('token');
+    console.log("commentId:", commentId)
+    console.log("report:", report)
+
     try {
       const reportCategory = Object.keys(checkedItems).reduce((acc, key) => {
         if (checkedItems[key]) {
@@ -65,8 +67,8 @@ console.log(reportCommentId)
         .post(`${serverUrl}/report`, {
           token: token,
           reportPostId: reportPostId,
-          reportCommentId: reportParentCommentId, // FOR REPORT COMMENT
-          reportParentCommentId: reportCommentId, // FOR REPORT CHILD COMMENT
+          reportCommentId: commentId, // FOR REPORT COMMENT
+          reportParentCommentId: commentId, // FOR REPORT CHILD COMMENT
           reportUserId: reportUserId, // FOR REPORT USER
           reportCategory: reportCategory
         })
