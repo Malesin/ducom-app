@@ -47,7 +47,7 @@ import CommunityAbout from './Community/CommunityAbout';
 import ViewCommunity from './Community/ViewCommunity';
 import CreateCommunity from './Community/CreateCommunity';
 import CommunitySettings from './Community/CommunitySettings';
-import CommunityList from './Community/CommunityList';
+import CommunityList from './Community/CommunityUserList';
 import CommunityEditRules from './Community/CommunityEditRules';
 
   export {
