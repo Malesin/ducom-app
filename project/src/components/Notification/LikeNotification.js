@@ -9,7 +9,6 @@ import {
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import DefaultAvatar from '../../assets/profilepic.png';
-import PostImage from '../../assets/iya.png';
 import {useNavigation} from '@react-navigation/native';
 import {formatNotification} from '../../pages/Notification/formatNotification';
 import {createThumbnail} from 'react-native-create-thumbnail';
@@ -70,6 +69,12 @@ const LikeNotification = ({likeNotification}) => {
     return `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
   };
 
+  const renderUsername = (name, maxLength = 15) => {
+    return name.length > maxLength
+      ? `${name.substring(0, maxLength)}...`
+      : name;
+  };
+
   useEffect(() => {
     const generateThumbnail = async () => {
       if (
@@ -112,7 +117,7 @@ const LikeNotification = ({likeNotification}) => {
           <View style={styles.textContainer}>
             <View style={styles.nameRow}>
               <Text style={styles.userName}>
-                {likeNotification.like.user.name}
+                {renderUsername(likeNotification.like.user.name)}
               </Text>
               <Text style={styles.userNameAt}>
                 @{likeNotification.like.user.username}
@@ -146,7 +151,6 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 10,
     width: '100%',
-
   },
   notificationRow: {
     flexDirection: 'row',
