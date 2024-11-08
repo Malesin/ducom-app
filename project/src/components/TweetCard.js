@@ -460,13 +460,11 @@ const TweetCard = ({tweet, onRefreshPage, comments, isUserProfile}) => {
           <View style={styles.modalBackground}>
             <View style={styles.modalContainer}>
               {modalMediaUri ? (
-                // Debug logging
                 console.log('Modal Media URI:', {
                   uri: modalMediaUri,
                   type: typeof modalMediaUri,
                   isValidUri: /^(http|https):\/\//.test(modalMediaUri),
                 }) ||
-                // Pengecekan ekstensi file yang lebih komprehensif
                 (/\.(jpg|jpeg|png|gif|webp)$/i.test(modalMediaUri) ? (
                   <Image
                     source={{uri: modalMediaUri}}
@@ -493,7 +491,6 @@ const TweetCard = ({tweet, onRefreshPage, comments, isUserProfile}) => {
                     }}
                   />
                 ) : (
-                  // Fallback untuk tipe media tidak dikenali
                   <View style={styles.errorContainer}>
                     <Text style={styles.errorText}>Unsupported media type</Text>
                     <Text>{modalMediaUri}</Text>
@@ -661,12 +658,13 @@ const styles = StyleSheet.create({
     height: '100%',
     maxWidth: '100%',
     maxHeight: '100%',
+    resizeMode: 'contain',
   },
   modalVideo: {
     width: '100%',
     height: '100%',
-    maxWidth: '100%',
-    maxHeight: '100%',
+    maxWidth: '85%',
+    maxHeight: '85%',
   },
   videoContainer: {
     width: 390,
@@ -683,7 +681,7 @@ const styles = StyleSheet.create({
   placeholderThumbnail: {
     width: '100%',
     height: '100%',
-    backgroundColor: '#e0e0e0', // Placeholder color
+    backgroundColor: '#e0e0e0',
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
