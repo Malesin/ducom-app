@@ -97,111 +97,105 @@ const CreatePost = ({route, navigation}) => {
     SetIsUploading(true);
     const token = await AsyncStorage.getItem('token');
     try {
-      if (selectedMedia.length > 0) {
-        const formData = new FormData();
-        let uploadedMedia = [];
+      const formDataImages = new FormData();
+      const formDataVideos = new FormData();
+      const uploadedImages = [];
+      const uploadedVideos = [];
 
-        for (const media of selectedMedia) {
-          const mediaType = media.type || 'image/jpeg';
-          try {
-            const compressedUri = await compressMedia(media.uri, mediaType);
+      for (const media of selectedMedia) {
+        const mediaType = media.type || 'image/jpeg';
+        try {
+          const compressedUri = await compressMedia(media.uri, mediaType);
 
-            if (typeof compressedUri === 'string') {
-              const fileType = compressedUri.endsWith('.mp4')
-                ? 'video/mp4'
-                : mediaType;
+          if (typeof compressedUri === 'string') {
+            const fileType = compressedUri.endsWith('.mp4') ? 'video/mp4' : mediaType;
 
-              formData.append('media', {
+            if (fileType.startsWith('image/')) {
+              formDataImages.append('media', {
                 uri: compressedUri,
                 type: fileType,
                 name: `media.${compressedUri.endsWith('.mp4') ? 'mp4' : 'png'}`,
               });
-
-              uploadedMedia.push({
+              uploadedImages.push({ uri: compressedUri, type: fileType });
+            } else if (fileType.startsWith('video/')) {
+              formDataVideos.append('media', {
                 uri: compressedUri,
                 type: fileType,
+                name: `media.${compressedUri.endsWith('.mp4') ? 'mp4' : 'mov'}`,
               });
-
-              if (uploadedMedia.length === 4) {
-                break;
-              }
-            } else {
-              console.error(
-                'Compressed URI is not a string, skipping this media.',
-              );
+              uploadedVideos.push({ uri: compressedUri, type: fileType });
             }
-          } catch (error) {
-            Alert.alert('Upload Error', error.message);
-            return;
-          }
-        }
 
-        if (uploadedMedia.length === 0) {
-          console.error('No valid media to upload.');
+            if (uploadedImages.length === 4 || uploadedVideos.length === 4) {
+              break;
+            }
+          } else {
+            console.error('Compressed URI is not a string, skipping this media.');
+          }
+        } catch (error) {
+          Alert.alert('Upload Error', error.message);
           return;
         }
+      }
 
-        formData.append('token', token);
-
-        const uploadResponse = await axios.post(
-          `${serverUrl}/upload-media`,
-          formData,
-          {
-            maxBodyLength: Infinity,
-            maxContentLength: Infinity,
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-            onUploadProgress: progressEvent => {
-              const progress = Math.round(
-                (progressEvent.loaded * 100) / progressEvent.total,
-              );
-              setUploadProgress(progress);
-            },
+      if (uploadedImages.length > 0) {
+        formDataImages.append('token', token);
+        const uploadResponseImages = await axios.post(`${serverUrl}/upload-media`, formDataImages, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+          onUploadProgress: progressEvent => {
+            const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            setUploadProgress(progress);
           },
-        );
-
-        if (uploadResponse.data.status === 'ok') {
-          const mediaData = uploadResponse.data.data;
-
-          const postResponse = await axios.post(`${serverUrl}/create-post`, {
-            token: token,
-            media: mediaData.map(item => `${item.url}|${item.type}`).join(','),
-            description: newPostText,
-            commentsEnabled: commentsEnabled,
-          });
-
-          if (postResponse.data.status === 'ok') {
-            navigation.reset({
-              index: 0,
-              routes: [{name: 'Home'}],
-            });
-            console.log('Post created successfully with media');
-          } else {
-            console.error('Failed to create post:', postResponse.data.data);
-          }
-        } else {
-          console.error('Failed to upload media:', uploadResponse.data.data);
-        }
-      } else {
-        const postResponse = await axios.post(`${serverUrl}/create-post`, {
-          token: token,
-          description: newPostText,
-          commentsEnabled: commentsEnabled,
         });
 
-        if (postResponse.data.status === 'ok') {
-          navigation.reset({
-            index: 0,
-            routes: [{name: 'Home'}],
-          });
-          console.log('Post created successfully without media');
+        if (uploadResponseImages.data.status === 'ok') {
+          const mediaDataImages = uploadResponseImages.data.data;
+          console.log('Images uploaded successfully:', mediaDataImages);
         } else {
-          console.error('Failed to create post:', postResponse.data.data);
+          console.error('Failed to upload images:', uploadResponseImages.data.data);
         }
+      }
+
+      if (uploadedVideos.length > 0) {
+        formDataVideos.append('token', token);
+        const uploadResponseVideos = await axios.post(`${serverUrl}/upload-media`, formDataVideos, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+          onUploadProgress: progressEvent => {
+            const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            setUploadProgress(progress);
+          },
+        });
+
+        if (uploadResponseVideos.data.status === 'ok') {
+          const mediaDataVideos = uploadResponseVideos.data.data;
+          console.log('Videos uploaded successfully:', mediaDataVideos);
+        } else {
+          console.error('Failed to upload videos:', uploadResponseVideos.data.data);
+        }
+      }
+
+      const postResponse = await axios.post(`${serverUrl}/create-post`, {
+        token: token,
+        media: [
+          ...uploadedImages.map(item => item.uri),
+          ...uploadedVideos.map(item => item.uri),
+        ].join(','),
+        description: newPostText,
+        commentsEnabled: commentsEnabled,
+      });
+
+      if (postResponse.data.status === 'ok') {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Home' }],
+        });
+        console.log('Post created successfully with media');
+      } else {
+        console.error('Failed to create post:', postResponse.data.data);
       }
     } catch (error) {
       console.error('Error submitting post:', error.message);
+      Alert.alert('Error', 'Failed to create post.');
     } finally {
       SetIsUploading(false);
     }

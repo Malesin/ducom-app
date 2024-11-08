@@ -74,7 +74,7 @@ const ViewPost = ({route}) => {
       for (const media of tweet?.media || []) {
         if (media.type === 'video' && media.uri) {
           try {
-            const { path } = await createThumbnail({ url: media.uri });
+            const {path} = await createThumbnail({url: media.uri});
             newThumbnails[media.uri] = path;
           } catch (error) {
             console.log('Error generating thumbnail:', error);
@@ -247,7 +247,7 @@ const ViewPost = ({route}) => {
     setRefreshing(true);
     try {
       const url = `${serverUrl}/comments`;
-      const params = { postId: tweet.id };
+      const params = {postId: tweet.id};
 
       const response = await axios.post(url, params);
       const dataComment = response.data.data;
