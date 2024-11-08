@@ -59,9 +59,9 @@ const HomeScreen = ({navigation}) => {
   const fetchTweets = async pageNum => {
     if (!isConnected) {
       setLoading(false);
+      Alert.alert('No Connection', 'Unable to fetch tweets');
       return [];
     }
-
     setLoading(true);
     try {
       const token = await AsyncStorage.getItem('token');
@@ -419,20 +419,28 @@ const HomeScreen = ({navigation}) => {
   });
 
   const handleLoadMore = async () => {
-    if (!loadingMore && hasMore) {
-      setLoadingMore(true);
-      const moreTweets = await fetchTweets(page + 1);
-      const newTweets = moreTweets.filter(
-        tweet =>
-          !tweets.some(existingTweet => existingTweet.id === tweet.id) &&
-          tweet.id !== pinnedTweetId,
-      );
-      if (newTweets.length > 0) {
-        setTweets(prevTweets => [...prevTweets, ...newTweets.slice(0, 5)]);
-      }
-      setLoadingMore(false);
-      if (newTweets.length < 4) {
-        setHasMore(false);
+    if (!loadingMore && hasMore && isConnected) {
+      try {
+        setLoadingMore(true);
+        const moreTweets = await fetchTweets(page + 1);
+
+        const uniqueTweets = moreTweets.filter(
+          tweet =>
+            !tweets.some(existingTweet => existingTweet.id === tweet.id) &&
+            tweet.id !== pinnedTweetId,
+        );
+
+        if (uniqueTweets.length > 0) {
+          setTweets(prevTweets => [...prevTweets, ...uniqueTweets.slice(0, 5)]);
+          setPage(prevPage => prevPage + 1);
+        }
+
+        setHasMore(uniqueTweets.length >= 5);
+      } catch (error) {
+        console.error('Error loading more tweets', error);
+        Alert.alert('Load Error', 'Unable to load more tweets');
+      } finally {
+        setLoadingMore(false);
       }
     }
   };

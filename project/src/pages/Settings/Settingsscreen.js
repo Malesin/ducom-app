@@ -9,14 +9,12 @@ import {
 } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import Icon from 'react-native-vector-icons/MaterialIcons';
 import config from '../../config';
 const serverUrl = config.SERVER_URL;
-const verifiedIcon = <Icon name="verified" size={25} color="#699BF7" />;
 
-const Settingsscreen = ({ navigation }) => {
+const Settingsscreen = ({navigation}) => {
   const [amIAdmin, setAmIAdmin] = useState(null);
 
   const getData = async () => {
@@ -25,7 +23,7 @@ const Settingsscreen = ({ navigation }) => {
       const response = await axios.post(`${serverUrl}/userdata`, {
         token: token,
       });
-      const { data } = response.data;
+      const {data} = response.data;
 
       const routeAmIAdmin = data.isAdmin;
 
@@ -53,7 +51,7 @@ const Settingsscreen = ({ navigation }) => {
           await AsyncStorage.clear();
           navigation.reset({
             index: 0,
-            routes: [{ name: 'Auths' }],
+            routes: [{name: 'Auths'}],
           });
           console.log('Logout successfully');
         },
@@ -96,7 +94,11 @@ const Settingsscreen = ({ navigation }) => {
             <TouchableOpacity
               style={styles.button}
               onPress={() => navigation.navigate('AccountLists')}>
-              <MaterialCommunityIcons name="account-key" size={25} color="#000" />
+              <MaterialCommunityIcons
+                name="account-key"
+                size={25}
+                color="#000"
+              />
               <Text style={styles.buttonText}>User Lists</Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -107,25 +109,19 @@ const Settingsscreen = ({ navigation }) => {
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.button}
-              onPress={() => navigation.navigate('DeactivateorDeletedAccounts')}>
-              <MaterialCommunityIcons
-                name="delete"
-                size={25}
-                color="#000"
-              />
-              <Text style={styles.buttonText}>Deactivated or Deleted Accounts</Text>
+              onPress={() =>
+                navigation.navigate('DeactivateorDeletedAccounts')
+              }>
+              <MaterialCommunityIcons name="delete" size={25} color="#000" />
+              <Text style={styles.buttonText}>
+                Deactivated or Deleted Accounts
+              </Text>
             </TouchableOpacity>
           </View>
         )}
         <View style={styles.separator} />
         <View style={styles.section}>
           <Text style={styles.title}>Privacy and Interactions</Text>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => navigation.navigate('AccountPrivacy')}>
-            <MaterialCommunityIcons name="lock-outline" size={25} color="#000" />
-            <Text style={styles.buttonText}>Account Privacy</Text>
-          </TouchableOpacity>
           <TouchableOpacity
             style={styles.button}
             onPress={() => navigation.navigate('BlockedUsers')}>

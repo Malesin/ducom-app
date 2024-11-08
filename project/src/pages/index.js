@@ -16,7 +16,6 @@ import Settingsscreen from './Settings/Settingsscreen';
 import AccountLists from './Settings/Admin/AccountLists';
 import DeactivatedorDeletedAccounts from './Settings/Admin/DeactivatedorDeletedAccounts';
 import ReportsManagement from './Settings/Admin/ReportsManagement';
-import AccountPrivacy from './Settings/Privacy/AccountPrivacy';
 import AccountInformation from './Settings/Profile/AccountInformation';
 import UpdatePassword from './Settings/Profile/UpdatePassword';
 import Profilescreen from './Profile/Profilescreen';
@@ -70,7 +69,6 @@ import CommunityEditRules from './Community/CommunityEditRules';
   DeactivatedorDeletedAccounts,
   ReportsManagement,
   AccountInformation,
-  AccountPrivacy,
   UpdatePassword,
   Profilescreen,
   FollowerPage,
