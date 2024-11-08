@@ -431,7 +431,7 @@ const HomeScreen = ({navigation}) => {
         setTweets(prevTweets => [...prevTweets, ...newTweets.slice(0, 5)]);
       }
       setLoadingMore(false);
-      if (newTweets.length < 4) {
+      if (newTweets.length < 6) {
         setHasMore(false);
       }
     }

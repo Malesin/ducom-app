@@ -41,6 +41,7 @@ const TweetCard = ({tweet, onRefreshPage, comments, isUserProfile}) => {
   const [thumbnails, setThumbnails] = useState({});
   const [showBottomSheet, setShowBottomSheet] = useState(false);
   const [dataSent, setDataSent] = useState();
+  const [thumbnailLoading, setThumbnailLoading] = useState(false);
   const navigator = useNavigation();
 
   const handleProfilePress = () => {
@@ -79,7 +80,9 @@ const TweetCard = ({tweet, onRefreshPage, comments, isUserProfile}) => {
       setDataSent(dataSent);
     };
 
-    generateThumbnails();
+    if (tweet?.media) {
+      generateThumbnails();
+    }
     dataSend();
   }, [tweet?.media]);
 
@@ -273,7 +276,13 @@ const TweetCard = ({tweet, onRefreshPage, comments, isUserProfile}) => {
           <TouchableOpacity
             onPress={() => openMediaPreview(item.uri)}
             style={styles.videoContainer}>
-            <Image source={{uri: thumbnails[item.uri]}} style={mediaStyle} />
+            {thumbnailLoading ? ( // Show a placeholder while loading
+              <View style={styles.placeholderThumbnail}>
+                <Text>Loading...</Text>
+              </View>
+            ) : (
+              <Image source={{uri: thumbnails[item.uri]}} style={mediaStyle} />
+            )}
             <MaterialCommunityIcons
               name="play-circle-outline"
               size={40}
@@ -629,6 +638,14 @@ const styles = StyleSheet.create({
   },
   playIcon: {
     position: 'absolute',
+  },
+  placeholderThumbnail: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#e0e0e0', // Placeholder color
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 8,
   },
 });
 
