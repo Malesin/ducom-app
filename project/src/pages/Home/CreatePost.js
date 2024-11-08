@@ -43,6 +43,7 @@ const CreatePost = ({route, navigation}) => {
   const [commentsEnabled, setCommentsEnabled] = useState(true);
   const [dataVideo, setDataVideo] = useState([]);
   const [dataPhoto, setDataPhoto] = useState([]);
+  const [mediaData, setMediaData] = useState([]);
   const closePostSheet = () => setIsPostSheetVisible(false);
   const colorScheme = useColorScheme();
   const styles = getStyles(colorScheme);
@@ -92,6 +93,15 @@ const CreatePost = ({route, navigation}) => {
       useNativeDriver: true,
     }).start();
   }, [translateY]);
+
+  useEffect(() => {
+    const updatedMediaData = [
+      ...dataPhoto,
+      ...dataVideo
+    ];
+    setMediaData(updatedMediaData);
+    console.log("mediaData", updatedMediaData);
+  }, [dataPhoto, dataVideo]);
 
   console.log(selectedMedia, 'Selected Media');
 
@@ -200,15 +210,11 @@ const CreatePost = ({route, navigation}) => {
         }
       }
 
-      const mediaData = [
-        ...dataPhoto,
-        ...dataVideo
-      ];
-      console.log(mediaData);
+      const media = mediaData?.map(item => `${item.url}|${item.type}`).join(',');
 
       const postResponse = await axios.post(`${serverUrl}/create-post`, {
         token: token,
-        media: mediaData.map(item => `${item.url}|${item.type}`).join(','),
+        media: media,
         description: newPostText,
         commentsEnabled: commentsEnabled,
       });
