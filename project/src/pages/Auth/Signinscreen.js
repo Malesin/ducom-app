@@ -5,17 +5,19 @@ import {
   TextInput,
   TouchableOpacity,
   useColorScheme,
+  Alert,
 } from 'react-native';
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import axios from 'axios';
 import Toast from 'react-native-toast-message';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import config from '../../config';
-const serverUrl = config.SERVER_URL;
-import { Alert } from 'react-native';
+import NetInfo from '@react-native-community/netinfo';
 
-const Signinscreen = ({ navigation }) => {
+const serverUrl = config.SERVER_URL;
+
+const Signinscreen = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isChecked, setIsChecked] = useState(false);
@@ -32,12 +34,11 @@ const Signinscreen = ({ navigation }) => {
         navigation.navigate('Home');
       }
     };
-
     checkLoginStatus();
   }, []);
 
-  const handleLogin = () => {
-    console.log("clicked")
+  const handleLogin = async () => {
+    console.log('clicked');
     let valid = true;
     if (email === '') {
       setEmailError('Email cannot be empty');
@@ -54,10 +55,16 @@ const Signinscreen = ({ navigation }) => {
     }
 
     if (valid) {
-      const userData = {
-        email: email,
-        password,
-      };
+      const connection = await NetInfo.fetch();
+      if (!connection.isConnected) {
+        Alert.alert(
+          'No Internet Connection',
+          'Please check your network and try again.',
+        );
+        return;
+      }
+
+      const userData = {email, password};
       axios
         .post(`${serverUrl}/login-user`, userData)
         .then(res => {
@@ -72,7 +79,6 @@ const Signinscreen = ({ navigation }) => {
                 }, 1000);
               },
             });
-
             AsyncStorage.setItem('token', res.data.data);
           } else if (res.data.status === 'error') {
             Toast.show({
@@ -97,58 +103,64 @@ const Signinscreen = ({ navigation }) => {
               },
             });
           } else if (res.data.status === 'errorDeactivated') {
-            Alert.alert('Your account is deactivated', 'Do you want to Reactivate Account?', [
-              {
-                text: 'Cancel',
-                onPress: () => null,
-                style: 'cancel',
-              },
-              {
-                text: 'Reactivate',
-                onPress: async () => {
-                  try {
-                    const resp = await axios.post(`${serverUrl}/reactivate-account`, userData)
-                    console.log(resp.data)
-                    if (resp.data.status == 'ok') {
-                      Toast.show({
-                        type: 'success',
-                        text1: 'Success',
-                        text2: 'Reactivate Successfully!!',
-                        onHide: () => {
-                          setTimeout(() => {
-                            navigation.navigate('Auths');
-                          }, 1000);
-                        },
-                      })
-                    } else if (resp.data.status === 'error') {
-                      Toast.show({
-                        type: 'error',
-                        text1: 'Error',
-                        text2: "Email or User Doesn't Exist!!",
-                        onHide: () => {
-                          setTimeout(() => {
-                            navigation.navigate('Signin');
-                          }, 1000);
-                        },
-                      });
-                    } else if (resp.data.status === 'errorPass') {
-                      Toast.show({
-                        type: 'error',
-                        text1: 'Error',
-                        text2: 'Incorrect Password',
-                        onHide: () => {
-                          setTimeout(() => {
-                            navigation.navigate('Signin');
-                          }, 1000);
-                        },
-                      });
-                    }
-                  } catch (error) {
-                    console.error(error)
-                  }
+            Alert.alert(
+              'Your account is deactivated',
+              'Do you want to Reactivate Account?',
+              [
+                {
+                  text: 'Cancel',
+                  onPress: () => null,
+                  style: 'cancel',
                 },
-              },
-            ]);
+                {
+                  text: 'Reactivate',
+                  onPress: async () => {
+                    try {
+                      const resp = await axios.post(
+                        `${serverUrl}/reactivate-account`,
+                        userData,
+                      );
+                      if (resp.data.status === 'ok') {
+                        Toast.show({
+                          type: 'success',
+                          text1: 'Success',
+                          text2: 'Reactivate Successfully!!',
+                          onHide: () => {
+                            setTimeout(() => {
+                              navigation.navigate('Auths');
+                            }, 1000);
+                          },
+                        });
+                      } else if (resp.data.status === 'error') {
+                        Toast.show({
+                          type: 'error',
+                          text1: 'Error',
+                          text2: "Email or User Doesn't Exist!!",
+                          onHide: () => {
+                            setTimeout(() => {
+                              navigation.navigate('Signin');
+                            }, 1000);
+                          },
+                        });
+                      } else if (resp.data.status === 'errorPass') {
+                        Toast.show({
+                          type: 'error',
+                          text1: 'Error',
+                          text2: 'Incorrect Password',
+                          onHide: () => {
+                            setTimeout(() => {
+                              navigation.navigate('Signin');
+                            }, 1000);
+                          },
+                        });
+                      }
+                    } catch (error) {
+                      console.error(error);
+                    }
+                  },
+                },
+              ],
+            );
           }
         })
         .catch(e => {
@@ -235,7 +247,7 @@ const Signinscreen = ({ navigation }) => {
   );
 };
 
-const getStyles = () =>
+const getStyles = colorScheme =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -305,15 +317,13 @@ const getStyles = () =>
       marginTop: 20,
     },
     signupLink: {
-      color: '#0a3e99',
+      color: '#001374',
       fontWeight: 'bold',
     },
     errorText: {
       color: 'red',
-      fontSize: 14,
-      width: '80%',
-      textAlign: 'left',
-      marginBottom: 10,
+      fontSize: 12,
+      alignSelf: 'center',
     },
     errorInput: {
       borderColor: 'red',

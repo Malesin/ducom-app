@@ -197,7 +197,7 @@ const CreatePost = ({route, navigation}) => {
             },
           },
         );
-
+        
         if (uploadResponseVideos.data.status === 'ok') {
           const mediaDataVideos = uploadResponseVideos.data.data;
           setDataVideo(mediaDataVideos);
@@ -213,7 +213,7 @@ const CreatePost = ({route, navigation}) => {
       const media = mediaData?.map(item => `${item.url}|${item.type}`).join(',');
 
       const postResponse = await axios.post(`${serverUrl}/create-post`, {
-        // token: token,
+        token: token,
         media: media,
         description: newPostText,
         commentsEnabled: commentsEnabled,
