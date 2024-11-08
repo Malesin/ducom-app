@@ -47,6 +47,7 @@ const BottomSheet = ({
 
   const deletePost = async () => {
     const token = await AsyncStorage.getItem('token');
+    console.log(tweet?.id)
     try {
       const delPost = await axios.post(`${serverUrl}/delete-post`, {
         token: token,
@@ -59,7 +60,6 @@ const BottomSheet = ({
       console.error('Error: ', error);
     }
   };
-
   {
     /* PIN POST AT HOMESCREEN */
   }

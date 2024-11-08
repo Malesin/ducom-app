@@ -41,6 +41,8 @@ const CreatePost = ({route, navigation}) => {
   const [IsUploading, SetIsUploading] = useState(false);
   const [isPostSheetVisible, setIsPostSheetVisible] = useState(false);
   const [commentsEnabled, setCommentsEnabled] = useState(true);
+  const [dataVideo, setDataVideo] = useState([]);
+  const [dataPhoto, setDataPhoto] = useState([]);
   const closePostSheet = () => setIsPostSheetVisible(false);
   const colorScheme = useColorScheme();
   const styles = getStyles(colorScheme);
@@ -141,7 +143,7 @@ const CreatePost = ({route, navigation}) => {
           return;
         }
       }
-      console.log(mediaType);
+
       if (uploadedImages.length > 0) {
         formDataImages.append('token', token);
         const uploadResponseImages = await axios.post(
@@ -160,6 +162,7 @@ const CreatePost = ({route, navigation}) => {
 
         if (uploadResponseImages.data.status === 'ok') {
           const mediaDataImages = uploadResponseImages.data.data;
+          setDataPhoto(mediaDataImages);
           console.log('Images uploaded successfully:', mediaDataImages);
         } else {
           console.error(
@@ -187,6 +190,7 @@ const CreatePost = ({route, navigation}) => {
 
         if (uploadResponseVideos.data.status === 'ok') {
           const mediaDataVideos = uploadResponseVideos.data.data;
+          setDataVideo(mediaDataVideos);
           console.log('Videos uploaded successfully:', mediaDataVideos);
         } else {
           console.error(
@@ -196,12 +200,15 @@ const CreatePost = ({route, navigation}) => {
         }
       }
 
+      const mediaData = [
+        ...dataPhoto,
+        ...dataVideo
+      ];
+      console.log(mediaData);
+
       const postResponse = await axios.post(`${serverUrl}/create-post`, {
         token: token,
-        media: [
-          ...uploadedImages.map(item => item.uri),
-          ...uploadedVideos.map(item => item.uri),
-        ].join(','),
+        media: mediaData.map(item => `${item.url}|${item.type}`).join(','),
         description: newPostText,
         commentsEnabled: commentsEnabled,
       });
