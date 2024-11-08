@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, {useState, useCallback} from 'react';
 import {
   StyleSheet,
   ScrollView,
@@ -10,10 +10,10 @@ import {
 } from 'react-native';
 import TweetCard from '../../components/TweetCard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import axios from 'axios';
 import config from '../../config';
-import { Skeleton } from 'react-native-elements';
+import {Skeleton} from 'react-native-elements';
 
 const serverUrl = config.SERVER_URL;
 
@@ -30,14 +30,14 @@ function Mediascreen() {
       setLoading(true);
       const token = await AsyncStorage.getItem('token');
       try {
-        const response = await axios.post(`${serverUrl}/userdata`, { token });
+        const response = await axios.post(`${serverUrl}/userdata`, {token});
 
-        const { data } = response.data;
+        const {data} = response.data;
         const idUser = data._id;
         const profilePicture = data.profilePicture;
-        const amIAdmin = data.isAdmin
-        const isMuteds = data.mutedUsers
-        const isBlockeds = data.blockedUsers
+        const amIAdmin = data.isAdmin;
+        const isMuteds = data.mutedUsers;
+        const isBlockeds = data.blockedUsers;
 
         const responseTweet = await axios.post(`${serverUrl}/my-posts`, {
           token: token,
@@ -48,7 +48,12 @@ function Mediascreen() {
           .filter(post => Array.isArray(post.media) && post.media.length > 0)
           .filter(post => post.user !== null)
           .map(post => {
-            const totalComments = post.comments.length + post.comments.reduce((acc, comment) => acc + comment.replies.length, 0);
+            const totalComments =
+              post.comments.length +
+              post.comments.reduce(
+                (acc, comment) => acc + comment.replies.length,
+                0,
+              );
             return {
               id: post._id,
               userAvatar: post.user.profilePicture,
@@ -58,25 +63,29 @@ function Mediascreen() {
               content: post.description,
               media: Array.isArray(post.media)
                 ? post.media.map(mediaItem => ({
-                  type: mediaItem.type,
-                  uri: mediaItem.uri,
-                }))
+                    type: mediaItem.type,
+                    uri: mediaItem.uri,
+                  }))
                 : [],
               likesCount: post.likes.length,
               commentsCount: totalComments,
               bookMarksCount: post.bookmarks.length,
               repostsCount: post.reposts.length,
               isLiked: post.likes.some(like => like._id === idUser),
-              isBookmarked: post.bookmarks.some(bookmark => bookmark.user === idUser),
+              isBookmarked: post.bookmarks.some(
+                bookmark => bookmark.user === idUser,
+              ),
               isReposted: post.reposts.some(repost => repost.user === idUser),
               isMuted: isMuteds.some(isMuted => isMuted === post.user._id),
-              isBlocked: isBlockeds.some(isBlocked => isBlocked === post.user._id),
+              isBlocked: isBlockeds.some(
+                isBlocked => isBlocked === post.user._id,
+              ),
               userIdPost: post.user._id,
               idUser: idUser,
               profilePicture: profilePicture,
               commentsEnabled: post.commentsEnabled,
               isAdmin: post.user.isAdmin,
-              amIAdmin: amIAdmin
+              amIAdmin: amIAdmin,
             };
           });
 
@@ -90,6 +99,38 @@ function Mediascreen() {
     },
     [navigation],
   );
+
+  const onRefreshPage = useCallback(async () => {
+    try {
+      console.log('Refreshing Media Screen...');
+
+      setLoading(true);
+      setPage(1);
+      setIsFetched(false);
+
+      const token = await AsyncStorage.getItem('token');
+
+      const response = await axios.post(`${serverUrl}/my-posts`, {
+        token: token,
+      });
+
+      const dataTweet = response.data.data;
+      const mediaOnlyTweets = dataTweet
+        .filter(post => Array.isArray(post.media) && post.media.length > 0)
+        .filter(post => post.user !== null);
+
+      setTweets(mediaOnlyTweets);
+      setIsFetched(true);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error refreshing media screen:', error);
+
+      Alert.alert('Error', 'Failed to refresh media posts');
+
+      setLoading(false);
+      setIsFetched(true);
+    }
+  }, []);
 
   useFocusEffect(
     useCallback(() => {
@@ -164,8 +205,8 @@ function Mediascreen() {
     </>
   );
 
-  const handleProfilePress = (tweet) => {
-    navigation.navigate('ViewPost', { tweet });
+  const handleProfilePress = tweet => {
+    navigation.navigate('ViewPost', {tweet});
   };
 
   return (
@@ -175,8 +216,8 @@ function Mediascreen() {
       ) : (
         <ScrollView
           contentContainerStyle={styles.contentContainer}
-          onScroll={({ nativeEvent }) => {
-            const { contentOffset, layoutMeasurement, contentSize } = nativeEvent;
+          onScroll={({nativeEvent}) => {
+            const {contentOffset, layoutMeasurement, contentSize} = nativeEvent;
             const contentHeight = contentSize.height;
             const viewportHeight = layoutMeasurement.height;
             const scrollPosition = contentOffset.y + viewportHeight;
@@ -189,7 +230,7 @@ function Mediascreen() {
             tweets.map((tweet, index) => (
               <View key={index} style={styles.tweetContainer}>
                 <TouchableOpacity onPress={() => handleProfilePress(tweet)}>
-                  <TweetCard tweet={tweet} />
+                  <TweetCard tweet={tweet} onRefreshPage={onRefreshPage} />
                 </TouchableOpacity>
               </View>
             ))

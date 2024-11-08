@@ -141,7 +141,7 @@ const CreatePost = ({route, navigation}) => {
           return;
         }
       }
-
+      console.log(mediaType);
       if (uploadedImages.length > 0) {
         formDataImages.append('token', token);
         const uploadResponseImages = await axios.post(

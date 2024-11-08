@@ -249,48 +249,45 @@ const TweetCard = ({tweet, onRefreshPage, comments, isUserProfile}) => {
   };
 
   const renderMediaItem = ({item}) => {
-    if (!item.uri) {
-      return null;
-    }
+    const isImage =
+      item.type === 'image' || /\.(jpg|jpeg|png|gif|webp)$/i.test(item.uri);
+
+    const isVideo =
+      item.type === 'video' || /\.(mp4|mov|avi|mkv)$/i.test(item.uri);
 
     const mediaStyle =
       tweet?.media?.length === 1
-        ? item.type === 'video'
+        ? isVideo
           ? styles.singleMediaVideo
           : styles.singleMediaImage
-        : item.type === 'video'
+        : isVideo
         ? styles.tweetVideo
         : styles.tweetImage;
 
     return (
-      <TouchableOpacity
-        onPress={() => openMediaPreview(item.uri)}
-        style={styles.mediaContainer}>
-        {item.type === 'image' ? (
+      <TouchableOpacity onPress={() => openMediaPreview(item.uri)}>
+        {isImage ? (
           <Image
             source={{uri: item.uri}}
             style={mediaStyle}
-            onError={() => console.log('Failed to load image')}
+            onError={e => {
+              console.error('Image Load Error:', e.nativeEvent.error);
+            }}
           />
-        ) : (
-          <TouchableOpacity
-            onPress={() => openMediaPreview(item.uri)}
-            style={styles.videoContainer}>
-            {thumbnailLoading ? ( // Show a placeholder while loading
-              <View style={styles.placeholderThumbnail}>
-                <Text>Loading...</Text>
-              </View>
-            ) : (
-              <Image source={{uri: thumbnails[item.uri]}} style={mediaStyle} />
-            )}
+        ) : isVideo ? (
+          <View style={styles.videoContainer}>
+            <Image
+              source={{uri: thumbnails[item.uri] || item.uri}}
+              style={mediaStyle}
+            />
             <MaterialCommunityIcons
               name="play-circle-outline"
               size={40}
               color="#fff"
               style={styles.playIcon}
             />
-          </TouchableOpacity>
-        )}
+          </View>
+        ) : null}
       </TouchableOpacity>
     );
   };
@@ -463,22 +460,50 @@ const TweetCard = ({tweet, onRefreshPage, comments, isUserProfile}) => {
           <View style={styles.modalBackground}>
             <View style={styles.modalContainer}>
               {modalMediaUri ? (
-                modalMediaUri.endsWith('.jpg') ||
-                modalMediaUri.endsWith('.png') ? (
+                // Debug logging
+                console.log('Modal Media URI:', {
+                  uri: modalMediaUri,
+                  type: typeof modalMediaUri,
+                  isValidUri: /^(http|https):\/\//.test(modalMediaUri),
+                }) ||
+                // Pengecekan ekstensi file yang lebih komprehensif
+                (/\.(jpg|jpeg|png|gif|webp)$/i.test(modalMediaUri) ? (
                   <Image
                     source={{uri: modalMediaUri}}
                     style={styles.modalImage}
-                    onError={() => console.log('Failed to load image')}
+                    resizeMode="contain"
+                    onError={e => {
+                      console.error('Modal Image Load Error:', {
+                        error: e.nativeEvent.error,
+                        uri: modalMediaUri,
+                      });
+                    }}
                   />
-                ) : (
+                ) : /\.(mp4|mov|avi|mkv)$/i.test(modalMediaUri) ? (
                   <Video
                     source={{uri: modalMediaUri}}
                     style={styles.modalVideo}
                     controls
                     resizeMode="contain"
+                    onError={error => {
+                      console.error('Modal Video Load Error:', {
+                        error,
+                        uri: modalMediaUri,
+                      });
+                    }}
                   />
-                )
-              ) : null}
+                ) : (
+                  // Fallback untuk tipe media tidak dikenali
+                  <View style={styles.errorContainer}>
+                    <Text style={styles.errorText}>Unsupported media type</Text>
+                    <Text>{modalMediaUri}</Text>
+                  </View>
+                ))
+              ) : (
+                <View style={styles.errorContainer}>
+                  <Text style={styles.errorText}>No media found</Text>
+                </View>
+              )}
             </View>
           </View>
         </TouchableWithoutFeedback>
@@ -611,21 +636,37 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
   },
-  modalContainer: {
-    width: '90%',
-    height: '80%',
+  errorContainer: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'rgba(255,0,0,0.1)',
+    padding: 20,
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  modalContainer: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
   },
   modalImage: {
-    width: '90%',
-    height: '80%',
-    resizeMode: 'contain',
+    width: '100%',
+    height: '100%',
+    maxWidth: '100%',
+    maxHeight: '100%',
   },
   modalVideo: {
-    width: '90%',
-    height: '80%',
-    resizeMode: 'contain',
+    width: '100%',
+    height: '100%',
+    maxWidth: '100%',
+    maxHeight: '100%',
   },
   videoContainer: {
     width: 390,
