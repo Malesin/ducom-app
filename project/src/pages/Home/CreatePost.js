@@ -100,8 +100,6 @@ const CreatePost = ({route, navigation}) => {
     console.log('mediaData', updatedMediaData);
   }, [dataPhoto, dataVideo]);
 
-  console.log(selectedMedia, 'Selected Media');
-
   const handlePostSubmit = async () => {
     SetIsUploading(true);
     const token = await AsyncStorage.getItem('token');
@@ -151,6 +149,7 @@ const CreatePost = ({route, navigation}) => {
         }
       }
 
+      let mediaDataImages = [];
       if (uploadedImages.length > 0) {
         formDataImages.append('token', token);
         const uploadResponseImages = await axios.post(
@@ -168,8 +167,7 @@ const CreatePost = ({route, navigation}) => {
         );
 
         if (uploadResponseImages.data.status === 'ok') {
-          const mediaDataImages = uploadResponseImages.data.data;
-          setDataPhoto(mediaDataImages);
+          mediaDataImages = uploadResponseImages.data.data;
           console.log('Images uploaded successfully:', mediaDataImages);
         } else {
           console.error(
@@ -179,6 +177,7 @@ const CreatePost = ({route, navigation}) => {
         }
       }
 
+      let mediaDataVideos = [];
       if (uploadedVideos.length > 0) {
         formDataVideos.append('token', token);
         const uploadResponseVideos = await axios.post(
@@ -196,8 +195,7 @@ const CreatePost = ({route, navigation}) => {
         );
 
         if (uploadResponseVideos.data.status === 'ok') {
-          const mediaDataVideos = uploadResponseVideos.data.data;
-          setDataVideo(mediaDataVideos);
+          mediaDataVideos = uploadResponseVideos.data.data;
           console.log('Videos uploaded successfully:', mediaDataVideos);
         } else {
           console.error(
@@ -207,9 +205,20 @@ const CreatePost = ({route, navigation}) => {
         }
       }
 
-      const media = mediaData
-        ?.map(item => `${item.url}|${item.type}`)
-        .join(',');
+      const media = [
+        ...mediaDataImages.map(item => `${item.url}|${item.type}`),
+        ...mediaDataVideos.map(item => `${item.url}|${item.type}`),
+      ].join(',');
+
+      if (!media) {
+        Alert.alert(
+          'Error',
+          'No media available to post. Please add images or videos.',
+        );
+        return;
+      }
+
+      console.log('media:', media);
 
       const postResponse = await axios.post(`${serverUrl}/create-post`, {
         token: token,
@@ -234,7 +243,6 @@ const CreatePost = ({route, navigation}) => {
       SetIsUploading(false);
     }
   };
-
   const compressMedia = async (uri, mediaType) => {
     if (mediaType === 'image/heic' || mediaType === 'image/heif') {
       try {
@@ -243,7 +251,7 @@ const CreatePost = ({route, navigation}) => {
           uriWithPrefix,
           1920,
           1080,
-          'JPEG', // Ubah ke 'JPEG'
+          'JPEG',
           80,
         );
         console.log(
@@ -256,13 +264,12 @@ const CreatePost = ({route, navigation}) => {
         throw new Error('Failed to convert HEIF/HEIC image to JPEG.');
       }
     } else if (
-      mediaType === 'image/png' ||
+      mediaType === 'image/png ' ||
       mediaType === 'image/jpeg' ||
       mediaType === 'image/jpg'
     ) {
       try {
         const uriWithPrefix = uri.startsWith('file://') ? uri : `file://${uri}`;
-
         const {uri: resizedUri} = await ImageResizer.createResizedImage(
           uriWithPrefix,
           1920,
@@ -270,7 +277,6 @@ const CreatePost = ({route, navigation}) => {
           'JPEG',
           80,
         );
-
         console.log('Image resized successfully:', resizedUri);
         return resizedUri;
       } catch (error) {
@@ -281,21 +287,17 @@ const CreatePost = ({route, navigation}) => {
     if (mediaType === 'video/mp4') {
       try {
         console.log('Compressing video...');
-
         const compressedResult = await VideoCompressor.compress(uri, {
           compressionMethod: 'manual',
           resolution: '1920x1080',
           maxSizeMB: 4.9,
           bitrate: 12000,
         });
-
         const compressedUri = compressedResult?.path;
-
         if (typeof compressedUri === 'string') {
           const finalCompressedUri = compressedUri.startsWith('file://')
             ? compressedUri
             : `file://${compressedUri}`;
-
           console.log('Video was compressed successfully:', finalCompressedUri);
           return finalCompressedUri;
         } else {
@@ -321,7 +323,7 @@ const CreatePost = ({route, navigation}) => {
 
     ImagePicker.launchCamera(options, async response => {
       if (response.didCancel) {
-        console.log('User cancelled photo or video capture');
+        console.log('User  cancelled photo or video capture');
       } else if (response.errorCode) {
         console.log('ImagePicker Error: ', response.errorMessage);
       } else {
@@ -359,7 +361,7 @@ const CreatePost = ({route, navigation}) => {
 
     ImagePicker.launchImageLibrary(options, async response => {
       if (response.didCancel) {
-        console.log('User cancelled media selection');
+        console.log('User  cancelled media selection');
       } else if (response.errorCode) {
         console.log('ImagePicker Error: ', response.errorMessage);
       } else {

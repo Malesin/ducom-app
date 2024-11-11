@@ -79,7 +79,6 @@ const TweetCard = ({tweet, onRefreshPage, comments, isUserProfile}) => {
       };
       setDataSent(dataSent);
     };
-
     if (tweet?.media) {
       generateThumbnails();
     }
