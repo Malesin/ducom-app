@@ -95,12 +95,9 @@ const CreatePost = ({route, navigation}) => {
   }, [translateY]);
 
   useEffect(() => {
-    const updatedMediaData = [
-      ...dataPhoto,
-      ...dataVideo
-    ];
+    const updatedMediaData = [...dataPhoto, ...dataVideo];
     setMediaData(updatedMediaData);
-    console.log("mediaData", updatedMediaData);
+    console.log('mediaData', updatedMediaData);
   }, [dataPhoto, dataVideo]);
 
   console.log(selectedMedia, 'Selected Media');
@@ -197,7 +194,7 @@ const CreatePost = ({route, navigation}) => {
             },
           },
         );
-
+        
         if (uploadResponseVideos.data.status === 'ok') {
           const mediaDataVideos = uploadResponseVideos.data.data;
           setDataVideo(mediaDataVideos);
@@ -210,7 +207,9 @@ const CreatePost = ({route, navigation}) => {
         }
       }
 
-      const media = mediaData?.map(item => `${item.url}|${item.type}`).join(',');
+      const media = mediaData
+        ?.map(item => `${item.url}|${item.type}`)
+        .join(',');
 
       const postResponse = await axios.post(`${serverUrl}/create-post`, {
         token: token,

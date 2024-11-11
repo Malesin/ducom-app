@@ -33,13 +33,21 @@ const CommentSheet = ({ commentId, postId, token, idUser, userIdPost, onDeleteSu
     }
   }, [idUser, userIdPost, amIAdmin]);
 
+  // reportCommentId ITU ANAK COMMENT
+  // reportParentCommentId ITU ORANGTUA COMMENT
+  // KITA KIRIMKAN KE REPORT NYA ITU SEBALIKNYA 
+
+  const idComment = childComment ? parentCommentId : commentId
+  const report = childComment ? 'reportParentCommentId' : 'reportCommentId'
+
   const deleteComment = async () => {
+    console.log(parentCommentId)
     try {
       const response = await axios.post(`${serverUrl}/delete-comment`, {
         token: token,
         postId: postId,
-        commentId: parentCommentId || commentId,
-        replyId: parentCommentId && commentId
+        commentId: idComment,
+        replyId: !idComment
       });
 
       if (response.data.status === 'ok') {
@@ -55,11 +63,10 @@ const CommentSheet = ({ commentId, postId, token, idUser, userIdPost, onDeleteSu
     }
   };
 
-  const commentReport = childComment ? 'reportCommentId' : 'reportParentCommentId'
-
   const reportComment = async () => {
     navigation.navigate('Report', {
-      [commentReport]: childComment ? commentId : parentCommentId
+      commentId: idComment,
+      report: report
     })
     console.log("report comment")
   };

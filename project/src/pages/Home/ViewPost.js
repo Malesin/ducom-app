@@ -251,8 +251,10 @@ const ViewPost = ({route}) => {
 
       const response = await axios.post(url, params);
       const dataComment = response.data.data;
-
-      const formattedComments = dataComment.map(comment => ({
+      
+      const formattedComments = dataComment
+      .filter(comment => comment.user !== null)
+      .map(comment => ({
         id: comment._id,
         text: comment.comment,
         userIdPost: comment.user._id,

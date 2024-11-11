@@ -23,7 +23,6 @@ const ReportsManagement = () => {
         try {
             const response = await axios.post(`${serverUrl}/show-reports`, { token: token });
             const resp = response.data.data;
-            console.log(resp)
             const formatted = resp.map(report => {
                 const userId = report.reportedEntity?.user?._id ?? report.reportedEntity?._id ??  report.reportedEntity?.user  ?? '';
                 const name = report.reportedEntity?.user?.name ?? report.reportedEntity?.name ?? '';
