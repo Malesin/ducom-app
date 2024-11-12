@@ -92,6 +92,11 @@ const CreatePost = ({route, navigation}) => {
       useNativeDriver: true,
     }).start();
   }, [translateY]);
+  useEffect(() => {
+    const updatedMediaData = [...dataPhoto, ...dataVideo];
+    setMediaData(updatedMediaData);
+    console.log('mediaData', updatedMediaData);
+  }, [dataPhoto, dataVideo]);
 
   const handlePostSubmit = async () => {
     SetIsUploading(true);
