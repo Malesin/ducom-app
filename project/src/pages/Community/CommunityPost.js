@@ -1,18 +1,52 @@
-import { View, Text } from 'react-native'
-import React from 'react'
-import CommunityCard from '../../components/Community/CommunityCard'
+import { View, Text } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import CommunityCard from '../../components/Community/CommunityCard';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import config from '../../config';
+import { useRoute } from '@react-navigation/native';
+
+const serverUrl = config.SERVER_URL;
 
 const CommunityPost = ({ navigation }) => {
-  const communityCardData = {
-    communityCardName: 'Nama Komunitas',
-    communityDescription: 'Deskripsi komunitas ini.',
+  const route = useRoute();
+  const { communityId } = route.params;
+  const [communityDataList, setCommunityDataList] = useState([]);
+
+  const fetchDataPost = async () => {
+    const token = await AsyncStorage.getItem('token');
+
+    try {
+      const response = await axios.post(`${serverUrl}/communityPosts-byId`, { token, communityId });
+      const data = response.data.data;
+      const communityName = response.data.communityName;
+      const formattedData = data.map(item => ({
+        communityCardName: communityName || 'Nama Komunitas',
+        communityDescription: item.description || 'Deskripsi komunitas ini.',
+        likesCount: item.likes.length || 0,
+        commentsCount: item.comments.length || 0,
+      }));
+      setCommunityDataList(formattedData);
+    } catch (error) {
+      console.error(error);
+    }
   };
+
+  useEffect(() => {
+    fetchDataPost();
+  }, []);
 
   return (
     <View>
-      <CommunityCard navigation={navigation} communityCardData={communityCardData} />
+      {communityDataList.map((communityCardData, index) => (
+        <CommunityCard
+          key={index}
+          navigation={navigation}
+          communityCardData={communityCardData}
+        />
+      ))}
     </View>
-  )
-}
+  );
+};
 
-export default CommunityPost
+export default CommunityPost;

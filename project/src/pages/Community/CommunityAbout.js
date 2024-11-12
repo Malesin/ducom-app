@@ -1,8 +1,44 @@
-import React from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import axios from 'axios';
+import config from '../../config';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const serverUrl = config.SERVER_URL;
+
+const formatDate = dateString => {
+  const date = new Date(dateString);
+  const day = date.getDate();
+  const monthNames = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+  const month = monthNames[date.getMonth()];
+  const year = date.getFullYear();
+  return `${month} ${day}, ${year}`;
+};
 
 const CommunityAbout = () => {
+  const route = useRoute();
+  const { communityId } = route.params;
+  const [communityData, setCommunityData] = useState(null);
+
+  useEffect(() => {
+    async function fetchCommunityData() {
+      const token = await AsyncStorage.getItem('token');
+      try {
+        const response = await axios.post(`${serverUrl}/community-byId`, { token: token, communityId: communityId });
+        setCommunityData(response.data.data);
+      } catch (error) {
+        console.error('Error fetching community data:', error);
+      }
+    }
+
+    fetchCommunityData();
+  }, []);
+
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Community Info</Text>
@@ -25,8 +61,8 @@ const CommunityAbout = () => {
       <View style={styles.infoRow}>
         <MaterialIcons name="event" size={22} color="black" />
         <Text style={styles.createAt}>
-          Created April 4, 2024
-          <Text style={styles.username}> by @dugam_official</Text>
+          Created {communityData?.created?.created_at ? formatDate(communityData.created.created_at) : 'Unknown Date'}
+          <Text style={styles.username}> by @{communityData?.created?.created_by?.username}</Text>
         </Text>
         <View style={styles.verified}>
           <MaterialIcons name="verified" size={20} color="#699BF7" />
@@ -36,52 +72,17 @@ const CommunityAbout = () => {
       <View style={styles.rulesContainer}>
         <Text style={styles.header}>Rules</Text>
         <Text style={styles.subHeader}>These are set and enforced by community admins and are in addition to Ducom’s rules.</Text>
-        <View style={styles.ruleWrapper}>
-          <View style={styles.ruleIcon}>
-            <Text style={styles.ruleNumber}>1</Text>
+        {communityData?.rules.map((rule, index) => (
+          <View key={rule._id} style={styles.ruleWrapper}>
+            <View style={styles.ruleIcon}>
+              <Text style={styles.ruleNumber}>{index + 1}</Text>
+            </View>
+            <View style={styles.ruleTextContainer}>
+              <Text style={styles.ruleTitle}>{rule.title}</Text>
+              <Text style={styles.ruleDescription}>{rule.description}</Text>
+            </View>
           </View>
-          <View style={styles.ruleTextContainer}>
-            <Text style={styles.ruleTitle}>Be kind and respectful.</Text>
-            <Text style={styles.ruleDescription}>
-              Not everyone is on the same technical level. Respect and encourage
-              the questions of others.
-            </Text>
-          </View>
-        </View>
-        <View style={styles.ruleWrapper}>
-          <View style={styles.ruleIcon}>
-            <Text style={styles.ruleNumber}>2</Text>
-          </View>
-          <View style={styles.ruleTextContainer}>
-            <Text style={styles.ruleTitle}>Keep post on topic.</Text>
-            <Text style={styles.ruleDescription}>
-              Stay on topic. Do not hijack another user's thread.
-            </Text>
-          </View>
-        </View>
-        <View style={styles.ruleWrapper}>
-          <View style={styles.ruleIcon}>
-            <Text style={styles.ruleNumber}>3</Text>
-          </View>
-          <View style={styles.ruleTextContainer}>
-            <Text style={styles.ruleTitle}>No selling or promoting.</Text>
-            <Text style={styles.ruleDescription}>
-              No selling or promoting of any kind. This is strictly a technical
-              support group only.
-            </Text>
-          </View>
-        </View>
-        <View style={styles.ruleWrapper}>
-          <View style={styles.ruleIcon}>
-            <Text style={styles.ruleNumber}>4</Text>
-          </View>
-          <View style={styles.ruleTextContainer}>
-            <Text style={styles.ruleTitle}>Explore and share.</Text>
-            <Text style={styles.ruleDescription}>
-              Explore ideas and share knowledge.
-            </Text>
-          </View>
-        </View>
+        ))}
       </View>
     </View>
   );

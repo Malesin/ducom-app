@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,16 +8,25 @@ import {
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const CommunityCard = ({navigation, communityCardData = {}}) => {
-  const {communityCardName = '', communityDescription = ''} = communityCardData;
+const CommunityCard = ({ navigation, communityCardData = {} }) => {
+  const {
+    communityCardName = '',
+    communityDescription = '',
+    likesCount: initialLikesCount = 0,
+    commentsCount: initialCommentsCount = 0,
+  } = communityCardData;
+
   const [liked, setLiked] = useState(false);
-  const [likesCount, setLikesCount] = useState(0);
-  const [bookmarked, setBookmarked] = useState(false);
-  const [bookMarksCount, setBookMarksCount] = useState(0);
-  const [commentsCount] = useState(0);
+  const [likesCount, setLikesCount] = useState(initialLikesCount);
+  const [commentsCount, setCommentsCount] = useState(initialCommentsCount);
+
+  useEffect(() => {
+    setLikesCount(initialLikesCount);
+    setCommentsCount(initialCommentsCount);
+  }, [initialLikesCount, initialCommentsCount]);
 
   const handleLike = () => {
-    if (liked) {  
+    if (liked) {
       setLiked(false);
       setLikesCount(prevLikesCount => prevLikesCount - 1);
     } else {
@@ -26,23 +35,14 @@ const CommunityCard = ({navigation, communityCardData = {}}) => {
     }
   };
 
-  const handleBookmark = () => {
-    if (bookmarked) {
-      setBookmarked(false);
-      setBookMarksCount(prevBookmarksCount => prevBookmarksCount - 1);
-    } else {
-      setBookmarked(true);
-      setBookMarksCount(prevBookmarksCount => prevBookmarksCount + 1);
-    }
-  };
 
   const handlePress = () => {
     navigation.navigate('ViewCommunity');
   };
 
-  const InteractionButton = ({icon, color, count, onPress}) => (
+  const InteractionButton = ({ icon, color, count, onPress }) => (
     <TouchableOpacity style={styles.actionButton} onPress={onPress}>
-      <MaterialCommunityIcons name={icon} size={20} color={color} /> 
+      <MaterialCommunityIcons name={icon} size={20} color={color} />
       <Text style={styles.actionText}>{count}</Text>
     </TouchableOpacity>
   );
@@ -72,12 +72,6 @@ const CommunityCard = ({navigation, communityCardData = {}}) => {
           color="#040608"
           count={commentsCount}
           onPress={handlePress}
-        />
-        <InteractionButton
-          icon={bookmarked ? 'bookmark' : 'bookmark-outline'}
-          color={bookmarked ? '#00c5ff' : '#040608'}
-          count={bookMarksCount}
-          onPress={handleBookmark}
         />
       </View>
     </SafeAreaView>

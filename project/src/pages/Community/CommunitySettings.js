@@ -1,4 +1,4 @@
-import React, {useState, useRef} from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -14,20 +14,19 @@ import {
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import ImagePicker from 'react-native-image-crop-picker';
-import {useNavigation, useFocusEffect} from '@react-navigation/native';
+import { useNavigation, useFocusEffect, useRoute } from '@react-navigation/native';
 
 const CommunitySettings = () => {
+  const route = useRoute();
+  const { communityData } = route.params;
+  console.log(communityData.rules)
   const navigation = useNavigation();
   const [isEditingName, setIsEditingName] = useState(false);
   const [isEditingBio, setIsEditingBio] = useState(false);
-  const [communityName, setCommunityName] = useState('Gerakan Pramuka Dugam');
-  const [communityBio, setCommunityBio] = useState(
-    'Lorem Ipsum is simply dummy text of the printing and typesetting industry...',
-  );
-  const [banner, setBanner] = useState(require('../../assets/iya.png'));
-  const [profilePicture, setProfilePicture] = useState(
-    require('../../assets/avatar.png'),
-  );
+  const [communityName, setCommunityName] = useState(communityData?.communityName);
+  const [communityBio, setCommunityBio] = useState(communityData?.communityDescription);
+  const [banner, setBanner] = useState();
+  const [profilePicture, setProfilePicture] = useState();
   const [profileBackground, setProfileBackground] = useState(null);
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const dropdownAnimation = useRef(new Animated.Value(0)).current;
@@ -59,7 +58,7 @@ const CommunitySettings = () => {
     })
       .then(image => {
         console.log('Image selected:', image);
-        setImage({uri: image.path});
+        setImage({ uri: image.path });
       })
       .catch(error => {
         console.error('Error selecting image:', error);
@@ -90,7 +89,7 @@ const CommunitySettings = () => {
           <TouchableOpacity
             style={[
               styles.saveButton,
-              {backgroundColor: isDataChanged ? '#001374' : '#ccc'},
+              { backgroundColor: isDataChanged ? '#001374' : '#ccc' },
             ]}
             onPress={isDataChanged ? handleSave : null}
             disabled={!isDataChanged}>
@@ -122,7 +121,7 @@ const CommunitySettings = () => {
       <View style={styles.bannerContainer}>
         <TouchableOpacity onPress={() => openModal(banner)}>
           <ImageBackground
-            source={banner}
+            source={communityData?.picture.banner.bannerPicture ? { uri: communityData.picture.banner.bannerPicture } : require('../../assets/banner.png')}
             style={styles.banner}
             resizeMode="cover"
             imageStyle={styles.bannerImage}>
@@ -133,7 +132,9 @@ const CommunitySettings = () => {
             </TouchableOpacity>
             <View style={styles.avatarContainer}>
               <TouchableOpacity onPress={() => openModal(profilePicture)}>
-                <Image source={profilePicture} style={styles.avatar} />
+                <Image
+                  source={communityData?.picture.profile.profilePicture ? { uri: communityData.picture.profile.profilePicture } : require('../../assets/profilepic.png')}
+                  style={styles.avatar} />
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.avatarEditIcon}
@@ -205,7 +206,7 @@ const CommunitySettings = () => {
               </TouchableOpacity>
             )}
           </View>
-          <Text style={styles.label}>Bio</Text>
+          <Text style={styles.label}>Description</Text>
         </View>
       </View>
 
@@ -215,7 +216,7 @@ const CommunitySettings = () => {
           {profileBackground && (
             <ImageBackground
               source={profileBackground}
-              style={{width: '100%', height: 200}}
+              style={{ width: '100%', height: 200 }}
               resizeMode="cover"
             />
           )}
@@ -248,57 +249,22 @@ const CommunitySettings = () => {
             </TouchableOpacity>
             <TouchableOpacity style={styles.dropdownItem}>
               <MaterialCommunityIcons name="delete" size={20} color="red" style={styles.dropdownIcon} />
-              <Text style={styles.dropdownItemText}>Delete Rules</Text> 
+              <Text style={styles.dropdownItemText}>Delete Rules</Text>
             </TouchableOpacity>
           </View>
         )}
         <View style={styles.rulesContainer}>
-          <View style={styles.ruleWrapper}>
-            <View style={styles.ruleIcon}>
-              <Text style={styles.ruleNumber}>1</Text>
+          {communityData.rules.map((rule, index) => (
+            <View key={rule._id} style={styles.ruleWrapper}>
+              <View style={styles.ruleIcon}>
+                <Text style={styles.ruleNumber}>{index + 1}</Text>
+              </View>
+              <View style={styles.ruleTextContainer}>
+                <Text style={styles.ruleTitle}>{rule.title}</Text>
+                <Text style={styles.ruleDescription}>{rule.description}</Text>
+              </View>
             </View>
-            <View style={styles.ruleTextContainer}>
-              <Text style={styles.ruleTitle}>Be kind and respectful.</Text>
-              <Text style={styles.ruleDescription}>
-                Not everyone is on the same technical level. Respect and
-                encourage the questions of others.
-              </Text>
-            </View>
-          </View>
-          <View style={styles.ruleWrapper}>
-            <View style={styles.ruleIcon}>
-              <Text style={styles.ruleNumber}>2</Text>
-            </View>
-            <View style={styles.ruleTextContainer}>
-              <Text style={styles.ruleTitle}>Keep post on topic.</Text>
-              <Text style={styles.ruleDescription}>
-                Stay on topic. Do not hijack another user's thread.
-              </Text>
-            </View>
-          </View>
-          <View style={styles.ruleWrapper}>
-            <View style={styles.ruleIcon}>
-              <Text style={styles.ruleNumber}>3</Text>
-            </View>
-            <View style={styles.ruleTextContainer}>
-              <Text style={styles.ruleTitle}>No selling or promoting.</Text>
-              <Text style={styles.ruleDescription}>
-                No selling or promoting of any kind. This is strictly a
-                technical support group only.
-              </Text>
-            </View>
-          </View>
-          <View style={styles.ruleWrapper}>
-            <View style={styles.ruleIcon}>
-              <Text style={styles.ruleNumber}>4</Text>
-            </View>
-            <View style={styles.ruleTextContainer}>
-              <Text style={styles.ruleTitle}>Explore and share.</Text>
-              <Text style={styles.ruleDescription}>
-                Explore ideas and share knowledge.
-              </Text>
-            </View>
-          </View>
+          ))}
         </View>
         <View style={styles.lineSeparator} />
       </View>
@@ -314,7 +280,7 @@ const CommunitySettings = () => {
             color="#000"
           />
           <Text style={styles.userAccountText}>User List</Text>
-          <View style={{flex: 1, alignItems: 'flex-end'}}>
+          <View style={{ flex: 1, alignItems: 'flex-end' }}>
             <MaterialCommunityIcons
               name="chevron-right"
               size={25}
@@ -373,13 +339,13 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: -3,
     left: '54%',
-    transform: [{translateX: -50}],
+    transform: [{ translateX: -50 }],
     alignItems: 'center',
   },
   avatar: {
     bottom: -15,
     left: '54%',
-    transform: [{translateX: -50}],
+    transform: [{ translateX: -50 }],
     width: 80,
     height: 80,
     borderRadius: 50,

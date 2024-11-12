@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -15,29 +15,32 @@ import Animated, {
   withSpring,
   runOnJS,
 } from 'react-native-reanimated';
-import {PanGestureHandler} from 'react-native-gesture-handler';
+import { PanGestureHandler } from 'react-native-gesture-handler';
+import axios from 'axios';
+import config from '../../config'; // Pastikan path ini sesuai dengan struktur proyek Anda
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const DELETE_THRESHOLD = -75;
 
-const SwipeableRule = ({rule, index, updateRule, onDelete, canDelete}) => {
+const SwipeableRule = ({ rule, index, updateRule, onDelete, canDelete }) => {
   const translateX = useSharedValue(0);
   const isRemoving = useSharedValue(false);
 
   const panGesture = useAnimatedGestureHandler({
     onStart: (_, context) => {
-      if (!canDelete) return; 
+      if (!canDelete) return;
       isRemoving.value = false;
       context.x = translateX.value;
     },
     onActive: (event, context) => {
-      if (!canDelete) return; 
+      if (!canDelete) return;
       if (!isRemoving.value) {
         const newValue = context.x + event.translationX;
         translateX.value = Math.min(0, Math.max(newValue, -100));
       }
     },
     onEnd: () => {
-      if (!canDelete) return; 
+      if (!canDelete) return;
       if (translateX.value < DELETE_THRESHOLD) {
         isRemoving.value = true;
         translateX.value = withSpring(-100, {}, finished => {
@@ -54,14 +57,14 @@ const SwipeableRule = ({rule, index, updateRule, onDelete, canDelete}) => {
 
   const rStyle = useAnimatedStyle(() => {
     return {
-      transform: [{translateX: translateX.value}],
+      transform: [{ translateX: translateX.value }],
     };
   });
 
   const deleteButtonStyle = useAnimatedStyle(() => {
     return {
-      transform: [{translateX: translateX.value + 100}],
-      opacity: canDelete ? 1 : 0, 
+      transform: [{ translateX: translateX.value + 100 }],
+      opacity: canDelete ? 1 : 0,
     };
   });
 
@@ -80,7 +83,7 @@ const SwipeableRule = ({rule, index, updateRule, onDelete, canDelete}) => {
           <Text style={styles.ruleNumber}>Rule {index + 1}</Text>
           <TextInput
             maxLength={150}
-            style={[styles.communityRulesInputTitle, {height: 35}]}
+            style={[styles.communityRulesInputTitle, { height: 35 }]}
             placeholder="Title"
             placeholderTextColor="#b6b6b6"
             value={rule.title}
@@ -88,7 +91,7 @@ const SwipeableRule = ({rule, index, updateRule, onDelete, canDelete}) => {
           />
           <TextInput
             maxLength={150}
-            style={[styles.communityRulesInputDescription, {height: 100}]}
+            style={[styles.communityRulesInputDescription, { height: 100 }]}
             placeholder="Description"
             placeholderTextColor="#b6b6b6"
             multiline={true}
@@ -102,14 +105,38 @@ const SwipeableRule = ({rule, index, updateRule, onDelete, canDelete}) => {
   );
 };
 
-const CreateCommunity = ({navigation}) => {
+const CreateCommunity = ({ navigation }) => {
   const [inputNameHeight, setInputNameHeight] = useState(35);
   const [inputHeightDescription, setInputHeightDescription] = useState(35);
-  const [rules, setRules] = useState([{title: '', description: ''}]);
+  const [rules, setRules] = useState([{ title: '', description: '' }]);
   const [newCommunityName, setNewCommunityName] = useState('');
   const [newCommunityDescription, setNewCommunityDescription] = useState('');
+  const serverUrl = config.SERVER_URL;
 
-  const handleCreateCommunity = () => {
+  const handleCreateCommunity = async () => {
+    try {
+      const token = await AsyncStorage.getItem('token');
+      if (!token) {
+        console.error('Token not found');
+        return;
+      }
+
+      const response = await axios.post(`${serverUrl}/create-community`, {
+        token: token,
+        communityName: newCommunityName,
+        communityDescription: newCommunityDescription,
+        description: 'Deskripsi tambahan',
+        rules: rules,
+      });
+
+      if (response.status === 201) {
+        console.log('Community created successfully:', response.data);
+      } else {
+        console.error('Error creating community:', response.data);
+      }
+    } catch (error) {
+      console.error('Network error:', error);
+    }
     console.log('Community created with the following details:');
     console.log('Name:', newCommunityName);
     console.log('Description:', newCommunityDescription);
@@ -161,7 +188,7 @@ const CreateCommunity = ({navigation}) => {
   const updateRule = (index, field, value) => {
     const updatedRules = rules.map((rule, i) => {
       if (i === index) {
-        return {...rule, [field]: value};
+        return { ...rule, [field]: value };
       }
       return rule;
     });
@@ -176,6 +203,7 @@ const CreateCommunity = ({navigation}) => {
     }
   };
 
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
@@ -185,11 +213,11 @@ const CreateCommunity = ({navigation}) => {
             maxLength={30}
             style={[
               styles.communityNameInput,
-              {height: Math.max(35, inputNameHeight)},
+              { height: Math.max(35, inputNameHeight) },
             ]}
             multiline={true}
             onContentSizeChange={e => {
-              const {height} = e.nativeEvent.contentSize;
+              const { height } = e.nativeEvent.contentSize;
               setInputNameHeight(height);
             }}
             value={newCommunityName}
@@ -208,11 +236,11 @@ const CreateCommunity = ({navigation}) => {
             maxLength={150}
             style={[
               styles.communityDescriptionInput,
-              {height: Math.max(35, inputHeightDescription)},
+              { height: Math.max(35, inputHeightDescription) },
             ]}
             multiline={true}
             onContentSizeChange={e => {
-              const {height} = e.nativeEvent.contentSize;
+              const { height } = e.nativeEvent.contentSize;
               setInputHeightDescription(height);
             }}
             value={newCommunityDescription}

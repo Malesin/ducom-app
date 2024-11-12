@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,83 +7,74 @@ import {
   SafeAreaView,
   TouchableOpacity,
 } from 'react-native';
-import {useNavigation} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import CommunityExplore from '../../components/Community/CommunityExplore';
 import CommunityCard from '../../components/Community/CommunityCard';
-import {ScrollView} from 'react-native-gesture-handler';
+import { ScrollView } from 'react-native-gesture-handler';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import config from '../../config';
+
+const serverUrl = config.SERVER_URL;
 
 const CommunityScreen = () => {
   const navigation = useNavigation();
+  const [cardData, setCardData] = useState([])
+  const [exploreData, setExploreData] = useState([])
 
   const handlePress = () => {
     navigation.navigate('CreateCommunity');
   };
 
-  const exploreData = [
-    {
-      id: '1',
-      exploreName: 'Komunitas A',
-      memberCount: '1.2K Members',
-      description:
-        'Deskripsi komunitas A. Tempat berkumpulnya para penggemar A.',
-    },
-    {
-      id: '2',
-      exploreName: 'Komunitas B',
-      memberCount: '800 Members',
-      description: 'Deskripsi komunitas B. Diskusi tentang topik B.',
-    },
-    {
-      id: '3',
-      exploreName: 'Komunitas C',
-      memberCount: '2.5K Members',
-      description: 'Deskripsi komunitas C. Berbagi informasi dan pengalaman.',
-    },
-    {
-      id: '4',
-      exploreName: 'Komunitas D',
-      memberCount: '1K Members',
-      description: 'Deskripsi komunitas D. Komunitas untuk para pecinta D.',
-    },
-  ];
+  const fetchDataCommunities = async () => {
+    const token = await AsyncStorage.getItem('token');
 
-  const cardData = [
-    {
-      id: '1',
-      communityCardName: 'Komunitas A',
-      communityDescription: 'Deskripsi lengkap komunitas A.',
-    },
-    {
-      id: '2',
-      communityCardName: 'Komunitas B',
-      communityDescription: 'Deskripsi lengkap komunitas B.',
-    },
-    {
-      id: '3',
-      communityCardName: 'Komunitas C',
-      communityDescription: 'Deskripsi lengkap komunitas C.',
-    },
-    {
-      id: '4',
-      communityCardName: 'Komunitas D',
-      communityDescription: 'Deskripsi lengkap komunitas D.',
-    },
-  ];
+    try {
+      await axios
+        .post(`${serverUrl}/communities`, { token: token })
+        .then(res => {
+          const response = res.data.data;
+          const respData = response.map(data => ({
+            communityId: data._id,
+            exploreName: data.communityName,
+            memberCount: `${data.members.length} Members`,
+            description: data.description || 'No description available.',
+            profilePicture: data.picture.profile.profilePicture,
+            backgroundPicture: data.picture.background.backgroundPicture,
+          }));
+          setExploreData(respData);
+        })
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  // setCardData([
+  //   {
+  //     id: '1',
+  //     communityCardName: 'Komunitas A',
+  //     communityDescription: 'Deskripsi lengkap komunitas A.',
+  //   }
+  // ])
+
+  useEffect(() => {
+    fetchDataCommunities()
+  }, [])
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView style={{flex: 1}}>
+      <ScrollView style={{ flex: 1 }}>
         <View style={styles.exploreContainer}>
           <Text style={styles.exploreText}>Explore</Text>
           <FlatList
             data={exploreData}
-            renderItem={({item}) => (
+            renderItem={({ item }) => (
               <CommunityExplore communityExploreData={item} />
             )}
             keyExtractor={item => item.id}
             horizontal={true}
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{paddingHorizontal: 0}}
+            contentContainerStyle={{ paddingHorizontal: 0 }}
           />
         </View>
         <View style={styles.communityCardContainer}>
