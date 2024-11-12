@@ -71,7 +71,6 @@ const Notificationscreen = () => {
         });
       setFollowNotifs(followNotifications);
 
-      let warningNotifications = [];
       await axios
         .post(`${serverUrl}/warning-notifications`, {token})
         .then(res => {

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   StyleSheet,
   Text,
@@ -11,15 +11,16 @@ import {
 import ProfilePicture from '../assets/profilepic.png';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import {useNavigation, useFocusEffect} from '@react-navigation/native';
 
-const ReportedNotification = ({ notif }) => {
+const ReportedNotification = ({notif}) => {
   const newNotif = notif[0];
   const slideAnim = useRef(new Animated.Value(-50)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const [modalVisible, setModalVisible] = useState(false);
   const [adminMessage, setAdminMessage] = useState(newNotif?.message);
   const navigation = useNavigation();
+  console.log(newNotif);
 
   useEffect(() => {
     Animated.parallel([
@@ -75,7 +76,7 @@ const ReportedNotification = ({ notif }) => {
         style={[
           styles.container,
           {
-            transform: [{ translateY: slideAnim }],
+            transform: [{translateY: slideAnim}],
             opacity: fadeAnim,
           },
         ]}>
@@ -115,25 +116,34 @@ const ReportedNotification = ({ notif }) => {
                 It looks like you threatened or harassed others, or targeted
                 them with content or messages that shame or disrespect them.
               </Text>
-              <View style={styles.reasonMessageContainer}>
-                <Image
-                  source={
-                    newNotif?.relatedPost?.user?.profilePicture
-                      ? { uri: newNotif?.relatedPost?.user?.profilePicture }
-                      : ProfilePicture
-                  }
-                  style={styles.profileImage} />
-                <Text style={styles.userInfo}>
-                  {newNotif?.relatedPost?.user?.username
-                    ?? newNotif?.report?.reportedPost?.user?.username
-                    ?? 'Post Deleted'}
-                </Text>
-                <Text style={styles.userMessage}>
-                  {newNotif?.relatedPost?.description
-                    ?? newNotif?.report?.reportedPost?.description
-                    ?? ''}
-                </Text>
-              </View>
+              {newNotif.category == 'user' ? null : (
+                <>
+                  <View style={styles.reasonMessageContainer}>
+                    <Image
+                      source={
+                        newNotif?.reportedEntity?.user?.profilePicture
+                          ? {
+                              uri: newNotif?.reportedEntity?.user
+                                ?.profilePicture,
+                            }
+                          : ProfilePicture
+                      }
+                      style={styles.profileImage}
+                    />
+                    <Text style={styles.userInfo}>
+                      {newNotif?.relatedPost?.user?.username ??
+                        newNotif?.report?.reportedPost?.user?.username ??
+                        'Post Deleted'}
+                    </Text>
+                    <Text style={styles.userMessage}>
+                      {newNotif?.relatedPost?.description ??
+                        newNotif?.report?.reportedPost?.description ??
+                        ''}
+                    </Text>
+                  </View>
+                </>
+              )}
+
               <Text style={styles.profileMessage}>
                 You shared this on your profile
               </Text>
