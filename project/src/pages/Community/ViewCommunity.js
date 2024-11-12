@@ -2,23 +2,27 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import axios from 'axios';
 import config from '../../config';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const serverUrl = config.SERVER_URL;
 
 const ViewCommunity = () => {
+  const route = useRoute();
+  const { communityId } = route.params;
   const [communityData, setCommunityData] = useState(null);
   const navigation = useNavigation();
 
-const handleSettingsPress= () => {
-  navigation.navigate('CommunitySettings');
-}
+  const handleSettingsPress = () => {
+    navigation.navigate('CommunitySettings', { communityData: communityData });
+  };
 
   useEffect(() => {
     async function fetchCommunityData() {
+      const token = await AsyncStorage.getItem('token');
       try {
-        const response = await axios.get(`${serverUrl}/communitydata`);
-        setCommunityData(response.data);
+        const response = await axios.post(`${serverUrl}/community-byId`, { token: token, communityId: communityId });
+        setCommunityData(response.data.data);
       } catch (error) {
         console.error('Error fetching community data:', error);
       }
@@ -31,18 +35,18 @@ const handleSettingsPress= () => {
     <ScrollView style={styles.container}>
       <View style={styles.bannerContainer}>
         <Image
-          source={communityData?.banner ? { uri: communityData.banner } : require('../../assets/iya.png')}
+          source={communityData?.picture.banner.bannerPicture ? { uri: communityData.picture.banner.bannerPicture } : require('../../assets/banner.png')}
           style={styles.banner}
         />
       </View>
       <View style={styles.infoContainer}>
         <View style={styles.nameContainer}>
-          <Text style={styles.name}>{communityData?.name || 'Community Name'}</Text>
+          <Text style={styles.name}>{communityData?.communityName || 'Community Name'}</Text>
           <TouchableOpacity style={styles.settingsButton} onPress={handleSettingsPress}>
             <Text style={styles.settings}>Settings</Text>
           </TouchableOpacity>
         </View>
-        <Text style={styles.bio}>{communityData?.bio || 'Community bio'}</Text>
+        <Text style={styles.bio}>{communityData?.communityDescription || 'Community bio'}</Text>
       </View>
     </ScrollView>
   );

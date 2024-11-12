@@ -8,15 +8,15 @@ import {
   Animated,
   Pressable,
 } from 'react-native';
-import React, {useState, useRef} from 'react';
+import React, { useState, useRef } from 'react';
 import backgroundCommunity from '../../assets/eskul/pramukabanner.png';
 import profileCommunity from '../../assets/iya.png';
-import {useNavigation} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 
-const {height} = Dimensions.get('window');
+const { height } = Dimensions.get('window');
 
-const CommunityExplore = ({communityExploreData}) => {
-  const {exploreName, memberCount, description} = communityExploreData;
+const CommunityExplore = ({ communityExploreData }) => {
+  const { communityId, exploreName, memberCount, description, profilePicture, backgroundPicture } = communityExploreData;
   const containerHeight = useRef(new Animated.Value(height * 0.25)).current;
   const contentPosition = useRef(new Animated.Value(0)).current;
   const buttonOpacity = useRef(new Animated.Value(0)).current;
@@ -66,14 +66,16 @@ const CommunityExplore = ({communityExploreData}) => {
   };
 
   const handlePressJoin = () => {
-    navigation.navigate('ViewCommunity');
+    navigation.navigate('ViewCommunity', { communityId: communityId });
   };
 
   return (
     <Pressable onPress={handlePress}>
       <View style={styles.container}>
         <View style={styles.backgroundContainer}>
-          <Image source={backgroundCommunity} style={styles.backgroundImage} />
+          <Image
+            source={backgroundPicture ? { uri: backgroundPicture } : require('../../assets/banner.png')}
+            style={styles.backgroundImage} />
           <Animated.View
             style={[
               styles.overlayAndContent,
@@ -81,12 +83,14 @@ const CommunityExplore = ({communityExploreData}) => {
                 height: containerHeight,
               },
             ]}>
-            <Image source={profileCommunity} style={styles.profileImage} />
+            <Image
+              source={profilePicture ? { uri: profilePicture } : require('../../assets/banner.png')}
+              style={styles.profileImage} />
             <Animated.View
               style={[
                 styles.contentContainer,
                 {
-                  transform: [{translateY: contentPosition}],
+                  transform: [{ translateY: contentPosition }],
                 },
               ]}>
               <View style={styles.infoContainer}>

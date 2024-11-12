@@ -2,10 +2,8 @@ import React, {useState, useEffect} from 'react';
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import config from '../config';
 import {UserFollower} from '../pages';
 import UserFollowing from './../pages/Userprofile/UserFollowing';
-const serverUrl = config.SERVER_URL;
 
 const Tab = createMaterialTopTabNavigator();
 

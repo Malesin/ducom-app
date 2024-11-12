@@ -2,10 +2,13 @@ import React, { useState, useCallback } from 'react';
 import { StyleSheet, View, RefreshControl } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Tabs, MaterialTabBar } from 'react-native-collapsible-tab-view';
-import { CommunityPost, CommunityMedia, ViewCommunity, CommunityAbout} from '../pages';
+import { CommunityPost, CommunityMedia, ViewCommunity, CommunityAbout } from '../pages';
+import { useRoute } from '@react-navigation/native';
 
 
 function CommunityTabNavigator() {
+  const route = useRoute();
+  const { communityId } = route.params;
   const [refreshing, setRefreshing] = useState(false);
   const [isScrollTop, setIsScrollTop] = useState(true);
 
@@ -20,10 +23,9 @@ function CommunityTabNavigator() {
     const { contentOffset } = event.nativeEvent;
     setIsScrollTop(contentOffset.y === 0);
   };
-
   const Header = () => (
     <View style={styles.communityWrapper}>
-      <ViewCommunity /> 
+      <ViewCommunity communityId={communityId} />
     </View>
   );
 
@@ -78,7 +80,7 @@ function CommunityTabNavigator() {
                 enabled={isScrollTop}
               />
             }>
-            <CommunityAbout />
+            <CommunityAbout communityId={communityId}/>
           </Tabs.ScrollView>
         </Tabs.Tab>
       </Tabs.Container>
