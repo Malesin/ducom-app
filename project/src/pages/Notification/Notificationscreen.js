@@ -84,11 +84,11 @@ const Notificationscreen = () => {
             Alert.alert('Error', 'Failed to fetch warning notifications');
           }
         });
-
       const allNotifications = [
         ...likeNotifications,
         ...commentNotifications,
         ...followNotifications,
+        ...warningNotifications,
       ].sort((a, b) => {
         const aDate =
           a.like?.created_at || a.comment?.created_at || a?.created_at;
@@ -96,11 +96,9 @@ const Notificationscreen = () => {
           b.like?.created_at || b.comment?.created_at || b?.created_at;
         return new Date(bDate) - new Date(aDate);
       });
-
       setAllNotifications(allNotifications);
     } catch (error) {
       console.error('Error fetching notifications:', error);
-      Alert.alert('Error', 'Failed to fetch notifications');
     } finally {
       setShowSkeleton(false);
     }
@@ -245,5 +243,3 @@ const styles = StyleSheet.create({
 });
 
 export default Notificationscreen;
-
-
