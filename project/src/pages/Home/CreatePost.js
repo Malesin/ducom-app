@@ -43,6 +43,7 @@ const CreatePost = ({route, navigation}) => {
   const [commentsEnabled, setCommentsEnabled] = useState(true);
   const [dataVideo, setDataVideo] = useState([]);
   const [dataPhoto, setDataPhoto] = useState([]);
+  const [mediaData, setMediaData] = useState([]);
   const closePostSheet = () => setIsPostSheetVisible(false);
   const colorScheme = useColorScheme();
   const styles = getStyles(colorScheme);
@@ -92,6 +93,7 @@ const CreatePost = ({route, navigation}) => {
       useNativeDriver: true,
     }).start();
   }, [translateY]);
+
   useEffect(() => {
     const updatedMediaData = [...dataPhoto, ...dataVideo];
     setMediaData(updatedMediaData);
