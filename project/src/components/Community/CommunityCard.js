@@ -9,6 +9,7 @@ import {
   Modal,
   TouchableWithoutFeedback,
   FlatList,
+  Dimensions,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Video from 'react-native-video';
@@ -22,8 +23,6 @@ const CommunityCard = ({navigation, communityCardData = {}}) => {
     commentsCount: initialCommentsCount = 0,
     media = [],
   } = communityCardData;
-
-  console.log(communityCardData)
 
   const [liked, setLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(initialLikesCount);
@@ -101,19 +100,34 @@ const CommunityCard = ({navigation, communityCardData = {}}) => {
   }, []);
 
   const renderMediaItem = useCallback(
-    ({item}) => {
+    ({item, index}) => {
       const isImage =
         item.type === 'image' || /\.(jpg|jpeg|png|gif|webp)$/i.test(item.uri);
 
       const isVideo =
         item.type === 'video' || /\.(mp4|mov|avi|mkv)$/i.test(item.uri);
 
+      // Tentukan lebar berdasarkan jumlah media
+      const mediaWidth =
+        memoizedMedia.length === 1
+          ? Dimensions.get('window').width * 0.9 // Lebar penuh jika hanya satu media
+          : Dimensions.get('window').width * 0.5; // Setengah lebar jika lebih dari satu media
+
       return (
-        <TouchableOpacity onPress={() => openMediaPreview(item.uri)}>
+        <TouchableOpacity
+          onPress={() => openMediaPreview(item.uri)}
+          style={[
+            styles.mediaItemContainer,
+            {
+              width: mediaWidth,
+              height: memoizedMedia.length === 1 ? 250 : 200,
+            },
+          ]}>
           {isImage ? (
             <Image
               source={{uri: item.uri}}
               style={styles.mediaImage}
+              resizeMode="cover"
               onError={e => {
                 console.error('Image Load Error:', e.nativeEvent.error);
               }}
@@ -123,6 +137,7 @@ const CommunityCard = ({navigation, communityCardData = {}}) => {
               <Image
                 source={{uri: thumbnails[item.uri] || item.uri}}
                 style={styles.mediaImage}
+                resizeMode="cover"
               />
               <MaterialCommunityIcons
                 name="play-circle-outline"
@@ -135,7 +150,7 @@ const CommunityCard = ({navigation, communityCardData = {}}) => {
         </TouchableOpacity>
       );
     },
-    [thumbnails, openMediaPreview],
+    [thumbnails, openMediaPreview, memoizedMedia.length],
   );
 
   const InteractionButton = useCallback(
@@ -174,12 +189,19 @@ const CommunityCard = ({navigation, communityCardData = {}}) => {
           data={memoizedMedia}
           renderItem={renderMediaItem}
           keyExtractor={(item, index) => item.uri || index.toString()}
-          horizontal
+          horizontal={true}
           showsHorizontalScrollIndicator={false}
+          scrollEnabled={memoizedMedia.length > 1}
           style={styles.mediaFlatList}
+          snapToAlignment="start"
+          snapToInterval={
+            memoizedMedia.length === 1
+              ? Dimensions.get('window').width * 0.9
+              : Dimensions.get('window').width * 0.5
+          }
+          decelerationRate="fast"
         />
       )}
-
       <View style={styles.actions}>
         <InteractionButton
           icon={liked ? 'heart' : 'heart-outline'}
@@ -194,7 +216,6 @@ const CommunityCard = ({navigation, communityCardData = {}}) => {
           onPress={handlePress}
         />
       </View>
-
       <Modal
         visible={isModalVisible}
         transparent
@@ -246,6 +267,7 @@ const CommunityCard = ({navigation, communityCardData = {}}) => {
 
 const styles = StyleSheet.create({
   card: {
+    flex: 1,
     backgroundColor: '#fff',
     padding: 10,
     borderColor: '#E1E8ED',
@@ -289,23 +311,26 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   mediaFlatList: {
+    paddingHorizontal: 5,
     marginTop: 10,
     marginBottom: 10,
   },
-  mediaImage: {
-    width: 200,
-    height: 200,
+  mediaItemContainer: {
+    marginRight: 10,
     borderRadius: 8,
-    marginRight: 8,
+  },
+  mediaImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 8,
   },
   videoContainer: {
-    width: 200,
-    height: 200,
+    width: '100%',
+    height: '100%',
     borderRadius: 8,
     backgroundColor: '#000',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 8,
   },
   playIcon: {
     position: 'absolute',
