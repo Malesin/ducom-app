@@ -5,8 +5,14 @@ import {
   StyleSheet,
   TouchableOpacity,
   SafeAreaView,
+  Image,
+  Modal,
+  TouchableWithoutFeedback,
+  FlatList,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Video from 'react-native-video';
+import {createThumbnail} from 'react-native-create-thumbnail';
 
 const CommunityCard = ({navigation, communityCardData = {}}) => {
   const {
@@ -14,16 +20,38 @@ const CommunityCard = ({navigation, communityCardData = {}}) => {
     communityDescription = '',
     likesCount: initialLikesCount = 0,
     commentsCount: initialCommentsCount = 0,
+    media = [],
   } = communityCardData;
 
   const [liked, setLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(initialLikesCount);
   const [commentsCount, setCommentsCount] = useState(initialCommentsCount);
 
+  const [thumbnails, setThumbnails] = useState({});
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [modalMediaUri, setModalMediaUri] = useState('');
+
   useEffect(() => {
     setLikesCount(initialLikesCount);
     setCommentsCount(initialCommentsCount);
-  }, [initialLikesCount, initialCommentsCount]);
+
+    const generateThumbnails = async () => {
+      const newThumbnails = {};
+      for (const mediaItem of media || []) {
+        if (mediaItem.type === 'video' && mediaItem.uri) {
+          try {
+            const {path} = await createThumbnail({url: mediaItem.uri});
+            newThumbnails[mediaItem.uri] = path;
+          } catch (error) {
+            console.log('Error generating thumbnail:', error);
+          }
+        }
+      }
+      setThumbnails(newThumbnails);
+    };
+
+    generateThumbnails();
+  }, [initialLikesCount, initialCommentsCount, media]);
 
   const handleLike = () => {
     if (liked) {
@@ -37,6 +65,51 @@ const CommunityCard = ({navigation, communityCardData = {}}) => {
 
   const handlePress = () => {
     navigation.navigate('ViewCommunity');
+  };
+
+  const openMediaPreview = uri => {
+    setModalMediaUri(uri);
+    setIsModalVisible(true);
+  };
+
+  const closeMediaPreview = () => {
+    setIsModalVisible(false);
+    setModalMediaUri('');
+  };
+
+  const renderMediaItem = ({item}) => {
+    const isImage =
+      item.type === 'image' || /\.(jpg|jpeg|png|gif|webp)$/i.test(item.uri);
+
+    const isVideo =
+      item.type === 'video' || /\.(mp4|mov|avi|mkv)$/i.test(item.uri);
+
+    return (
+      <TouchableOpacity onPress={() => openMediaPreview(item.uri)}>
+        {isImage ? (
+          <Image
+            source={{uri: item.uri}}
+            style={styles.mediaImage}
+            onError={e => {
+              console.error('Image Load Error:', e.nativeEvent.error);
+            }}
+          />
+        ) : isVideo ? (
+          <View style={styles.videoContainer}>
+            <Image
+              source={{uri: thumbnails[item.uri] || item.uri}}
+              style={styles.mediaImage}
+            />
+            <MaterialCommunityIcons
+              name="play-circle-outline"
+              size={40}
+              color="#fff"
+              style={styles.playIcon}
+            />
+          </View>
+        ) : null}
+      </TouchableOpacity>
+    );
   };
 
   const InteractionButton = ({icon, color, count, onPress}) => (
@@ -62,6 +135,18 @@ const CommunityCard = ({navigation, communityCardData = {}}) => {
         </TouchableOpacity>
       </View>
       <Text style={styles.communityDescription}>{communityDescription}</Text>
+
+      {media && media.length > 0 && (
+        <FlatList
+          data={media}
+          renderItem={renderMediaItem}
+          keyExtractor={(item, index) => item.uri || index.toString()}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.mediaFlatList}
+        />
+      )}
+
       <View style={styles.actions}>
         <InteractionButton
           icon={liked ? 'heart' : 'heart-outline'}
@@ -76,44 +161,118 @@ const CommunityCard = ({navigation, communityCardData = {}}) => {
           onPress={handlePress}
         />
       </View>
+
+      <Modal
+        visible={isModalVisible}
+        transparent
+        onRequestClose={closeMediaPreview}
+        animationType="fade">
+        <TouchableWithoutFeedback onPress={closeMediaPreview}>
+          <View style={styles.modalBackground}>
+            <View style={styles.modalContainer}>
+              {modalMediaUri ? (
+                /\.(jpg|jpeg|png|gif|webp)$/i.test(modalMediaUri) ? (
+                  <Image
+                    source={{uri: modalMediaUri}}
+                    style={styles.modalImage}
+                    resizeMode="contain"
+                    onError={e => {
+                      console.error(
+                        'Modal Image Load Error:',
+                        e.nativeEvent.error,
+                      );
+                    }}
+                  />
+                ) : /\.(mp4|mov|avi|mkv)$/i.test(modalMediaUri) ? (
+                  <Video
+                    source={{uri: modalMediaUri}}
+                    style={styles.modalVideo}
+                    controls
+                    resizeMode="contain"
+                    onError={error => {
+                      console.error('Modal Video Load Error:', error);
+                    }}
+                  />
+                ) : (
+                  <View style={styles.errorContainer}>
+                    <Text style={styles.errorText}>Unsupported media type</Text>
+                  </View>
+                )
+              ) : (
+                <View style={styles.errorContainer}>
+                  <Text style={styles.errorText}>No media found</Text>
+                </View>
+              )}
+            </View>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  card: {
-    backgroundColor: '#fff',
-    padding: 10,
-    borderColor: '#E1E8ED',
-    borderWidth: 1,
+  // ... existing styles
+  mediaFlatList: {
+    marginTop: 10,
+    marginBottom: 10,
+  },
+  mediaImage: {
+    width: 200,
+    height: 200,
     borderRadius: 8,
+    marginRight: 8,
   },
-  userInfo: {
-    flexDirection: 'row',
+  videoContainer: {
+    width: 200,
+    height: 200,
+    borderRadius: 8,
+    backgroundColor: '#000',
+    justifyContent: 'center',
     alignItems: 'center',
+    marginRight: 8,
   },
-  userHandle: {
-    color: '#718096',
-    fontSize: 14,
-    paddingHorizontal: 5,
+  playIcon: {
+    position: 'absolute',
   },
-  communityDescription: {
-    fontSize: 14,
-    color: '#040608',
-    paddingVertical: 5,
-  },
-  actions: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  actionButton: {
-    flexDirection: 'row',
+  modalBackground: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 10,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
   },
-  actionText: {
-    marginLeft: 3,
-    color: '#040608',
+  modalContainer: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  modalImage: {
+    width: '100%',
+    height: '100%',
+    maxWidth: '100%',
+    maxHeight: '100%',
+    resizeMode: 'contain',
+  },
+  modalVideo: {
+    width: '100%',
+    height: '100%',
+    maxWidth: '85%',
+    maxHeight: '85%',
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,0,0,0.1)',
+    padding: 20,
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 10,
   },
 });
 
