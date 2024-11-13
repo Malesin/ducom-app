@@ -68,6 +68,7 @@ const HomeScreen = ({navigation}) => {
       const response = await axios.post(`${serverUrl}/userdata`, {
         token: token,
       });
+
       const {data} = response.data;
       const idUser = data._id;
       const profilePicture = data.profilePicture;
@@ -79,54 +80,48 @@ const HomeScreen = ({navigation}) => {
         token: token,
         page: pageNum,
       });
-      const dataTweet = responseTweet.data.data;
 
+      const dataTweet = responseTweet.data.data;
       const formattedTweets = dataTweet
         .filter(post => post.user !== null)
         .map(post => {
           const totalComments =
-            post.comments && post.comments.length > 0
-              ? post.comments.length +
-                post.comments.reduce(
-                  (acc, comment) =>
-                    acc +
-                    (comment.replies && comment.replies.length
-                      ? comment.replies.length
-                      : 0),
-                  0,
-                )
-              : 0;
+            post?.comments?.length +
+            post?.comments?.reduce(
+              (acc, comment) => acc + comment.replies.length,
+              0,
+            );
           return {
-            id: post._id,
-            userAvatar: post.user.profilePicture,
-            userName: post.user.name,
-            userHandle: post.user.username,
-            postDate: post.created_at,
-            content: post.description,
-            media: Array.isArray(post.media)
-              ? post.media.map(mediaItem => ({
+            id: post?._id,
+            userAvatar: post?.user?.profilePicture,
+            userName: post?.user?.name,
+            userHandle: post?.user?.username,
+            postDate: post?.created_at,
+            content: post?.description,
+            media: Array.isArray(post?.media)
+              ? post?.media.map(mediaItem => ({
                   type: mediaItem.type,
                   uri: mediaItem.uri,
                 }))
               : [],
-            likesCount: post.likes.length,
+            likesCount: post?.likes?.length,
             commentsCount: totalComments,
-            bookMarksCount: post.bookmarks.length,
-            repostsCount: post.reposts.length,
-            isLiked: post.likes.some(like => like._id === idUser),
-            isBookmarked: post.bookmarks.some(
-              bookmark => bookmark.user === idUser,
+            bookMarksCount: post?.bookmarks?.length,
+            repostsCount: post?.reposts?.length,
+            isLiked: post?.likes?.some(like => like?._id === idUser),
+            isBookmarked: post?.bookmarks?.some(
+              bookmark => bookmark?.user === idUser,
             ),
-            isReposted: post.reposts.some(repost => repost.user === idUser),
-            isMuted: isMuteds.some(isMuted => isMuted === post.user._id),
-            isBlocked: isBlockeds.some(
-              isBlocked => isBlocked === post.user._id,
+            isReposted: post?.reposts?.some(repost => repost?.user === idUser),
+            isMuted: isMuteds?.some(isMuted => isMuted === post?.user?._id),
+            isBlocked: isBlockeds?.some(
+              isBlocked => isBlocked === post?.user?._id,
             ),
-            userIdPost: post.user._id,
+            userIdPost: post?.user?._id,
             idUser: idUser,
             profilePicture: profilePicture,
-            commentsEnabled: post.commentsEnabled,
-            isAdmin: post.user.isAdmin,
+            commentsEnabled: post?.commentsEnabled,
+            isAdmin: post?.user?.isAdmin,
             amIAdmin: amIAdmin,
           };
         });
@@ -145,7 +140,7 @@ const HomeScreen = ({navigation}) => {
       const response = await axios.post(`${serverUrl}/userdata`, {
         token: token,
       });
-      const {data, status} = response.data;
+      const {data} = response.data;
       const idUser = data._id;
       const profilePicture = data.profilePicture;
       const amIAdmin = data.isAdmin;
@@ -157,7 +152,7 @@ const HomeScreen = ({navigation}) => {
       });
 
       if (!pinPost.data.data) {
-        console.error('Pinned post data is null');
+        console.log('Pinned post data is null');
         return null;
       }
 
@@ -175,35 +170,37 @@ const HomeScreen = ({navigation}) => {
         );
 
       const pinTweet = {
-        id: postPin._id,
-        userAvatar: postPin.user.profilePicture,
-        userName: postPin.user.name,
-        userHandle: postPin.user.username,
-        postDate: postPin.created_at,
-        content: postPin.description,
-        media: Array.isArray(postPin.media)
-          ? postPin.media.map(mediaItem => ({
+        id: postPin?._id,
+        userAvatar: postPin?.user?.profilePicture,
+        userName: postPin?.user?.name,
+        userHandle: postPin?.user?.username,
+        postDate: postPin?.created_at,
+        content: postPin?.description,
+        media: Array.isArray(postPin?.media)
+          ? postPin?.media.map(mediaItem => ({
               type: mediaItem.type,
               uri: mediaItem.uri,
             }))
           : [],
-        likesCount: postPin.likes.length,
+        likesCount: postPin?.likes?.length,
         commentsCount: totalComments,
-        bookMarksCount: postPin.bookmarks.length,
-        repostsCount: postPin.reposts.length,
-        isLiked: postPin.likes.some(like => like._id === idUser),
-        isBookmarked: postPin.bookmarks.some(
-          bookmark => bookmark.user === idUser,
+        bookMarksCount: postPin?.bookmarks?.length,
+        repostsCount: postPin?.reposts?.length,
+        isLiked: postPin?.likes?.some(like => like._id === idUser),
+        isBookmarked: postPin?.bookmarks?.some(
+          bookmark => bookmark?.user === idUser,
         ),
-        isReposted: postPin.reposts.some(repost => repost.user === idUser),
-        isMuted: isMuteds.some(isMuted => isMuted === postPin.user._id),
-        isBlocked: isBlockeds.some(isBlocked => isBlocked === postPin.user._id),
-        userIdPost: postPin.user._id,
+        isReposted: postPin?.reposts?.some(repost => repost?.user === idUser),
+        isMuted: isMuteds?.some(isMuted => isMuted === postPin?.user?._id),
+        isBlocked: isBlockeds?.some(
+          isBlocked => isBlocked === postPin?.user?._id,
+        ),
+        userIdPost: postPin?.user?._id,
         idUser: idUser,
         profilePicture: profilePicture,
-        commentsEnabled: postPin.commentsEnabled,
+        commentsEnabled: postPin?.commentsEnabled,
         pinnedBy: pinnedBy,
-        isAdmin: postPin.user.isAdmin,
+        isAdmin: postPin?.user?.isAdmin,
         amIAdmin: amIAdmin,
       };
 
