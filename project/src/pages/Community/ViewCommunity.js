@@ -20,14 +20,20 @@ const ViewCommunity = () => {
   const route = useRoute();
   const { communityId } = route.params;
   const [communityData, setCommunityData] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(true); // true buat admin, false buat member 😛
   const navigation = useNavigation();
 
   const handleSettingsPress = () => {
     navigation.navigate('CommunitySettings', { communityData: communityData });
   };
 
+  const handleJoinPress = () => {
+    console.log('Joined community');
+    // Implement join functionality if needed
+  };
+
   const handleCreate = () => {
-    console.log('create');
+    console.log('Creating post in community');
     navigation.navigate('CreatePostCommunity', { communityId: communityId });
   };
 
@@ -83,11 +89,19 @@ const ViewCommunity = () => {
               />
               <Text style={styles.create}>Create</Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.settingsButton}
-              onPress={handleSettingsPress}>
-              <Text style={styles.settings}>Settings</Text>
-            </TouchableOpacity>
+            {isAdmin ? (
+              <TouchableOpacity
+                style={styles.settingsButton}
+                onPress={handleSettingsPress}>
+                <Text style={styles.settings}>Settings</Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                style={styles.joinButton}
+                onPress={handleJoinPress}>
+                <Text style={styles.join}>Join</Text>
+              </TouchableOpacity>
+            )}
           </View>
         </View>
       </ScrollView>
@@ -145,37 +159,41 @@ const styles = StyleSheet.create({
     backgroundColor: '#E1E8ED',
     borderColor: '#000',
     borderWidth: 1,
-    paddingVertical: 3,
-    paddingHorizontal: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
     borderRadius: 100,
+    marginRight: 10,
   },
-  settingsButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+  joinButton: {
     backgroundColor: '#E1E8ED',
+    paddingVertical: 6,
+    paddingHorizontal: 25,
+    borderRadius: 100,
     borderColor: '#000',
     borderWidth: 1,
-    paddingVertical: 3,
-    paddingHorizontal: 8,
-    borderRadius: 100,
-    marginLeft: 5,
   },
-  create: {
-    fontSize: 12,
+  join: {
+    fontSize: 14,
     color: '#000',
     fontWeight: 'bold',
-    textAlign: 'center',
-    paddingVertical: 3,
-    paddingHorizontal: 5,
+  },
+  settingsButton: {
+    backgroundColor: '#E1E8ED',
+    paddingVertical: 6,
+    paddingHorizontal: 15,
+    borderRadius: 100,
+    borderColor: '#000',
+    borderWidth: 1,
   },
   settings: {
-    fontSize: 12,
+    fontSize: 14,
     color: '#000',
     fontWeight: 'bold',
-    textAlign: 'center',
-    paddingVertical: 3,
-    paddingHorizontal: 5,
+  },
+  create: {
+    fontSize: 14,
+    color: '#000',
+    fontWeight: 'bold',
   },
 });
 

@@ -14,6 +14,8 @@ import {
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Video from 'react-native-video';
 import {createThumbnail} from 'react-native-create-thumbnail';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 const CommunityCard = ({navigation, communityCardData = {}}) => {
   const {
@@ -31,6 +33,7 @@ const CommunityCard = ({navigation, communityCardData = {}}) => {
   const [thumbnails, setThumbnails] = useState({});
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalMediaUri, setModalMediaUri] = useState('');
+  const [isAdmin, setIsAdmin] = useState(false);  // true buat admin, false buat member jomok 🙈🙉
 
   const generateThumbnails = useCallback(async mediaItems => {
     const newThumbnails = {};
@@ -64,6 +67,15 @@ const CommunityCard = ({navigation, communityCardData = {}}) => {
     };
 
     loadThumbnails();
+
+    const checkAdminStatus = async () => {
+      const token = await AsyncStorage.getItem('token');
+      // Misalnya, panggil API untuk memeriksa status admin
+      // const response = await axios.post(`${serverUrl}/check-admin`, { token });
+      // setIsAdmin(response.data.isAdmin);
+    };
+
+    checkAdminStatus();
   }, [
     initialLikesCount,
     initialCommentsCount,
@@ -174,13 +186,15 @@ const CommunityCard = ({navigation, communityCardData = {}}) => {
         <TouchableOpacity onPress={handlePress}>
           <Text style={styles.userHandle}>{communityCardName}</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.joinButton, joined && styles.joinButton]}
-          onPress={pressJoin}>
-          <Text style={[styles.joinText, joined && styles.joinText]}>
-            {joined ? 'Joined' : 'Join'}
-          </Text>
-        </TouchableOpacity>
+        {!isAdmin && (
+          <TouchableOpacity
+            style={[styles.joinButton, joined && styles.joinButton]}
+            onPress={pressJoin}>
+            <Text style={[styles.joinText, joined && styles.joinText]}>
+              {joined ? 'Joined' : 'Join'}
+            </Text>
+          </TouchableOpacity>
+        )}
       </View>
       <Text style={styles.communityDescription}>{communityDescription}</Text>
 
