@@ -133,14 +133,18 @@ const CreatePost = ({route, navigation}) => {
                 formDataImages.append('media', {
                   uri: compressedUri,
                   type: fileType,
-                  name: `media.${compressedUri.endsWith('.mp4') ? 'mp4' : 'png'}`,
+                  name: `media.${
+                    compressedUri.endsWith('.mp4') ? 'mp4' : 'png'
+                  }`,
                 });
                 uploadedImages.push({uri: compressedUri, type: fileType});
               } else if (fileType.startsWith('video/')) {
                 formDataVideos.append('media', {
                   uri: compressedUri,
                   type: fileType,
-                  name: `media.${compressedUri.endsWith('.mp4') ? 'mp4' : 'mov'}`,
+                  name: `media.${
+                    compressedUri.endsWith('.mp4') ? 'mp4' : 'mov'
+                  }`,
                 });
                 uploadedVideos.push({uri: compressedUri, type: fileType});
               }
@@ -247,7 +251,7 @@ const CreatePost = ({route, navigation}) => {
       SetIsUploading(false);
     }
   };
-  
+
   const compressMedia = async (uri, mediaType) => {
     if (mediaType === 'image/heic' || mediaType === 'image/heif') {
       try {

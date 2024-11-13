@@ -1,7 +1,7 @@
 import React, {useState, useCallback, useEffect} from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import {Image, StyleSheet, View, Text} from 'react-native';
+import {Image, StyleSheet, View, Text, TouchableOpacity} from 'react-native';
 import {CommunityScreen, Notificationscreen} from '../pages';
 import DrawerNavigator from './DrawerNavigator';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
@@ -19,7 +19,8 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 
 const Tab = createBottomTabNavigator();
 
-function BottomTabNavigator() {
+function BottomTabNavigator({navigation}) {
+  // Menerima navigation sebagai prop
   const [profilePicture, setProfilePicture] = useState('');
   const [isConnected, setIsConnected] = useState(true);
 
@@ -107,7 +108,6 @@ function BottomTabNavigator() {
           tabBarActiveTintColor: 'black',
           tabBarInactiveTintColor: 'gray',
         })}>
-
         <Tab.Screen name="HomeTab" component={DrawerNavigator} />
         <Tab.Screen
           name="Community"
@@ -126,6 +126,25 @@ function BottomTabNavigator() {
               color: 'black',
               fontWeight: 'bold',
             },
+            headerRight: () => (
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  marginRight: 15,
+                }}>
+                <TouchableOpacity
+                  onPress={() => {
+                    navigation.navigate('CreateCommunity');
+                  }}>
+                  <MaterialCommunityIcons
+                    name="account-multiple-plus"
+                    size={25}
+                    color="black"
+                  />
+                </TouchableOpacity>
+              </View>
+            ),
           }}
         />
         <Tab.Screen
