@@ -25,11 +25,14 @@ import config from '../../config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ImageResizer from 'react-native-image-resizer';
 import VideoCompressor from 'react-native-video-compressor';
+import { useNavigation, useRoute } from '@react-navigation/native';
+
 import PostSheet from '../../components/PostSheet';
 
 const serverUrl = config.SERVER_URL;
 
 const CreatePostCommunity = ({route, navigation}) => {
+  const { communityId } = route.params;
   const [newPostText, setNewPostText] = useState('');
   const [selectedMedia, setSelectedMedia] = useState([]);
   const [previewVisible, setPreviewVisible] = useState(false);
@@ -223,11 +226,14 @@ const CreatePostCommunity = ({route, navigation}) => {
         ].join(',');
       }
 
+      console.log(media)
       const postResponse = await axios.post(`${serverUrl}/create-post`, {
         token: token,
         media: media,
         description: newPostText,
         commentsEnabled: commentsEnabled,
+        isCommunity: true,
+        communityId: communityId,
       });
 
       if (postResponse.data.status === 'ok') {

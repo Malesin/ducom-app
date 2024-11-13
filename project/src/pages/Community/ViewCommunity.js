@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   SafeAreaView,
   View,
@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import axios from 'axios';
 import config from '../../config';
-import {useNavigation, useRoute} from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -18,17 +18,17 @@ const serverUrl = config.SERVER_URL;
 
 const ViewCommunity = () => {
   const route = useRoute();
-  const {communityId} = route.params;
+  const { communityId } = route.params;
   const [communityData, setCommunityData] = useState(null);
   const navigation = useNavigation();
 
   const handleSettingsPress = () => {
-    navigation.navigate('CommunitySettings', {communityData: communityData});
+    navigation.navigate('CommunitySettings', { communityData: communityData });
   };
 
   const handleCreate = () => {
     console.log('create');
-    navigation.navigate('CreatePostCommunity');
+    navigation.navigate('CreatePostCommunity', { communityId: communityId });
   };
 
   useEffect(() => {
@@ -54,7 +54,7 @@ const ViewCommunity = () => {
           <Image
             source={
               communityData?.picture.banner.bannerPicture
-                ? {uri: communityData.picture.banner.bannerPicture}
+                ? { uri: communityData.picture.banner.bannerPicture }
                 : require('../../assets/banner.png')
             }
             style={styles.banner}
