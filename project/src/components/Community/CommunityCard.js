@@ -57,6 +57,9 @@ const CommunityCard = ({navigation, communityCardData = {}}) => {
         <TouchableOpacity onPress={handlePress}>
           <Text style={styles.userHandle}>{communityCardName}</Text>
         </TouchableOpacity>
+        <TouchableOpacity style={styles.joinContainer}>
+          <Text style={styles.joinText}>Join</Text>
+        </TouchableOpacity>
       </View>
       <Text style={styles.communityDescription}>{communityDescription}</Text>
       <View style={styles.actions}>
