@@ -210,7 +210,7 @@ export default function MainNavigation() {
         <Stack.Screen
           name="CreatePostCommunity"
           component={CreatePostCommunity}
-          options={{headerShown: true, title: 'Create New Post'}}
+          options={{headerShown: true, title: 'Create New Community Post'}}
         />
         <Stack.Screen
           name="CommunityAbout"
