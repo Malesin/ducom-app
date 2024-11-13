@@ -45,6 +45,7 @@ import CommunityMedia from './Community/CommunityMedia';
 import CommunityAbout from './Community/CommunityAbout';
 import ViewCommunity from './Community/ViewCommunity';
 import CreateCommunity from './Community/CreateCommunity';
+import CreatePostCommunity from './Community/CreatePostCommunity';
 import CommunitySettings from './Community/CommunitySettings';
 import CommunityList from './Community/CommunityUserList';
 import CommunityEditRules from './Community/CommunityEditRules';
@@ -97,6 +98,7 @@ import CommunityEditRules from './Community/CommunityEditRules';
   CommunityScreen,
   ViewCommunity,
   CreateCommunity,
+  CreatePostCommunity,
   CommunitySettings,
   CommunityList,
   CommunityEditRules,

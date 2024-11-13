@@ -5,7 +5,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../../config';
 import {useRoute} from '@react-navigation/native';
-import {TouchableOpacity} from 'react-native';
 
 const serverUrl = config.SERVER_URL;
 
@@ -13,10 +12,6 @@ const CommunityPost = ({navigation}) => {
   const route = useRoute();
   const {communityId} = route.params;
   const [communityDataList, setCommunityDataList] = useState([]);
-
-  const handlePress = () => {
-    console.log('Create');
-  };
 
   const fetchDataPost = async () => {
     const token = await AsyncStorage.getItem('token');
@@ -55,11 +50,6 @@ const CommunityPost = ({navigation}) => {
           />
         ))}
       </View>
-      <View style={styles.fabContainer}>
-        <TouchableOpacity onPress={handlePress} style={styles.mainButton}>
-          <Text style={styles.mainButtonText}>+</Text>
-        </TouchableOpacity>
-      </View>
     </SafeAreaView>
   );
 };
@@ -70,24 +60,5 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
-  },
-  fabContainer: {
-    position: 'absolute',
-    bottom: 20,
-    right: 20,
-    alignItems: 'center',
-    zIndex: 2,
-  },
-  mainButton: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: '#001374',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  mainButtonText: {
-    fontSize: 30,
-    color: 'white',
   },
 });
