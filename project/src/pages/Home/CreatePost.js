@@ -101,7 +101,6 @@ const CreatePost = ({route, navigation}) => {
   }, [dataPhoto, dataVideo]);
 
   const handlePostSubmit = async () => {
-    // Validasi minimal ada teks atau media
     if (!newPostText.trim() && selectedMedia.length === 0) {
       Alert.alert('Error', 'Please add some text or media to your post.');
       return;
@@ -112,7 +111,6 @@ const CreatePost = ({route, navigation}) => {
     try {
       let media = '';
 
-      // Hanya proses upload media jika ada media yang dipilih
       if (selectedMedia.length > 0) {
         const formDataImages = new FormData();
         const formDataVideos = new FormData();
@@ -219,17 +217,15 @@ const CreatePost = ({route, navigation}) => {
           }
         }
 
-        // Gabungkan media URLs
         media = [
           ...mediaDataImages.map(item => `${item.url}|${item.type}`),
           ...mediaDataVideos.map(item => `${item.url}|${item.type}`),
         ].join(',');
       }
 
-      // Kirim post, baik dengan media maupun tanpa media
       const postResponse = await axios.post(`${serverUrl}/create-post`, {
         token: token,
-        media: media, // Bisa berupa string kosong jika tidak ada media
+        media: media, 
         description: newPostText,
         commentsEnabled: commentsEnabled,
       });
