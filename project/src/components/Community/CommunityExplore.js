@@ -8,15 +8,20 @@ import {
   Animated,
   Pressable,
 } from 'react-native';
-import React, { useState, useRef } from 'react';
-import backgroundCommunity from '../../assets/eskul/pramukabanner.png';
-import profileCommunity from '../../assets/iya.png';
-import { useNavigation } from '@react-navigation/native';
+import React, {useState, useRef} from 'react';
+import {useNavigation} from '@react-navigation/native';
 
-const { height } = Dimensions.get('window');
+const {height} = Dimensions.get('window');
 
-const CommunityExplore = ({ communityExploreData }) => {
-  const { communityId, exploreName, memberCount, description, profilePicture, backgroundPicture } = communityExploreData;
+const CommunityExplore = ({communityExploreData}) => {
+  const {
+    communityId,
+    exploreName,
+    memberCount,
+    description,
+    profilePicture,
+    backgroundPicture,
+  } = communityExploreData;
   const containerHeight = useRef(new Animated.Value(height * 0.25)).current;
   const contentPosition = useRef(new Animated.Value(0)).current;
   const buttonOpacity = useRef(new Animated.Value(0)).current;
@@ -66,7 +71,7 @@ const CommunityExplore = ({ communityExploreData }) => {
   };
 
   const handlePressJoin = () => {
-    navigation.navigate('ViewCommunity', { communityId: communityId });
+    navigation.navigate('ViewCommunity', {communityId: communityId});
   };
 
   return (
@@ -74,8 +79,13 @@ const CommunityExplore = ({ communityExploreData }) => {
       <View style={styles.container}>
         <View style={styles.backgroundContainer}>
           <Image
-            source={backgroundPicture ? { uri: backgroundPicture } : require('../../assets/banner.png')}
-            style={styles.backgroundImage} />
+            source={
+              backgroundPicture
+                ? {uri: backgroundPicture}
+                : require('../../assets/banner.png')
+            }
+            style={styles.backgroundImage}
+          />
           <Animated.View
             style={[
               styles.overlayAndContent,
@@ -84,13 +94,18 @@ const CommunityExplore = ({ communityExploreData }) => {
               },
             ]}>
             <Image
-              source={profilePicture ? { uri: profilePicture } : require('../../assets/banner.png')}
-              style={styles.profileImage} />
+              source={
+                profilePicture
+                  ? {uri: profilePicture}
+                  : require('../../assets/banner.png')
+              }
+              style={styles.profileImage}
+            />
             <Animated.View
               style={[
                 styles.contentContainer,
                 {
-                  transform: [{ translateY: contentPosition }],
+                  transform: [{translateY: contentPosition}],
                 },
               ]}>
               <View style={styles.infoContainer}>

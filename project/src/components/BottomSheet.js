@@ -47,7 +47,7 @@ const BottomSheet = ({
 
   const deletePost = async () => {
     const token = await AsyncStorage.getItem('token');
-    console.log(tweet?.id)
+    console.log(tweet?.id);
     try {
       const delPost = await axios.post(`${serverUrl}/delete-post`, {
         token: token,
@@ -257,20 +257,29 @@ const BottomSheet = ({
     <SafeAreaView style={styles.container}>
       {!isViewPost ? (
         <>
-          {isAdmin && (
+          {!isUserProfile && (
             <>
-              <View style={styles.optionRow}>
-                {/* PIN POST AT HOMESCREEN */}
-                <TouchableOpacity style={styles.option} onPress={handlePinPost}>
-                  <MaterialCommunityIcons name="pin" size={24} color="#333" />
-                  <Text style={styles.optionText}>
-                    {isPin ? 'Unpin' : 'Pin'} @{tweet.userName}
-                  </Text>
-                </TouchableOpacity>
-              </View>
+              {isAdmin && (
+                <>
+                  <View style={styles.optionRow}>
+                    {/* PIN POST AT HOMESCREEN */}
+                    <TouchableOpacity
+                      style={styles.option}
+                      onPress={handlePinPost}>
+                      <MaterialCommunityIcons
+                        name="pin"
+                        size={24}
+                        color="#333"
+                      />
+                      <Text style={styles.optionText}>
+                        {isPin ? 'Unpin' : 'Pin'} @{tweet.userName}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </>
+              )}
             </>
           )}
-
           {!isOwn && (
             <>
               <View style={styles.optionRow}>

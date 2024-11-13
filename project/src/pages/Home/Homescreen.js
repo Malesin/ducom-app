@@ -103,6 +103,7 @@ const HomeScreen = ({ navigation }) => {
                 type: mediaItem.type,
                 uri: mediaItem.uri,
               }))
+            
               : [],
             likesCount: post?.likes?.length,
             commentsCount: totalComments,
@@ -136,7 +137,6 @@ const HomeScreen = ({ navigation }) => {
     }
   };
 
-  // Pinned Tweet
   const fetchPinTweet = async () => {
     try {
       const token = await AsyncStorage.getItem('token');
