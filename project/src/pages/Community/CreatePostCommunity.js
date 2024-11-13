@@ -29,7 +29,7 @@ import PostSheet from '../../components/PostSheet';
 
 const serverUrl = config.SERVER_URL;
 
-const CreatePost = ({route, navigation}) => {
+const CreatePostCommunity = ({route, navigation}) => {
   const [newPostText, setNewPostText] = useState('');
   const [selectedMedia, setSelectedMedia] = useState([]);
   const [previewVisible, setPreviewVisible] = useState(false);
@@ -225,7 +225,7 @@ const CreatePost = ({route, navigation}) => {
 
       const postResponse = await axios.post(`${serverUrl}/create-post`, {
         token: token,
-        media: media, 
+        media: media,
         description: newPostText,
         commentsEnabled: commentsEnabled,
       });
@@ -519,11 +519,6 @@ const CreatePost = ({route, navigation}) => {
         </ScrollView>
         <View style={styles.buttonContainer}>
           <View style={{flexDirection: 'row'}}>
-            <PostSheet
-              isPostSheetVisible={isPostSheetVisible}
-              closePostSheet={closePostSheet}
-              onOptionSelect={setCommentsEnabled}
-            />
             <Button
               icon={<Icon name="camera" size={24} color="#000" />}
               buttonStyle={styles.button}
@@ -626,12 +621,11 @@ const getStyles = colorScheme =>
     },
     buttonContainer: {
       flexDirection: 'row',
-      justifyContent: 'space-between',
+      justifyContent: 'flex-end',
       alignItems: 'center',
     },
     buttonComments: {
       backgroundColor: 'transparent',
-      padding: 0,
     },
     button: {
       backgroundColor: 'transparent',
@@ -675,4 +669,4 @@ const getStyles = colorScheme =>
     },
   });
 
-export default CreatePost;
+export default CreatePostCommunity;

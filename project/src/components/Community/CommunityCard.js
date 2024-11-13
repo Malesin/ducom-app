@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const CommunityCard = ({ navigation, communityCardData = {} }) => {
+const CommunityCard = ({navigation, communityCardData = {}}) => {
   const {
     communityCardName = '',
     communityDescription = '',
@@ -35,12 +35,11 @@ const CommunityCard = ({ navigation, communityCardData = {} }) => {
     }
   };
 
-
   const handlePress = () => {
     navigation.navigate('ViewCommunity');
   };
 
-  const InteractionButton = ({ icon, color, count, onPress }) => (
+  const InteractionButton = ({icon, color, count, onPress}) => (
     <TouchableOpacity style={styles.actionButton} onPress={onPress}>
       <MaterialCommunityIcons name={icon} size={20} color={color} />
       <Text style={styles.actionText}>{count}</Text>

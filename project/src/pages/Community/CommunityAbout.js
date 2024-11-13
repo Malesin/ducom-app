@@ -1,9 +1,9 @@
 import React, {useState, useEffect} from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import {View, Text, StyleSheet} from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import axios from 'axios';
 import config from '../../config';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import {useRoute} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const serverUrl = config.SERVER_URL;
@@ -12,8 +12,18 @@ const formatDate = dateString => {
   const date = new Date(dateString);
   const day = date.getDate();
   const monthNames = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
   ];
   const month = monthNames[date.getMonth()];
   const year = date.getFullYear();
@@ -22,14 +32,17 @@ const formatDate = dateString => {
 
 const CommunityAbout = () => {
   const route = useRoute();
-  const { communityId } = route.params;
+  const {communityId} = route.params;
   const [communityData, setCommunityData] = useState(null);
 
   useEffect(() => {
     async function fetchCommunityData() {
       const token = await AsyncStorage.getItem('token');
       try {
-        const response = await axios.post(`${serverUrl}/community-byId`, { token: token, communityId: communityId });
+        const response = await axios.post(`${serverUrl}/community-byId`, {
+          token: token,
+          communityId: communityId,
+        });
         setCommunityData(response.data.data);
       } catch (error) {
         console.error('Error fetching community data:', error);
@@ -61,8 +74,14 @@ const CommunityAbout = () => {
       <View style={styles.infoRow}>
         <MaterialIcons name="event" size={22} color="black" />
         <Text style={styles.createAt}>
-          Created {communityData?.created?.created_at ? formatDate(communityData.created.created_at) : 'Unknown Date'}
-          <Text style={styles.username}> by @{communityData?.created?.created_by?.username}</Text>
+          Created{' '}
+          {communityData?.created?.created_at
+            ? formatDate(communityData.created.created_at)
+            : 'Unknown Date'}
+          <Text style={styles.username}>
+            {' '}
+            by @{communityData?.created?.created_by?.username}
+          </Text>
         </Text>
         <View style={styles.verified}>
           <MaterialIcons name="verified" size={20} color="#699BF7" />
@@ -71,7 +90,10 @@ const CommunityAbout = () => {
       <View style={styles.separator} />
       <View style={styles.rulesContainer}>
         <Text style={styles.header}>Rules</Text>
-        <Text style={styles.subHeader}>These are set and enforced by community admins and are in addition to Ducom’s rules.</Text>
+        <Text style={styles.subHeader}>
+          These are set and enforced by community admins and are in addition to
+          Ducom’s rules.
+        </Text>
         {communityData?.rules.map((rule, index) => (
           <View key={rule._id} style={styles.ruleWrapper}>
             <View style={styles.ruleIcon}>
