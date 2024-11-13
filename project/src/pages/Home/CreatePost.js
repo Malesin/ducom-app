@@ -203,14 +203,6 @@ const CreatePost = ({route, navigation}) => {
         ...mediaDataVideos.map(item => `${item.url}|${item.type}`),
       ].join(',');
 
-      if (!media) {
-        Alert.alert(
-          'Error',
-          'No media available to post. Please add images or videos.',
-        );
-        return;
-      }
-
       console.log('media:', media);
 
       const postResponse = await axios.post(`${serverUrl}/create-post`, {
