@@ -23,6 +23,8 @@ const CommunityCard = ({navigation, communityCardData = {}}) => {
     media = [],
   } = communityCardData;
 
+  console.log(communityCardData)
+
   const [liked, setLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(initialLikesCount);
   const [commentsCount, setCommentsCount] = useState(initialCommentsCount);

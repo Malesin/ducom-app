@@ -1,16 +1,16 @@
-import {View, Text, StyleSheet, SafeAreaView} from 'react-native';
-import React, {useState, useEffect} from 'react';
+import { View, Text, StyleSheet, SafeAreaView } from 'react-native';
+import React, { useState, useEffect } from 'react';
 import CommunityCard from '../../components/Community/CommunityCard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../../config';
-import {useRoute} from '@react-navigation/native';
+import { useRoute } from '@react-navigation/native';
 
 const serverUrl = config.SERVER_URL;
 
-const CommunityPost = ({navigation}) => {
+const CommunityPost = ({ navigation }) => {
   const route = useRoute();
-  const {communityId} = route.params;
+  const { communityId } = route.params;
   const [communityDataList, setCommunityDataList] = useState([]);
 
   const fetchDataPost = async () => {
@@ -26,6 +26,13 @@ const CommunityPost = ({navigation}) => {
       const formattedData = data.map(item => ({
         communityCardName: communityName || 'Nama Komunitas',
         communityDescription: item.description || 'Deskripsi komunitas ini.',
+        media: Array.isArray(item?.media)
+          ? item?.media.map(mediaItem => ({
+            type: mediaItem.type,
+            uri: mediaItem.uri,
+          }))
+
+          : [],
         likesCount: item.likes.length || 0,
         commentsCount: item.comments.length || 0,
       }));
