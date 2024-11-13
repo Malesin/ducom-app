@@ -68,7 +68,6 @@ const HomeScreen = ({navigation}) => {
       const response = await axios.post(`${serverUrl}/userdata`, {
         token: token,
       });
-
       const {data} = response.data;
       const idUser = data._id;
       const profilePicture = data.profilePicture;
@@ -86,11 +85,17 @@ const HomeScreen = ({navigation}) => {
         .filter(post => post.user !== null)
         .map(post => {
           const totalComments =
-            post.comments.length +
-            post.comments.reduce(
-              (acc, comment) => acc + comment.replies.length,
-              0,
-            );
+            post.comments && post.comments.length > 0
+              ? post.comments.length +
+                post.comments.reduce(
+                  (acc, comment) =>
+                    acc +
+                    (comment.replies && comment.replies.length
+                      ? comment.replies.length
+                      : 0),
+                  0,
+                )
+              : 0;
           return {
             id: post._id,
             userAvatar: post.user.profilePicture,
@@ -134,7 +139,6 @@ const HomeScreen = ({navigation}) => {
     }
   };
 
-  // Pinned Tweet
   const fetchPinTweet = async () => {
     try {
       const token = await AsyncStorage.getItem('token');
