@@ -217,11 +217,12 @@ const CreatePost = ({route, navigation}) => {
           }
         }
 
-        media = [
-          ...mediaDataImages.map(item => `${item.url}|${item.type}`),
-          ...mediaDataVideos.map(item => `${item.url}|${item.type}`),
-        ].join(',');
-      }
+      const media = [
+        ...mediaDataImages.map(item => `${item.url}|${item.type}`),
+        ...mediaDataVideos.map(item => `${item.url}|${item.type}`),
+      ].join(',');
+
+      console.log('media:', media);
 
       const postResponse = await axios.post(`${serverUrl}/create-post`, {
         token: token,
