@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback, useMemo} from 'react';
 import {
   View,
   Text,
@@ -26,97 +26,124 @@ const CommunityCard = ({navigation, communityCardData = {}}) => {
   const [liked, setLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(initialLikesCount);
   const [commentsCount, setCommentsCount] = useState(initialCommentsCount);
-
+  const [joined, setJoined] = useState(false);
   const [thumbnails, setThumbnails] = useState({});
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [modalMediaUri, setModalMediaUri] = useState('');
+
+  const generateThumbnails = useCallback(async mediaItems => {
+    const newThumbnails = {};
+    for (const mediaItem of mediaItems || []) {
+      if (mediaItem.type === 'video' && mediaItem.uri) {
+        try {
+          const {path} = await createThumbnail({url: mediaItem.uri});
+          newThumbnails[mediaItem.uri] = path;
+        } catch (error) {
+          console.log('Error generating thumbnail:', error);
+        }
+      }
+    }
+    return newThumbnails;
+  }, []);
+
+  const memoizedMedia = useMemo(() => media || [], [media]);
 
   useEffect(() => {
     setLikesCount(initialLikesCount);
     setCommentsCount(initialCommentsCount);
 
-    const generateThumbnails = async () => {
-      const newThumbnails = {};
-      for (const mediaItem of media || []) {
-        if (mediaItem.type === 'video' && mediaItem.uri) {
-          try {
-            const {path} = await createThumbnail({url: mediaItem.uri});
-            newThumbnails[mediaItem.uri] = path;
-          } catch (error) {
-            console.log('Error generating thumbnail:', error);
-          }
-        }
+    const loadThumbnails = async () => {
+      if (memoizedMedia.length > 0) {
+        const newThumbnails = await generateThumbnails(memoizedMedia);
+        setThumbnails(prevThumbnails => ({
+          ...prevThumbnails,
+          ...newThumbnails,
+        }));
       }
-      setThumbnails(newThumbnails);
     };
 
-    generateThumbnails();
-  }, [initialLikesCount, initialCommentsCount, media]);
+    loadThumbnails();
+  }, [
+    initialLikesCount,
+    initialCommentsCount,
+    memoizedMedia,
+    generateThumbnails,
+  ]);
 
-  const handleLike = () => {
-    if (liked) {
-      setLiked(false);
-      setLikesCount(prevLikesCount => prevLikesCount - 1);
-    } else {
-      setLiked(true);
-      setLikesCount(prevLikesCount => prevLikesCount + 1);
-    }
-  };
+  const handleLike = useCallback(() => {
+    setLiked(prevLiked => {
+      const newLikedState = !prevLiked;
+      setLikesCount(prevCount =>
+        newLikedState ? prevCount + 1 : prevCount - 1,
+      );
+      return newLikedState;
+    });
+  }, []);
 
-  const handlePress = () => {
+  const pressJoin = useCallback(() => {
+    setJoined(prevJoined => !prevJoined);
+  });
+
+  const handlePress = useCallback(() => {
     navigation.navigate('ViewCommunity');
-  };
+  }, [navigation]);
 
-  const openMediaPreview = uri => {
+  const openMediaPreview = useCallback(uri => {
     setModalMediaUri(uri);
     setIsModalVisible(true);
-  };
+  }, []);
 
-  const closeMediaPreview = () => {
+  const closeMediaPreview = useCallback(() => {
     setIsModalVisible(false);
     setModalMediaUri('');
-  };
+  }, []);
 
-  const renderMediaItem = ({item}) => {
-    const isImage =
-      item.type === 'image' || /\.(jpg|jpeg|png|gif|webp)$/i.test(item.uri);
+  const renderMediaItem = useCallback(
+    ({item}) => {
+      const isImage =
+        item.type === 'image' || /\.(jpg|jpeg|png|gif|webp)$/i.test(item.uri);
 
-    const isVideo =
-      item.type === 'video' || /\.(mp4|mov|avi|mkv)$/i.test(item.uri);
+      const isVideo =
+        item.type === 'video' || /\.(mp4|mov|avi|mkv)$/i.test(item.uri);
 
-    return (
-      <TouchableOpacity onPress={() => openMediaPreview(item.uri)}>
-        {isImage ? (
-          <Image
-            source={{uri: item.uri}}
-            style={styles.mediaImage}
-            onError={e => {
-              console.error('Image Load Error:', e.nativeEvent.error);
-            }}
-          />
-        ) : isVideo ? (
-          <View style={styles.videoContainer}>
+      return (
+        <TouchableOpacity onPress={() => openMediaPreview(item.uri)}>
+          {isImage ? (
             <Image
-              source={{uri: thumbnails[item.uri] || item.uri}}
+              source={{uri: item.uri}}
               style={styles.mediaImage}
+              onError={e => {
+                console.error('Image Load Error:', e.nativeEvent.error);
+              }}
             />
-            <MaterialCommunityIcons
-              name="play-circle-outline"
-              size={40}
-              color="#fff"
-              style={styles.playIcon}
-            />
-          </View>
-        ) : null}
-      </TouchableOpacity>
-    );
-  };
+          ) : isVideo ? (
+            <View style={styles.videoContainer}>
+              <Image
+                source={{uri: thumbnails[item.uri] || item.uri}}
+                style={styles.mediaImage}
+              />
+              <MaterialCommunityIcons
+                name="play-circle-outline"
+                size={40}
+                color="#fff"
+                style={styles.playIcon}
+              />
+            </View>
+          ) : null}
+        </TouchableOpacity>
+      );
+    },
+    [thumbnails, openMediaPreview],
+  );
 
-  const InteractionButton = ({icon, color, count, onPress}) => (
-    <TouchableOpacity style={styles.actionButton} onPress={onPress}>
-      <MaterialCommunityIcons name={icon} size={20} color={color} />
-      <Text style={styles.actionText}>{count}</Text>
-    </TouchableOpacity>
+  const InteractionButton = useCallback(
+    ({icon, color, count, onPress}) => (
+      <TouchableOpacity style={styles.actionButton} onPress={onPress}>
+        <MaterialCommunityIcons name={icon} size={20} color={color} />
+        <Text style={styles.actionText}>{count}</Text>
+      </TouchableOpacity>
+    ),
+    [],
   );
 
   return (
@@ -130,15 +157,19 @@ const CommunityCard = ({navigation, communityCardData = {}}) => {
         <TouchableOpacity onPress={handlePress}>
           <Text style={styles.userHandle}>{communityCardName}</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.joinContainer}>
-          <Text style={styles.joinText}>Join</Text>
+        <TouchableOpacity
+          style={[styles.joinButton, joined && styles.joinButton]}
+          onPress={pressJoin}>
+          <Text style={[styles.joinText, joined && styles.joinText]}>
+            {joined ? 'Joined' : 'Join'}
+          </Text>
         </TouchableOpacity>
       </View>
       <Text style={styles.communityDescription}>{communityDescription}</Text>
 
-      {media && media.length > 0 && (
+      {memoizedMedia.length > 0 && (
         <FlatList
-          data={media}
+          data={memoizedMedia}
           renderItem={renderMediaItem}
           keyExtractor={(item, index) => item.uri || index.toString()}
           horizontal
@@ -212,7 +243,49 @@ const CommunityCard = ({navigation, communityCardData = {}}) => {
 };
 
 const styles = StyleSheet.create({
-  // ... existing styles
+  card: {
+    backgroundColor: '#fff',
+    padding: 10,
+    borderColor: '#E1E8ED',
+    borderWidth: 1,
+    borderRadius: 8,
+  },
+  userInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  userHandle: {
+    color: '#718096',
+    fontSize: 14,
+    paddingHorizontal: 5,
+  },
+  communityDescription: {
+    fontSize: 14,
+    color: '#040608',
+    paddingVertical: 5,
+  },
+  actions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  actionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+  },
+  actionText: {
+    marginLeft: 3,
+    color: '#040608',
+  },
+  joinButton: {
+    backgroundColor: '#ccc',
+    paddingHorizontal: 20,
+    borderRadius: 5,
+  },
+  joinText: {
+    color: '#000',
+    fontSize: 13,
+  },
   mediaFlatList: {
     marginTop: 10,
     marginBottom: 10,
