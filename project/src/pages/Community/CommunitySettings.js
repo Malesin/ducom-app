@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -11,28 +11,72 @@ import {
   Animated,
   TouchableWithoutFeedback,
   Modal,
+  RefreshControl,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import ImagePicker from 'react-native-image-crop-picker';
 import { useNavigation, useFocusEffect, useRoute } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import config from '../../config';
+
+const serverUrl = config.SERVER_URL;
 
 const CommunitySettings = () => {
   const route = useRoute();
-  const { communityData } = route.params;
-  console.log(communityData.rules)
+  const { communityId } = route.params;
+  const [communityData, setCommunityData] = useState();
+  const [refreshing, setRefreshing] = useState(false);
+
+  const fetchCommunityData = async () => {
+    const token = await AsyncStorage.getItem('token');
+    try {
+      const response = await axios.post(`${serverUrl}/community-byId`, {
+        token: token,
+        communityId: communityId,
+      });
+      setCommunityData(response.data.data);
+    } catch (error) {
+      console.error('Error fetching community data:', error);
+    }
+  };
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    fetchCommunityData().then(() => setRefreshing(false));
+  }, [communityId]);
+
+  useEffect(() => {
+    fetchCommunityData();
+  }, [communityId]);
+
   const navigation = useNavigation();
   const [isEditingName, setIsEditingName] = useState(false);
   const [isEditingBio, setIsEditingBio] = useState(false);
   const [communityName, setCommunityName] = useState(communityData?.communityName);
   const [communityBio, setCommunityBio] = useState(communityData?.communityDescription);
-  const [banner, setBanner] = useState();
-  const [profilePicture, setProfilePicture] = useState();
+  const [banner, setBanner] = useState('');
+  const [newBanner, setNewBanner] = useState('');
+  const [profilePicture, setProfilePicture] = useState('');
+  const [newProfilePicture, setNewProfilePicture] = useState('');
   const [profileBackground, setProfileBackground] = useState(null);
+  const [newProfileBackground, setNewProfileBackground] = useState(null);
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const dropdownAnimation = useRef(new Animated.Value(0)).current;
   const [isDataChanged, setIsDataChanged] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalImageSource, setModalImageSource] = useState(null);
+
+  useEffect(() => {
+    if (communityData) {
+      setCommunityName(communityData.communityName || '');
+      setCommunityBio(communityData.communityDescription || '');
+
+      setBanner({ uri: communityData.picture?.banner.bannerPicture });
+      setProfilePicture({ uri: communityData.picture?.profile.profilePicture });
+      setProfileBackground({ uri: communityData.picture?.background.backgroundPicture });
+    }
+  }, [communityData]);
 
   const toggleEditing = field => {
     if (field === 'name') {
@@ -44,21 +88,74 @@ const CommunitySettings = () => {
     }
   };
 
-  const saveCommunityBio = () => {
-    // Logic to save community bio
-    setIsEditingBio(false);
+  useEffect(() => {
+    if (communityData) {
+      const banner = { uri: communityData?.picture.banner.bannerPicture };
+      setBanner(banner);
+
+      const profilePicture = { uri: communityData?.picture.profile.profilePicture };
+      setProfilePicture(profilePicture);
+    }
+
+    const checkDataChanged = () => {
+      const dataChanged =
+        (communityName && communityName !== communityData?.communityName) ||
+        (communityBio && communityBio !== communityData?.communityDescription) ||
+        newProfilePicture ||
+        newProfileBackground ||
+        newBanner;
+      setIsDataChanged(dataChanged);
+    }
+    checkDataChanged()
+
+  }, [newProfilePicture, newProfileBackground, newBanner])
+
+
+  const selectImageBanner = () => {
+    ImagePicker.openPicker({
+      width: 1600,
+      height: 900,
+      cropping: true,
+      mediaType: 'photo',
+    })
+      .then(async image => {
+        console.log('Image selected:', image);
+        setNewBanner(image)
+        setBanner({ uri: image.path });
+      })
+      .catch(error => {
+        console.error('Error selecting image:', error);
+      });
   };
 
-  const selectImage = setImage => {
+  const selectImageProfile = () => {
     ImagePicker.openPicker({
       width: 400,
       height: 400,
       cropping: true,
       mediaType: 'photo',
     })
-      .then(image => {
+      .then(async image => {
         console.log('Image selected:', image);
-        setImage({ uri: image.path });
+        setNewProfilePicture(image)
+        setProfilePicture({ uri: image.path });
+      })
+      .catch(error => {
+        console.error('Error selecting image:', error);
+      });
+  };
+
+  const selectImageBackground = () => {
+    ImagePicker.openPicker({
+      width: 900,
+      height: 1600,
+      cropping: true,
+      mediaType: 'photo',
+    })
+      .then(async image => {
+        console.log('Image selected:', image);
+        setNewProfileBackground(image)
+        setProfileBackground({ uri: image.path });
       })
       .catch(error => {
         console.error('Error selecting image:', error);
@@ -100,10 +197,93 @@ const CommunitySettings = () => {
     }, [navigation, isDataChanged]),
   );
 
-  const handleSave = () => {
+  const handleSave = async () => {
     // Logic to save changes
-    console.log('Saving changes...');
-    setIsDataChanged(false);
+    const communityId = communityData?._id
+    const token = await AsyncStorage.getItem('token');
+
+    try {
+
+      if (newBanner) {
+        const bannerFormData = new FormData();
+        bannerFormData.append('image', {
+          uri: newBanner.path,
+          name: newBanner.filename || 'banner.jpg',
+          type: newBanner.mime,
+        });
+        bannerFormData.append('token', token);
+        bannerFormData.append('communityId', communityId);
+
+        await axios.post(`${serverUrl}/upload-community-banner`, bannerFormData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+      }
+
+      if (newProfilePicture) {
+        try {
+          const profileFormData = new FormData();
+          profileFormData.append('image', {
+            uri: newProfilePicture.path,
+            name: newProfilePicture.filename || 'profile.jpg',
+            type: newProfilePicture.mime,
+          });
+          profileFormData.append('token', token);
+          profileFormData.append('communityId', communityId);
+
+          await axios.post(`${serverUrl}/upload-community-profile`, profileFormData, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          });
+        } catch (error) {
+          console.error('Error uploading image:', error);
+        }
+      }
+
+      if (newProfileBackground) {
+        try {
+          const backgroundFormData = new FormData();
+          backgroundFormData.append('image', {
+            uri: newProfileBackground.path,
+            name: newProfileBackground.filename || 'background.jpg',
+            type: newProfileBackground.mime,
+          });
+          backgroundFormData.append('token', token);
+          backgroundFormData.append('communityId', communityId);
+
+          await axios.post(`${serverUrl}/upload-community-background`, backgroundFormData, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          });
+        } catch (error) {
+          console.error('Error uploading image:', error);
+        }
+      }
+
+
+      const response = await axios.post(`${serverUrl}/edit-community`, {
+        token,
+        communityId,
+        communityName: communityName,
+        communityDescription: communityBio,
+        description: ''
+      })
+
+      if (response.data.status === 'ok') {
+        console.log('Updating new data');
+        navigation.goBack();
+      }
+
+      console.log('Saving changes...');
+      setIsDataChanged(false);
+    } catch (error) {
+      console.error('Error Update Data:', error);
+    }
+
+
   };
 
   const openModal = imageSource => {
@@ -116,29 +296,40 @@ const CommunitySettings = () => {
     setModalImageSource(null);
   };
 
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchCommunityData();
+    }, [communityId])
+  );
+
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView
+      contentContainerStyle={styles.container}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
       <View style={styles.bannerContainer}>
         <TouchableOpacity onPress={() => openModal(banner)}>
           <ImageBackground
-            source={communityData?.picture.banner.bannerPicture ? { uri: communityData.picture.banner.bannerPicture } : require('../../assets/banner.png')}
+            source={banner.uri ? banner : require('../../assets/banner.png')}
             style={styles.banner}
             resizeMode="cover"
             imageStyle={styles.bannerImage}>
             <TouchableOpacity
               style={styles.editIcon}
-              onPress={() => selectImage(setBanner)}>
+              onPress={selectImageBanner}>
               <MaterialCommunityIcons name="pencil" size={24} color="#fff" />
             </TouchableOpacity>
             <View style={styles.avatarContainer}>
               <TouchableOpacity onPress={() => openModal(profilePicture)}>
                 <Image
-                  source={communityData?.picture.profile.profilePicture ? { uri: communityData.picture.profile.profilePicture } : require('../../assets/profilepic.png')}
+                  source={profilePicture.uri ? profilePicture : require('../../assets/profilepic.png')}
                   style={styles.avatar} />
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.avatarEditIcon}
-                onPress={() => selectImage(setProfilePicture)}>
+                onPress={selectImageProfile}>
                 <MaterialCommunityIcons name="pencil" size={20} color="#fff" />
               </TouchableOpacity>
             </View>
@@ -223,7 +414,7 @@ const CommunitySettings = () => {
         </View>
         <TouchableOpacity
           style={styles.galleryButton}
-          onPress={() => selectImage(setProfileBackground)}>
+          onPress={selectImageBackground}>
           <MaterialCommunityIcons name="image-outline" size={24} color="#000" />
           <Text style={styles.galleryButtonText}>Select from Gallery</Text>
         </TouchableOpacity>
@@ -243,18 +434,30 @@ const CommunitySettings = () => {
         </View>
         {dropdownVisible && (
           <View style={styles.dropdownMenu}>
-            <TouchableOpacity style={styles.dropdownItem} onPress={() => navigation.navigate('CommunityEditRules')}>
+            <TouchableOpacity
+              style={styles.dropdownItem}
+              onPress={() => {
+                navigation.navigate('CommunityEditRules', { communityData });
+                setDropdownVisible(false);
+              }}
+            >
               <MaterialCommunityIcons name="pencil" size={20} color="#000" style={styles.dropdownIcon} />
               <Text style={styles.dropdownItemText}>Edit Rules</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.dropdownItem}>
+            <TouchableOpacity
+              style={styles.dropdownItem}
+              onPress={() => {
+                // Tambahkan logika untuk menghapus aturan di sini
+                setDropdownVisible(false);
+              }}
+            >
               <MaterialCommunityIcons name="delete" size={20} color="red" style={styles.dropdownIcon} />
               <Text style={styles.dropdownItemText}>Delete Rules</Text>
             </TouchableOpacity>
           </View>
         )}
         <View style={styles.rulesContainer}>
-          {communityData.rules.map((rule, index) => (
+          {communityData?.rules.map((rule, index) => (
             <View key={rule._id} style={styles.ruleWrapper}>
               <View style={styles.ruleIcon}>
                 <Text style={styles.ruleNumber}>{index + 1}</Text>

@@ -33,7 +33,6 @@ export default function EditProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
   const [userData, setUserData] = useState(null);
   const [username, setUsername] = useState('');
-  const [isSaving, setIsSaving] = useState(false);
   const [newProfileImage, setNewProfileImage] = useState('');
   const [newBannerImage, setNewBannerImage] = useState('');
   const [isLoading, setIsLoading] = useState(true);
@@ -142,7 +141,6 @@ export default function EditProfilePage() {
 
 
   const handleSave = async () => {
-    setIsSaving(true);
     let hasError = false;
 
      if (!validateUsername(username)) {
@@ -167,7 +165,6 @@ export default function EditProfilePage() {
     }
 
     if (hasError) {
-      setIsSaving(false);
       return;
     }
 
@@ -179,7 +176,6 @@ export default function EditProfilePage() {
       newBannerImage;
 
     if (!isDataChanged) {
-      setIsSaving(false);
       return;
     }
 
@@ -199,7 +195,6 @@ export default function EditProfilePage() {
             text1: 'Failed',
             text2: 'User name is already taken',
           });
-          setIsSaving(false);
           return;
         }
         updatedUserData.username = username;
@@ -255,7 +250,6 @@ export default function EditProfilePage() {
         }, 2500);
       }
     } catch (error) {
-      setIsSaving(false);
       console.error('Error updating profile:', error);
       Toast.show({
         type: 'error',

@@ -16,10 +16,17 @@ import Animated, {
   runOnJS,
 } from 'react-native-reanimated';
 import { PanGestureHandler } from 'react-native-gesture-handler';
+import { useRoute } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import config from '../../config';
+
+const serverUrl = config.SERVER_URL;
 
 const DELETE_THRESHOLD = -75;
 
 const SwipeableRule = ({ rule, index, updateRule, onDelete }) => {
+
   const translateX = useSharedValue(0);
   const isRemoving = useSharedValue(false);
 
@@ -28,7 +35,7 @@ const SwipeableRule = ({ rule, index, updateRule, onDelete }) => {
       isRemoving.value = false;
       context.x = translateX.value;
     },
-    onActive: (event, context) => { 
+    onActive: (event, context) => {
       if (!isRemoving.value) {
         const newValue = context.x + event.translationX;
         translateX.value = Math.min(0, Math.max(newValue, -100));
@@ -98,7 +105,9 @@ const SwipeableRule = ({ rule, index, updateRule, onDelete }) => {
 };
 
 const CommunityEditRules = ({ navigation }) => {
-  const [rules, setRules] = useState([{ title: '', description: '' }]);
+  const route = useRoute()
+  const { communityData } = route.params
+  const [rules, setRules] = useState(communityData.rules || [{ title: '', description: '' }]);
 
   const addNewRule = () => {
     if (rules.length < 5) {
@@ -124,15 +133,23 @@ const CommunityEditRules = ({ navigation }) => {
     }
   };
 
-  const handleSaveRules = () => {
+  const handleSaveRules = async () => {
     console.log('Rules saved:', rules);
+    const token = await AsyncStorage.getItem('token');
+    try {
+      await axios.post(`${serverUrl}/edit-rules-community`, {
+        token,
+        communityId: communityData._id,
+        rules
+      }).then(res => {
+        const response = res.data;
+        console.log(response);
+        navigation.goBack();
+      });
+    } catch (error) {
+      console.error(error);
+    }
     // Implement logic to save rules, e.g., API call
-  };
-
-  const isFormValid = () => {
-    return rules.every(
-      rule => rule.title.trim() !== '' && rule.description.trim() !== ''
-    );
   };
 
   useEffect(() => {
@@ -160,6 +177,12 @@ const CommunityEditRules = ({ navigation }) => {
       ),
     });
   }, [navigation, rules]);
+
+  const isFormValid = () => {
+    return rules.every(
+      rule => rule.title.trim() !== '' && rule.description.trim() !== ''
+    );
+  };
 
   return (
     <SafeAreaView style={styles.container}>
