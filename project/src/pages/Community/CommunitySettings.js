@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {
   View,
   Text,
@@ -12,10 +12,15 @@ import {
   TouchableWithoutFeedback,
   Modal,
   RefreshControl,
+  Alert,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import ImagePicker from 'react-native-image-crop-picker';
-import { useNavigation, useFocusEffect, useRoute } from '@react-navigation/native';
+import {
+  useNavigation,
+  useFocusEffect,
+  useRoute,
+} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../../config';
@@ -24,7 +29,7 @@ const serverUrl = config.SERVER_URL;
 
 const CommunitySettings = () => {
   const route = useRoute();
-  const { communityId, communityDataBefore } = route.params;
+  const {communityId, communityDataBefore} = route.params;
   const [communityData, setCommunityData] = useState();
   const [refreshing, setRefreshing] = useState(false);
 
@@ -35,21 +40,37 @@ const CommunitySettings = () => {
         token: token,
         communityId: communityId,
       });
-      // setCommunityName(response?.data?.data?.communityName);
-      // setCommunityBio(response?.data?.data?.communityDescription);
+
+      console.log('Fetch Community Data Response:', response.data);
+
+      // Log detail data yang diterima
+      console.log(
+        'Received Community Name:',
+        response?.data?.data?.communityName,
+      );
+      console.log(
+        'Received Community Description:',
+        response?.data?.data?.communityDescription,
+      );
+      setCommunityName(response?.data?.data?.communityName);
+      setCommunityBio(response?.data?.data?.communityDescription);
       setCommunityData(response.data.data);
     } catch (error) {
       console.error('Error fetching community data:', error);
+      console.error('Error Response:', error.response?.data);
     }
   };
 
-  const onRefresh = React.useCallback(() => {
-    setRefreshing(true);
-    // fetchCommunityData().then(() => setRefreshing(false));
-  }, [communityId]);
-
   useEffect(() => {
     fetchCommunityData();
+  }, []);
+
+  useEffect(() => {
+    console.log('Community Data:', communityData);
+  }, [communityData]);
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
   }, [communityId]);
 
   const navigation = useNavigation();
@@ -65,20 +86,9 @@ const CommunitySettings = () => {
   const [newProfileBackground, setNewProfileBackground] = useState(null);
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const dropdownAnimation = useRef(new Animated.Value(0)).current;
-  const [isDataChanged, setIsDataChanged] = useState(true);
+  const [isDataChanged, setIsDataChanged] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalImageSource, setModalImageSource] = useState(null);
-
-  useEffect(() => {
-    if (communityData) {
-      setCommunityName(communityData?.communityName);
-      setCommunityBio(communityData?.communityDescription);
-
-      setBanner({ uri: communityData.picture?.banner.bannerPicture });
-      setProfilePicture({ uri: communityData.picture?.profile.profilePicture });
-      setProfileBackground({ uri: communityData.picture?.background.backgroundPicture });
-    }
-  }, [communityData]);
 
   const toggleEditing = field => {
     if (field === 'name') {
@@ -91,20 +101,148 @@ const CommunitySettings = () => {
   };
 
   useEffect(() => {
-
     const checkDataChanged = () => {
       const dataChanged =
         (communityName && communityName !== communityData?.communityName) ||
-        (communityBio && communityBio !== communityData?.communityDescription) ||
+        (communityBio &&
+          communityBio !== communityData?.communityDescription) ||
         newProfilePicture ||
         newProfileBackground ||
         newBanner;
       setIsDataChanged(dataChanged);
+    };
+    checkDataChanged();
+  }, [
+    communityName,
+    communityBio,
+    newProfilePicture,
+    newProfileBackground,
+    newBanner,
+    communityData,
+  ]);
+
+  navigation.setOptions({
+    headerRight: () => (
+      <TouchableOpacity
+        style={[
+          styles.saveButton,
+          {backgroundColor: isDataChanged ? '#001374' : '#ccc'},
+        ]}
+        onPress={isDataChanged ? handleSave : null}
+        disabled={!isDataChanged}>
+        <Text style={styles.saveButtonText}> Save </Text>
+      </TouchableOpacity>
+    ),
+  });
+
+  const handleSave = async () => {
+    const token = await AsyncStorage.getItem('token');
+
+    if (!communityId) {
+      Alert.alert('Error', 'Community ID is missing');
+      return;
     }
-    checkDataChanged()
 
-  }, [newProfilePicture, newProfileBackground, newBanner, communityData, communityName, communityBio])
+    const nameToSave = communityName.trim();
+    const bioToSave = communityBio.trim();
 
+    if (!nameToSave || !bioToSave) {
+      Alert.alert('Error', 'Community name and description are required');
+      return;
+    }
+
+    const dataToSend = {
+      token,
+      communityId,
+      communityName: nameToSave,
+      communityDescription: bioToSave,
+    };
+
+    try {
+      // Upload new images if they exist
+      if (newProfilePicture) {
+        const profileFormData = new FormData();
+        profileFormData.append('image', {
+          uri: newProfilePicture.path,
+          name: newProfilePicture.filename || 'profile.jpg',
+          type: newProfilePicture.mime,
+        });
+        profileFormData.append('token', token);
+
+        await axios.post(`${serverUrl}/upload-image-profile`, profileFormData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+      }
+
+      if (newBanner) {
+        const bannerFormData = new FormData();
+        bannerFormData.append('image', {
+          uri: newBanner.path,
+          name: newBanner.filename || 'banner.jpg',
+          type: newBanner.mime,
+        });
+        bannerFormData.append('token', token);
+
+        await axios.post(`${serverUrl}/upload-image-banner`, bannerFormData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+      }
+
+      if (newProfileBackground) {
+        const backgroundFormData = new FormData();
+        backgroundFormData.append('image', {
+          uri: newProfileBackground.path,
+          name: newProfileBackground.filename || 'background.jpg',
+          type: newProfileBackground.mime,
+        });
+        backgroundFormData.append('token', token);
+
+        await axios.post(
+          `${serverUrl}/upload-image-background`,
+          backgroundFormData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          },
+        );
+      }
+
+      const editResponse = await axios.post(
+        `${serverUrl}/edit-community`,
+        dataToSend,
+        {
+          validateStatus: function (status) {
+            return status >= 200 && status < 500;
+          },
+        },
+      );
+
+      if (editResponse.status === 200 || editResponse.data?.status === 'ok') {
+        await fetchCommunityData(); // Refresh data
+        setIsDataChanged(false);
+
+        Alert.alert(
+          'Success',
+          editResponse.data?.message ||
+            'Community settings updated successfully',
+        );
+      } else {
+        const errorMessage =
+          editResponse.data?.message ||
+          editResponse.data?.error ||
+          'Failed to update community';
+        Alert.alert('Error', errorMessage);
+      }
+    } catch (error) {
+      console.error('Error Update Data:', error);
+      Alert.alert('Error', error.message || 'An unexpected error occurred');
+    }
+  };
 
   const selectImageBanner = () => {
     ImagePicker.openPicker({
@@ -115,8 +253,8 @@ const CommunitySettings = () => {
     })
       .then(async image => {
         console.log('Image selected:', image);
-        setNewBanner(image)
-        setBanner({ uri: image.path });
+        setNewBanner(image);
+        setBanner({uri: image.path});
       })
       .catch(error => {
         console.error('Error selecting image:', error);
@@ -132,8 +270,8 @@ const CommunitySettings = () => {
     })
       .then(async image => {
         console.log('Image selected:', image);
-        setNewProfilePicture(image)
-        setProfilePicture({ uri: image.path });
+        setNewProfilePicture(image);
+        setProfilePicture({uri: image.path});
       })
       .catch(error => {
         console.error('Error selecting image:', error);
@@ -149,8 +287,8 @@ const CommunitySettings = () => {
     })
       .then(async image => {
         console.log('Image selected:', image);
-        setNewProfileBackground(image)
-        setProfileBackground({ uri: image.path });
+        setNewProfileBackground(image);
+        setProfileBackground({uri: image.path});
       })
       .catch(error => {
         console.error('Error selecting image:', error);
@@ -174,114 +312,6 @@ const CommunitySettings = () => {
     }
   };
 
-  useFocusEffect(
-    React.useCallback(() => {
-      navigation.setOptions({
-        headerRight: () => (
-          <TouchableOpacity
-            style={[
-              styles.saveButton,
-              { backgroundColor: isDataChanged ? '#001374' : '#ccc' },
-            ]}
-            onPress={isDataChanged ? handleSave : null}
-            disabled={!isDataChanged}>
-            <Text style={styles.saveButtonText}>Save</Text>
-          </TouchableOpacity>
-        ),
-      });
-    }, [navigation, isDataChanged]),
-  );
-
-  const handleSave = async () => {
-    const communityId = communityData?._id;
-    const token = await AsyncStorage.getItem('token');
-
-    console.log("Before save, communityName:", communityName);
-
-    try {
-      console.log("Sending to server, communityName:", communityName);
-
-      if (newBanner) {
-        const bannerFormData = new FormData();
-        bannerFormData.append('image', {
-          uri: newBanner.path,
-          name: newBanner.filename || 'banner.jpg',
-          type: newBanner.mime,
-        });
-        bannerFormData.append('token', token);
-        bannerFormData.append('communityId', communityId);
-
-        await axios.post(`${serverUrl}/upload-community-banner`, bannerFormData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
-      }
-
-      if (newProfilePicture) {
-        try {
-          const profileFormData = new FormData();
-          profileFormData.append('image', {
-            uri: newProfilePicture.path,
-            name: newProfilePicture.filename || 'profile.jpg',
-            type: newProfilePicture.mime,
-          });
-          profileFormData.append('token', token);
-          profileFormData.append('communityId', communityId);
-
-          await axios.post(`${serverUrl}/upload-community-profile`, profileFormData, {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-          });
-        } catch (error) {
-          console.error('Error uploading image:', error);
-        }
-      }
-
-      if (newProfileBackground) {
-        try {
-          const backgroundFormData = new FormData();
-          backgroundFormData.append('image', {
-            uri: newProfileBackground.path,
-            name: newProfileBackground.filename || 'background.jpg',
-            type: newProfileBackground.mime,
-          });
-          backgroundFormData.append('token', token);
-          backgroundFormData.append('communityId', communityId);
-
-          await axios.post(`${serverUrl}/upload-community-background`, backgroundFormData, {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-            },
-          });
-        } catch (error) {
-          console.error('Error uploading image:', error);
-        }
-      }
-
-      const response = await axios.post(`${serverUrl}/edit-community`, {
-        token,
-        communityId,
-        communityName: communityName,
-        communityDescription: communityBio,
-        description: ''
-      });
-
-      console.log(response.data)
-
-      if (response.data.status === 'ok') {
-        console.log("After save, communityName:", communityName);
-        // navigation.goBack();
-      }
-
-      setIsDataChanged(false);
-    } catch (error) {
-      console.error('Error Update Data:', error);
-    }
-  };
-
-  console.log("communityName:", communityName)
   const openModal = imageSource => {
     setModalImageSource(imageSource);
     setModalVisible(true);
@@ -292,19 +322,26 @@ const CommunitySettings = () => {
     setModalImageSource(null);
   };
 
-  useFocusEffect(
-    React.useCallback(() => {
-      fetchCommunityData();
-    }, [communityId])
-  );
+  console.log('communityData:', communityData);
+
+  const inputNameChange = text => {
+    console.log('Full Input Text:', text);
+    console.log('Input Text Length:', text.length);
+    setCommunityName(text);
+  };
+
+  const handleBioChange = text => {
+    console.log('Full Bio Text:', text);
+    console.log('Bio Text Length:', text.length);
+    setCommunityBio(text);
+  };
 
   return (
     <ScrollView
       contentContainerStyle={styles.container}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }
-    >
+      }>
       <View style={styles.bannerContainer}>
         <TouchableOpacity onPress={() => openModal(banner)}>
           <ImageBackground
@@ -320,8 +357,13 @@ const CommunitySettings = () => {
             <View style={styles.avatarContainer}>
               <TouchableOpacity onPress={() => openModal(profilePicture)}>
                 <Image
-                  source={profilePicture.uri ? profilePicture : require('../../assets/profilepic.png')}
-                  style={styles.avatar} />
+                  source={
+                    profilePicture.uri
+                      ? profilePicture
+                      : require('../../assets/profilepic.png')
+                  }
+                  style={styles.avatar}
+                />
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.avatarEditIcon}
@@ -336,67 +378,36 @@ const CommunitySettings = () => {
         <Text style={styles.sectionTitle}>Community Account</Text>
         <View style={styles.infoContainer}>
           <View style={styles.infoRow}>
-            {isEditingName ? (
-              <TextInput
-                style={styles.infoText}
-                value={communityName}
-                onChangeText={(text) => {
-                  console.log("TextInput onChangeText:", text);
-                  setCommunityName(text);
-                }}
-                autoFocus={true}
+            <TextInput
+              style={styles.infoText}
+              value={communityName}
+              onChangeText={inputNameChange}
+            />
+            {/* <TouchableOpacity onPress={() => toggleEditing('name')}>
+              <MaterialCommunityIcons
+                name="chevron-right"
+                size={25}
+                color="#000"
               />
-            ) : (
-              <Text style={styles.infoText}>{communityName}</Text>
-            )}
-            {isEditingName ? (
-              <TouchableOpacity
-                style={styles.saveButtonInline}
-                onPress={() => {toggleEditing('name')
-                console.log("TextInput ngentot:", communityName  );}
-              }>
-                <Text style={styles.saveButtonText}>Save</Text>
-              </TouchableOpacity>
-            ) : (
-              <TouchableOpacity onPress={() => toggleEditing('name')}>
-                <MaterialCommunityIcons
-                  name="chevron-right"
-                  size={25}
-                  color="#000"
-                />
-              </TouchableOpacity>
-            )}
+            </TouchableOpacity> */}
           </View>
           <Text style={styles.label}>Community Name</Text>
         </View>
         <View style={styles.bioContainer}>
           <View style={styles.infoRow}>
-            {isEditingBio ? (
-              <TextInput
-                style={styles.bioText}
-                value={communityBio}
-                onChangeText={(text) => setCommunityBio(text)}
-                autoFocus={true}
-                multiline={true}
+            <TextInput
+              style={styles.bioText}
+              value={communityBio}
+              onChangeText={handleBioChange}
+              multiline={true}
+            />
+            {/* <TouchableOpacity onPress={() => toggleEditing('bio')}>
+              <MaterialCommunityIcons
+                name="chevron-right"
+                size={25}
+                color="#000"
               />
-            ) : (
-              <Text style={styles.bioText}>{communityBio}</Text>
-            )}
-            {isEditingBio ? (
-              <TouchableOpacity
-                style={styles.saveButtonInline}
-                onPress={() => toggleEditing('bio')}>
-                <Text style={styles.saveButtonText}>Save</Text>
-              </TouchableOpacity>
-            ) : (
-              <TouchableOpacity onPress={() => toggleEditing('bio')}>
-                <MaterialCommunityIcons
-                  name="chevron-right"
-                  size={25}
-                  color="#000"
-                />
-              </TouchableOpacity>
-            )}
+            </TouchableOpacity> */}
           </View>
           <Text style={styles.label}>Description</Text>
         </View>
@@ -408,7 +419,7 @@ const CommunitySettings = () => {
           {profileBackground && (
             <ImageBackground
               source={profileBackground}
-              style={{ width: '100%', height: 200 }}
+              style={{width: '100%', height: 200}}
               resizeMode="cover"
             />
           )}
@@ -421,7 +432,6 @@ const CommunitySettings = () => {
         </TouchableOpacity>
         <View style={styles.lineSeparator} />
       </View>
-
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Community Rules</Text>
@@ -438,21 +448,28 @@ const CommunitySettings = () => {
             <TouchableOpacity
               style={styles.dropdownItem}
               onPress={() => {
-                navigation.navigate('CommunityEditRules', { communityData });
+                navigation.navigate('CommunityEditRules', {communityData});
                 setDropdownVisible(false);
-              }}
-            >
-              <MaterialCommunityIcons name="pencil" size={20} color="#000" style={styles.dropdownIcon} />
+              }}>
+              <MaterialCommunityIcons
+                name="pencil"
+                size={20}
+                color="#000"
+                style={styles.dropdownIcon}
+              />
               <Text style={styles.dropdownItemText}>Edit Rules</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.dropdownItem}
               onPress={() => {
-                // Tambahkan logika untuk menghapus aturan di sini
                 setDropdownVisible(false);
-              }}
-            >
-              <MaterialCommunityIcons name="delete" size={20} color="red" style={styles.dropdownIcon} />
+              }}>
+              <MaterialCommunityIcons
+                name="delete"
+                size={20}
+                color="red"
+                style={styles.dropdownIcon}
+              />
               <Text style={styles.dropdownItemText}>Delete Rules</Text>
             </TouchableOpacity>
           </View>
@@ -484,7 +501,7 @@ const CommunitySettings = () => {
             color="#000"
           />
           <Text style={styles.userAccountText}>User List</Text>
-          <View style={{ flex: 1, alignItems: 'flex-end' }}>
+          <View style={{flex: 1, alignItems: 'flex-end'}}>
             <MaterialCommunityIcons
               name="chevron-right"
               size={25}
@@ -543,13 +560,13 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: -3,
     left: '54%',
-    transform: [{ translateX: -50 }],
+    transform: [{translateX: -50}],
     alignItems: 'center',
   },
   avatar: {
     bottom: -15,
     left: '54%',
-    transform: [{ translateX: -50 }],
+    transform: [{translateX: -50}],
     width: 80,
     height: 80,
     borderRadius: 50,

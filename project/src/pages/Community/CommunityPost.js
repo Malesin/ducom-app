@@ -1,17 +1,26 @@
-import { View, Text, StyleSheet, SafeAreaView } from 'react-native';
-import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  SafeAreaView,
+  ScrollView, // Tambahkan ScrollView
+  RefreshControl, // Tambahkan RefreshControl
+  Alert, // Tambahkan Alert
+} from 'react-native';
+import React, {useState, useEffect, useCallback} from 'react';
 import CommunityCard from '../../components/Community/CommunityCard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../../config';
-import { useRoute } from '@react-navigation/native';
+import {useRoute} from '@react-navigation/native';
 
 const serverUrl = config.SERVER_URL;
 
-const CommunityPost = ({ navigation }) => {
+const CommunityPost = ({navigation}) => {
   const route = useRoute();
-  const { communityId } = route.params;
+  const {communityId} = route.params;
   const [communityDataList, setCommunityDataList] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
 
   const fetchDataPost = async () => {
     const token = await AsyncStorage.getItem('token');
@@ -42,6 +51,7 @@ const CommunityPost = ({ navigation }) => {
       setCommunityDataList(formattedData);
     } catch (error) {
       console.error(error);
+      Alert.alert('Error', 'Failed to fetch community posts');
     }
   };
 
@@ -49,9 +59,30 @@ const CommunityPost = ({ navigation }) => {
     fetchDataPost();
   }, []);
 
+  // Fungsi untuk handle refresh
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await fetchDataPost();
+    } catch (error) {
+      console.error('Error refreshing data:', error);
+      Alert.alert('Error', 'Failed to refresh community posts');
+    } finally {
+      setRefreshing(false);
+    }
+  }, [communityId]);
+
   return (
     <SafeAreaView style={styles.container}>
-      <View>
+      <ScrollView
+        contentContainerStyle={styles.scrollContainer}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={['#001374']}
+          />
+        }>
         {communityDataList.map((communityCardData, index) => (
           <CommunityCard
             key={index}
@@ -59,7 +90,7 @@ const CommunityPost = ({ navigation }) => {
             communityCardData={communityCardData}
           />
         ))}
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };
@@ -70,5 +101,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
+  },
+  scrollContainer: {
+    flexGrow: 1,
   },
 });
