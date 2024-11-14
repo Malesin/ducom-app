@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   SafeAreaView,
   View,
@@ -7,10 +7,12 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  RefreshControl, // Tambahkan import ini
+  Alert, // Tambahkan import ini
 } from 'react-native';
 import axios from 'axios';
 import config from '../../config';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -18,49 +20,80 @@ const serverUrl = config.SERVER_URL;
 
 const ViewCommunity = () => {
   const route = useRoute();
-  const { communityId } = route.params;
+  const {communityId} = route.params;
   const [communityData, setCommunityData] = useState(null);
-  const [isAdmin, setIsAdmin] = useState(true); // true buat admin, false buat member 😛
+  const [isAdmin, setIsAdmin] = useState(true);
+  const [refreshing, setRefreshing] = useState(false); // Tambahkan state refreshing
   const navigation = useNavigation();
 
+  // Fungsi untuk fetch data komunitas
+  const fetchCommunityData = async () => {
+    const token = await AsyncStorage.getItem('token');
+    try {
+      const response = await axios.post(`${serverUrl}/community-byId`, {
+        token: token,
+        communityId: communityId,
+      });
+      setCommunityData(response.data.data);
+
+      // Opsional: Tambahkan logika untuk mengecek apakah pengguna adalah admin
+      // setIsAdmin(response.data.data.isAdmin);
+    } catch (error) {
+      console.error('Error fetching community data:', error);
+      Alert.alert('Error', 'Failed to fetch community data');
+    }
+  };
+
+  useEffect(() => {
+    fetchCommunityData();
+  }, []);
+
+  // Fungsi untuk handle refresh
+  const onRefresh = React.useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await fetchCommunityData();
+    } catch (error) {
+      console.error('Error refreshing data:', error);
+      Alert.alert('Error', 'Failed to refresh community data');
+    } finally {
+      setRefreshing(false);
+    }
+  }, [communityId]);
+
   const handleSettingsPress = () => {
-    navigation.navigate('CommunitySettings', { communityId: communityId, communityDataBefore: communityData });
+    navigation.navigate('CommunitySettings', {
+      communityId: communityId,
+      communityDataBefore: communityData,
+    });
   };
 
   const handleJoinPress = () => {
     console.log('Joined community');
-    // Implement join functionality if needed
   };
 
   const handleCreate = () => {
     console.log('Creating post in community');
-    navigation.navigate('CreatePostCommunity', { communityId: communityId });
+    navigation.navigate('CreatePostCommunity', {communityId: communityId});
   };
-
-  useEffect(() => {
-    async function fetchCommunityData() {
-      const token = await AsyncStorage.getItem('token');
-      try {
-        const response = await axios.post(`${serverUrl}/community-byId`, {
-          token: token,
-          communityId: communityId,
-        });
-        setCommunityData(response.data.data);
-      } catch (error) {
-        console.error('Error fetching community data:', error);
-      }
-    }
-    fetchCommunityData();
-  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.scrollContainer}>
+      <ScrollView
+        style={styles.scrollContainer}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={['#001374']} // Warna loading indicator (opsional)
+            tintColor="#001374" // Warna loading indicator untuk iOS
+          />
+        }>
         <View style={styles.bannerContainer}>
           <Image
             source={
-              communityData?.picture.banner.bannerPicture
-                ? { uri: communityData.picture.banner.bannerPicture }
+              communityData?.picture?.banner?.bannerPicture
+                ? {uri: communityData.picture.banner.bannerPicture}
                 : require('../../assets/banner.png')
             }
             style={styles.banner}
