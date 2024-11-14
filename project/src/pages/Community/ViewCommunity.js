@@ -24,7 +24,7 @@ const ViewCommunity = () => {
   const navigation = useNavigation();
 
   const handleSettingsPress = () => {
-    navigation.navigate('CommunitySettings', { communityId: communityId });
+    navigation.navigate('CommunitySettings', { communityId: communityId, communityDataBefore: communityData });
   };
 
   const handleJoinPress = () => {

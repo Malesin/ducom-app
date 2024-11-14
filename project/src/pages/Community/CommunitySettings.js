@@ -24,7 +24,7 @@ const serverUrl = config.SERVER_URL;
 
 const CommunitySettings = () => {
   const route = useRoute();
-  const { communityId } = route.params;
+  const { communityId, communityDataBefore } = route.params;
   const [communityData, setCommunityData] = useState();
   const [refreshing, setRefreshing] = useState(false);
 
@@ -35,6 +35,8 @@ const CommunitySettings = () => {
         token: token,
         communityId: communityId,
       });
+      // setCommunityName(response?.data?.data?.communityName);
+      // setCommunityBio(response?.data?.data?.communityDescription);
       setCommunityData(response.data.data);
     } catch (error) {
       console.error('Error fetching community data:', error);
@@ -43,7 +45,7 @@ const CommunitySettings = () => {
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
-    fetchCommunityData().then(() => setRefreshing(false));
+    // fetchCommunityData().then(() => setRefreshing(false));
   }, [communityId]);
 
   useEffect(() => {
@@ -53,8 +55,8 @@ const CommunitySettings = () => {
   const navigation = useNavigation();
   const [isEditingName, setIsEditingName] = useState(false);
   const [isEditingBio, setIsEditingBio] = useState(false);
-  const [communityName, setCommunityName] = useState(communityData?.communityName);
-  const [communityBio, setCommunityBio] = useState(communityData?.communityDescription);
+  const [communityName, setCommunityName] = useState('');
+  const [communityBio, setCommunityBio] = useState('');
   const [banner, setBanner] = useState('');
   const [newBanner, setNewBanner] = useState('');
   const [profilePicture, setProfilePicture] = useState('');
@@ -63,14 +65,14 @@ const CommunitySettings = () => {
   const [newProfileBackground, setNewProfileBackground] = useState(null);
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const dropdownAnimation = useRef(new Animated.Value(0)).current;
-  const [isDataChanged, setIsDataChanged] = useState(false);
+  const [isDataChanged, setIsDataChanged] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [modalImageSource, setModalImageSource] = useState(null);
 
   useEffect(() => {
     if (communityData) {
-      setCommunityName(communityData.communityName || '');
-      setCommunityBio(communityData.communityDescription || '');
+      setCommunityName(communityData?.communityName);
+      setCommunityBio(communityData?.communityDescription);
 
       setBanner({ uri: communityData.picture?.banner.bannerPicture });
       setProfilePicture({ uri: communityData.picture?.profile.profilePicture });
@@ -89,13 +91,6 @@ const CommunitySettings = () => {
   };
 
   useEffect(() => {
-    if (communityData) {
-      const banner = { uri: communityData?.picture.banner.bannerPicture };
-      setBanner(banner);
-
-      const profilePicture = { uri: communityData?.picture.profile.profilePicture };
-      setProfilePicture(profilePicture);
-    }
 
     const checkDataChanged = () => {
       const dataChanged =
@@ -108,7 +103,7 @@ const CommunitySettings = () => {
     }
     checkDataChanged()
 
-  }, [newProfilePicture, newProfileBackground, newBanner])
+  }, [newProfilePicture, newProfileBackground, newBanner, communityData, communityName, communityBio])
 
 
   const selectImageBanner = () => {
@@ -198,11 +193,13 @@ const CommunitySettings = () => {
   );
 
   const handleSave = async () => {
-    // Logic to save changes
-    const communityId = communityData?._id
+    const communityId = communityData?._id;
     const token = await AsyncStorage.getItem('token');
 
+    console.log("Before save, communityName:", communityName);
+
     try {
+      console.log("Sending to server, communityName:", communityName);
 
       if (newBanner) {
         const bannerFormData = new FormData();
@@ -263,29 +260,28 @@ const CommunitySettings = () => {
         }
       }
 
-
       const response = await axios.post(`${serverUrl}/edit-community`, {
         token,
         communityId,
         communityName: communityName,
         communityDescription: communityBio,
         description: ''
-      })
+      });
+
+      console.log(response.data)
 
       if (response.data.status === 'ok') {
-        console.log('Updating new data');
-        navigation.goBack();
+        console.log("After save, communityName:", communityName);
+        // navigation.goBack();
       }
 
-      console.log('Saving changes...');
       setIsDataChanged(false);
     } catch (error) {
       console.error('Error Update Data:', error);
     }
-
-
   };
 
+  console.log("communityName:", communityName)
   const openModal = imageSource => {
     setModalImageSource(imageSource);
     setModalVisible(true);
@@ -344,7 +340,10 @@ const CommunitySettings = () => {
               <TextInput
                 style={styles.infoText}
                 value={communityName}
-                onChangeText={setCommunityName}
+                onChangeText={(text) => {
+                  console.log("TextInput onChangeText:", text);
+                  setCommunityName(text);
+                }}
                 autoFocus={true}
               />
             ) : (
@@ -353,7 +352,9 @@ const CommunitySettings = () => {
             {isEditingName ? (
               <TouchableOpacity
                 style={styles.saveButtonInline}
-                onPress={() => toggleEditing('name')}>
+                onPress={() => {toggleEditing('name')
+                console.log("TextInput ngentot:", communityName  );}
+              }>
                 <Text style={styles.saveButtonText}>Save</Text>
               </TouchableOpacity>
             ) : (
@@ -374,7 +375,7 @@ const CommunitySettings = () => {
               <TextInput
                 style={styles.bioText}
                 value={communityBio}
-                onChangeText={setCommunityBio}
+                onChangeText={(text) => setCommunityBio(text)}
                 autoFocus={true}
                 multiline={true}
               />
