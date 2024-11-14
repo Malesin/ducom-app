@@ -50,8 +50,8 @@ const CommunityScreen = () => {
         .then(res => {
           const data = res.data.data;
           const formattedData = data.map(item => ({
-            communityCardName: item.communityId.communityName || 'Nama Komunitas',
-            communityDescription: item.description || 'Deskripsi komunitas ini.',
+            communityCardName: item.communityId.communityName || 'Community Name',
+            communityDescription: item.description || 'This is Description Community.',
             media: Array.isArray(item?.media)
               ? item?.media.map(mediaItem => ({
                 type: mediaItem.type,

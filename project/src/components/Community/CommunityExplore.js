@@ -97,7 +97,7 @@ const CommunityExplore = ({communityExploreData}) => {
               source={
                 profilePicture
                   ? {uri: profilePicture}
-                  : require('../../assets/banner.png')
+                  : require('../../assets/profilepic.png')
               }
               style={styles.profileImage}
             />
