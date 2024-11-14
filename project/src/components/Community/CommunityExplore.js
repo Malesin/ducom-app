@@ -128,7 +128,7 @@ const CommunityExplore = ({communityExploreData}) => {
                 <TouchableOpacity
                   style={styles.joinButton}
                   onPress={handlePressJoin}>
-                  <Text style={styles.joinButtonText}>Join</Text>
+                  <Text style={styles.joinButtonText}>View</Text>
                 </TouchableOpacity>
               </Animated.View>
             </Animated.View>

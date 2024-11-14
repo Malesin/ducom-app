@@ -20,16 +20,46 @@ const ViewCommunity = () => {
   const route = useRoute();
   const { communityId } = route.params;
   const [communityData, setCommunityData] = useState(null);
-  const [isAdmin, setIsAdmin] = useState(true); // true buat admin, false buat member 😛
+  const [userData, setUserData] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(userData?.isAdmin || false); // true buat admin, false buat member 😛
+  const [isJoined, setIsJoined] = useState();
   const navigation = useNavigation();
 
   const handleSettingsPress = () => {
     navigation.navigate('CommunitySettings', { communityId: communityId, communityDataBefore: communityData });
   };
 
-  const handleJoinPress = () => {
-    console.log('Joined community');
-    // Implement join functionality if needed
+  const handleJoinPress = async () => {
+    const token = await AsyncStorage.getItem('token');
+    const data = {
+      token,
+      communityId: communityData?._id
+    }
+
+    if (isJoined) {
+      setIsJoined(!isJoined)
+      axios
+        .post(`${serverUrl}/leave-community`, data)
+        .then((response) => {
+          console.log(response.data)
+        })
+        .catch(error => {
+          setIsJoined(isJoined)
+          console.error(error)
+        })
+    } else {
+      setIsJoined(!isJoined)
+      axios
+        .post(`${serverUrl}/join-community`, data)
+        .then((response) => {
+          console.log(response.data)
+        })
+        .catch(error => {
+          setIsJoined(isJoined)
+          console.error(error)
+        })
+    }
+    console.log(`${isJoined ? 'Leaved' : 'Joined'} Community`);
   };
 
   const handleCreate = () => {
@@ -40,6 +70,7 @@ const ViewCommunity = () => {
   useEffect(() => {
     async function fetchCommunityData() {
       const token = await AsyncStorage.getItem('token');
+
       try {
         const response = await axios.post(`${serverUrl}/community-byId`, {
           token: token,
@@ -51,7 +82,35 @@ const ViewCommunity = () => {
       }
     }
     fetchCommunityData();
+
+    async function getData() {
+      const token = await AsyncStorage.getItem('token');
+
+      try {
+        const userResponse = await axios.post(`${serverUrl}/userdata`, {
+          token: token,
+        });
+
+        const userData = userResponse.data.data;
+        setUserData(userData)
+
+      } catch (error) {
+        console.error('Error occurred:', error);
+      }
+    }
+    getData()
   }, []);
+
+  useEffect(() => {
+
+    if (communityData && userData) {
+      const isJoined = communityData?.members?.map((user) => user?.user)
+      const data = isJoined?.some(userId => userId?._id === userData?._id)
+      setIsJoined(data)
+    }
+
+  }, [communityData, userData])
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -78,29 +137,37 @@ const ViewCommunity = () => {
             </View>
           </View>
           <View style={styles.actionContainer}>
-            <TouchableOpacity
-              style={styles.createButton}
-              onPress={handleCreate}>
-              <MaterialIcons
-                name="add"
-                size={20}
-                color="#000"
-                style={styles.addIcon}
-              />
-              <Text style={styles.create}>Create</Text>
-            </TouchableOpacity>
-            {isAdmin ? (
+            {isAdmin ? (<>
+              <TouchableOpacity
+                style={styles.createButton}
+                onPress={handleCreate}>
+                <MaterialIcons
+                  name="add"
+                  size={20}
+                  color="#000"
+                  style={styles.addIcon}
+                />
+                <Text style={styles.create}>Create</Text>
+              </TouchableOpacity>
               <TouchableOpacity
                 style={styles.settingsButton}
                 onPress={handleSettingsPress}>
                 <Text style={styles.settings}>Settings</Text>
               </TouchableOpacity>
-            ) : (
+            </>
+            ) : (isJoined ?
               <TouchableOpacity
-                style={styles.joinButton}
+                style={styles.joinedButton}
                 onPress={handleJoinPress}>
-                <Text style={styles.join}>Join</Text>
+                <Text style={styles.joined}>Joined</Text>
               </TouchableOpacity>
+              : (<>
+                <TouchableOpacity
+                  style={styles.joinButton}
+                  onPress={handleJoinPress}>
+                  <Text style={styles.join}>Join</Text>
+                </TouchableOpacity>
+              </>)
             )}
           </View>
         </View>
@@ -144,7 +211,7 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   bio: {
-    fontSize: 16,
+    fontSize: 14,
     color: '#666',
     marginTop: 5,
   },
@@ -165,7 +232,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   joinButton: {
-    backgroundColor: '#E1E8ED',
+    backgroundColor: '#001374',
     paddingVertical: 6,
     paddingHorizontal: 25,
     borderRadius: 100,
@@ -173,6 +240,19 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   join: {
+    fontSize: 14,
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  joinedButton: {
+    backgroundColor: '#E1E8ED',
+    paddingVertical: 6,
+    paddingHorizontal: 25,
+    borderRadius: 100,
+    borderColor: '#000',
+    borderWidth: 1,
+  },
+  joined: {
     fontSize: 14,
     color: '#000',
     fontWeight: 'bold',

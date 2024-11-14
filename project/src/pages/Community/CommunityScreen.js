@@ -49,18 +49,21 @@ const CommunityScreen = () => {
         .post(`${serverUrl}/communityPosts`, { token: token })
         .then(res => {
           const data = res.data.data;
-          const formattedData = data.map(item => ({
-            communityCardName: item.communityId.communityName || 'Community Name',
-            communityDescription: item.description || 'This is Description Community.',
-            media: Array.isArray(item?.media)
-              ? item?.media.map(mediaItem => ({
+          const myId = res.data.myId;
+          const formattedData = data.map(post => ({
+            id: post._id,
+            communityCardName: post.communityId.communityName || 'Community Name',
+            communityDescription: post.description || 'This is Description Community.',
+            media: Array.isArray(post?.media)
+              ? post?.media.map(mediaItem => ({
                 type: mediaItem.type,
                 uri: mediaItem.uri,
               }))
-    
+
               : [],
-            likesCount: item.likes.length || 0,
-            commentsCount: item.comments.length || 0,
+            isLiked: post?.likes?.some(like => like?._id === myId),
+            likesCount: post.likes.length || 0,
+            commentsCount: post.comments.length || 0,
           }));
           setCardData(formattedData);
         });

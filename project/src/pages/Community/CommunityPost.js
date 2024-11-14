@@ -23,19 +23,22 @@ const CommunityPost = ({ navigation }) => {
       });
       const data = response.data.data;
       const communityName = response.data.communityName;
-      const formattedData = data.map(item => ({
-        communityCardName: communityName || 'Nama Komunitas',
-        communityDescription: item.description || 'Deskripsi komunitas ini.',
-        media: Array.isArray(item?.media)
-          ? item?.media.map(mediaItem => ({
-            type: mediaItem.type,
-            uri: mediaItem.uri,
-          }))
+      const formattedData = data
+        .filter(post => post.user !== null)
+        .map(post => ({
+          id: post._id,
+          communityCardName: communityName || 'Nama Komunitas',
+          communityDescription: post.description || 'Deskripsi komunitas ini.',
+          media: Array.isArray(post?.media)
+            ? post?.media.map(mediaItem => ({
+              type: mediaItem.type,
+              uri: mediaItem.uri,
+            }))
 
-          : [],
-        likesCount: item.likes.length || 0,
-        commentsCount: item.comments.length || 0,
-      }));
+            : [],
+          likesCount: post.likes.length || 0,
+          commentsCount: post.comments.length || 0,
+        }));
       setCommunityDataList(formattedData);
     } catch (error) {
       console.error(error);
