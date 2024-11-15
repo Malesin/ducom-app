@@ -5,8 +5,9 @@ import {
   FlatList,
   StyleSheet,
   SafeAreaView,
-  RefreshControl,
   Alert,
+  ScrollView,
+  RefreshControl,
 } from 'react-native';
 import {useNavigation, useFocusEffect} from '@react-navigation/native'; // Tambahkan useFocusEffect
 import CommunityExplore from '../../components/Community/CommunityExplore';
@@ -15,6 +16,7 @@ import {ScrollView} from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../../config';
+import { Skeleton } from 'react-native-elements';
 
 const serverUrl = config.SERVER_URL;
 
@@ -22,10 +24,12 @@ const CommunityScreen = () => {
   const navigation = useNavigation();
   const [cardData, setCardData] = useState([]);
   const [exploreData, setExploreData] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
   const fetchDataCommunities = async () => {
     const token = await AsyncStorage.getItem('token');
+    setLoading(true);
 
     try {
       const exploreResponse = await axios.post(`${serverUrl}/communities`, {
@@ -45,7 +49,9 @@ const CommunityScreen = () => {
       const postsResponse = await axios.post(`${serverUrl}/communityPosts`, {
         token: token,
       });
+      
       const data = postsResponse.data.data;
+      
       const formattedData = data.map(item => ({
         communityCardName: item.communityId.communityName || 'Community Name',
         communityDescription:
@@ -63,8 +69,40 @@ const CommunityScreen = () => {
     } catch (error) {
       console.error('Error fetching community data:', error);
       Alert.alert('Error', 'Failed to fetch community data');
+    try {
+      await axios
+        .post(`${serverUrl}/communityPosts`, { token: token })
+        .then(res => {
+          const data = res.data.data;
+          const myId = res.data.myId;
+          const formattedData = data.map(post => ({
+            id: post._id,
+            communityCardName: post.communityId.communityName || 'Community Name',
+            communityDescription: post.description || 'This is Description Community.',
+            media: Array.isArray(post?.media)
+              ? post?.media.map(mediaItem => ({
+                type: mediaItem.type,
+                uri: mediaItem.uri,
+              }))
+              : [],
+            isLiked: post?.likes?.some(like => like?._id === myId),
+            likesCount: post.likes.length || 0,
+            commentsCount: post.comments.length || 0,
+          }));
+          setCardData(formattedData);
+        });
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
     }
   };
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchDataCommunities();
+  }, []);
 
   useEffect(() => {
     fetchDataCommunities();
@@ -129,6 +167,74 @@ const CommunityScreen = () => {
               communityCardData={community}
             />
           ))}
+          
+  const renderSkeleton = (isHorizontal) => (
+    <ScrollView horizontal={isHorizontal} showsHorizontalScrollIndicator={false}>
+      {[...Array(5)].map((_, index) => (
+        <View
+          key={index}
+          style={
+            isHorizontal
+              ? styles.skeletonContainerHorizontal
+              : { ...styles.skeletonContainer, paddingHorizontal: 8, }
+          }
+        >
+          {!isHorizontal && (
+            <Skeleton
+              animation="pulse"
+              height={17}
+              width={170}
+              style={[styles.skeleton, { borderRadius: 2, marginBottom: 10 }]}
+            />
+          )}
+          <Skeleton
+            animation="pulse"
+            height={isHorizontal ? 320 : 100}
+            width={isHorizontal ? 240 : "100%"}
+            style={[styles.skeleton, { borderRadius: 5 }]}
+          />
+        </View>
+      ))}
+    </ScrollView>
+  );
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <ScrollView
+        style={{ flex: 1 }}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+        <View style={styles.exploreContainer}>
+          <Text style={styles.exploreText}>Explore</Text>
+          {loading ? (
+            renderSkeleton(true)
+          ) : (
+            <FlatList
+              data={exploreData}
+              renderItem={({ item }) => (
+                <CommunityExplore communityExploreData={item} />
+              )}
+              keyExtractor={item => item.communityId}
+              horizontal={true}
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ paddingHorizontal: 0 }}
+            />
+          )}
+        </View>
+        <View style={styles.communityCardContainer}>
+          {loading ? (
+            renderSkeleton(false)
+          ) : (
+            cardData.map((community, index) => (
+              <CommunityCard
+                key={`${community.communityCardName}-${index}`}
+                navigation={navigation}
+                communityCardData={community}
+              />
+            ))
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -143,7 +249,6 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     paddingHorizontal: 5,
     backgroundColor: '#fff',
-    borderBottomWidth: 1,
     borderColor: '#ccc',
   },
   exploreText: {
@@ -154,8 +259,20 @@ const styles = StyleSheet.create({
   },
   communityCardContainer: {
     flex: 1,
-    borderBottomWidth: 1,
+    backgroundColor: '#fff',
     borderColor: '#ccc',
+  },
+  skeletonContainer: {
+    padding: 20,
+    alignItems: 'flex-start',
+    width: '100%',
+  },
+  skeleton: {
+    marginBottom: 10,
+  },
+  skeletonContainerHorizontal: {
+    padding: 5,
+    alignItems: 'flex-start',
   },
 });
 
