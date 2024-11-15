@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   SafeAreaView,
   View,
@@ -7,12 +7,12 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  RefreshControl, // Tambahkan import ini
-  Alert, // Tambahkan import ini
+  RefreshControl,
+  Alert,
 } from 'react-native';
 import axios from 'axios';
 import config from '../../config';
-import {useNavigation, useRoute} from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -20,12 +20,12 @@ const serverUrl = config.SERVER_URL;
 
 const ViewCommunity = () => {
   const route = useRoute();
-  const {communityId} = route.params;
+  const { communityId } = route.params;
   const [communityData, setCommunityData] = useState(null);
-  const [isAdmin, setIsAdmin] = useState(true);
-  const [userData, setUserData] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(userData?.isAdmin || false); // true buat admin, false buat member 😛
-  const [isJoined, setIsJoined] = useState();
+  const [userData, setUserData] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isJoined, setIsJoined] = useState(false);
+  const [refreshing, setRefreshing] = useState(false); // Tambahkan state refreshing
   const navigation = useNavigation();
 
   // Fungsi untuk fetch data komunitas
@@ -37,9 +37,8 @@ const ViewCommunity = () => {
         communityId: communityId,
       });
       setCommunityData(response.data.data);
-
-      // Opsional: Tambahkan logika untuk mengecek apakah pengguna adalah admin
-      // setIsAdmin(response.data.data.isAdmin);
+      setIsAdmin(response.data.data.isAdmin); // Set isAdmin berdasarkan data yang diterima
+      setIsJoined(response.data.data.isJoined); // Set isJoined berdasarkan data yang diterima
     } catch (error) {
       console.error('Error fetching community data:', error);
       Alert.alert('Error', 'Failed to fetch community data');
@@ -48,10 +47,24 @@ const ViewCommunity = () => {
 
   useEffect(() => {
     fetchCommunityData();
+    getUserData(); // Panggil fungsi untuk mendapatkan data pengguna
   }, []);
 
+  // Fungsi untuk mendapatkan data pengguna
+  const getUserData = async () => {
+    const token = await AsyncStorage.getItem('token');
+    try {
+      const userResponse = await axios.post(`${serverUrl}/userdata`, {
+        token: token,
+      });
+      setUserData(userResponse.data.data);
+    } catch (error) {
+      console.error('Error occurred:', error);
+    }
+  };
+
   // Fungsi untuk handle refresh
-  const onRefresh = React.useCallback(async () => {
+  const onRefresh = async () => {
     setRefreshing(true);
     try {
       await fetchCommunityData();
@@ -61,7 +74,7 @@ const ViewCommunity = () => {
     } finally {
       setRefreshing(false);
     }
-  }, [communityId]);
+  };
 
   const handleSettingsPress = () => {
     navigation.navigate('CommunitySettings', {
@@ -69,77 +82,44 @@ const ViewCommunity = () => {
       communityDataBefore: communityData,
     });
   };
+
   const handleJoinPress = async () => {
     const token = await AsyncStorage.getItem('token');
     const data = {
       token,
-      communityId: communityData?._id
-    }
+      communityId: communityData?._id,
+    };
 
     if (isJoined) {
-      setIsJoined(!isJoined)
+      setIsJoined(false);
       axios
         .post(`${serverUrl}/leave-community`, data)
-        .then((response) => {
-          console.log(response.data)
+        .then(response => {
+          console.log(response.data);
         })
         .catch(error => {
-          setIsJoined(isJoined)
-          console.error(error)
-        })
+          setIsJoined(true); // Kembalikan status jika terjadi error
+          console.error(error);
+        });
     } else {
-      setIsJoined(!isJoined)
+      setIsJoined(true);
       axios
         .post(`${serverUrl}/join-community`, data)
-        .then((response) => {
-          console.log(response.data)
+        .then(response => {
+          console.log(response.data);
         })
         .catch(error => {
-          setIsJoined(isJoined)
-          console.error(error)
-        })
+          setIsJoined(false); // Kembalikan status jika terjadi error
+          console.error(error);
+        });
     }
     console.log(`${isJoined ? 'Leaved' : 'Joined'} Community`);
   };
 
   const handleCreate = () => {
     console.log('Creating post in community');
-    navigation.navigate('CreatePostCommunity', {communityId: communityId});
+    navigation.navigate('CreatePostCommunity', { communityId: communityId });
   };
-
-  useEffect(() => {
-    async function fetchCommunityData() {
-      const token = await AsyncStorage.getItem('token');
-
-      try {
-        const response = await axios.post(`${serverUrl}/community-byId`, {
-          token: token,
-          communityId: communityId,
-        });
-        setCommunityData(response.data.data);
-      } catch (error) {
-        console.error('Error fetching community data:', error);
-      }
-    }
-    fetchCommunityData();
-
-    async function getData() {
-      const token = await AsyncStorage.getItem('token');
-
-      try {
-        const userResponse = await axios.post(`${serverUrl}/userdata`, {
-          token: token,
-        });
-
-        const userData = userResponse.data.data;
-        setUserData(userData)
-
-      } catch (error) {
-        console.error('Error occurred:', error);
-      }
-    }
-    getData()
-  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -149,15 +129,15 @@ const ViewCommunity = () => {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={['#001374']} // Warna loading indicator (opsional)
-            tintColor="#001374" // Warna loading indicator untuk iOS
+            colors={['#001374']}
+            tintColor="#001374"
           />
         }>
         <View style={styles.bannerContainer}>
           <Image
             source={
               communityData?.picture?.banner?.bannerPicture
-                ? {uri: communityData.picture.banner.bannerPicture}
+                ? { uri: communityData.picture.banner.bannerPicture }
                 : require('../../assets/banner.png')
             }
             style={styles.banner}
@@ -175,37 +155,37 @@ const ViewCommunity = () => {
             </View>
           </View>
           <View style={styles.actionContainer}>
-            {isAdmin ? (<>
-              <TouchableOpacity
-                style={styles.createButton}
-                onPress={handleCreate}>
-                <MaterialIcons
-                  name="add"
-                  size={20}
-                  color="#000"
-                  style={styles.addIcon}
-                />
-                <Text style={styles.create}>Create</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.settingsButton}
-                onPress={handleSettingsPress}>
-                <Text style={styles.settings}>Settings</Text>
-              </TouchableOpacity>
-            </>
-            ) : (isJoined ?
+            {isAdmin ? (
+              <>
+                <TouchableOpacity
+                  style={styles.createButton}
+                  onPress={handleCreate}>
+                  <MaterialIcons
+                    name="add"
+                    size={20}
+                    color="#000"
+                    style={styles.addIcon}
+                  />
+                  <Text style={styles.create}>Create</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.settingsButton}
+                  onPress={handleSettingsPress}>
+                  <Text style={styles.settings}>Settings</Text>
+                </TouchableOpacity>
+              </>
+            ) : isJoined ? (
               <TouchableOpacity
                 style={styles.joinedButton}
                 onPress={handleJoinPress}>
                 <Text style={styles.joined}>Joined</Text>
               </TouchableOpacity>
-              : (<>
-                <TouchableOpacity
-                  style={styles.joinButton}
-                  onPress={handleJoinPress}>
-                  <Text style={styles.join}>Join</Text>
-                </TouchableOpacity>
-              </>)
+            ) : (
+              <TouchableOpacity
+                style={styles.joinButton}
+                onPress={handleJoinPress}>
+                <Text style={styles.join}>Join</Text>
+              </TouchableOpacity>
             )}
           </View>
         </View>
