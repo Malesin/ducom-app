@@ -12,6 +12,7 @@ import {
   Dimensions,
   ToastAndroid
 } from 'react-native';
+import BottomSheet from '../BottomSheet';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Video from 'react-native-video';
 import { createThumbnail } from 'react-native-create-thumbnail';
@@ -27,13 +28,13 @@ const CommunityCard = ({ navigation, communityCardData = {} }) => {
     commentsCount: initialCommentsCount = 0,
     media = [],
   } = communityCardData;
-
   const [liked, setLiked] = useState(communityCardData?.isLiked);
   const [likesCount, setLikesCount] = useState();
   const [commentsCount, setCommentsCount] = useState();
   const [joined, setJoined] = useState(false);
   const [thumbnails, setThumbnails] = useState({});
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [showBottomSheet, setShowBottomSheet] = useState(false);
   const [modalMediaUri, setModalMediaUri] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);  // true buat admin, false buat member jomok 🙈🙉
   const [dataSent, setDataSent] = useState(null);  // true buat admin, false buat member jomok 🙈🙉
@@ -95,6 +96,28 @@ const CommunityCard = ({ navigation, communityCardData = {} }) => {
     generateThumbnails,
   ]);
 
+  const onResp = async resp => {
+    try {
+      if (resp.status == `ok${resp.type}`) {
+        ToastAndroid.show(
+          `Tweet Successfully ${resp.typed}`,
+          ToastAndroid.SHORT,
+        );
+      } else if (resp.status == `okUn${resp.type}`) {
+        ToastAndroid.show(
+          `Tweet Successfully Un${resp.typed}`,
+          ToastAndroid.SHORT,
+        );
+      } else {
+        console.error(`Error in ${resp.typing} response data:`, resp.status);
+        Alert.alert('Error', `Failed to ${resp.type} post. Please try again.`);
+      }
+    } catch (error) {
+      console.error(`Error ${resp.type}:`, error.message);
+      Alert.alert('Error', `Failed to ${resp.type}. Please try again.`);
+    }
+  };
+
   const handleLike = async () => {
     try {
       setLiked(liked ? false : true);
@@ -148,11 +171,10 @@ const CommunityCard = ({ navigation, communityCardData = {} }) => {
       const isVideo =
         item.type === 'video' || /\.(mp4|mov|avi|mkv)$/i.test(item.uri);
 
-      // Tentukan lebar berdasarkan jumlah media
       const mediaWidth =
         memoizedMedia.length === 1
-          ? Dimensions.get('window').width * 0.9 // Lebar penuh jika hanya satu media
-          : Dimensions.get('window').width * 0.5; // Setengah lebar jika lebih dari satu media
+          ? Dimensions.get('window').width * 0.9
+          : Dimensions.get('window').width * 0.5;
 
       return (
         <TouchableOpacity
@@ -194,6 +216,10 @@ const CommunityCard = ({ navigation, communityCardData = {} }) => {
     [thumbnails, openMediaPreview, memoizedMedia.length],
   );
 
+  const handleOptionPress = () => {
+    setShowBottomSheet(true);
+  };
+
   const InteractionButton = useCallback(
     ({ icon, color, count, onPress }) => (
       <TouchableOpacity style={styles.actionButton} onPress={onPress}>
@@ -215,9 +241,56 @@ const CommunityCard = ({ navigation, communityCardData = {} }) => {
         <TouchableOpacity onPress={handlePress}>
           <Text style={styles.userHandle}>{communityCardName}</Text>
         </TouchableOpacity>
+        {!isAdmin && (
+          <TouchableOpacity
+            style={[styles.joinButton, joined && styles.joinButton]}
+            onPress={pressJoin}>
+            <Text style={[styles.joinText, joined && styles.joinText]}>
+              {joined ? 'Joined' : 'Join'}
+            </Text>
+          </TouchableOpacity>
+        )}
+        <View style={styles.optionsContainer}>
+          <TouchableOpacity
+            style={styles.optionsButton}
+            onPress={handleOptionPress}>
+            <MaterialCommunityIcons
+              name="dots-horizontal"
+              size={24}
+              color="#657786"
+            />
+          </TouchableOpacity>
+        </View>
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={showBottomSheet}
+          onRequestClose={() => setShowBottomSheet(false)}>
+          <TouchableWithoutFeedback onPress={() => setShowBottomSheet(false)}>
+            <View style={styles.overlay} />
+          </TouchableWithoutFeedback>
+          <View style={styles.bottomSheetContainer}>
+            <BottomSheet
+              onCloseDel={respdel => {
+                setShowBottomSheet(false);
+                onRefreshPage();
+                onDel(respdel);
+              }}
+              onCloseResp={resp => {
+                setShowBottomSheet(false);
+                onRefreshPage();
+                onResp(resp);
+              }}
+              // tweet={tweet}
+              // onRefreshPage={onRefreshPage}
+              // isUserProfile={isUserProfile}
+              // handlePin={false}
+              // handlePinUser={false}
+            />
+          </View>
+        </Modal>
       </View>
       <Text style={styles.communityDescription}>{communityDescription}</Text>
-
       {memoizedMedia.length > 0 && (
         <FlatList
           data={memoizedMedia}
@@ -311,6 +384,28 @@ const styles = StyleSheet.create({
   userInfo: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  bottomSheetContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'transparent',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  optionsContainer: {
+    position: 'absolute',
+    right: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  optionsButton: {
+    marginLeft: 10,
   },
   userHandle: {
     color: '#718096',
