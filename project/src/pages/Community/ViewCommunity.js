@@ -36,11 +36,6 @@ const ViewCommunity = () => {
         communityId: communityId,
       });
 
-      console.log(
-        'Community Response:',
-        JSON.stringify(response.data, null, 2),
-      );
-
       const communityData = response.data.data;
 
       const adminStatus =
