@@ -29,6 +29,7 @@ import {
   CommunityList,
   CommunityEditRules,
   CreatePostCommunity,
+  ViewPostCommunity,
 } from '../pages';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
@@ -211,6 +212,11 @@ export default function MainNavigation() {
           name="CreatePostCommunity"
           component={CreatePostCommunity}
           options={{headerShown: true, title: 'Create New Community Post'}}
+        />
+        <Stack.Screen
+          name="ViewPostCommunity"
+          component={ViewPostCommunity}
+          options={{headerShown: true, title: 'Post'}}
         />
         <Stack.Screen
           name="CommunityAbout"

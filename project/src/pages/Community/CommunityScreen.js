@@ -8,6 +8,7 @@ import {
   Alert,
   ScrollView,
   RefreshControl,
+  TouchableOpacity,
 } from 'react-native';
 import {useNavigation, useFocusEffect} from '@react-navigation/native';
 import CommunityExplore from '../../components/Community/CommunityExplore';
@@ -25,6 +26,8 @@ const CommunityScreen = () => {
   const [exploreData, setExploreData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+
+  console.log(navigation);
 
   const fetchDataCommunities = async () => {
     const token = await AsyncStorage.getItem('token');
@@ -49,7 +52,7 @@ const CommunityScreen = () => {
         token: token,
       });
       const data = postsResponse.data.data;
-      const myId = postsResponse.data.myId; 
+      const myId = postsResponse.data.myId;
       const formattedData = data.map(post => ({
         id: post._id,
         communityCardName: post.communityId.communityName || 'Community Name',
@@ -164,11 +167,16 @@ const CommunityScreen = () => {
           {loading
             ? renderSkeleton(false)
             : cardData.map((community, index) => (
-                <CommunityCard
-                  key={`${community.communityCardName}-${index}`}
-                  navigation={navigation}
-                  communityCardData={community}
-                />
+                <TouchableOpacity
+                  onPress={() => {
+                    navigation.navigate('ViewPostCommunity');
+                  }}>
+                  <CommunityCard
+                    key={`${community.communityCardName}-${index}`}
+                    navigation={navigation}
+                    communityCardData={community}
+                  />
+                </TouchableOpacity>
               ))}
         </View>
       </ScrollView>
