@@ -49,8 +49,9 @@ import CreatePostCommunity from './Community/CreatePostCommunity';
 import CommunitySettings from './Community/CommunitySettings';
 import CommunityList from './Community/CommunityUserList';
 import CommunityEditRules from './Community/CommunityEditRules';
+import ViewPostCommunity from './Community/ViewPostCommunity';
 
-  export {
+export {
   Splashscreen,
   Authscreen,
   Signinscreen,
@@ -102,4 +103,5 @@ import CommunityEditRules from './Community/CommunityEditRules';
   CommunitySettings,
   CommunityList,
   CommunityEditRules,
+  ViewPostCommunity,
 };
