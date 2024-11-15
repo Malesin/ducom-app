@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -13,7 +13,7 @@ import axios from 'axios';
 import config from '../../config';
 import LikeNotification from '../../components/Notification/LikeNotification';
 import CommentNotification from '../../components/Notification/CommentNotification';
-import {Skeleton} from 'react-native-elements';
+import { Skeleton } from 'react-native-elements';
 import ReportedNotification from '../../components/ReportedNotification';
 import FollowNotification from '../../components/Notification/FollowNotification';
 import RepostNotification from '../../components/Notification/RepostNotification';
@@ -34,7 +34,7 @@ const Notificationscreen = () => {
       const token = await AsyncStorage.getItem('token');
 
       let likeNotifications = [];
-      await axios.post(`${serverUrl}/like-notifications`, {token}).then(res => {
+      await axios.post(`${serverUrl}/like-notifications`, { token }).then(res => {
         if (res.data.status === 'ok') {
           likeNotifications = res.data.data
             .flat()
@@ -46,7 +46,7 @@ const Notificationscreen = () => {
 
       let commentNotifications = [];
       await axios
-        .post(`${serverUrl}/comment-notifications`, {token})
+        .post(`${serverUrl}/comment-notifications`, { token })
         .then(res => {
           if (res.data.status === 'ok') {
             commentNotifications = res.data.data
@@ -59,7 +59,7 @@ const Notificationscreen = () => {
 
       let followNotifications = [];
       await axios
-        .post(`${serverUrl}/follow-notifications`, {token})
+        .post(`${serverUrl}/follow-notifications`, { token })
         .then(res => {
           if (res.data.status === 'ok') {
             followNotifications = res.data.data
@@ -71,8 +71,24 @@ const Notificationscreen = () => {
         });
       setFollowNotifs(followNotifications);
 
+      let repostNotifications = [];
       await axios
-        .post(`${serverUrl}/warning-notifications`, {token})
+        .post(`${serverUrl}/repost-notifications`, { token })
+        .then(res => {
+          if (res.data.status === 'ok') {
+            repostNotifications = res.data.data
+              .flat()
+              .filter(notification => notification !== null);
+          } else {
+            Alert.alert('Error', 'Failed to fetch follow notifications');
+          }
+        });
+
+      console.log(token)
+
+
+      await axios
+        .post(`${serverUrl}/warning-notifications`, { token })
         .then(res => {
           if (res.data.status === 'ok') {
             const warnings = res.data.data
@@ -86,8 +102,9 @@ const Notificationscreen = () => {
       const allNotifications = [
         ...likeNotifications,
         ...commentNotifications,
+        ...repostNotifications,
         ...followNotifications,
-        ...warningNotifications,
+        ...warningNotifications
       ].sort((a, b) => {
         const aDate =
           a.like?.created_at || a.comment?.created_at || a?.created_at;
@@ -145,7 +162,7 @@ const Notificationscreen = () => {
             animation="pulse"
             height={40}
             width="100%"
-            style={[styles.skeleton, {borderRadius: 3}]}
+            style={[styles.skeleton, { borderRadius: 3 }]}
           />
         </View>
       ))}

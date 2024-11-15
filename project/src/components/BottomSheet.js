@@ -45,9 +45,9 @@ const BottomSheet = ({
       : setIsCommentDisabled(!tweet.commentsEnabled);
   }, [isViewPost, setIsCommentDisabled]);
 
+  console.log(tweet?.id);
   const deletePost = async () => {
     const token = await AsyncStorage.getItem('token');
-    console.log(tweet?.id);
     try {
       const delPost = await axios.post(`${serverUrl}/delete-post`, {
         token: token,

@@ -18,7 +18,7 @@ const serverUrl = config.SERVER_URL;
 const FollowNotification = ({followNotif}) => {
   const [isFollowing, setIsFollowing] = useState(false);
   const navigation = useNavigation();
-  console.log();
+  
   const formatDate = dateString => {
     const date = new Date(dateString);
     const now = new Date();

@@ -9,17 +9,28 @@ import {
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import DefaultAvatar from '../../assets/profilepic.png';
-import {useNavigation} from '@react-navigation/native';
+import {formatNotification} from '../../pages/Notification/formatNotification';
+import { useNavigation } from '@react-navigation/native';
 
-const RepostNotification = ({repostNotification}) => {
+const RepostNotification = ({ repostNotification }) => {
   const navigation = useNavigation();
 
-  const handleRepostNotificationPress = () => {
-    navigation.navigate('ViewPost', {
-      postId: repostNotification.post.id,
-      // Add other necessary parameters
-    });
+  const handleRepostNotificationPress = async () => {
+    const formattedTweet = await formatNotification(repostNotification);
+
+    if (formattedTweet) {
+      navigation.navigate('ViewPost', {
+        tweet: formattedTweet,
+        postId: formattedTweet.id,
+        idUser: formattedTweet.idUser,
+        comments: formattedTweet.comments || [],
+        userAvatar: formattedTweet.userAvatar,
+        userName: formattedTweet.userName,
+        userHandle: formattedTweet.userHandle,
+      });
+    }
   };
+
 
   const formatDate = dateString => {
     const date = new Date(dateString);
@@ -51,8 +62,8 @@ const RepostNotification = ({repostNotification}) => {
           />
           <Image
             source={
-              repostNotification.repost.user.profilePicture
-                ? {uri: repostNotification.repost.user.profilePicture}
+              repostNotification?.fromUser?.profilePicture
+                ? { uri: repostNotification?.fromUser?.profilePicture }
                 : DefaultAvatar
             }
             style={styles.avatar}
@@ -60,22 +71,22 @@ const RepostNotification = ({repostNotification}) => {
           <View style={styles.textContainer}>
             <View style={styles.nameRow}>
               <Text style={styles.userName}>
-                {repostNotification.repost.user.name}
+                {repostNotification?.fromUser?.name}
               </Text>
               <Text style={styles.userNameAt}>
-                @{repostNotification.repost.user.username}
+                @{repostNotification?.fromUser?.username}
               </Text>
               <Text style={styles.dot}>•</Text>
               <Text style={styles.date}>
-                {formatDate(repostNotification.repost.created_at)}
+                {formatDate(repostNotification?.created_at)}
               </Text>
             </View>
             <Text style={styles.notificationText}>Reposted your post</Text>
           </View>
           {repostNotification?.post?.media &&
-            repostNotification.post.media.length > 0 && (
+            repostNotification?.post?.media?.length > 0 && (
               <Image
-                source={{uri: repostNotification.post.media[0].uri}}
+                source={{ uri: repostNotification?.post?.media[0].uri }}
                 style={styles.postImage}
               />
             )}
