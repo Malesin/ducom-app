@@ -26,7 +26,7 @@ const CommunityMedia = ({ navigation }) => {
       const formattedData = data
         .filter(post => Array.isArray(post.media) && post.media.length > 0)
         .filter(post => post.user !== null)
-        .map(item => ({
+        .map(post => ({
           communityCardName: communityName || 'Nama Komunitas',
           communityDescription: post.description || 'Deskripsi komunitas ini.',
           media: Array.isArray(post?.media)
