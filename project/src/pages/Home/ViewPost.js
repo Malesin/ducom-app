@@ -251,31 +251,33 @@ const ViewPost = ({route}) => {
 
       const response = await axios.post(url, params);
       const dataComment = response.data.data;
-      
+
       const formattedComments = dataComment
-      .filter(comment => comment.user !== null)
-      .map(comment => ({
-        id: comment._id,
-        text: comment.comment,
-        userIdPost: comment.user._id,
-        idUser: tweet.idUser,
-        isLikedCom: comment.likes.some(like => like.user === tweet.idUser),
-        replies: Array.isArray(comment.replies)
-          ? comment.replies.map(reply => ({
-              id: reply._id,
-              text: reply.comment,
-              userIdPost: reply.user._id,
-              idUser: tweet.idUser,
-              username: reply.user.username,
-              isLikedCom: reply.likes.some(like => like.user === tweet.idUser),
-              profilePicture: reply.user.profilePicture,
-              replies: reply.replies || [],
-            }))
-          : [],
-        username: comment.user.username,
-        profilePicture: comment.user.profilePicture,
-        isAdmin: comment.user.isAdmin,
-      }));
+        .filter(comment => comment.user !== null)
+        .map(comment => ({
+          id: comment._id,
+          text: comment.comment,
+          userIdPost: comment.user._id,
+          idUser: tweet.idUser,
+          isLikedCom: comment.likes.some(like => like.user === tweet.idUser),
+          replies: Array.isArray(comment.replies)
+            ? comment.replies.map(reply => ({
+                id: reply._id,
+                text: reply.comment,
+                userIdPost: reply.user._id,
+                idUser: tweet.idUser,
+                username: reply.user.username,
+                isLikedCom: reply.likes.some(
+                  like => like.user === tweet.idUser,
+                ),
+                profilePicture: reply.user.profilePicture,
+                replies: reply.replies || [],
+              }))
+            : [],
+          username: comment.user.username,
+          profilePicture: comment.user.profilePicture,
+          isAdmin: comment.user.isAdmin,
+        }));
       setComments(formattedComments || []);
       setVisibleComments(3);
     } catch (error) {
@@ -557,8 +559,7 @@ const ViewPost = ({route}) => {
                       />
                     ) : (
                       <TouchableOpacity
-                        onPress={() => handleMediaPress(mediaItem.uri)}
-                        style={styles.videoContainer}>
+                        onPress={() => handleMediaPress(mediaItem.uri)}>
                         <Image
                           source={{uri: thumbnails[mediaItem.uri]}}
                           style={
@@ -905,18 +906,17 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     resizeMode: 'cover',
   },
-  singleMediaVideo: {
-    width: 390,
-    height: 200,
-    borderRadius: 8,
-  },
   tweetVideo: {
     width: 200,
     height: 200,
     borderRadius: 8,
     marginRight: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#000',
+    marginRight: 8,
   },
-  videoContainer: {
+  singleMediaVideo: {
     width: 390,
     height: 200,
     borderRadius: 8,
@@ -926,7 +926,12 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   playIcon: {
-    position: 'absolute',
+    position: 'absolute', // Pastikan tetap absolute
+    top: '50%', // Posisikan di tengah secara vertikal
+    left: '50%', // Posisikan di tengah secara horizontal
+    marginTop: -20, // Sesuaikan offset vertikal (setengah dari tinggi icon)
+    marginLeft: -20, // Sesuaikan offset horizontal (setengah dari lebar icon)
+    zIndex: 10, // Pastikan icon berada di atas gambar
   },
   newContainer: {
     padding: 20,
