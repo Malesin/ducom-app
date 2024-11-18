@@ -40,8 +40,6 @@ const ReportScreen = () => {
     }    
   }, [])
 
-
-
   const handleSubmit = async () => {
     const token = await AsyncStorage.getItem('token');
     console.log("commentId:", commentId)

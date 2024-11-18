@@ -221,7 +221,7 @@ const Userprofile = ({userIdPost, navigation}) => {
               <View style={styles.dropdownMenu}>
                 <TouchableOpacity
                   style={styles.dropdownItem}
-                  onPress={() => handleDropdownItemPress(' Mute')}>
+                  onPress={() => handleDropdownItemPress('Mute')}>
                   {isMuted ? (
                     <MaterialIcons name="volume-up" size={20} color="#000" />
                   ) : (

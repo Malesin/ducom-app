@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   SafeAreaView,
   View,
@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import axios from 'axios';
 import config from '../../config';
-import {useNavigation, useRoute} from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -20,7 +20,7 @@ const serverUrl = config.SERVER_URL;
 
 const ViewCommunity = () => {
   const route = useRoute();
-  const {communityId} = route.params;
+  const { communityId } = route.params;
   const [communityData, setCommunityData] = useState(null);
   const [userData, setUserData] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -28,39 +28,39 @@ const ViewCommunity = () => {
   const [refreshing, setRefreshing] = useState(false);
   const navigation = useNavigation();
 
+  const getUserData = async () => {
+    const token = await AsyncStorage.getItem('token');
+    try {
+      const userResponse = await axios.post(`${serverUrl}/userdata`, {
+        token: token,
+      });
+      setUserData(userResponse.data.data);
+    } catch (error) {
+      console.error('Error occurred:', error);
+    }
+  };
+
+  const fetchCommunityData = async () => {
+    const token = await AsyncStorage.getItem('token');
+    try {
+      const response = await axios.post(`${serverUrl}/community-byId`, {
+        token: token,
+        communityId: communityId,
+      });
+
+      const communityData = response?.data?.data;
+      const adminStatus = userData?.isAdmin === true;
+
+      setCommunityData(communityData);
+      setIsAdmin(adminStatus);
+    } catch (error) {
+      console.error('Error fetching community data:', error);
+      Alert.alert('Error', 'Failed to fetch community data');
+    }
+  };
+
   useEffect(() => {
-    const getUserData = async () => {
-      const token = await AsyncStorage.getItem('token');
-      try {
-        const userResponse = await axios.post(`${serverUrl}/userdata`, {
-          token: token,
-        });
-        setUserData(userResponse.data.data);
-      } catch (error) {
-        console.error('Error occurred:', error);
-      }
-    };
 
-    const fetchCommunityData = async () => {
-      const token = await AsyncStorage.getItem('token');
-      try {
-        const response = await axios.post(`${serverUrl}/community-byId`, {
-          token: token,
-          communityId: communityId,
-        });
-
-        const communityData = response?.data?.data;
-        const adminStatus = userData?.isAdmin === true;
-
-        setCommunityData(communityData);
-        setIsAdmin(adminStatus);
-      } catch (error) {
-        console.error('Error fetching community data:', error);
-        Alert.alert('Error', 'Failed to fetch community data');
-      }
-    };
-
-    
     fetchCommunityData();
     getUserData();
 
@@ -123,7 +123,7 @@ const ViewCommunity = () => {
 
   const handleCreate = () => {
     console.log('Creating post in community');
-    navigation.navigate('CreatePostCommunity', {communityId: communityId});
+    navigation.navigate('CreatePostCommunity', { communityId: communityId });
   };
 
   return (
@@ -142,7 +142,7 @@ const ViewCommunity = () => {
           <Image
             source={
               communityData?.picture?.banner?.bannerPicture
-                ? {uri: communityData.picture.banner.bannerPicture}
+                ? { uri: communityData.picture.banner.bannerPicture }
                 : require('../../assets/banner.png')
             }
             style={styles.banner}
