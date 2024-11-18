@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useCallback} from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -10,13 +10,13 @@ import {
   RefreshControl,
   TouchableOpacity,
 } from 'react-native';
-import {useNavigation, useFocusEffect} from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import CommunityExplore from '../../components/Community/CommunityExplore';
 import CommunityCard from '../../components/Community/CommunityCard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../../config';
-import {Skeleton} from 'react-native-elements';
+import { Skeleton } from 'react-native-elements';
 
 const serverUrl = config.SERVER_URL;
 
@@ -50,21 +50,26 @@ const CommunityScreen = () => {
         token: token,
       });
       const data = postsResponse.data.data;
+      const amIAdmin = postsResponse.data.amIAdmin
       const myId = postsResponse.data.myId;
       const formattedData = data.map(post => ({
-        id: post._id,
-        communityCardName: post.communityId.communityName || 'Community Name',
+        id: post?._id,
+        idUser: myId,
+        userIdPost: post?.user?._id,
+        communityId: post?.communityId?._id,
+        communityCardName: post?.communityId?.communityName || 'Community Name',
         communityDescription:
-          post.description || 'This is Description Community.',
+          post?.description || 'This is Description Community.',
         media: Array.isArray(post?.media)
-          ? post?.media.map(mediaItem => ({
-              type: mediaItem.type,
-              uri: mediaItem.uri,
-            }))
+          ? post?.media?.map(mediaItem => ({
+            type: mediaItem?.type,
+            uri: mediaItem?.uri,
+          }))
           : [],
         isLiked: post?.likes?.some(like => like?._id === myId),
         likesCount: post.likes.length || 0,
         commentsCount: post.comments.length || 0,
+        amIAdmin: amIAdmin
       }));
       setCardData(formattedData);
     } catch (error) {
@@ -116,21 +121,21 @@ const CommunityScreen = () => {
           style={
             isHorizontal
               ? styles.skeletonContainerHorizontal
-              : {...styles.skeletonContainer, paddingHorizontal: 8}
+              : { ...styles.skeletonContainer, paddingHorizontal: 8 }
           }>
           {!isHorizontal && (
             <Skeleton
               animation="pulse"
               height={17}
               width={170}
-              style={[styles.skeleton, {borderRadius: 2, marginBottom: 10}]}
+              style={[styles.skeleton, { borderRadius: 2, marginBottom: 10 }]}
             />
           )}
           <Skeleton
             animation="pulse"
             height={isHorizontal ? 320 : 100}
             width={isHorizontal ? 240 : '100%'}
-            style={[styles.skeleton, {borderRadius: 5}]}
+            style={[styles.skeleton, { borderRadius: 5 }]}
           />
         </View>
       ))}
@@ -140,7 +145,7 @@ const CommunityScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
-        style={{flex: 1}}
+        style={{ flex: 1 }}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }>
@@ -151,13 +156,13 @@ const CommunityScreen = () => {
           ) : (
             <FlatList
               data={exploreData}
-              renderItem={({item}) => (
+              renderItem={({ item }) => (
                 <CommunityExplore communityExploreData={item} />
               )}
               keyExtractor={item => item.communityId}
               horizontal={true}
               showsHorizontalScrollIndicator={false}
-              contentContainerStyle={{paddingHorizontal: 0}}
+              contentContainerStyle={{ paddingHorizontal: 0 }}
             />
           )}
         </View>
@@ -165,17 +170,17 @@ const CommunityScreen = () => {
           {loading
             ? renderSkeleton(false)
             : cardData.map((community, index) => (
-                <TouchableOpacity
-                  onPress={() => {
-                    navigation.navigate('ViewPostCommunity');
-                  }}>
-                  <CommunityCard
-                    key={`${community.communityCardName}-${index}`}
-                    navigation={navigation}
-                    communityCardData={community}
-                  />
-                </TouchableOpacity>
-              ))}
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.navigate('ViewPostCommunity');
+                }}>
+                <CommunityCard
+                  key={`${community.communityCardName}-${index}`}
+                  navigation={navigation}
+                  communityCardData={community}
+                />
+              </TouchableOpacity>
+            ))}
         </View>
       </ScrollView>
     </SafeAreaView>

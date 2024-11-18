@@ -7,18 +7,18 @@ import {
   RefreshControl, // Tambahkan RefreshControl
   Alert, // Tambahkan Alert
 } from 'react-native';
-import React, {useState, useEffect, useCallback} from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import CommunityCard from '../../components/Community/CommunityCard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../../config';
-import {useRoute} from '@react-navigation/native';
+import { useRoute } from '@react-navigation/native';
 
 const serverUrl = config.SERVER_URL;
 
-const CommunityPost = ({navigation}) => {
+const CommunityPost = ({ navigation }) => {
   const route = useRoute();
-  const {communityId} = route.params;
+  const { communityId } = route.params;
   const [communityDataList, setCommunityDataList] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -31,21 +31,27 @@ const CommunityPost = ({navigation}) => {
         communityId,
       });
       const data = response.data.data;
+      const amIAdmin = postsResponse.data.amIAdmin
       const communityName = response.data.communityName;
       const formattedData = data
         .filter(post => post.user !== null)
         .map(post => ({
           id: post._id,
+          idUser: myId,
+          userIdPost: post?.user?._id,
+          communityId: post?.communityId?._id,
           communityCardName: communityName || 'Nama Komunitas',
           communityDescription: post.description || 'Deskripsi komunitas ini.',
+          amIAdmin: post?.user?.isAdmin,
           media: Array.isArray(post?.media)
             ? post?.media.map(mediaItem => ({
-                type: mediaItem.type,
-                uri: mediaItem.uri,
-              }))
+              type: mediaItem.type,
+              uri: mediaItem.uri,
+            }))
             : [],
           likesCount: post.likes.length || 0,
           commentsCount: post.comments.length || 0,
+          amIAdmin: amIAdmin
         }));
       setCommunityDataList(formattedData);
     } catch (error) {
@@ -91,8 +97,8 @@ const CommunityPost = ({navigation}) => {
         ))}
       </ScrollView>
     </SafeAreaView>
-    );
-  };
+  );
+};
 
 export default CommunityPost;
 

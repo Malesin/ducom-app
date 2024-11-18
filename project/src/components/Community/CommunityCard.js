@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useCallback, useMemo} from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -12,15 +12,15 @@ import {
   Dimensions,
   ToastAndroid,
 } from 'react-native';
-import BottomSheet from '../BottomSheet';
+import CommBottomSheet from '../CommBottomSheet';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Video from 'react-native-video';
-import {createThumbnail} from 'react-native-create-thumbnail';
+import { createThumbnail } from 'react-native-create-thumbnail';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../../config';
 const serverUrl = config.SERVER_URL;
-const CommunityCard = ({navigation, communityCardData = {}}) => {
+const CommunityCard = ({ navigation, communityCardData = {} }) => {
   const {
     communityCardName = '',
     communityDescription = '',
@@ -31,20 +31,18 @@ const CommunityCard = ({navigation, communityCardData = {}}) => {
   const [liked, setLiked] = useState(communityCardData?.isLiked);
   const [likesCount, setLikesCount] = useState();
   const [commentsCount, setCommentsCount] = useState();
-  const [joined, setJoined] = useState(false);
   const [thumbnails, setThumbnails] = useState({});
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [showBottomSheet, setShowBottomSheet] = useState(false);
   const [modalMediaUri, setModalMediaUri] = useState('');
-  const [isAdmin, setIsAdmin] = useState(false); // true buat admin, false buat member jomok 🙈🙉
-  const [dataSent, setDataSent] = useState(null); // true buat admin, false buat member jomok 🙈🙉
+  const [dataSent, setDataSent] = useState(null);
 
   const generateThumbnails = useCallback(async mediaItems => {
     const newThumbnails = {};
     for (const mediaItem of mediaItems || []) {
       if (mediaItem.type === 'video' && mediaItem.uri) {
         try {
-          const {path} = await createThumbnail({url: mediaItem.uri});
+          const { path } = await createThumbnail({ url: mediaItem.uri });
           newThumbnails[mediaItem.uri] = path;
         } catch (error) {
           console.log('Error generating thumbnail:', error);
@@ -81,14 +79,6 @@ const CommunityCard = ({navigation, communityCardData = {}}) => {
 
     loadThumbnails();
 
-    const checkAdminStatus = async () => {
-      const token = await AsyncStorage.getItem('token');
-      // Misalnya, panggil API untuk memeriksa status admin
-      // const response = await axios.post(`${serverUrl}/check-admin`, { token });
-      // setIsAdmin(response.data.isAdmin);
-    };
-
-    checkAdminStatus();
   }, [
     initialLikesCount,
     initialCommentsCount,
@@ -145,12 +135,9 @@ const CommunityCard = ({navigation, communityCardData = {}}) => {
       );
     }
   };
-  const pressJoin = useCallback(() => {
-    setJoined(prevJoined => !prevJoined);
-  });
 
   const handlePress = useCallback(() => {
-    navigation.navigate('ViewCommunity');
+    navigation.navigate('ViewCommunity', { communityId: communityCardData?.communityId });
   }, [navigation]);
 
   const openMediaPreview = useCallback(uri => {
@@ -164,7 +151,7 @@ const CommunityCard = ({navigation, communityCardData = {}}) => {
   }, []);
 
   const renderMediaItem = useCallback(
-    ({item, index}) => {
+    ({ item, index }) => {
       const isImage =
         item.type === 'image' || /\.(jpg|jpeg|png|gif|webp)$/i.test(item.uri);
 
@@ -188,7 +175,7 @@ const CommunityCard = ({navigation, communityCardData = {}}) => {
           ]}>
           {isImage ? (
             <Image
-              source={{uri: item.uri}}
+              source={{ uri: item.uri }}
               style={styles.mediaImage}
               resizeMode="cover"
               onError={e => {
@@ -198,7 +185,7 @@ const CommunityCard = ({navigation, communityCardData = {}}) => {
           ) : isVideo ? (
             <View style={styles.videoContainer}>
               <Image
-                source={{uri: thumbnails[item.uri] || item.uri}}
+                source={{ uri: thumbnails[item.uri] || item.uri }}
                 style={styles.mediaImage}
                 resizeMode="cover"
               />
@@ -221,7 +208,7 @@ const CommunityCard = ({navigation, communityCardData = {}}) => {
   };
 
   const InteractionButton = useCallback(
-    ({icon, color, count, onPress}) => (
+    ({ icon, color, count, onPress }) => (
       <TouchableOpacity style={styles.actionButton} onPress={onPress}>
         <MaterialCommunityIcons name={icon} size={20} color={color} />
         <Text style={styles.actionText}>{count}</Text>
@@ -241,15 +228,6 @@ const CommunityCard = ({navigation, communityCardData = {}}) => {
         <TouchableOpacity onPress={handlePress}>
           <Text style={styles.userHandle}>{communityCardName}</Text>
         </TouchableOpacity>
-        {!isAdmin && (
-          <TouchableOpacity
-            style={[styles.joinButton, joined && styles.joinButton]}
-            onPress={pressJoin}>
-            <Text style={[styles.joinText, joined && styles.joinText]}>
-              {joined ? 'Joined' : 'Join'}
-            </Text>
-          </TouchableOpacity>
-        )}
         <View style={styles.optionsContainer}>
           <TouchableOpacity
             style={styles.optionsButton}
@@ -270,7 +248,7 @@ const CommunityCard = ({navigation, communityCardData = {}}) => {
             <View style={styles.overlay} />
           </TouchableWithoutFeedback>
           <View style={styles.bottomSheetContainer}>
-            <BottomSheet
+            <CommBottomSheet
               onCloseDel={respdel => {
                 setShowBottomSheet(false);
                 onRefreshPage();
@@ -281,11 +259,11 @@ const CommunityCard = ({navigation, communityCardData = {}}) => {
                 onRefreshPage();
                 onResp(resp);
               }}
-              // tweet={tweet}
-              // onRefreshPage={onRefreshPage}
-              // isUserProfile={isUserProfile}
-              // handlePin={false}
-              // handlePinUser={false}
+            post={communityCardData}
+            // onRefreshPage={onRefreshPage}
+            // isUserProfile={isUserProfile}
+            // handlePin={false}
+            // handlePinUser={false}
             />
           </View>
         </Modal>
@@ -334,7 +312,7 @@ const CommunityCard = ({navigation, communityCardData = {}}) => {
               {modalMediaUri ? (
                 /\.(jpg|jpeg|png|gif|webp)$/i.test(modalMediaUri) ? (
                   <Image
-                    source={{uri: modalMediaUri}}
+                    source={{ uri: modalMediaUri }}
                     style={styles.modalImage}
                     resizeMode="contain"
                     onError={e => {
@@ -346,7 +324,7 @@ const CommunityCard = ({navigation, communityCardData = {}}) => {
                   />
                 ) : /\.(mp4|mov|avi|mkv)$/i.test(modalMediaUri) ? (
                   <Video
-                    source={{uri: modalMediaUri}}
+                    source={{ uri: modalMediaUri }}
                     style={styles.modalVideo}
                     controls
                     resizeMode="contain"
@@ -429,15 +407,6 @@ const styles = StyleSheet.create({
   actionText: {
     marginLeft: 3,
     color: '#040608',
-  },
-  joinButton: {
-    backgroundColor: '#ccc',
-    paddingHorizontal: 20,
-    borderRadius: 5,
-  },
-  joinText: {
-    color: '#000',
-    fontSize: 13,
   },
   mediaFlatList: {
     paddingHorizontal: 5,
