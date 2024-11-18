@@ -411,9 +411,9 @@ const Userprofile = ({userIdPost, navigation}) => {
           {!userData ? (
             <Skeleton
               animation="pulse"
-              height={30}
-              width={150}
-              style={[styles.skeleton, {borderRadius: 20, marginRight: 15}]}
+              height={28}
+              width={120}
+              style={[styles.skeleton, {borderRadius: 20, marginRight: 7}]}
             />
           ) : (
             <View style={styles.buttonContainer}>

@@ -126,13 +126,22 @@ const Notificationscreen = () => {
     setShowSkeleton(true);
     await fetchNotifications();
     setRefreshing(false);
+    setShowSkeleton(false);
   };
 
   const renderSkeleton = () => (
     <>
       {[...Array(5)].map((_, index) => (
         <View key={index} style={styles.skeletonContainer}>
+          
           <View style={styles.skeletonHeader}>
+          <Skeleton
+              animation="pulse"
+              circle
+              height={22}
+              width={20}
+              style={[styles.skeletonAvatar, {borderRadius:4}]}
+            />
             <Skeleton
               animation="pulse"
               circle
@@ -140,28 +149,30 @@ const Notificationscreen = () => {
               width={40}
               style={styles.skeletonAvatar}
             />
+
             <View style={styles.skeletonTextContainer}>
               <Skeleton
                 animation="pulse"
-                height={20}
+                height={14}
                 width="25%"
                 style={styles.skeleton}
               />
               <Skeleton
                 animation="pulse"
                 height={14}
-                width="15%"
+                width="45%"
                 style={styles.skeleton}
               />
+              <Skeleton
+              animation="pulse"
+              circle
+              height={24}
+              width={100}
+              style={[styles.skeleton, {position: 'absolute', right: 0}]}
+            />
             </View>
           </View>
-          <Skeleton
-            animation="pulse"
-            height={40}
-            width="100%"
-            style={[styles.skeleton, { borderRadius: 3 }]}
-          />
-        </View>
+         </View>
       ))}
     </>
   );
@@ -175,9 +186,11 @@ const Notificationscreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      {showReportedNotification && (
+      {showSkeleton ? (
+        renderSkeleton()
+      ) : showReportedNotification && warningNotifications.length > 0 ? (
         <ReportedNotification notif={warningNotifications} />
-      )}
+      ) : null}
       <ScrollView
         contentContainerStyle={
           allNotifications.length === 0 ? styles.centeredContent : null
@@ -185,30 +198,30 @@ const Notificationscreen = () => {
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }>
-        {showSkeleton ? (
-          renderSkeleton()
-        ) : allNotifications.length === 0 ? (
+        {!showSkeleton && allNotifications.length === 0 ? (
           <Text style={styles.noNotificationsText}>No notifications</Text>
         ) : (
-          <View style={styles.notificationContainer}>
-            {allNotifications.map((notification, index) =>
-              notification?.like ? (
-                <LikeNotification key={index} likeNotification={notification} />
-              ) : notification?.comment ? (
-                <CommentNotification
-                  key={index}
-                  commentNotification={notification}
-                />
-              ) : notification?.repost ? (
-                <RepostNotification
-                  key={index}
-                  repostNotification={notification}
-                />
-              ) : (
-                <FollowNotification key={index} followNotif={notification} />
-              ),
-            )}
-          </View>
+          !showSkeleton && (
+            <View style={styles.notificationContainer}>
+              {allNotifications.map((notification, index) =>
+                notification?.like ? (
+                  <LikeNotification key={index} likeNotification={notification} />
+                ) : notification?.comment ? (
+                  <CommentNotification
+                    key={index}
+                    commentNotification={notification}
+                  />
+                ) : notification?.repost ? (
+                  <RepostNotification
+                    key={index}
+                    repostNotification={notification}
+                  />
+                ) : (
+                  <FollowNotification key={index} followNotif={notification} />
+                ),
+              )}
+            </View>
+          )
         )}
       </ScrollView>
     </SafeAreaView>
@@ -230,12 +243,13 @@ const styles = StyleSheet.create({
     color: '#888',
   },
   skeletonContainer: {
-    padding: 20,
+    padding: 10,
     alignItems: 'flex-start',
     width: '100%',
   },
   skeleton: {
     marginBottom: 10,
+    borderRadius:4,
   },
   skeletonHeader: {
     flexDirection: 'row',
