@@ -32,7 +32,7 @@ const verifiedIcon = <Icon name="verified" size={16} color="#699BF7" />;
 const serverUrl = config.SERVER_URL;
 
 const ViewPostCommunity = ({route}) => {
-  const { tweet, comments, focusCommentInput, isUserProfile} = route?.params || {};
+  const {tweet, focusCommentInput, isUserProfile} = route?.params || {};
 
   const [liked, setLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(0);
