@@ -35,8 +35,8 @@ const Notificationscreen = () => {
 
       let likeNotifications = [];
       await axios.post(`${serverUrl}/like-notifications`, { token }).then(res => {
-        if (res.data.status === 'ok') {
-          likeNotifications = res.data.data
+        if (res?.data?.status === 'ok') {
+          likeNotifications = res?.data?.data
             .flat()
             .filter(notification => notification !== null);
         } else {
@@ -48,8 +48,8 @@ const Notificationscreen = () => {
       await axios
         .post(`${serverUrl}/comment-notifications`, { token })
         .then(res => {
-          if (res.data.status === 'ok') {
-            commentNotifications = res.data.data
+          if (res?.data?.status === 'ok') {
+            commentNotifications = res?.data?.data
               .flat()
               .filter(notification => notification !== null);
           } else {
@@ -61,8 +61,8 @@ const Notificationscreen = () => {
       await axios
         .post(`${serverUrl}/follow-notifications`, { token })
         .then(res => {
-          if (res.data.status === 'ok') {
-            followNotifications = res.data.data
+          if (res?.data?.status === 'ok') {
+            followNotifications = res?.data?.data
               .flat()
               .filter(notification => notification !== null);
           } else {
@@ -75,8 +75,8 @@ const Notificationscreen = () => {
       await axios
         .post(`${serverUrl}/repost-notifications`, { token })
         .then(res => {
-          if (res.data.status === 'ok') {
-            repostNotifications = res.data.data
+          if (res?.data?.status === 'ok') {
+            repostNotifications = res?.data?.data
               .flat()
               .filter(notification => notification !== null);
           } else {
@@ -84,14 +84,11 @@ const Notificationscreen = () => {
           }
         });
 
-      console.log(token)
-
-
       await axios
         .post(`${serverUrl}/warning-notifications`, { token })
         .then(res => {
-          if (res.data.status === 'ok') {
-            const warnings = res.data.data
+          if (res?.data?.status === 'ok') {
+            const warnings = res?.data?.data
               .flat()
               .filter(notification => notification !== null);
             setWarningNotifications(warnings);
@@ -99,12 +96,12 @@ const Notificationscreen = () => {
             Alert.alert('Error', 'Failed to fetch warning notifications');
           }
         });
-      const allNotifications = [
+
+        const allNotifications = [
         ...likeNotifications,
         ...commentNotifications,
         ...repostNotifications,
         ...followNotifications,
-        ...warningNotifications
       ].sort((a, b) => {
         const aDate =
           a.like?.created_at || a.comment?.created_at || a?.created_at;
@@ -195,14 +192,14 @@ const Notificationscreen = () => {
         ) : (
           <View style={styles.notificationContainer}>
             {allNotifications.map((notification, index) =>
-              notification.like ? (
+              notification?.like ? (
                 <LikeNotification key={index} likeNotification={notification} />
-              ) : notification.comment ? (
+              ) : notification?.comment ? (
                 <CommentNotification
                   key={index}
                   commentNotification={notification}
                 />
-              ) : notification.repost ? (
+              ) : notification?.repost ? (
                 <RepostNotification
                   key={index}
                   repostNotification={notification}

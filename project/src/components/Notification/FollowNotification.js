@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Image,
   SafeAreaView,
@@ -12,13 +12,13 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../../config';
-import {useNavigation} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 const serverUrl = config.SERVER_URL;
 
-const FollowNotification = ({followNotif}) => {
+const FollowNotification = ({ followNotif }) => {
   const [isFollowing, setIsFollowing] = useState(false);
   const navigation = useNavigation();
-  
+
   const formatDate = dateString => {
     const date = new Date(dateString);
     const now = new Date();
@@ -62,7 +62,7 @@ const FollowNotification = ({followNotif}) => {
         await axios
           .post(`${serverUrl}/unfollow`, {
             token: token,
-            unfollowUserId: followNotif?.fromUser._id,
+            unfollowUserId: followNotif?.fromUser?._id,
           })
           .then(res => {
             console.log(res.data);
@@ -71,7 +71,7 @@ const FollowNotification = ({followNotif}) => {
         await axios
           .post(`${serverUrl}/follow`, {
             token: token,
-            followUserId: followNotif?.fromUser._id,
+            followUserId: followNotif?.fromUser?._id,
           })
           .then(res => {
             console.log(res.data);
@@ -93,11 +93,12 @@ const FollowNotification = ({followNotif}) => {
   };
 
   useEffect(() => {
-    const follow = followNotif?.fromUser.followers.some(
+    const follow = followNotif?.fromUser?.followers
+    const isFollow = follow?.some(
       follow => follow === followNotif?.user,
     );
-    setIsFollowing(follow);
-  }, []);
+    setIsFollowing(isFollow);
+  }, [followNotif]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -108,7 +109,7 @@ const FollowNotification = ({followNotif}) => {
         <Image
           source={
             followNotif?.fromUser.profilePicture
-              ? {uri: followNotif?.fromUser.profilePicture}
+              ? { uri: followNotif?.fromUser.profilePicture }
               : require('../../assets/profilepic.png')
           }
           style={styles.profilePicture}

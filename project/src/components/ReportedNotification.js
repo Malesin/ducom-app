@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -11,18 +11,25 @@ import {
 import ProfilePicture from '../assets/profilepic.png';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useNavigation, useFocusEffect} from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 
-const ReportedNotification = ({notif}) => {
+const ReportedNotification = ({ notif }) => {
   const newNotif = notif[0];
   const slideAnim = useRef(new Animated.Value(-50)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const [modalVisible, setModalVisible] = useState(false);
   const [adminMessage, setAdminMessage] = useState(newNotif?.message);
+  const [message, setMessage] = useState(false);
   const navigation = useNavigation();
-  console.log(newNotif);
 
   useEffect(() => {
+    if (adminMessage == '') {
+      setMessage(false)
+    } else {
+      setMessage(true)
+    }
+    console.log(message)
+
     Animated.parallel([
       Animated.timing(slideAnim, {
         toValue: 0,
@@ -35,7 +42,7 @@ const ReportedNotification = ({notif}) => {
         useNativeDriver: true,
       }),
     ]).start();
-  }, [slideAnim, fadeAnim]);
+  }, [message, adminMessage, slideAnim, fadeAnim]);
 
   const handleClick = () => {
     setModalVisible(true);
@@ -76,7 +83,7 @@ const ReportedNotification = ({notif}) => {
         style={[
           styles.container,
           {
-            transform: [{translateY: slideAnim}],
+            transform: [{ translateY: slideAnim }],
             opacity: fadeAnim,
           },
         ]}>
@@ -123,9 +130,9 @@ const ReportedNotification = ({notif}) => {
                       source={
                         newNotif?.reportedEntity?.user?.profilePicture
                           ? {
-                              uri: newNotif?.reportedEntity?.user
-                                ?.profilePicture,
-                            }
+                            uri: newNotif?.reportedEntity?.user
+                              ?.profilePicture,
+                          }
                           : ProfilePicture
                       }
                       style={styles.profileImage}
@@ -175,12 +182,17 @@ const ReportedNotification = ({notif}) => {
               </TouchableOpacity>
             </View>
             <View style={styles.separator} />
-            <View style={styles.adminMessageContainer}>
-              <Text style={styles.adminMessageTitle}>
-                Message from Admin :{' '}
-              </Text>
-              <Text style={styles.adminMessage}>{adminMessage}</Text>
-            </View>
+
+            {message &&
+              (<>
+                <View style={styles.adminMessageContainer}>
+                  <Text style={styles.adminMessageTitle}>
+                    Message from Admin :{' '}
+                  </Text>
+                  <Text style={styles.adminMessage}>{adminMessage}</Text>
+                </View>
+              </>)
+            }
             <TouchableOpacity
               style={styles.closeButton}
               onPress={() => setModalVisible(false)}>
@@ -258,6 +270,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#DDD',
     width: '100%',
     marginVertical: 5,
+    marginBottom: 5,
   },
   reasonContainer: {
     alignItems: 'flex-start',
