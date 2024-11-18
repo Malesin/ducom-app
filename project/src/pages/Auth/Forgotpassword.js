@@ -12,14 +12,14 @@ import {
   Dialog,
   AlertNotificationRoot,
 } from 'react-native-alert-notification';
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import config from '../../config';
 import { useFocusEffect } from '@react-navigation/native';
 
 const serverUrl = config.SERVER_URL;
 
-const Forgotpassword = ({navigation}) => {
+const Forgotpassword = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
@@ -56,33 +56,52 @@ const Forgotpassword = ({navigation}) => {
             onHide: () => {
               setTimeout(() => {
                 Dialog.hide();
-                navigation.navigate('OTPScreen', {email: email});
+                navigation.navigate('OTPScreen', { email: email });
               }, 1000);
             },
           });
           setTimeout(() => {
             Dialog.hide();
           }, 3000);
-        } else if (response.data.status === 'errorEmail') {
+        }
+
+      } catch (error) {
+        console.error('Error in sending OTP:', error.message);
+        setIsButtonDisabled(false);
+
+        if (error.message === 'Request failed with status code 404') {
           setError('Email not registered');
           setIsButtonDisabled(false);
+          Dialog.show({
+            type: ALERT_TYPE.DANGER,
+            title: 'Error',
+            textBody: 'Email not registered',
+            onHide: () => {
+              setTimeout(() => {
+                Dialog.hide();
+              }, 2000);
+            },
+          });
+          setTimeout(() => {
+            Dialog.hide();
+          }, 4000);
+        } else {
+          Dialog.show({
+            type: ALERT_TYPE.DANGER,
+            title: 'Error',
+            textBody: 'Error in sending OTP, Try Again Later',
+            onHide: () => {
+              setTimeout(() => {
+                Dialog.hide();
+              }, 2000);
+            },
+          });
+          setTimeout(() => {
+            Dialog.hide();
+          }, 4000);
         }
-      } catch (error) {
-        console.error('Error in sending OTP:', error);
-        Dialog.show({
-          type: ALERT_TYPE.DANGER,
-          title: 'Error',
-          textBody: 'Error in sending OTP',
-          onHide: () => {
-            setTimeout(() => {
-              Dialog.hide();
-            }, 1000);
-          },
-        });
-        setTimeout(() => {
-          Dialog.hide();
-        }, 2000);
       }
+
     }
   };
 

@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -29,7 +29,7 @@ const serverUrl = config.SERVER_URL;
 
 const CommunitySettings = () => {
   const route = useRoute();
-  const {communityId, communityDataBefore} = route.params;
+  const { communityId, communityDataBefore } = route.params;
   const [communityData, setCommunityData] = useState();
   const [refreshing, setRefreshing] = useState(false);
 
@@ -41,17 +41,6 @@ const CommunitySettings = () => {
         communityId: communityId,
       });
 
-      console.log('Fetch Community Data Response:', response.data);
-
-      // Log detail data yang diterima
-      console.log(
-        'Received Community Name:',
-        response?.data?.data?.communityName,
-      );
-      console.log(
-        'Received Community Description:',
-        response?.data?.data?.communityDescription,
-      );
       setCommunityName(response?.data?.data?.communityName);
       setCommunityBio(response?.data?.data?.communityDescription);
       setCommunityData(response.data.data);
@@ -66,7 +55,7 @@ const CommunitySettings = () => {
   }, []);
 
   useEffect(() => {
-    console.log('Community Data:', communityData);
+    console.log('Community Data');
   }, [communityData]);
 
   const onRefresh = React.useCallback(() => {
@@ -126,7 +115,7 @@ const CommunitySettings = () => {
       <TouchableOpacity
         style={[
           styles.saveButton,
-          {backgroundColor: isDataChanged ? '#001374' : '#ccc'},
+          { backgroundColor: isDataChanged ? '#001374' : '#ccc' },
         ]}
         onPress={isDataChanged ? handleSave : null}
         disabled={!isDataChanged}>
@@ -229,7 +218,7 @@ const CommunitySettings = () => {
         Alert.alert(
           'Success',
           editResponse.data?.message ||
-            'Community settings updated successfully',
+          'Community settings updated successfully',
         );
       } else {
         const errorMessage =
@@ -254,7 +243,7 @@ const CommunitySettings = () => {
       .then(async image => {
         console.log('Image selected:', image);
         setNewBanner(image);
-        setBanner({uri: image.path});
+        setBanner({ uri: image.path });
       })
       .catch(error => {
         console.error('Error selecting image:', error);
@@ -271,7 +260,7 @@ const CommunitySettings = () => {
       .then(async image => {
         console.log('Image selected:', image);
         setNewProfilePicture(image);
-        setProfilePicture({uri: image.path});
+        setProfilePicture({ uri: image.path });
       })
       .catch(error => {
         console.error('Error selecting image:', error);
@@ -288,7 +277,7 @@ const CommunitySettings = () => {
       .then(async image => {
         console.log('Image selected:', image);
         setNewProfileBackground(image);
-        setProfileBackground({uri: image.path});
+        setProfileBackground({ uri: image.path });
       })
       .catch(error => {
         console.error('Error selecting image:', error);
@@ -321,8 +310,6 @@ const CommunitySettings = () => {
     setModalVisible(false);
     setModalImageSource(null);
   };
-
-  console.log('communityData:', communityData);
 
   const inputNameChange = text => {
     console.log('Full Input Text:', text);
@@ -419,7 +406,7 @@ const CommunitySettings = () => {
           {profileBackground && (
             <ImageBackground
               source={profileBackground}
-              style={{width: '100%', height: 200}}
+              style={{ width: '100%', height: 200 }}
               resizeMode="cover"
             />
           )}
@@ -448,7 +435,7 @@ const CommunitySettings = () => {
             <TouchableOpacity
               style={styles.dropdownItem}
               onPress={() => {
-                navigation.navigate('CommunityEditRules', {communityData});
+                navigation.navigate('CommunityEditRules', { communityData });
                 setDropdownVisible(false);
               }}>
               <MaterialCommunityIcons
@@ -494,14 +481,14 @@ const CommunitySettings = () => {
         <Text style={styles.sectionTitle}>User Account</Text>
         <TouchableOpacity
           style={styles.userAccountContainer}
-          onPress={() => navigation.navigate('CommunityList')}>
+          onPress={() => navigation.navigate('CommunityList', { communityId })}>
           <MaterialCommunityIcons
             name="shield-account"
             size={26}
             color="#000"
           />
           <Text style={styles.userAccountText}>User List</Text>
-          <View style={{flex: 1, alignItems: 'flex-end'}}>
+          <View style={{ flex: 1, alignItems: 'flex-end' }}>
             <MaterialCommunityIcons
               name="chevron-right"
               size={25}
@@ -560,13 +547,13 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: -3,
     left: '54%',
-    transform: [{translateX: -50}],
+    transform: [{ translateX: -50 }],
     alignItems: 'center',
   },
   avatar: {
     bottom: -15,
     left: '54%',
-    transform: [{translateX: -50}],
+    transform: [{ translateX: -50 }],
     width: 80,
     height: 80,
     borderRadius: 50,

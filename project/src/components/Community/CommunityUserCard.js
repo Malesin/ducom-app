@@ -6,15 +6,15 @@ const CommunityUserCard = ({ user }) => {
     <View style={styles.container}>
       <Image
         source={
-          user?.profilePicture
-            ? { uri: user?.profilePicture }
+          user?.user?.profilePicture
+            ? { uri: user?.user?.profilePicture }
             : require('../../assets/profilepic.png')
         }
         style={styles.profileImage}
       />
       <View style={styles.textContainer}>
-        <Text style={styles.username}>{user?.name}</Text>
-        <Text style={styles.userhandle}>@{user?.username}</Text>
+        <Text style={styles.username}>{user?.user?.name}</Text>
+        <Text style={styles.userhandle}>@{user?.user?.username}</Text>
       </View>
     </View>
   );

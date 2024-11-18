@@ -24,7 +24,7 @@ const ReportsManagement = () => {
             const response = await axios.post(`${serverUrl}/show-reports`, { token: token });
             const resp = response.data.data;
             const formatted = resp.map(report => {
-                const userId = report.reportedEntity?.user?._id ?? report.reportedEntity?._id ??  report.reportedEntity?.user  ?? '';
+                const userId = report.reportedEntity?.user?._id ?? report.reportedEntity?._id ?? report.reportedEntity?.user ?? '';
                 const name = report.reportedEntity?.user?.name ?? report.reportedEntity?.name ?? '';
                 const username = report.reportedEntity?.user?.username ?? report.reportedEntity?.username ?? '';
                 const usernamePost = report.relatedPost?.user?.username ?? '';
@@ -35,12 +35,6 @@ const ReportsManagement = () => {
                 const reason = report.reportCategoryDescriptions;
                 const reportedAt = report.reported_at;
                 const myId = report.myId
-
-                // Validasi untuk memastikan username adalah string sebelum menggunakan charAt
-                if (typeof username === 'string' && username.length > 0) {
-                    const firstChar = username.charAt(0);
-                    // Lakukan sesuatu dengan firstChar jika diperlukan
-                }
 
                 return {
                     id: report._id,
@@ -59,15 +53,18 @@ const ReportsManagement = () => {
                     myId
                 };
             });
+
+            const sortedReports = formatted.sort((a, b) => new Date(b.reportedAt) - new Date(a.reportedAt));
+
             setShowSkeleton(false);
-            return formatted; // Pastikan mengembalikan array
+            return sortedReports;
         } catch (error) {
             setShowSkeleton(false);
             console.error(error);
             return []; // Kembalikan array kosong jika terjadi error
         }
     }
-    
+
     useEffect(() => {
         const loadReportUsers = async () => {
             setRefreshing(true);
