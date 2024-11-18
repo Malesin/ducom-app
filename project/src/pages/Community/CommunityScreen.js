@@ -27,8 +27,6 @@ const CommunityScreen = () => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
-  console.log(navigation);
-
   const fetchDataCommunities = async () => {
     const token = await AsyncStorage.getItem('token');
     setLoading(true);

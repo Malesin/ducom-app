@@ -8,7 +8,7 @@ import {
   ToastAndroid
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
@@ -21,6 +21,7 @@ const ReportScreen = () => {
   const route = useRoute();
   const { reportPostId, reportUserId, commentId, report } = route.params;
   const [checkedItems, setCheckedItems] = useState({});
+  const [isReport, setIsReport] = useState();
   const navigation = useNavigation();
   const handleCheckboxPress = item => {
     setCheckedItems(prevState => ({
@@ -29,10 +30,21 @@ const ReportScreen = () => {
     }));
   };
 
+  useEffect(() => {
+    if (report === 'reportCommentId') {
+      setIsReport('Comment')
+    } else if (report === 'reportParentCommentId') {
+      setIsReport('Comment')
+    } else {
+      setIsReport('Post')
+    }    
+  }, [])
+
+
+
   const handleSubmit = async () => {
     const token = await AsyncStorage.getItem('token');
     console.log("commentId:", commentId)
-    console.log("report:", report)
 
     try {
       const reportCategory = Object.keys(checkedItems).reduce((acc, key) => {
@@ -74,13 +86,14 @@ const ReportScreen = () => {
         })
         .then(res => {
           if (res.data.status == 'ok') {
+            ToastAndroid.show(`${isReport} was Successfully Reported!`, ToastAndroid.SHORT);
             setTimeout(() => {
               navigation.navigate('Home');
-            }, 1000);
-            ToastAndroid.show('Post was Successfully Reported!', ToastAndroid.SHORT);
+            }, 1200);
           }
         })
     } catch (error) {
+      ToastAndroid.show(`Something Error, Try Again Later`, ToastAndroid.SHORT);
       console.error(error);
     }
   };
