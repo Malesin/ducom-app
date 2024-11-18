@@ -24,7 +24,7 @@ const ViewCommunity = () => {
   const [communityData, setCommunityData] = useState(null);
   const [userData, setUserData] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [isJoined, setIsJoined] = useState(false);
+  const [isJoined, setIsJoined] = useState();
   const [refreshing, setRefreshing] = useState(false);
   const navigation = useNavigation();
 
@@ -50,9 +50,7 @@ const ViewCommunity = () => {
         });
 
         const communityData = response?.data?.data;
-        console.log(communityData);
-
-        const adminStatus = communityData?.isAdmin === true;
+        const adminStatus = userData?.isAdmin === true;
 
         setCommunityData(communityData);
         setIsAdmin(adminStatus);
@@ -62,13 +60,14 @@ const ViewCommunity = () => {
       }
     };
 
+    
+    fetchCommunityData();
+    getUserData();
+
     const isJoined = communityData?.members?.map(user => user?.user);
     const data = isJoined?.some(userId => userId?._id === userData?._id);
     setIsJoined(data);
-
-    fetchCommunityData();
-    getUserData();
-  }, [communityId]);
+  }, [communityId, communityData]);
 
   const onRefresh = async () => {
     setRefreshing(true);
