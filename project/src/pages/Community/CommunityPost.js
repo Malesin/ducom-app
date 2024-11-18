@@ -40,10 +40,9 @@ const CommunityPost = ({navigation}) => {
           communityDescription: post.description || 'Deskripsi komunitas ini.',
           media: Array.isArray(post?.media)
             ? post?.media.map(mediaItem => ({
-              type: mediaItem.type,
-              uri: mediaItem.uri,
-            }))
-
+                type: mediaItem.type,
+                uri: mediaItem.uri,
+              }))
             : [],
           likesCount: post.likes.length || 0,
           commentsCount: post.comments.length || 0,

@@ -263,6 +263,11 @@ const TweetCard = ({tweet, onRefreshPage, comments, isUserProfile}) => {
         ? styles.tweetVideo
         : styles.tweetImage;
 
+    const containerStyle =
+      tweet?.media?.length === 1 && isVideo
+        ? styles.singleVideoContainer
+        : styles.videoContainer;
+
     return (
       <TouchableOpacity onPress={() => openMediaPreview(item.uri)}>
         {isImage ? (
@@ -274,7 +279,7 @@ const TweetCard = ({tweet, onRefreshPage, comments, isUserProfile}) => {
             }}
           />
         ) : isVideo ? (
-          <View style={styles.videoContainer}>
+          <View style={containerStyle}>
             <Image
               source={{uri: thumbnails[item.uri] || item.uri}}
               style={mediaStyle}
@@ -290,7 +295,6 @@ const TweetCard = ({tweet, onRefreshPage, comments, isUserProfile}) => {
       </TouchableOpacity>
     );
   };
-
   const onDel = async respdel => {
     try {
       if (respdel === 'ok') {
@@ -594,6 +598,13 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginRight: 8,
   },
+  tweetVideo: {
+    width: 200,
+    height: 200,
+    borderRadius: 8,
+    marginRight: 8,
+    marginLeft: 2,
+  },
   singleMediaImage: {
     width: 390,
     height: 200,
@@ -604,6 +615,23 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     borderRadius: 8,
+  },
+  singleVideoContainer: {
+    width: 390,
+    height: 200,
+    borderRadius: 8,
+    backgroundColor: '#000',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  videoContainer: {
+    width: 200,
+    height: 200,
+    borderRadius: 8,
+    backgroundColor: '#000',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 8,
   },
   actions: {
     flexDirection: 'row',
@@ -664,15 +692,6 @@ const styles = StyleSheet.create({
     height: '100%',
     maxWidth: '85%',
     maxHeight: '85%',
-  },
-  videoContainer: {
-    width: 390,
-    height: 200,
-    borderRadius: 8,
-    backgroundColor: '#000',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 8,
   },
   playIcon: {
     position: 'absolute',
