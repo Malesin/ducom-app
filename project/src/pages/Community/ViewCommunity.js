@@ -28,46 +28,47 @@ const ViewCommunity = () => {
   const [refreshing, setRefreshing] = useState(false);
   const navigation = useNavigation();
 
-  const fetchCommunityData = async () => {
-    const token = await AsyncStorage.getItem('token');
-    try {
-      const response = await axios.post(`${serverUrl}/community-byId`, {
-        token: token,
-        communityId: communityId,
-      });
-
-      const communityData = response.data.data;
-
-      const adminStatus =
-        communityData.isAdmin === true ||
-        communityData.isAdmin === 'true' ||
-        communityData.creatorId === userData?._id;
-
-      setCommunityData(communityData);
-      setIsAdmin(adminStatus);
-      setIsJoined(communityData.isJoined || true);
-    } catch (error) {
-      console.error('Error fetching community data:', error);
-      Alert.alert('Error', 'Failed to fetch community data');
-    }
-  };
-
   useEffect(() => {
+    const getUserData = async () => {
+      const token = await AsyncStorage.getItem('token');
+      try {
+        const userResponse = await axios.post(`${serverUrl}/userdata`, {
+          token: token,
+        });
+        setUserData(userResponse.data.data);
+      } catch (error) {
+        console.error('Error occurred:', error);
+      }
+    };
+
+    const fetchCommunityData = async () => {
+      const token = await AsyncStorage.getItem('token');
+      try {
+        const response = await axios.post(`${serverUrl}/community-byId`, {
+          token: token,
+          communityId: communityId,
+        });
+
+        const communityData = response?.data?.data;
+        console.log(communityData);
+
+        const adminStatus = communityData?.isAdmin === true;
+
+        setCommunityData(communityData);
+        setIsAdmin(adminStatus);
+      } catch (error) {
+        console.error('Error fetching community data:', error);
+        Alert.alert('Error', 'Failed to fetch community data');
+      }
+    };
+
+    const isJoined = communityData?.members?.map(user => user?.user);
+    const data = isJoined?.some(userId => userId?._id === userData?._id);
+    setIsJoined(data);
+
     fetchCommunityData();
     getUserData();
   }, [communityId]);
-
-  const getUserData = async () => {
-    const token = await AsyncStorage.getItem('token');
-    try {
-      const userResponse = await axios.post(`${serverUrl}/userdata`, {
-        token: token,
-      });
-      setUserData(userResponse.data.data);
-    } catch (error) {
-      console.error('Error occurred:', error);
-    }
-  };
 
   const onRefresh = async () => {
     setRefreshing(true);
