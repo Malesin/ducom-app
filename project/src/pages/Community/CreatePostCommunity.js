@@ -25,14 +25,11 @@ import config from '../../config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ImageResizer from 'react-native-image-resizer';
 import VideoCompressor from 'react-native-video-compressor';
-import { useNavigation, useRoute } from '@react-navigation/native';
-
-import PostSheet from '../../components/PostSheet';
 
 const serverUrl = config.SERVER_URL;
 
 const CreatePostCommunity = ({route, navigation}) => {
-  const { communityId } = route.params;
+  const {communityId} = route.params;
   const [newPostText, setNewPostText] = useState('');
   const [selectedMedia, setSelectedMedia] = useState([]);
   const [previewVisible, setPreviewVisible] = useState(false);
@@ -42,12 +39,10 @@ const CreatePostCommunity = ({route, navigation}) => {
   const [translateY] = useState(new Animated.Value(500));
   const [UploadProgress, setUploadProgress] = useState(0);
   const [IsUploading, SetIsUploading] = useState(false);
-  const [isPostSheetVisible, setIsPostSheetVisible] = useState(false);
   const [commentsEnabled, setCommentsEnabled] = useState(true);
   const [dataVideo, setDataVideo] = useState([]);
   const [dataPhoto, setDataPhoto] = useState([]);
   const [mediaData, setMediaData] = useState([]);
-  const closePostSheet = () => setIsPostSheetVisible(false);
   const colorScheme = useColorScheme();
   const styles = getStyles(colorScheme);
   const profilePictureUri = require('../../assets/profilepic.png');
@@ -226,7 +221,7 @@ const CreatePostCommunity = ({route, navigation}) => {
         ].join(',');
       }
 
-      console.log(media)
+      console.log(media);
       const postResponse = await axios.post(`${serverUrl}/create-post`, {
         token: token,
         media: media,
