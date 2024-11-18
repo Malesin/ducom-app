@@ -239,6 +239,23 @@ const CreatePost = ({ route, navigation }) => {
           console.error('Failed to create post:', postResponse.data.data);
           Alert.alert('Error', 'Failed to create post.');
         }
+      } else {
+        const postResponse = await axios.post(`${serverUrl}/create-post`, {
+          token: token,
+          description: newPostText,
+          commentsEnabled: commentsEnabled,
+        });
+
+        if (postResponse.data.status === 'ok') {
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'Home' }],
+          });
+          console.log('Post created successfully');
+        } else {
+          console.error('Failed to create post:', postResponse.data.data);
+          Alert.alert('Error', 'Failed to create post.');
+        }
       }
     } catch (error) {
       console.error('Error submitting post:', error.message);
