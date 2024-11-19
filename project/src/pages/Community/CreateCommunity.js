@@ -7,6 +7,7 @@ import {
   TextInput,
   View,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import Animated, {
   useAnimatedGestureHandler,
@@ -112,12 +113,17 @@ const CreateCommunity = ({ navigation }) => {
   const [newCommunityName, setNewCommunityName] = useState('');
   const [newCommunityDescription, setNewCommunityDescription] = useState('');
   const serverUrl = config.SERVER_URL;
+  const [isCreating, setIsCreating] = useState(false);
 
   const handleCreateCommunity = async () => {
+    if (isCreating) return;
+    setIsCreating(true);
+
     try {
       const token = await AsyncStorage.getItem('token');
       if (!token) {
         console.error('Token not found');
+        setIsCreating(false);
         return;
       }
 
@@ -131,16 +137,25 @@ const CreateCommunity = ({ navigation }) => {
 
       if (response.status === 201) {
         console.log('Community created successfully:', response.data);
+        Alert.alert(
+          'Success',
+          'Community created successfully!',
+          [
+            {
+              text: 'OK',
+              onPress: () => navigation.goBack(),
+            },
+          ],
+          { cancelable: false }
+        );
       } else {
         console.error('Error creating community:', response.data);
       }
     } catch (error) {
       console.error('Network error:', error);
+    } finally {
+      setIsCreating(false);
     }
-    console.log('Community created with the following details:');
-    console.log('Name:', newCommunityName);
-    console.log('Description:', newCommunityDescription);
-    console.log('Rules:', rules);
   };
 
   const isFormValid = () => {
@@ -158,14 +173,14 @@ const CreateCommunity = ({ navigation }) => {
       headerRight: () => (
         <TouchableOpacity
           style={{
-            backgroundColor: isFormValid() ? '#00137f' : '#b0b0b0',
+            backgroundColor: isFormValid() && !isCreating ? '#00137f' : '#b0b0b0',
             borderRadius: 20,
             paddingVertical: 6,
             paddingHorizontal: 16,
             marginRight: 5,
           }}
           onPress={handleCreateCommunity}
-          disabled={!isFormValid()}>
+          disabled={!isFormValid() || isCreating}>
           <Text
             style={{
               color: '#fff',
@@ -177,7 +192,7 @@ const CreateCommunity = ({ navigation }) => {
         </TouchableOpacity>
       ),
     });
-  }, [navigation, newCommunityName, newCommunityDescription, rules]);
+  }, [navigation, newCommunityName, newCommunityDescription, rules, isCreating]);
 
   const addNewRule = () => {
     if (rules.length < 5) {

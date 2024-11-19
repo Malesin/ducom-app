@@ -15,6 +15,7 @@ import config from '../../config';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Skeleton } from 'react-native-elements';
 
 const serverUrl = config.SERVER_URL;
 
@@ -27,6 +28,7 @@ const ViewCommunity = () => {
   const [isJoined, setIsJoined] = useState();
   const [refreshing, setRefreshing] = useState(false);
   const navigation = useNavigation();
+  const [loading, setLoading] = useState(true);
 
   const getUserData = async () => {
     const token = await AsyncStorage.getItem('token');
@@ -49,25 +51,33 @@ const ViewCommunity = () => {
       });
 
       const communityData = response?.data?.data;
-      const adminStatus = userData?.isAdmin === true;
-
       setCommunityData(communityData);
-      setIsAdmin(adminStatus);
+
+      // Simulate loading delay
+      setTimeout(() => {
+        setLoading(false); // Stop loading after 3 seconds
+      }, 2000);
     } catch (error) {
       console.error('Error fetching community data:', error);
       Alert.alert('Error', 'Failed to fetch community data');
+      setLoading(false); // Stop loading in case of error
     }
   };
 
   useEffect(() => {
-
     fetchCommunityData();
     getUserData();
 
     const isJoined = communityData?.members?.map(user => user?.user);
     const data = isJoined?.some(userId => userId?._id === userData?._id);
     setIsJoined(data);
-  }, [communityId, communityData]);
+
+    // Determine admin status during loading
+    if (userData) {
+      const adminStatus = userData?.isAdmin === true;
+      setIsAdmin(adminStatus);
+    }
+  }, [communityId, communityData, userData]);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -126,6 +136,21 @@ const ViewCommunity = () => {
     navigation.navigate('CreatePostCommunity', { communityId: communityId });
   };
 
+  const renderSkeleton = () => (
+    <View style={styles.skeletonContainer}>
+      <Skeleton animation="pulse" height={185} width={'100%'} style={styles.skeletonBanner} />
+      <View style={styles.skeletonInfoActionContainer}>
+        <View style={styles.skeletonInfoContainer}>
+          <Skeleton animation="pulse" height={24} width={150} style={styles.skeleton} />
+          <Skeleton animation="pulse" height={14} width={200} style={styles.skeleton} />
+        </View>
+        <View style={styles.skeletonActionContainer}>
+          <Skeleton animation="pulse" height={30} width={100} style={styles.skeletonButton} />
+        </View>
+      </View>
+    </View>
+  );
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
@@ -138,66 +163,72 @@ const ViewCommunity = () => {
             tintColor="#001374"
           />
         }>
-        <View style={styles.bannerContainer}>
-          <Image
-            source={
-              communityData?.picture?.banner?.bannerPicture
-                ? { uri: communityData.picture.banner.bannerPicture }
-                : require('../../assets/banner.png')
-            }
-            style={styles.banner}
-          />
-        </View>
-        <View style={styles.infoActionContainer}>
-          <View style={styles.infoContainer}>
-            <View style={styles.nameContainer}>
-              <Text style={styles.name}>
-                {communityData?.communityName || 'Community Name'}
-              </Text>
-              <Text style={styles.bio}>
-                {communityData?.communityDescription || 'Community bio'}
-              </Text>
+        {loading ? (
+          renderSkeleton()
+        ) : (
+          <>
+            <View style={styles.bannerContainer}>
+              <Image
+                source={
+                  communityData?.picture?.banner?.bannerPicture
+                    ? { uri: communityData.picture.banner.bannerPicture }
+                    : require('../../assets/banner.png')
+                }
+                style={styles.banner}
+              />
             </View>
-          </View>
-          <View style={styles.actionContainer}>
-            {isAdmin ? (
-              <>
-                <TouchableOpacity
-                  style={styles.createButton}
-                  onPress={handleCreate}>
-                  <MaterialIcons
-                    name="add"
-                    size={20}
-                    color="#000"
-                    style={styles.addIcon}
-                  />
-                  <Text style={styles.create}>Create</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.settingsButton}
-                  onPress={handleSettingsPress}>
-                  <Text style={styles.settings}>Settings</Text>
-                </TouchableOpacity>
-              </>
-            ) : (
-              <>
-                {isJoined ? (
-                  <TouchableOpacity
-                    style={styles.joinedButton}
-                    onPress={handleJoinPress}>
-                    <Text style={styles.joined}>Joined</Text>
-                  </TouchableOpacity>
+            <View style={styles.infoActionContainer}>
+              <View style={styles.infoContainer}>
+                <View style={styles.nameContainer}>
+                  <Text style={styles.name}>
+                    {communityData?.communityName || 'Community Name'}
+                  </Text>
+                  <Text style={styles.bio}>
+                    {communityData?.communityDescription || 'Community bio'}
+                  </Text>
+                </View>
+              </View>
+              <View style={styles.actionContainer}>
+                {isAdmin ? (
+                  <>
+                    <TouchableOpacity
+                      style={styles.createButton}
+                      onPress={handleCreate}>
+                      <MaterialIcons
+                        name="add"
+                        size={20}
+                        color="#000"
+                        style={styles.addIcon}
+                      />
+                      <Text style={styles.create}>Create</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.settingsButton}
+                      onPress={handleSettingsPress}>
+                      <Text style={styles.settings}>Settings</Text>
+                    </TouchableOpacity>
+                  </>
                 ) : (
-                  <TouchableOpacity
-                    style={styles.joinButton}
-                    onPress={handleJoinPress}>
-                    <Text style={styles.join}>Join</Text>
-                  </TouchableOpacity>
+                  <>
+                    {isJoined ? (
+                      <TouchableOpacity
+                        style={styles.joinedButton}
+                        onPress={handleJoinPress}>
+                        <Text style={styles.joined}>Joined</Text>
+                      </TouchableOpacity>
+                    ) : (
+                      <TouchableOpacity
+                        style={styles.joinButton}
+                        onPress={handleJoinPress}>
+                        <Text style={styles.join}>Join</Text>
+                      </TouchableOpacity>
+                    )}
+                  </>
                 )}
-              </>
-            )}
-          </View>
-        </View>
+              </View>
+            </View>
+          </>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -301,6 +332,34 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#000',
     fontWeight: 'bold',
+  },
+  skeletonContainer: {
+    marginBottom: 15,
+  },
+  skeletonBanner: {
+    marginBottom: 25,
+  },
+  skeletonInfoActionContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  skeletonInfoContainer: {
+    flex: 1,
+  },
+  skeletonActionContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+  },
+  skeletonButton: {
+    marginHorizontal: 10,
+    borderRadius: 15,
+  },
+  skeleton: {
+    marginLeft: 20,
+    marginBottom: 10,
+    borderRadius: 3,
   },
 });
 

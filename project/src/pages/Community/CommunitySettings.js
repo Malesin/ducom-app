@@ -13,6 +13,7 @@ import {
   Modal,
   RefreshControl,
   Alert,
+  ToastAndroid
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import ImagePicker from 'react-native-image-crop-picker';
@@ -24,12 +25,29 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../../config';
+import { Skeleton } from 'react-native-elements';
 
 const serverUrl = config.SERVER_URL;
 
 const CommunitySettings = () => {
   const route = useRoute();
+  const navigation = useNavigation();
   const { communityId, communityDataBefore } = route.params;
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [isEditingBio, setIsEditingBio] = useState(false);
+  const [communityName, setCommunityName] = useState('');
+  const [communityBio, setCommunityBio] = useState('');
+  const [banner, setBanner] = useState('');
+  const [newBanner, setNewBanner] = useState('');
+  const [profilePicture, setProfilePicture] = useState('');
+  const [newProfilePicture, setNewProfilePicture] = useState('');
+  const [profileBackground, setProfileBackground] = useState(null);
+  const [newProfileBackground, setNewProfileBackground] = useState(null);
+  const [dropdownVisible, setDropdownVisible] = useState(false);
+  const dropdownAnimation = useRef(new Animated.Value(0)).current;
+  const [isDataChanged, setIsDataChanged] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalImageSource, setModalImageSource] = useState(null);
   const [communityData, setCommunityData] = useState();
   const [refreshing, setRefreshing] = useState(false);
 
@@ -52,32 +70,22 @@ const CommunitySettings = () => {
 
   useEffect(() => {
     fetchCommunityData();
-  }, []);
 
-  useEffect(() => {
-    console.log('Community Data');
-  }, [communityData]);
+    if (communityDataBefore?.picture?.banner?.bannerPicture) {
+      setBanner({ uri: communityDataBefore.picture.banner.bannerPicture });
+    }
+    if (communityDataBefore?.picture?.profile?.profilePicture) {
+      setProfilePicture({ uri: communityDataBefore.picture.profile.profilePicture });
+    }
+    if (communityDataBefore?.picture?.background?.backgroundPicture) {
+      setProfileBackground({ uri: communityDataBefore.picture.background.backgroundPicture });
+    }
+  }, [communityDataBefore]);
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
   }, [communityId]);
 
-  const navigation = useNavigation();
-  const [isEditingName, setIsEditingName] = useState(false);
-  const [isEditingBio, setIsEditingBio] = useState(false);
-  const [communityName, setCommunityName] = useState('');
-  const [communityBio, setCommunityBio] = useState('');
-  const [banner, setBanner] = useState('');
-  const [newBanner, setNewBanner] = useState('');
-  const [profilePicture, setProfilePicture] = useState('');
-  const [newProfilePicture, setNewProfilePicture] = useState('');
-  const [profileBackground, setProfileBackground] = useState(null);
-  const [newProfileBackground, setNewProfileBackground] = useState(null);
-  const [dropdownVisible, setDropdownVisible] = useState(false);
-  const dropdownAnimation = useRef(new Animated.Value(0)).current;
-  const [isDataChanged, setIsDataChanged] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [modalImageSource, setModalImageSource] = useState(null);
 
   const toggleEditing = field => {
     if (field === 'name') {
@@ -142,7 +150,7 @@ const CommunitySettings = () => {
 
     const dataToSend = {
       token,
-      communityId,
+      communityId: communityId,
       communityName: nameToSave,
       communityDescription: bioToSave,
     };
@@ -157,8 +165,9 @@ const CommunitySettings = () => {
           type: newProfilePicture.mime,
         });
         profileFormData.append('token', token);
+        profileFormData.append('communityId', communityId);
 
-        await axios.post(`${serverUrl}/upload-image-profile`, profileFormData, {
+        await axios.post(`${serverUrl}/upload-community-profile`, profileFormData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
@@ -173,8 +182,9 @@ const CommunitySettings = () => {
           type: newBanner.mime,
         });
         bannerFormData.append('token', token);
+        bannerFormData.append('communityId', communityId);
 
-        await axios.post(`${serverUrl}/upload-image-banner`, bannerFormData, {
+        await axios.post(`${serverUrl}/upload-community-banner`, bannerFormData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
@@ -189,9 +199,10 @@ const CommunitySettings = () => {
           type: newProfileBackground.mime,
         });
         backgroundFormData.append('token', token);
+        backgroundFormData.append('communityId', communityId);
 
         await axios.post(
-          `${serverUrl}/upload-image-background`,
+          `${serverUrl}/upload-community-background`,
           backgroundFormData,
           {
             headers: {
@@ -323,6 +334,38 @@ const CommunitySettings = () => {
     setCommunityBio(text);
   };
 
+  const handleDelete = async () => {
+    const token = await AsyncStorage.getItem('token');
+    try {
+      Alert.alert('Delete Community', 'Are you sure want to delete this community?', [
+        {
+          text: 'Cancel',
+          onPress: () => null,
+          style: 'cancel',
+        },
+        {
+          text: 'Delete',
+          onPress: async () => {
+            await axios
+              .post(`${serverUrl}/delete-community`, {
+                token: token,
+                communityId: communityId
+              })
+              .then(res => {
+                console.log(res.data)
+                navigation.navigate('Community');
+                ToastAndroid.show('Community successfully deleted', ToastAndroid.SHORT);
+              })
+          },
+        },
+      ]);
+    } catch (error) {
+      ToastAndroid.show('Something Error, Try Again Later', ToastAndroid.SHORT);
+      console.error(error)
+    }
+  }
+
+
   return (
     <ScrollView
       contentContainerStyle={styles.container}
@@ -365,36 +408,30 @@ const CommunitySettings = () => {
         <Text style={styles.sectionTitle}>Community Account</Text>
         <View style={styles.infoContainer}>
           <View style={styles.infoRow}>
-            <TextInput
-              style={styles.infoText}
-              value={communityName}
-              onChangeText={inputNameChange}
-            />
-            {/* <TouchableOpacity onPress={() => toggleEditing('name')}>
-              <MaterialCommunityIcons
-                name="chevron-right"
-                size={25}
-                color="#000"
+            {communityData ? (
+              <TextInput
+                style={styles.infoText}
+                value={communityName}
+                onChangeText={inputNameChange}
               />
-            </TouchableOpacity> */}
+            ) : (
+              <Skeleton animation="pulse" height={20} width={150} style={styles.skeleton} />
+            )}
           </View>
           <Text style={styles.label}>Community Name</Text>
         </View>
         <View style={styles.bioContainer}>
           <View style={styles.infoRow}>
-            <TextInput
-              style={styles.bioText}
-              value={communityBio}
-              onChangeText={handleBioChange}
-              multiline={true}
-            />
-            {/* <TouchableOpacity onPress={() => toggleEditing('bio')}>
-              <MaterialCommunityIcons
-                name="chevron-right"
-                size={25}
-                color="#000"
+            {communityData ? (
+              <TextInput
+                style={styles.bioText}
+                value={communityBio}
+                onChangeText={handleBioChange}
+                multiline={true}
               />
-            </TouchableOpacity> */}
+            ) : (
+              <Skeleton animation="pulse" height={20} width={150} style={styles.skeleton} />
+            )}
           </View>
           <Text style={styles.label}>Description</Text>
         </View>
@@ -496,7 +533,7 @@ const CommunitySettings = () => {
             />
           </View>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.deleteButton}>
+        <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
           <Text style={styles.deleteButtonText}>Delete Community</Text>
         </TouchableOpacity>
       </View>
@@ -760,6 +797,10 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     resizeMode: 'contain',
+  },
+  skeleton: {
+    borderRadius: 3,
+    marginBottom: 10,
   },
 });
 

@@ -16,27 +16,26 @@ import {
   Keyboard,
   useColorScheme,
 } from 'react-native';
-import React, {useState, useEffect, useCallback} from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../../config';
 import Video from 'react-native-video';
-import {createThumbnail} from 'react-native-create-thumbnail';
+import { createThumbnail } from 'react-native-create-thumbnail';
 import CommentCard from '../../components/CommentCard';
-import BottomSheet from '../../components/BottomSheet';
+import CommBottomSheet from '../../components/CommBottomSheet';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import {Skeleton} from 'react-native-elements';
+import { Skeleton } from 'react-native-elements';
 const verifiedIcon = <Icon name="verified" size={16} color="#699BF7" />;
 
 const serverUrl = config.SERVER_URL;
 
-const ViewPostCommunity = ({route}) => {
-  const {tweet, focusCommentInput, isUserProfile} = route?.params || {};
-
-  const [liked, setLiked] = useState(false);
-  const [likesCount, setLikesCount] = useState(0);
-  const profilePicture = tweet?.profilePicture;
+const ViewPostCommunity = ({ route }) => {
+  const { post, focusCommentInput } = route?.params || {};
+  const [liked, setLiked] = useState(post?.isLiked);
+  const [likesCount, setLikesCount] = useState(post?.likesCount);
+  const profilePicture = post?.profilePicture;
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState(null);
   const [thumbnails, setThumbnails] = useState({});
@@ -56,21 +55,32 @@ const ViewPostCommunity = ({route}) => {
   const [isEnabledComm, setIsEnabledComm] = useState(true);
   const [loading, setLoading] = useState(true);
   const [dataSent, setDataSent] = useState();
-  const isOwner = tweet?.userIdPost === tweet?.idUser;
+  const isOwner = post?.userIdPost === post?.idUser;
 
   useEffect(() => {
     if (focusCommentInput && textInputRef.current) {
       textInputRef.current.focus();
     }
+
+    const data = async () => {
+      const token = await AsyncStorage.getItem('token');
+      const dataSent = {
+        token: token,
+        postId: post?.id
+      }
+      setDataSent(dataSent)
+    }
+    data()
+
   }, [focusCommentInput]);
 
   useEffect(() => {
     const generateThumbnails = async () => {
       const newThumbnails = {};
-      for (const media of tweet?.media || []) {
+      for (const media of post?.media || []) {
         if (media.type === 'video' && media.uri) {
           try {
-            const {path} = await createThumbnail({url: media.uri});
+            const { path } = await createThumbnail({ url: media.uri });
             newThumbnails[media.uri] = path;
           } catch (error) {
             console.log('Error generating thumbnail:', error);
@@ -83,10 +93,10 @@ const ViewPostCommunity = ({route}) => {
       }));
     };
 
-    if (tweet?.media) {
+    if (post?.media) {
       generateThumbnails();
     }
-  }, [tweet?.media]);
+  }, [post?.media]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -166,7 +176,7 @@ const ViewPostCommunity = ({route}) => {
     setRefreshing(true);
     try {
       const url = `${serverUrl}/comments`;
-      const params = {postId: tweet.id};
+      const params = { postId: post.id };
 
       const response = await axios.post(url, params);
       const dataComment = response.data.data;
@@ -177,21 +187,21 @@ const ViewPostCommunity = ({route}) => {
           id: comment._id,
           text: comment.comment,
           userIdPost: comment.user._id,
-          idUser: tweet.idUser,
-          isLikedCom: comment.likes.some(like => like.user === tweet.idUser),
+          idUser: post.idUser,
+          isLikedCom: comment.likes.some(like => like.user === post.idUser),
           replies: Array.isArray(comment.replies)
             ? comment.replies.map(reply => ({
-                id: reply._id,
-                text: reply.comment,
-                userIdPost: reply.user._id,
-                idUser: tweet.idUser,
-                username: reply.user.username,
-                isLikedCom: reply.likes.some(
-                  like => like.user === tweet.idUser,
-                ),
-                profilePicture: reply.user.profilePicture,
-                replies: reply.replies || [],
-              }))
+              id: reply._id,
+              text: reply.comment,
+              userIdPost: reply.user._id,
+              idUser: post.idUser,
+              username: reply.user.username,
+              isLikedCom: reply.likes.some(
+                like => like.user === post.idUser,
+              ),
+              profilePicture: reply.user.profilePicture,
+              replies: reply.replies || [],
+            }))
             : [],
           username: comment.user.username,
           profilePicture: comment.user.profilePicture,
@@ -204,14 +214,14 @@ const ViewPostCommunity = ({route}) => {
     } finally {
       setRefreshing(false);
     }
-  }, [tweet.id]);
+  }, [post.id]);
 
   const isEnabledComment = useCallback(async () => {
     const token = await AsyncStorage.getItem('token');
     try {
       const response = await axios.post(`${serverUrl}/isenabled-comments`, {
         token: token,
-        postId: tweet.id,
+        postId: post.id,
       });
       setIsEnabledComm(response.data.data.commentsEnabled);
     } catch (error) {
@@ -251,7 +261,7 @@ const ViewPostCommunity = ({route}) => {
     try {
       await axios.post(`${serverUrl}/comment-post`, {
         token: token,
-        postId: tweet.id,
+        postId: post.id,
         comment: comment,
         parentCommentId: replyToCommentId || null,
       });
@@ -328,39 +338,39 @@ const ViewPostCommunity = ({route}) => {
         animation="pulse"
         height={20}
         width="80%"
-        style={[styles.skeleton, {borderRadius: 3}]}
+        style={[styles.skeleton, { borderRadius: 3 }]}
       />
       <Skeleton
         animation="pulse"
         height={200}
         width="100%"
-        style={[styles.skeleton, {borderRadius: 8, marginTop: 10}]}
+        style={[styles.skeleton, { borderRadius: 8, marginTop: 10 }]}
       />
       <Skeleton
         animation="pulse"
         height={17}
         width="50%"
-        style={[styles.skeleton, {borderRadius: 3, marginTop: 10}]}
+        style={[styles.skeleton, { borderRadius: 3, marginTop: 10 }]}
       />
       <Skeleton
         animation="pulse"
         height={1}
         width="100%"
-        style={[styles.skeleton, {borderRadius: 3, marginTop: 5}]}
+        style={[styles.skeleton, { borderRadius: 3, marginTop: 5 }]}
       />
       <Skeleton
         animation="pulse"
         height={16}
         width="58%"
-        style={[styles.skeleton, {borderRadius: 3, marginTop: 5}]}
+        style={[styles.skeleton, { borderRadius: 3, marginTop: 5 }]}
       />
       <Skeleton
         animation="pulse"
         height={1}
         width="100%"
-        style={[styles.skeleton, {borderRadius: 3, marginTop: 5}]}
+        style={[styles.skeleton, { borderRadius: 3, marginTop: 5 }]}
       />
-      <View style={styles.skeletonIconRow}>
+      <View style={[styles.skeletonIconRow, { justifyContent: 'center' }]}>
         <Skeleton
           animation="pulse"
           circle
@@ -368,27 +378,7 @@ const ViewPostCommunity = ({route}) => {
           width={20}
           style={styles.skeletonIcon}
         />
-        <Skeleton
-          animation="pulse"
-          circle
-          height={20}
-          width={20}
-          style={styles.skeletonIcon}
-        />
-        <Skeleton
-          animation="pulse"
-          circle
-          height={20}
-          width={20}
-          style={styles.skeletonIcon}
-        />
-        <Skeleton
-          animation="pulse"
-          circle
-          height={20}
-          width={20}
-          style={styles.skeletonIcon}
-        />
+        <View style={{ width: 140 }} />
         <Skeleton
           animation="pulse"
           circle
@@ -401,7 +391,7 @@ const ViewPostCommunity = ({route}) => {
         animation="pulse"
         height={1}
         width="100%"
-        style={[styles.skeleton, {borderRadius: 3, marginTop: 5}]}
+        style={[styles.skeleton, { borderRadius: 3, marginTop: 5 }]}
       />
     </View>
   );
@@ -413,7 +403,7 @@ const ViewPostCommunity = ({route}) => {
       ) : (
         <ScrollView
           style={styles.scrollContainer}
-          contentContainerStyle={{paddingBottom: 50}}
+          contentContainerStyle={{ paddingBottom: 50 }}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }>
@@ -421,8 +411,8 @@ const ViewPostCommunity = ({route}) => {
             <View style={styles.headerContainer}>
               <Image
                 source={
-                  tweet.userAvatar
-                    ? {uri: tweet.userAvatar}
+                  post.communityProfile
+                    ? { uri: post.communityProfile }
                     : require('../../assets/profilepic.png')
                 }
                 style={styles.avatar}
@@ -432,22 +422,22 @@ const ViewPostCommunity = ({route}) => {
                   <Text
                     style={[
                       styles.userName,
-                      {color: colorScheme === 'dark' ? '#000000' : '#000'},
+                      { color: colorScheme === 'dark' ? '#000000' : '#000' },
                     ]}>
-                    {tweet.userName}
+                    {post.communityCardName}
                   </Text>
-                  {tweet.isAdmin ? (
+                  {post.isAdmin ? (
                     <Text style={styles.verifiedIcon}>{verifiedIcon}</Text>
                   ) : null}
                 </View>
 
-                <Text2
+                <Text
                   style={[
                     styles.userHandle,
-                    {color: colorScheme === 'dark' ? '#ccc' : 'gray'},
+                    { color: colorScheme === 'dark' ? '#ccc' : 'gray' },
                   ]}>
-                  @{tweet.userHandle}
-                </Text2>
+                  Community
+                </Text>
               </View>
               <TouchableOpacity
                 style={styles.optionsButton}
@@ -460,19 +450,19 @@ const ViewPostCommunity = ({route}) => {
               </TouchableOpacity>
             </View>
             <View>
-              <Text style={styles.postContent}>{tweet.content}</Text>
+              <Text style={styles.postContent}>{post.content}</Text>
               <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                {(tweet.media || []).map((mediaItem, index) => (
+                {(post.media || []).map((mediaItem, index) => (
                   <TouchableOpacity
                     key={index}
                     onPress={() => handleMediaPress(mediaItem.uri)}>
                     {mediaItem.type === 'image' ? (
                       <Image
-                        source={{uri: mediaItem.uri}}
+                        source={{ uri: mediaItem.uri }}
                         style={
-                          tweet.media.length === 1
+                          post.media.length === 1
                             ? styles.singleMediaImage
-                            : styles.tweetImage
+                            : styles.postImage
                         }
                         onError={() => console.log('Failed to load image')}
                       />
@@ -481,11 +471,11 @@ const ViewPostCommunity = ({route}) => {
                         onPress={() => handleMediaPress(mediaItem.uri)}
                         style={styles.videoContainer}>
                         <Image
-                          source={{uri: thumbnails[mediaItem.uri]}}
+                          source={{ uri: thumbnails[mediaItem.uri] }}
                           style={
-                            tweet.media.length === 1
+                            post.media.length === 1
                               ? styles.singleMediaVideo
-                              : styles.tweetVideo
+                              : styles.postVideo
                           }
                         />
                         <MaterialCommunityIcons
@@ -499,18 +489,14 @@ const ViewPostCommunity = ({route}) => {
                   </TouchableOpacity>
                 ))}
               </ScrollView>
-              <Text style={styles.postDate}>{formatDate(tweet.postDate)}</Text>
+              <Text style={styles.postDate}>{formatDate(post.postDate)}</Text>
             </View>
             <View style={styles.interactionsContainer}>
               <Text style={styles.interactionText}>
                 <Text style={styles.interactionNumber}>
-                  {tweet.commentsCount}
+                  {post.commentsCount}
                 </Text>{' '}
                 Comments{' '}
-              </Text>
-              <Text style={styles.interactionText}>
-                <Text style={styles.interactionNumber}>{bookMarksCount}</Text>{' '}
-                Bookmarks{' '}
               </Text>
               <Text style={styles.interactionText}>
                 <Text style={styles.interactionNumber}>{likesCount}</Text> Likes{' '}
@@ -546,7 +532,7 @@ const ViewPostCommunity = ({route}) => {
                 <CommentCard
                   key={comment.id}
                   text={comment.text}
-                  tweet={tweet}
+                  tweet={post}
                   replies={comment.replies}
                   hasReplies={comment.replies.length > 0}
                   username={comment.username}
@@ -558,12 +544,12 @@ const ViewPostCommunity = ({route}) => {
                     handleAddReply(comment.id, replyText)
                   }
                   commentId={comment.id}
-                  postId={tweet.id}
                   userIdPost={comment.userIdPost}
-                  idUser={tweet.idUser}
                   isLikedCom={comment.isLikedCom}
                   isAdmin={comment.isAdmin}
-                  amIAdmin={tweet.amIAdmin}
+                  postId={post?.id}
+                  idUser={post?.idUser}
+                  amIAdmin={post?.amIAdmin}
                   onDeleteSuccess={onDeleteSuccess}
                 />
               ))}
@@ -579,10 +565,10 @@ const ViewPostCommunity = ({route}) => {
           </View>
         </ScrollView>
       )}
-      <View style={[styles.inputContainer, {height: inputHeight}]}>
-        <Image source={{uri: profilePicture}} style={styles.profilePicture} />
+      <View style={[styles.inputContainer, { height: inputHeight }]}>
+        <Image source={{ uri: profilePicture }} style={styles.profilePicture} />
 
-        {isEnabledComm || isOwner || tweet?.amIAdmin ? (
+        {isEnabledComm || isOwner || post?.amIAdmin ? (
           <>
             <TextInput
               ref={textInputRef}
@@ -620,7 +606,7 @@ const ViewPostCommunity = ({route}) => {
             <Text
               style={[
                 styles.commentDisabled,
-                {color: colorScheme === 'dark' ? '#ccc' : '#888'},
+                { color: colorScheme === 'dark' ? '#ccc' : '#888' },
               ]}>
               Comments Disabled
             </Text>
@@ -637,15 +623,15 @@ const ViewPostCommunity = ({route}) => {
             <View style={styles.modalBackground}>
               <View style={styles.modalContainer}>
                 {selectedMedia.endsWith('.jpg') ||
-                selectedMedia.endsWith('.png') ? (
+                  selectedMedia.endsWith('.png') ? (
                   <Image
-                    source={{uri: selectedMedia}}
+                    source={{ uri: selectedMedia }}
                     style={styles.modalImage}
                     onError={() => console.log('Failed to load image')}
                   />
                 ) : (
                   <Video
-                    source={{uri: selectedMedia}}
+                    source={{ uri: selectedMedia }}
                     style={styles.modalImage}
                     controls
                     resizeMode="contain"
@@ -665,7 +651,7 @@ const ViewPostCommunity = ({route}) => {
           <View style={styles.overlay} />
         </TouchableWithoutFeedback>
         <View style={styles.bottomSheetContainer}>
-          <BottomSheet
+          <CommBottomSheet
             onCloseDel={respdel => {
               setShowBottomSheet(false);
               onRefreshPage();
@@ -676,9 +662,8 @@ const ViewPostCommunity = ({route}) => {
               onRefreshPage();
               onResp(resp);
             }}
-            tweet={tweet}
+            post={post}
             onRefreshPage={onRefreshPage}
-            isUserProfile={isUserProfile}
             isEnabledComm={isEnabledComm}
             viewPost={true}
             handlePin={false}
@@ -786,7 +771,7 @@ const styles = StyleSheet.create({
     height: '100%',
     resizeMode: 'contain',
   },
-  tweetImage: {
+  postImage: {
     width: 200,
     height: 200,
     borderRadius: 8,
@@ -803,7 +788,7 @@ const styles = StyleSheet.create({
     height: 200,
     borderRadius: 8,
   },
-  tweetVideo: {
+  postVideo: {
     width: 200,
     height: 200,
     borderRadius: 8,
