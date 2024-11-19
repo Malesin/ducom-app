@@ -17,10 +17,13 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import Video from 'react-native-video';
 import { createThumbnail } from 'react-native-create-thumbnail';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 import config from '../../config';
 const serverUrl = config.SERVER_URL;
-const CommunityCard = ({ navigation, communityCardData = {} }) => {
+
+const CommunityCard = ({ communityCardData = {} }) => {
+  const navigator = useNavigation();
   const {
     communityCardName = '',
     communityDescription = '',
@@ -137,8 +140,8 @@ const CommunityCard = ({ navigation, communityCardData = {} }) => {
   };
 
   const handlePress = useCallback(() => {
-    navigation.navigate('ViewCommunity', { communityId: communityCardData?.communityId });
-  }, [navigation]);
+    navigator.navigate('ViewCommunity', { communityId: communityCardData?.communityId });
+  }, [navigator]);
 
   const openMediaPreview = useCallback(uri => {
     setModalMediaUri(uri);
@@ -259,7 +262,7 @@ const CommunityCard = ({ navigation, communityCardData = {} }) => {
                 onRefreshPage();
                 onResp(resp);
               }}
-            post={communityCardData}
+              post={communityCardData}
             // onRefreshPage={onRefreshPage}
             // isUserProfile={isUserProfile}
             // handlePin={false}

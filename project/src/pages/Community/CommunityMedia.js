@@ -17,27 +17,37 @@ const CommunityMedia = ({ navigation }) => {
     const token = await AsyncStorage.getItem('token');
 
     try {
-      const response = await axios.post(`${serverUrl}/communityPosts-byId`, {
+      const postsResponse = await axios.post(`${serverUrl}/communityPosts-byId`, {
         token,
         communityId,
       });
-      const data = response.data.data;
-      const communityName = response.data.communityName;
+      const data = postsResponse.data.data;
+      const myData = postsResponse.data.myUser
       const formattedData = data
         .filter(post => Array.isArray(post.media) && post.media.length > 0)
         .filter(post => post.user !== null)
         .map(post => ({
-          communityCardName: communityName || 'Nama Komunitas',
-          communityDescription: post.description || 'Deskripsi komunitas ini.',
+          id: post?._id,
+          userIdPost: post?.user?._id,
+          communityId: post?.communityId?._id,
+          communityCardName: post?.communityId?.communityName || 'Community Name',
+          communityProfile: post?.communityId?.picture?.profile?.profilePicture,
+          communityDescription:
+            post?.description || 'This is Description Community.',
           media: Array.isArray(post?.media)
-            ? post?.media.map(mediaItem => ({
-              type: mediaItem.type,
-              uri: mediaItem.uri,
+            ? post?.media?.map(mediaItem => ({
+              type: mediaItem?.type,
+              uri: mediaItem?.uri,
             }))
-
             : [],
+          isLiked: post?.likes?.some(like => like?._id === myData?.myId),
           likesCount: post.likes.length || 0,
           commentsCount: post.comments.length || 0,
+          postDate: post?.created_at,
+          commentsEnabled: post?.commentsEnabled,
+          idUser: myData?.myId,
+          amIAdmin: myData?.amIAdmin,
+          profilePicture: myData?.profilePicture
         }));
       setCommunityDataList(formattedData);
     } catch (error) {

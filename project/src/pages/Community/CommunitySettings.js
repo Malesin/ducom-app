@@ -29,7 +29,23 @@ const serverUrl = config.SERVER_URL;
 
 const CommunitySettings = () => {
   const route = useRoute();
+  const navigation = useNavigation();
   const { communityId, communityDataBefore } = route.params;
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [isEditingBio, setIsEditingBio] = useState(false);
+  const [communityName, setCommunityName] = useState('');
+  const [communityBio, setCommunityBio] = useState('');
+  const [banner, setBanner] = useState('');
+  const [newBanner, setNewBanner] = useState('');
+  const [profilePicture, setProfilePicture] = useState('');
+  const [newProfilePicture, setNewProfilePicture] = useState('');
+  const [profileBackground, setProfileBackground] = useState(null);
+  const [newProfileBackground, setNewProfileBackground] = useState(null);
+  const [dropdownVisible, setDropdownVisible] = useState(false);
+  const dropdownAnimation = useRef(new Animated.Value(0)).current;
+  const [isDataChanged, setIsDataChanged] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalImageSource, setModalImageSource] = useState(null);
   const [communityData, setCommunityData] = useState();
   const [refreshing, setRefreshing] = useState(false);
 
@@ -52,32 +68,17 @@ const CommunitySettings = () => {
 
   useEffect(() => {
     fetchCommunityData();
-  }, []);
 
-  useEffect(() => {
-    console.log('Community Data');
-  }, [communityData]);
+
+    setBanner({ uri: communityDataBefore?.picture?.banner.bannerPicture });
+    setProfilePicture({ uri: communityDataBefore?.picture?.profile.profilePicture });
+    setProfileBackground({ uri: communityDataBefore?.picture?.background.backgroundPicture });
+  }, [communityDataBefore]);
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
   }, [communityId]);
 
-  const navigation = useNavigation();
-  const [isEditingName, setIsEditingName] = useState(false);
-  const [isEditingBio, setIsEditingBio] = useState(false);
-  const [communityName, setCommunityName] = useState('');
-  const [communityBio, setCommunityBio] = useState('');
-  const [banner, setBanner] = useState('');
-  const [newBanner, setNewBanner] = useState('');
-  const [profilePicture, setProfilePicture] = useState('');
-  const [newProfilePicture, setNewProfilePicture] = useState('');
-  const [profileBackground, setProfileBackground] = useState(null);
-  const [newProfileBackground, setNewProfileBackground] = useState(null);
-  const [dropdownVisible, setDropdownVisible] = useState(false);
-  const dropdownAnimation = useRef(new Animated.Value(0)).current;
-  const [isDataChanged, setIsDataChanged] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [modalImageSource, setModalImageSource] = useState(null);
 
   const toggleEditing = field => {
     if (field === 'name') {
@@ -142,7 +143,7 @@ const CommunitySettings = () => {
 
     const dataToSend = {
       token,
-      communityId,
+      communityId: communityId,
       communityName: nameToSave,
       communityDescription: bioToSave,
     };
@@ -157,8 +158,9 @@ const CommunitySettings = () => {
           type: newProfilePicture.mime,
         });
         profileFormData.append('token', token);
+        profileFormData.append('communityId', communityId);
 
-        await axios.post(`${serverUrl}/upload-image-profile`, profileFormData, {
+        await axios.post(`${serverUrl}/upload-community-profile`, profileFormData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
@@ -173,8 +175,9 @@ const CommunitySettings = () => {
           type: newBanner.mime,
         });
         bannerFormData.append('token', token);
+        bannerFormData.append('communityId', communityId);
 
-        await axios.post(`${serverUrl}/upload-image-banner`, bannerFormData, {
+        await axios.post(`${serverUrl}/upload-community-banner`, bannerFormData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
@@ -189,9 +192,10 @@ const CommunitySettings = () => {
           type: newProfileBackground.mime,
         });
         backgroundFormData.append('token', token);
+        backgroundFormData.append('communityId', communityId);
 
         await axios.post(
-          `${serverUrl}/upload-image-background`,
+          `${serverUrl}/upload-community-background`,
           backgroundFormData,
           {
             headers: {
@@ -332,7 +336,7 @@ const CommunitySettings = () => {
       <View style={styles.bannerContainer}>
         <TouchableOpacity onPress={() => openModal(banner)}>
           <ImageBackground
-            source={banner.uri ? banner : require('../../assets/banner.png')}
+            source={banner ? banner : require('../../assets/banner.png')}
             style={styles.banner}
             resizeMode="cover"
             imageStyle={styles.bannerImage}>

@@ -26,33 +26,35 @@ const CommunityPost = ({ navigation }) => {
     const token = await AsyncStorage.getItem('token');
 
     try {
-      const response = await axios.post(`${serverUrl}/communityPosts-byId`, {
+      const postsResponse = await axios.post(`${serverUrl}/communityPosts-byId`, {
         token,
         communityId,
       });
-      const data = response.data.data;
-      const amIAdmin = postsResponse.data.amIAdmin
-      const communityName = response.data.communityName;
-      const formattedData = data
-        .filter(post => post.user !== null)
-        .map(post => ({
-          id: post._id,
-          idUser: myId,
-          userIdPost: post?.user?._id,
-          communityId: post?.communityId?._id,
-          communityCardName: communityName || 'Nama Komunitas',
-          communityDescription: post.description || 'Deskripsi komunitas ini.',
-          amIAdmin: post?.user?.isAdmin,
-          media: Array.isArray(post?.media)
-            ? post?.media.map(mediaItem => ({
-              type: mediaItem.type,
-              uri: mediaItem.uri,
-            }))
-            : [],
-          likesCount: post.likes.length || 0,
-          commentsCount: post.comments.length || 0,
-          amIAdmin: amIAdmin
-        }));
+      const data = postsResponse.data.data;
+      const myData = postsResponse.data.myUser
+      const formattedData = data.map(post => ({
+        id: post?._id,
+        userIdPost: post?.user?._id,
+        communityId: post?.communityId?._id,
+        communityCardName: post?.communityId?.communityName || 'Community Name',
+        communityProfile: post?.communityId?.picture?.profile?.profilePicture,
+        communityDescription:
+          post?.description || 'This is Description Community.',
+        media: Array.isArray(post?.media)
+          ? post?.media?.map(mediaItem => ({
+            type: mediaItem?.type,
+            uri: mediaItem?.uri,
+          }))
+          : [],
+        isLiked: post?.likes?.some(like => like?._id === myData?.myId),
+        likesCount: post.likes.length || 0,
+        commentsCount: post.comments.length || 0,
+        postDate: post?.created_at,
+        commentsEnabled: post?.commentsEnabled,
+        idUser: myData?.myId,
+        amIAdmin: myData?.amIAdmin,
+        profilePicture: myData?.profilePicture
+      }));
       setCommunityDataList(formattedData);
     } catch (error) {
       console.error(error);

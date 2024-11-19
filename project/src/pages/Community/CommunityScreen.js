@@ -50,14 +50,13 @@ const CommunityScreen = () => {
         token: token,
       });
       const data = postsResponse.data.data;
-      const amIAdmin = postsResponse.data.amIAdmin
-      const myId = postsResponse.data.myId;
+      const myData = postsResponse.data.myUser
       const formattedData = data.map(post => ({
         id: post?._id,
-        idUser: myId,
         userIdPost: post?.user?._id,
         communityId: post?.communityId?._id,
         communityCardName: post?.communityId?.communityName || 'Community Name',
+        communityProfile: post?.communityId?.picture?.profile?.profilePicture,
         communityDescription:
           post?.description || 'This is Description Community.',
         media: Array.isArray(post?.media)
@@ -66,10 +65,14 @@ const CommunityScreen = () => {
             uri: mediaItem?.uri,
           }))
           : [],
-        isLiked: post?.likes?.some(like => like?._id === myId),
+        isLiked: post?.likes?.some(like => like?._id === myData?.myId),
         likesCount: post.likes.length || 0,
         commentsCount: post.comments.length || 0,
-        amIAdmin: amIAdmin
+        postDate: post?.created_at,
+        commentsEnabled: post?.commentsEnabled,
+        idUser: myData?.myId,
+        amIAdmin: myData?.amIAdmin,
+        profilePicture: myData?.profilePicture
       }));
       setCardData(formattedData);
     } catch (error) {
@@ -172,7 +175,7 @@ const CommunityScreen = () => {
             : cardData.map((community, index) => (
               <TouchableOpacity
                 onPress={() => {
-                  navigation.navigate('ViewPostCommunity');
+                  navigation.navigate('ViewPostCommunity', { post: community, isUserProfile: false });
                 }}>
                 <CommunityCard
                   key={`${community.communityCardName}-${index}`}

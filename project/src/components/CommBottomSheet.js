@@ -26,12 +26,10 @@ const CommBottomSheet = ({
   viewPost,
 }) => {
   const navigation = useNavigation();
-  const [isOwn, setIsOwn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(post?.amIAdmin);
   const [isCommentDisabled, setIsCommentDisabled] = useState(false);
   const [isViewPost, setIsViewPost] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false);
-  console.log(post)
+
   useEffect(() => {
     setIsViewPost(viewPost || false);
     isViewPost
@@ -39,7 +37,6 @@ const CommBottomSheet = ({
       : setIsCommentDisabled(!post.commentsEnabled);
   }, [isViewPost, setIsCommentDisabled]);
 
-  console.log(post?.id);
   const deletePost = async () => {
     const token = await AsyncStorage.getItem('token');
     try {
@@ -56,16 +53,13 @@ const CommBottomSheet = ({
   };
 
   useEffect(() => {
-    if (post?.idUser === post?.userIdPost) {
-      setIsOwn(true);
-      console.log('1 OWNER');
-    } else if (isAdmin) {
+    if (isAdmin) {
       setIsAdmin(true);
       console.log('2.ADMIN');
     } else {
       console.log('3 USER');
     }
-  }, [post?.idUser, post?.userIdPost, isUserProfile]);
+  }, [post?.idUser, post?.userIdPost]);
 
   const toggleComment = async () => {
     const token = await AsyncStorage.getItem('token');
@@ -93,14 +87,13 @@ const CommBottomSheet = ({
     <SafeAreaView style={styles.container}>
       {!isViewPost ? (
         <>
-          {isAdmin || isOwn ? (
+          {isAdmin ? (
             <>
               <View style={styles.optionRow}>
                 <TouchableOpacity style={styles.option} onPress={deletePost}>
                   <MaterialIcons name="delete" size={24} color="#333" />
                   <Text style={styles.optionText}>
-                    Delete{' '}
-                    {isAdmin && !isOwn ? `Post @${post.userName}` : 'Post'}
+                    Delete Post
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -120,7 +113,7 @@ const CommBottomSheet = ({
             </>
           ) : null}
 
-          {!isOwn && (
+          {!isAdmin && (
             <>
               <View style={styles.optionRow}>
                 <TouchableOpacity
@@ -128,7 +121,7 @@ const CommBottomSheet = ({
                   onPress={handleReportPress}>
                   <MaterialIcons name="report" size={24} color="#D60000" />
                   <Text style={styles.optionTextReport}>
-                    Report @{post.userName}
+                    Report Post
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -137,7 +130,7 @@ const CommBottomSheet = ({
         </>
       ) : (
         <>
-          {isAdmin || isOwn ? (
+          {isAdmin ? (
             <>
               <View style={styles.optionRow}>
                 <TouchableOpacity style={styles.option} onPress={toggleComment}>
