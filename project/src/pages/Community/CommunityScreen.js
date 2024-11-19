@@ -77,7 +77,7 @@ const CommunityScreen = () => {
       setCardData(formattedData);
     } catch (error) {
       console.error('Error fetching community data:', error);
-      Alert.alert('Error', 'Failed to fetch community data');
+      // Alert.alert('Error', 'Failed to fetch community data');
     } finally {
       setLoading(false);
       setRefreshing(false);

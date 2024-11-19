@@ -13,6 +13,7 @@ import {
   Modal,
   RefreshControl,
   Alert,
+  ToastAndroid
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import ImagePicker from 'react-native-image-crop-picker';
@@ -327,6 +328,38 @@ const CommunitySettings = () => {
     setCommunityBio(text);
   };
 
+  const handleDelete = async () => {
+    const token = await AsyncStorage.getItem('token');
+    try {
+      Alert.alert('Delete Community', 'Are you sure want to delete this community?', [
+        {
+          text: 'Cancel',
+          onPress: () => null,
+          style: 'cancel',
+        },
+        {
+          text: 'Delete',
+          onPress: async () => {
+            await axios
+              .post(`${serverUrl}/delete-community`, {
+                token: token,
+                communityId: communityId
+              })
+              .then(res => {
+                console.log(res.data)
+                navigation.navigate('Community');
+                ToastAndroid.show('Community successfully deleted', ToastAndroid.SHORT);
+              })
+          },
+        },
+      ]);
+    } catch (error) {
+      ToastAndroid.show('Something Error, Try Again Later', ToastAndroid.SHORT);
+      console.error(error)
+    }
+  }
+
+
   return (
     <ScrollView
       contentContainerStyle={styles.container}
@@ -374,13 +407,6 @@ const CommunitySettings = () => {
               value={communityName}
               onChangeText={inputNameChange}
             />
-            {/* <TouchableOpacity onPress={() => toggleEditing('name')}>
-              <MaterialCommunityIcons
-                name="chevron-right"
-                size={25}
-                color="#000"
-              />
-            </TouchableOpacity> */}
           </View>
           <Text style={styles.label}>Community Name</Text>
         </View>
@@ -392,13 +418,6 @@ const CommunitySettings = () => {
               onChangeText={handleBioChange}
               multiline={true}
             />
-            {/* <TouchableOpacity onPress={() => toggleEditing('bio')}>
-              <MaterialCommunityIcons
-                name="chevron-right"
-                size={25}
-                color="#000"
-              />
-            </TouchableOpacity> */}
           </View>
           <Text style={styles.label}>Description</Text>
         </View>
@@ -500,7 +519,7 @@ const CommunitySettings = () => {
             />
           </View>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.deleteButton}>
+        <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
           <Text style={styles.deleteButtonText}>Delete Community</Text>
         </TouchableOpacity>
       </View>
