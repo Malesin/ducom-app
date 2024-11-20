@@ -6,6 +6,7 @@ import {
   ScrollView, // Tambahkan ScrollView
   RefreshControl, // Tambahkan RefreshControl
   Alert, // Tambahkan Alert
+  TouchableOpacity, // Tambahkan TouchableOpacity
 } from 'react-native';
 import React, {useState, useEffect, useCallback} from 'react';
 import CommunityCard from '../../components/Community/CommunityCard';
@@ -13,16 +14,17 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../../config';
 import { Skeleton } from 'react-native-elements';
-import { useRoute } from '@react-navigation/native';
+import { useRoute, useNavigation } from '@react-navigation/native';
 
 const serverUrl = config.SERVER_URL;
 
-const CommunityPost = ({navigation}) => {
+const CommunityPost = () => {
   const route = useRoute();
   const {communityId} = route.params;
   const [communityDataList, setCommunityDataList] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true); // Tambahkan state loading
+  const navigation = useNavigation(); // Gunakan useNavigation untuk mendapatkan objek navigation
 
   const fetchDataPost = async () => {
     setLoading(true); // Set loading ke true saat mulai fetch data
@@ -149,11 +151,18 @@ const CommunityPost = ({navigation}) => {
             <Text style={styles.noPostsText}>No posts available</Text>
           ) : (
             communityDataList.map((communityCardData, index) => (
-              <CommunityCard
+              <TouchableOpacity
                 key={index}
-                navigation={navigation}
-                communityCardData={communityCardData}
-              />
+                onPress={() => navigation.navigate('ViewPostCommunity', {
+                  post: communityCardData,
+                  focusCommentInput: false, // Atur sesuai kebutuhan
+                })}
+              >
+                <CommunityCard
+                  navigation={navigation}
+                  communityCardData={communityCardData}
+                />
+              </TouchableOpacity>
             ))
           )}
         </ScrollView>

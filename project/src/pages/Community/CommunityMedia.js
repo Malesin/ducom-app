@@ -1,31 +1,37 @@
-import { View, Text, StyleSheet, SafeAreaView } from 'react-native';
-import React, { useState, useEffect } from 'react';
+import {View, Text, StyleSheet, SafeAreaView, TouchableOpacity} from 'react-native';
+import React, {useState, useEffect} from 'react';
 import CommunityCard from '../../components/Community/CommunityCard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../../config';
-import { useRoute } from '@react-navigation/native';
-import { Skeleton } from 'react-native-elements';
+import {useRoute} from '@react-navigation/native';
+import {Skeleton} from 'react-native-elements';
+import {useNavigation} from '@react-navigation/native';
 
 const serverUrl = config.SERVER_URL;
 
-const CommunityMedia = ({ navigation }) => {
+const CommunityMedia = ({navigation}) => {
   const route = useRoute();
-  const { communityId } = route.params;
+  const {communityId} = route.params;
   const [communityDataList, setCommunityDataList] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const nav = navigation || useNavigation();
 
   const fetchDataPost = async () => {
     setLoading(true);
     const token = await AsyncStorage.getItem('token');
 
     try {
-      const postsResponse = await axios.post(`${serverUrl}/communityPosts-byId`, {
-        token,
-        communityId,
-      });
+      const postsResponse = await axios.post(
+        `${serverUrl}/communityPosts-byId`,
+        {
+          token,
+          communityId,
+        },
+      );
       const data = postsResponse.data.data;
-      const myData = postsResponse.data.myUser
+      const myData = postsResponse.data.myUser;
       const formattedData = data
         .filter(post => Array.isArray(post.media) && post.media.length > 0)
         .filter(post => post.user !== null)
@@ -33,15 +39,15 @@ const CommunityMedia = ({ navigation }) => {
           id: post?._id,
           userIdPost: post?.user?._id,
           communityId: post?.communityId?._id,
-          communityCardName: post?.communityId?.communityName || 'Community Name',
+          communityCardName:
+            post?.communityId?.communityName || 'Community Name',
           communityProfile: post?.communityId?.picture?.profile?.profilePicture,
-          communityDescription:
-            post?.description || 'This is Description Community.',
+          communityDescription: post?.description || null,
           media: Array.isArray(post?.media)
             ? post?.media?.map(mediaItem => ({
-              type: mediaItem?.type,
-              uri: mediaItem?.uri,
-            }))
+                type: mediaItem?.type,
+                uri: mediaItem?.uri,
+              }))
             : [],
           isLiked: post?.likes?.some(like => like?._id === myData?.myId),
           likesCount: post.likes.length || 0,
@@ -50,7 +56,7 @@ const CommunityMedia = ({ navigation }) => {
           commentsEnabled: post?.commentsEnabled,
           idUser: myData?.myId,
           amIAdmin: myData?.amIAdmin,
-          profilePicture: myData?.profilePicture
+          profilePicture: myData?.profilePicture,
         }));
       setCommunityDataList(formattedData);
     } catch (error) {
@@ -118,11 +124,18 @@ const CommunityMedia = ({ navigation }) => {
             <Text style={styles.noPostsText}>No media available</Text>
           ) : (
             communityDataList.map((communityCardData, index) => (
-              <CommunityCard
+              <TouchableOpacity
                 key={index}
-                navigation={navigation}
-                communityCardData={communityCardData}
-              />
+                onPress={() => nav.navigate('ViewPostCommunity', {
+                  post: communityCardData,
+                  focusCommentInput: false,
+                })}
+              >
+                <CommunityCard
+                  navigation={nav}
+                  communityCardData={communityCardData}
+                />
+              </TouchableOpacity>
             ))
           )}
         </View>
