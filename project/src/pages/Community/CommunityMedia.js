@@ -114,13 +114,17 @@ const CommunityMedia = ({ navigation }) => {
         renderSkeleton()
       ) : (
         <View>
-          {communityDataList.map((communityCardData, index) => (
-            <CommunityCard
-              key={index}
-              navigation={navigation}
-              communityCardData={communityCardData}
-            />
-          ))}
+          {communityDataList.length === 0 ? (
+            <Text style={styles.noPostsText}>No media available</Text>
+          ) : (
+            communityDataList.map((communityCardData, index) => (
+              <CommunityCard
+                key={index}
+                navigation={navigation}
+                communityCardData={communityCardData}
+              />
+            ))
+          )}
         </View>
       )}
     </SafeAreaView>
@@ -153,5 +157,11 @@ const styles = StyleSheet.create({
   },
   skeleton: {
     marginBottom: 10,
+  },
+  noPostsText: {
+    textAlign: 'center',
+    marginTop: 20,
+    fontSize: 16,
+    color: '#888',
   },
 });

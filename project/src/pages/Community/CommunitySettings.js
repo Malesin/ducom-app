@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {
   View,
   Text,
@@ -13,7 +13,7 @@ import {
   Modal,
   RefreshControl,
   Alert,
-  ToastAndroid
+  ToastAndroid,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import ImagePicker from 'react-native-image-crop-picker';
@@ -25,14 +25,14 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../../config';
-import { Skeleton } from 'react-native-elements';
+import {Skeleton} from 'react-native-elements';
 
 const serverUrl = config.SERVER_URL;
 
 const CommunitySettings = () => {
   const route = useRoute();
   const navigation = useNavigation();
-  const { communityId, communityDataBefore } = route.params;
+  const {communityId, communityDataBefore} = route.params;
   const [isEditingName, setIsEditingName] = useState(false);
   const [isEditingBio, setIsEditingBio] = useState(false);
   const [communityName, setCommunityName] = useState('');
@@ -51,6 +51,18 @@ const CommunitySettings = () => {
   const [communityData, setCommunityData] = useState();
   const [refreshing, setRefreshing] = useState(false);
   const [isDeleted, setIsDeleted] = useState(false);
+  const communityNameInputRef = useRef(null);
+
+  const CommunityNameBackspacePress = event => {
+    try {
+      const key = event?.nativeEvent?.key;
+      if (key === 'Backspace' && communityName.length > 0) {
+        setCommunityName(communityName.slice(0, -1));
+      }
+    } catch (error) {
+      console.log('Error handling key press:', error);
+    }
+  };
 
   const fetchCommunityData = async () => {
     const token = await AsyncStorage.getItem('token');
@@ -70,25 +82,34 @@ const CommunitySettings = () => {
   };
 
   useEffect(() => {
-    if (!isDeleted) {
-      fetchCommunityData();
-    }
+    fetchCommunityData();
 
-    if (communityDataBefore?.picture?.banner?.bannerPicture) {
-      setBanner({ uri: communityDataBefore.picture.banner.bannerPicture });
-    }
-    if (communityDataBefore?.picture?.profile?.profilePicture) {
-      setProfilePicture({ uri: communityDataBefore.picture.profile.profilePicture });
-    }
-    if (communityDataBefore?.picture?.background?.backgroundPicture) {
-      setProfileBackground({ uri: communityDataBefore.picture.background.backgroundPicture });
-    }
-  }, [communityDataBefore, isDeleted]);
+    setBanner({uri: communityDataBefore?.picture?.banner.bannerPicture});
+    setProfilePicture({
+      uri: communityDataBefore?.picture?.profile.profilePicture,
+    });
+    setProfileBackground({
+      uri: communityDataBefore?.picture?.background.backgroundPicture,
+    });
+  }, [communityDataBefore]);
 
-  const onRefresh = React.useCallback(() => {
+  const onRefresh = React.useCallback(async () => {
     setRefreshing(true);
-  }, [communityId]);
-
+    try {
+      await fetchCommunityData();
+      setBanner({uri: communityDataBefore?.picture?.banner.bannerPicture});
+      setProfilePicture({
+        uri: communityDataBefore?.picture?.profile.profilePicture,
+      });
+      setProfileBackground({
+        uri: communityDataBefore?.picture?.background.backgroundPicture,
+      });
+    } catch (error) {
+      console.error('Error refreshing data:', error);
+    } finally {
+      setRefreshing(false);
+    }
+  }, [communityId, communityDataBefore]);
 
   const toggleEditing = field => {
     if (field === 'name') {
@@ -103,7 +124,9 @@ const CommunitySettings = () => {
   useEffect(() => {
     const checkDataChanged = () => {
       const dataChanged =
-        (communityName && communityName !== communityData?.communityName) ||
+        (communityName &&
+          communityName.length >= 3 &&
+          communityName !== communityData?.communityName) ||
         (communityBio &&
           communityBio !== communityData?.communityDescription) ||
         newProfilePicture ||
@@ -126,7 +149,7 @@ const CommunitySettings = () => {
       <TouchableOpacity
         style={[
           styles.saveButton,
-          { backgroundColor: isDataChanged ? '#001374' : '#ccc' },
+          {backgroundColor: isDataChanged ? '#001374' : '#ccc'},
         ]}
         onPress={isDataChanged ? handleSave : null}
         disabled={!isDataChanged}>
@@ -146,6 +169,11 @@ const CommunitySettings = () => {
     const nameToSave = communityName.trim();
     const bioToSave = communityBio.trim();
 
+    if (nameToSave.length < 3) {
+      Alert.alert('Error', 'Community name must be at least 3 characters long');
+      return;
+    }
+
     if (!nameToSave || !bioToSave) {
       Alert.alert('Error', 'Community name and description are required');
       return;
@@ -159,7 +187,8 @@ const CommunitySettings = () => {
     };
 
     try {
-      // Upload new images if they exist
+      setRefreshing(true);
+
       if (newProfilePicture) {
         const profileFormData = new FormData();
         profileFormData.append('image', {
@@ -170,11 +199,15 @@ const CommunitySettings = () => {
         profileFormData.append('token', token);
         profileFormData.append('communityId', communityId);
 
-        await axios.post(`${serverUrl}/upload-community-profile`, profileFormData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
+        await axios.post(
+          `${serverUrl}/upload-community-profile`,
+          profileFormData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
           },
-        });
+        );
       }
 
       if (newBanner) {
@@ -187,11 +220,15 @@ const CommunitySettings = () => {
         bannerFormData.append('token', token);
         bannerFormData.append('communityId', communityId);
 
-        await axios.post(`${serverUrl}/upload-community-banner`, bannerFormData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
+        await axios.post(
+          `${serverUrl}/upload-community-banner`,
+          bannerFormData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
           },
-        });
+        );
       }
 
       if (newProfileBackground) {
@@ -226,15 +263,21 @@ const CommunitySettings = () => {
       );
 
       if (editResponse.status === 200 || editResponse.data?.status === 'ok') {
-        await fetchCommunityData(); // Refresh data
+        await onRefresh();
+
         setIsDataChanged(false);
+        setNewProfilePicture(null);
+        setNewBanner(null);
+        setNewProfileBackground(null);
 
         Alert.alert(
           'Success',
           editResponse.data?.message ||
-          'Community settings updated successfully',
+            'Community settings updated successfully',
         );
       } else {
+        setRefreshing(false);
+
         const errorMessage =
           editResponse.data?.message ||
           editResponse.data?.error ||
@@ -242,6 +285,8 @@ const CommunitySettings = () => {
         Alert.alert('Error', errorMessage);
       }
     } catch (error) {
+      setRefreshing(false);
+
       console.error('Error Update Data:', error);
       Alert.alert('Error', error.message || 'An unexpected error occurred');
     }
@@ -257,7 +302,7 @@ const CommunitySettings = () => {
       .then(async image => {
         console.log('Image selected:', image);
         setNewBanner(image);
-        setBanner({ uri: image.path });
+        setBanner({uri: image.path});
       })
       .catch(error => {
         console.error('Error selecting image:', error);
@@ -274,7 +319,7 @@ const CommunitySettings = () => {
       .then(async image => {
         console.log('Image selected:', image);
         setNewProfilePicture(image);
-        setProfilePicture({ uri: image.path });
+        setProfilePicture({uri: image.path});
       })
       .catch(error => {
         console.error('Error selecting image:', error);
@@ -291,7 +336,7 @@ const CommunitySettings = () => {
       .then(async image => {
         console.log('Image selected:', image);
         setNewProfileBackground(image);
-        setProfileBackground({ uri: image.path });
+        setProfileBackground({uri: image.path});
       })
       .catch(error => {
         console.error('Error selecting image:', error);
@@ -325,10 +370,22 @@ const CommunitySettings = () => {
     setModalImageSource(null);
   };
 
+  const validateCommunityName = name => {
+    const symbolRegex = /[@#!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/;
+
+    if (symbolRegex.test(name)) {
+      return false;
+    }
+
+    return /^[a-zA-Z0-9\s]+$/.test(name);
+  };
+
   const inputNameChange = text => {
     console.log('Full Input Text:', text);
     console.log('Input Text Length:', text.length);
-    setCommunityName(text);
+    if (validateCommunityName(text)) {
+      setCommunityName(text);
+    }
   };
 
   const handleBioChange = text => {
@@ -340,35 +397,50 @@ const CommunitySettings = () => {
   const handleDelete = async () => {
     const token = await AsyncStorage.getItem('token');
     try {
-      Alert.alert('Delete Community', 'Are you sure want to delete this community?', [
-        {
-          text: 'Cancel',
-          onPress: () => null,
-          style: 'cancel',
-        },
-        {
-          text: 'Delete',
-          onPress: async () => {
-            await axios
-              .post(`${serverUrl}/delete-community`, {
-                token: token,
-                communityId: communityId
-              })
-              .then(res => {
-                console.log(res.data)
-                setIsDeleted(true);
-                navigation.navigate('Community');
-                ToastAndroid.show('Community successfully deleted', ToastAndroid.SHORT);
-              })
+      Alert.alert(
+        'Delete Community',
+        'Are you sure want to delete this community?',
+        [
+          {
+            text: 'Cancel',
+            onPress: () => null,
+            style: 'cancel',
           },
-        },
-      ]);
+          {
+            text: 'Delete',
+            onPress: async () => {
+              await axios
+                .post(`${serverUrl}/delete-community`, {
+                  token: token,
+                  communityId: communityId,
+                })
+                .then(res => {
+                  console.log(res.data);
+                  navigation.navigate('Community');
+                  ToastAndroid.show(
+                    'Community successfully deleted',
+                    ToastAndroid.SHORT,
+                  );
+                });
+            },
+          },
+        ],
+      );
     } catch (error) {
       ToastAndroid.show('Something Error, Try Again Later', ToastAndroid.SHORT);
-      console.error(error)
+      console.error(error);
     }
-  }
+  };
 
+  useFocusEffect(
+    React.useCallback(() => {
+      const refreshData = async () => {
+        await onRefresh();
+      };
+
+      refreshData();
+    }, [communityId, communityDataBefore]),
+  );
 
   return (
     <ScrollView
@@ -414,12 +486,20 @@ const CommunitySettings = () => {
           <View style={styles.infoRow}>
             {communityData ? (
               <TextInput
+                maxLength={30}
                 style={styles.infoText}
                 value={communityName}
                 onChangeText={inputNameChange}
+                onKeyPress={CommunityNameBackspacePress}
+                ref={communityNameInputRef}
               />
-            ) : ( 
-              <Skeleton animation="pulse" height={20} width={150} style={styles.skeleton} />
+            ) : (
+              <Skeleton
+                animation="pulse"
+                height={20}
+                width={150}
+                style={styles.skeleton}
+              />
             )}
           </View>
           <Text style={styles.label}>Community Name</Text>
@@ -428,13 +508,19 @@ const CommunitySettings = () => {
           <View style={styles.infoRow}>
             {communityData ? (
               <TextInput
+                maxLength={150}
                 style={styles.bioText}
                 value={communityBio}
                 onChangeText={handleBioChange}
                 multiline={true}
               />
             ) : (
-              <Skeleton animation="pulse" height={20} width={150} style={styles.skeleton} />
+              <Skeleton
+                animation="pulse"
+                height={20}
+                width={150}
+                style={styles.skeleton}
+              />
             )}
           </View>
           <Text style={styles.label}>Description</Text>
@@ -447,7 +533,7 @@ const CommunitySettings = () => {
           {profileBackground && (
             <ImageBackground
               source={profileBackground}
-              style={{ width: '100%', height: 200 }}
+              style={{width: '100%', height: 200}}
               resizeMode="cover"
             />
           )}
@@ -476,7 +562,7 @@ const CommunitySettings = () => {
             <TouchableOpacity
               style={styles.dropdownItem}
               onPress={() => {
-                navigation.navigate('CommunityEditRules', { communityData });
+                navigation.navigate('CommunityEditRules', {communityData});
                 setDropdownVisible(false);
               }}>
               <MaterialCommunityIcons
@@ -491,15 +577,7 @@ const CommunitySettings = () => {
               style={styles.dropdownItem}
               onPress={() => {
                 setDropdownVisible(false);
-              }}>
-              <MaterialCommunityIcons
-                name="delete"
-                size={20}
-                color="red"
-                style={styles.dropdownIcon}
-              />
-              <Text style={styles.dropdownItemText}>Delete Rules</Text>
-            </TouchableOpacity>
+              }}></TouchableOpacity>
           </View>
         )}
         <View style={styles.rulesContainer}>
@@ -522,14 +600,14 @@ const CommunitySettings = () => {
         <Text style={styles.sectionTitle}>User Account</Text>
         <TouchableOpacity
           style={styles.userAccountContainer}
-          onPress={() => navigation.navigate('CommunityList', { communityId })}>
+          onPress={() => navigation.navigate('CommunityList', {communityId})}>
           <MaterialCommunityIcons
             name="shield-account"
             size={26}
             color="#000"
           />
           <Text style={styles.userAccountText}>User List</Text>
-          <View style={{ flex: 1, alignItems: 'flex-end' }}>
+          <View style={{flex: 1, alignItems: 'flex-end'}}>
             <MaterialCommunityIcons
               name="chevron-right"
               size={25}
@@ -588,13 +666,13 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: -3,
     left: '54%',
-    transform: [{ translateX: -50 }],
+    transform: [{translateX: -50}],
     alignItems: 'center',
   },
   avatar: {
     bottom: -15,
     left: '54%',
-    transform: [{ translateX: -50 }],
+    transform: [{translateX: -50}],
     width: 80,
     height: 80,
     borderRadius: 50,
@@ -606,7 +684,7 @@ const styles = StyleSheet.create({
     bottom: -10,
     right: 0,
     backgroundColor: '#d3d3d3',
-    borderRadius: 10,
+    borderRadius: 100,
     padding: 2,
   },
   section: {

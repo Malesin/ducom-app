@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   SafeAreaView,
   View,
@@ -12,16 +12,16 @@ import {
 } from 'react-native';
 import axios from 'axios';
 import config from '../../config';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Skeleton } from 'react-native-elements';
+import {Skeleton} from 'react-native-elements';
 
 const serverUrl = config.SERVER_URL;
 
 const ViewCommunity = () => {
   const route = useRoute();
-  const { communityId } = route.params;
+  const {communityId} = route.params;
   const [communityData, setCommunityData] = useState(null);
   const [userData, setUserData] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -56,12 +56,11 @@ const ViewCommunity = () => {
       setIsAdmin(adminStatus);
     } catch (error) {
       console.error('Error fetching community data:', error);
-      Alert.alert('Error', 'Failed to fetch community data');
+      // Alert.alert('Error', 'Failed to fetch community data');
     }
   };
 
   useEffect(() => {
-
     fetchCommunityData();
     getUserData();
 
@@ -124,19 +123,39 @@ const ViewCommunity = () => {
 
   const handleCreate = () => {
     console.log('Creating post in community');
-    navigation.navigate('CreatePostCommunity', { communityId: communityId });
+    navigation.navigate('CreatePostCommunity', {communityId: communityId});
   };
 
   const renderSkeleton = () => (
     <View style={styles.skeletonContainer}>
-      <Skeleton animation="pulse" height={185} width={'100%'} style={styles.skeletonBanner} />
+      <Skeleton
+        animation="pulse"
+        height={185}
+        width={'100%'}
+        style={styles.skeletonBanner}
+      />
       <View style={styles.skeletonInfoActionContainer}>
         <View style={styles.skeletonInfoContainer}>
-          <Skeleton animation="pulse" height={24} width={150} style={styles.skeleton} />
-          <Skeleton animation="pulse" height={14} width={200} style={styles.skeleton} />
+          <Skeleton
+            animation="pulse"
+            height={24}
+            width={150}
+            style={styles.skeleton}
+          />
+          <Skeleton
+            animation="pulse"
+            height={14}
+            width={200}
+            style={styles.skeleton}
+          />
         </View>
         <View style={styles.skeletonActionContainer}>
-          <Skeleton animation="pulse" height={30} width={80} style={styles.skeletonButton} />
+          <Skeleton
+            animation="pulse"
+            height={30}
+            width={80}
+            style={styles.skeletonButton}
+          />
         </View>
       </View>
     </View>
@@ -160,7 +179,7 @@ const ViewCommunity = () => {
               <Image
                 source={
                   communityData?.picture?.banner?.bannerPicture
-                    ? { uri: communityData.picture.banner.bannerPicture }
+                    ? {uri: communityData.picture.banner.bannerPicture}
                     : require('../../assets/banner.png')
                 }
                 style={styles.banner}
@@ -325,7 +344,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   skeletonContainer: {
-    marginBottom:19,
+    marginBottom: 19,
   },
   skeletonBanner: {
     marginBottom: 15,
@@ -349,7 +368,7 @@ const styles = StyleSheet.create({
     marginRight: 15,
   },
   skeleton: {
-    marginLeft:14,
+    marginLeft: 14,
     marginBottom: 10,
     borderRadius: 3,
   },

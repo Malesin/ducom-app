@@ -20,9 +20,9 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 const Tab = createBottomTabNavigator();
 
 function BottomTabNavigator({navigation}) {
-  // Menerima navigation sebagai prop
   const [profilePicture, setProfilePicture] = useState('');
   const [isConnected, setIsConnected] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const getData = useCallback(async () => {
     try {
@@ -40,6 +40,10 @@ function BottomTabNavigator({navigation}) {
         const profile = {uri: user.profilePicture};
         setProfilePicture(profile);
         console.log('Image Profile Retrieved Successfully');
+      }
+
+      if (user.isAdmin) {
+        setIsAdmin(true);
       }
     } catch (error) {
       console.error('Error occurred:', error);
@@ -133,16 +137,18 @@ function BottomTabNavigator({navigation}) {
                   alignItems: 'center',
                   marginRight: 15,
                 }}>
-                <TouchableOpacity
-                  onPress={() => {
-                    navigation.navigate('CreateCommunity');
-                  }}>
-                  <MaterialCommunityIcons
-                    name="account-multiple-plus"
-                    size={25}
-                    color="black"
-                  />
-                </TouchableOpacity>
+                {isAdmin && (
+                  <TouchableOpacity
+                    onPress={() => {
+                      navigation.navigate('CreateCommunity');
+                    }}>
+                    <MaterialCommunityIcons
+                      name="account-multiple-plus"
+                      size={25}
+                      color="black"
+                    />
+                  </TouchableOpacity>
+                )}
               </View>
             ),
           }}

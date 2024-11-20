@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -16,14 +16,14 @@ import Animated, {
   withSpring,
   runOnJS,
 } from 'react-native-reanimated';
-import { PanGestureHandler } from 'react-native-gesture-handler';
+import {PanGestureHandler} from 'react-native-gesture-handler';
 import axios from 'axios';
-import config from '../../config'; // Pastikan path ini sesuai dengan struktur proyek Anda
+import config from '../../config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const DELETE_THRESHOLD = -75;
 
-const SwipeableRule = ({ rule, index, updateRule, onDelete, canDelete }) => {
+const SwipeableRule = ({rule, index, updateRule, onDelete, canDelete}) => {
   const translateX = useSharedValue(0);
   const isRemoving = useSharedValue(false);
 
@@ -58,13 +58,13 @@ const SwipeableRule = ({ rule, index, updateRule, onDelete, canDelete }) => {
 
   const rStyle = useAnimatedStyle(() => {
     return {
-      transform: [{ translateX: translateX.value }],
+      transform: [{translateX: translateX.value}],
     };
   });
 
   const deleteButtonStyle = useAnimatedStyle(() => {
     return {
-      transform: [{ translateX: translateX.value + 100 }],
+      transform: [{translateX: translateX.value + 100}],
       opacity: canDelete ? 1 : 0,
     };
   });
@@ -83,8 +83,8 @@ const SwipeableRule = ({ rule, index, updateRule, onDelete, canDelete }) => {
         <Animated.View style={[styles.ruleContainer, rStyle]}>
           <Text style={styles.ruleNumber}>Rule {index + 1}</Text>
           <TextInput
-            maxLength={150}
-            style={[styles.communityRulesInputTitle, { height: 35 }]}
+            maxLength={30}
+            style={[styles.communityRulesInputTitle, {height: 35}]}
             placeholder="Title"
             placeholderTextColor="#b6b6b6"
             value={rule.title}
@@ -92,7 +92,7 @@ const SwipeableRule = ({ rule, index, updateRule, onDelete, canDelete }) => {
           />
           <TextInput
             maxLength={150}
-            style={[styles.communityRulesInputDescription, { height: 100 }]}
+            style={[styles.communityRulesInputDescription, {height: 100}]}
             placeholder="Description"
             placeholderTextColor="#b6b6b6"
             multiline={true}
@@ -106,16 +106,47 @@ const SwipeableRule = ({ rule, index, updateRule, onDelete, canDelete }) => {
   );
 };
 
-const CreateCommunity = ({ navigation }) => {
+const CreateCommunity = ({navigation}) => {
   const [inputNameHeight, setInputNameHeight] = useState(35);
   const [inputHeightDescription, setInputHeightDescription] = useState(35);
-  const [rules, setRules] = useState([{ title: '', description: '' }]);
+  const [rules, setRules] = useState([{title: '', description: ''}]);
   const [newCommunityName, setNewCommunityName] = useState('');
   const [newCommunityDescription, setNewCommunityDescription] = useState('');
   const serverUrl = config.SERVER_URL;
+
+  const communityNameInputRef = useRef(null);
   const [isCreating, setIsCreating] = useState(false);
 
+  const CommunityNameBackspacePress = event => {
+    try {
+      const key = event?.nativeEvent?.key;
+      if (key === 'Backspace' && newCommunityName.length > 0) {
+        setNewCommunityName('');
+      }
+    } catch (error) {
+      console.log('Error handling key press:', error);
+    }
+  };
+
+  const validateCommunityName = name => {
+    const symbolRegex = /[@#!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/;
+
+    if (symbolRegex.test(name)) {
+      return false;
+    }
+
+    return /^[a-zA-Z0-9\s]+$/.test(name);
+  };
+
   const handleCreateCommunity = async () => {
+    if (newCommunityName.length < 3) {
+      Alert.alert(
+        'Invalid Community Name',
+        'Community name must be at least 3 characters long',
+      );
+      return;
+    }
+
     if (isCreating) return;
     setIsCreating(true);
 
@@ -126,7 +157,6 @@ const CreateCommunity = ({ navigation }) => {
         setIsCreating(false);
         return;
       }
-
       const response = await axios.post(`${serverUrl}/create-community`, {
         token: token,
         communityName: newCommunityName,
@@ -146,7 +176,7 @@ const CreateCommunity = ({ navigation }) => {
               onPress: () => navigation.goBack(),
             },
           ],
-          { cancelable: false }
+          {cancelable: false},
         );
       } else {
         console.error('Error creating community:', response.data);
@@ -160,6 +190,7 @@ const CreateCommunity = ({ navigation }) => {
 
   const isFormValid = () => {
     return (
+      newCommunityName.trim().length >= 3 &&
       newCommunityName.trim() !== '' &&
       newCommunityDescription.trim() !== '' &&
       rules.every(
@@ -173,7 +204,8 @@ const CreateCommunity = ({ navigation }) => {
       headerRight: () => (
         <TouchableOpacity
           style={{
-            backgroundColor: isFormValid() && !isCreating ? '#00137f' : '#b0b0b0',
+            backgroundColor:
+              isFormValid() && !isCreating ? '#00137f' : '#b0b0b0',
             borderRadius: 20,
             paddingVertical: 6,
             paddingHorizontal: 16,
@@ -192,18 +224,24 @@ const CreateCommunity = ({ navigation }) => {
         </TouchableOpacity>
       ),
     });
-  }, [navigation, newCommunityName, newCommunityDescription, rules, isCreating]);
+  }, [
+    navigation,
+    newCommunityName,
+    newCommunityDescription,
+    rules,
+    isCreating,
+  ]);
 
   const addNewRule = () => {
     if (rules.length < 5) {
-      setRules([...rules, { title: '', description: '' }]);
+      setRules([...rules, {title: '', description: ''}]);
     }
   };
 
   const updateRule = (index, field, value) => {
     const updatedRules = rules.map((rule, i) => {
       if (i === index) {
-        return { ...rule, [field]: value };
+        return {...rule, [field]: value};
       }
       return rule;
     });
@@ -218,7 +256,6 @@ const CreateCommunity = ({ navigation }) => {
     }
   };
 
-
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
@@ -228,15 +265,21 @@ const CreateCommunity = ({ navigation }) => {
             maxLength={30}
             style={[
               styles.communityNameInput,
-              { height: Math.max(35, inputNameHeight) },
+              {height: Math.max(35, inputNameHeight)},
             ]}
             multiline={true}
             onContentSizeChange={e => {
-              const { height } = e.nativeEvent.contentSize;
+              const {height} = e.nativeEvent.contentSize;
               setInputNameHeight(height);
             }}
             value={newCommunityName}
-            onChangeText={setNewCommunityName}
+            onChangeText={text => {
+              if (validateCommunityName(text)) {
+                setNewCommunityName(text);
+              }
+            }}
+            ref={communityNameInputRef}
+            onKeyPress={CommunityNameBackspacePress}
           />
           <Text style={styles.communityNameSubText}>
             Name must be between 3 and 30 characters and can't include symbols,
@@ -251,11 +294,11 @@ const CreateCommunity = ({ navigation }) => {
             maxLength={150}
             style={[
               styles.communityDescriptionInput,
-              { height: Math.max(35, inputHeightDescription) },
+              {height: Math.max(35, inputHeightDescription)},
             ]}
             multiline={true}
             onContentSizeChange={e => {
-              const { height } = e.nativeEvent.contentSize;
+              const {height} = e.nativeEvent.contentSize;
               setInputHeightDescription(height);
             }}
             value={newCommunityDescription}
@@ -299,7 +342,7 @@ const CreateCommunity = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    padding: 20,
     backgroundColor: '#f5f5f5',
   },
   communityName: {
