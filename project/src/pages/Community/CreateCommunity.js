@@ -146,10 +146,10 @@ const CreateCommunity = ({navigation}) => {
       );
       return;
     }
-
+  
     if (isCreating) return;
     setIsCreating(true);
-
+  
     try {
       const token = await AsyncStorage.getItem('token');
       if (!token) {
@@ -164,7 +164,7 @@ const CreateCommunity = ({navigation}) => {
         description: 'Deskripsi tambahan',
         rules: rules,
       });
-
+  
       if (response.status === 201) {
         console.log('Community created successfully:', response.data);
         Alert.alert(
@@ -179,13 +179,16 @@ const CreateCommunity = ({navigation}) => {
           {cancelable: false},
         );
       } else {
-        console.error('Error creating community:', response.data);
+        throw new Error('Failed to create community');
       }
     } catch (error) {
       console.error('Network error:', error);
+      Alert.alert(
+        'Error', 
+        error.response?.data?.message || 'Failed to create community. Please try again.'
+      );
     } finally {
       setIsCreating(false);
-      Alert.alert('Error', 'Failed to create community. Please try again.');
     }
   };
 

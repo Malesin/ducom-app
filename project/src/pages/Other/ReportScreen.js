@@ -5,21 +5,21 @@ import {
   View,
   TouchableOpacity,
   ScrollView,
-  ToastAndroid
+  ToastAndroid,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import React, { useState, useEffect } from 'react';
-import { useNavigation } from '@react-navigation/native';
+import React, {useState, useEffect} from 'react';
+import {useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../../config';
-import { useRoute } from '@react-navigation/native';
+import {useRoute} from '@react-navigation/native';
 
 const serverUrl = config.SERVER_URL;
 
 const ReportScreen = () => {
   const route = useRoute();
-  const { reportPostId, reportUserId, commentId, report } = route.params;
+  const {reportPostId, reportUserId, commentId, report} = route.params;
   const [checkedItems, setCheckedItems] = useState({});
   const [isReport, setIsReport] = useState();
   const navigation = useNavigation();
@@ -32,17 +32,18 @@ const ReportScreen = () => {
 
   useEffect(() => {
     if (report === 'reportCommentId') {
-      setIsReport('Comment')
+      setIsReport('Comment');
     } else if (report === 'reportParentCommentId') {
-      setIsReport('Comment')
+      setIsReport('Comment');
+    } else if (report === 'Post') {
+      setIsReport('Post');
     } else {
-      setIsReport('Post')
-    }    
-  }, [])
+      setIsReport('User');
+    }
+  }, []);
 
   const handleSubmit = async () => {
     const token = await AsyncStorage.getItem('token');
-    console.log("commentId:", commentId)
 
     try {
       const reportCategory = Object.keys(checkedItems).reduce((acc, key) => {
@@ -80,16 +81,19 @@ const ReportScreen = () => {
           reportCommentId: commentId, // FOR REPORT COMMENT
           reportParentCommentId: commentId, // FOR REPORT CHILD COMMENT
           reportUserId: reportUserId, // FOR REPORT USER
-          reportCategory: reportCategory
+          reportCategory: reportCategory,
         })
         .then(res => {
           if (res.data.status == 'ok') {
-            ToastAndroid.show(`${isReport} was Successfully Reported!`, ToastAndroid.SHORT);
+            ToastAndroid.show(
+              `${isReport} was Successfully Reported!`,
+              ToastAndroid.SHORT,
+            );
             setTimeout(() => {
               navigation.navigate('Home');
             }, 1200);
           }
-        })
+        });
     } catch (error) {
       ToastAndroid.show(`Something Error, Try Again Later`, ToastAndroid.SHORT);
       console.error(error);

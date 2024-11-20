@@ -273,6 +273,13 @@ const CommunitySettings = () => {
           'Success',
           editResponse.data?.message ||
             'Community settings updated successfully',
+          [
+            {
+              text: 'OK',
+              onPress: () =>
+                navigation.navigate('ViewCommunity', {communityId}),
+            },
+          ],
         );
       } else {
         setRefreshing(false);
@@ -433,12 +440,40 @@ const CommunitySettings = () => {
 
   useFocusEffect(
     React.useCallback(() => {
-      const refreshData = async () => {
-        await onRefresh();
+      let isNavigatingAway = false;
+
+      const onBlur = () => {
+        if (isDataChanged) {
+          Alert.alert(
+            'Unsaved Changes',
+            'You have unsaved changes. Do you want to save them before leaving?',
+            [
+              {text: 'Cancel', style: 'cancel'},
+              {
+                text: 'Leave',
+                onPress: () => {
+                  isNavigatingAway = true;
+                  navigation.goBack();
+                },
+              },
+              {text: 'Save', onPress: handleSave},
+            ],
+          );
+        } else {
+          isNavigatingAway = true;
+          navigation.goBack();
+        }
       };
 
-      refreshData();
-    }, [communityId, communityDataBefore]),
+      const unsubscribe = navigation.addListener('beforeRemove', e => {
+        if (!isNavigatingAway) {
+          e.preventDefault();
+          onBlur();
+        }
+      });
+
+      return unsubscribe;
+    }, [isDataChanged, navigation]),
   );
 
   return (

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -13,7 +13,7 @@ import axios from 'axios';
 import config from '../../config';
 import LikeNotification from '../../components/Notification/LikeNotification';
 import CommentNotification from '../../components/Notification/CommentNotification';
-import { Skeleton } from 'react-native-elements';
+import {Skeleton} from 'react-native-elements';
 import ReportedNotification from '../../components/ReportedNotification';
 import FollowNotification from '../../components/Notification/FollowNotification';
 import RepostNotification from '../../components/Notification/RepostNotification';
@@ -34,7 +34,7 @@ const Notificationscreen = () => {
       const token = await AsyncStorage.getItem('token');
 
       let likeNotifications = [];
-      await axios.post(`${serverUrl}/like-notifications`, { token }).then(res => {
+      await axios.post(`${serverUrl}/like-notifications`, {token}).then(res => {
         if (res?.data?.status === 'ok') {
           likeNotifications = res?.data?.data
             .flat()
@@ -46,7 +46,7 @@ const Notificationscreen = () => {
 
       let commentNotifications = [];
       await axios
-        .post(`${serverUrl}/comment-notifications`, { token })
+        .post(`${serverUrl}/comment-notifications`, {token})
         .then(res => {
           if (res?.data?.status === 'ok') {
             commentNotifications = res?.data?.data
@@ -59,7 +59,7 @@ const Notificationscreen = () => {
 
       let followNotifications = [];
       await axios
-        .post(`${serverUrl}/follow-notifications`, { token })
+        .post(`${serverUrl}/follow-notifications`, {token})
         .then(res => {
           if (res?.data?.status === 'ok') {
             followNotifications = res?.data?.data
@@ -73,19 +73,21 @@ const Notificationscreen = () => {
 
       let repostNotifications = [];
       await axios
-        .post(`${serverUrl}/repost-notifications`, { token })
+        .post(`${serverUrl}/repost-notifications`, {token})
         .then(res => {
+          const myId = res?.data?.myId;
           if (res?.data?.status === 'ok') {
             repostNotifications = res?.data?.data
               .flat()
-              .filter(notification => notification !== null);
+              .filter(notification => notification !== null)
+              .filter(notification => notification?.fromUser?._id !== myId);
           } else {
             Alert.alert('Error', 'Failed to fetch follow notifications');
           }
         });
 
       await axios
-        .post(`${serverUrl}/warning-notifications`, { token })
+        .post(`${serverUrl}/warning-notifications`, {token})
         .then(res => {
           if (res?.data?.status === 'ok') {
             const warnings = res?.data?.data
@@ -97,7 +99,7 @@ const Notificationscreen = () => {
           }
         });
 
-        const allNotifications = [
+      const allNotifications = [
         ...likeNotifications,
         ...commentNotifications,
         ...repostNotifications,
@@ -133,14 +135,13 @@ const Notificationscreen = () => {
     <>
       {[...Array(5)].map((_, index) => (
         <View key={index} style={styles.skeletonContainer}>
-          
           <View style={styles.skeletonHeader}>
-          <Skeleton
+            <Skeleton
               animation="pulse"
               circle
               height={22}
               width={20}
-              style={[styles.skeletonAvatar, {borderRadius:4}]}
+              style={[styles.skeletonAvatar, {borderRadius: 4}]}
             />
             <Skeleton
               animation="pulse"
@@ -164,15 +165,15 @@ const Notificationscreen = () => {
                 style={styles.skeleton}
               />
               <Skeleton
-              animation="pulse"
-              circle
-              height={24}
-              width={100}
-              style={[styles.skeleton, {position: 'absolute', right: 0}]}
-            />
+                animation="pulse"
+                circle
+                height={24}
+                width={100}
+                style={[styles.skeleton, {position: 'absolute', right: 0}]}
+              />
             </View>
           </View>
-         </View>
+        </View>
       ))}
     </>
   );
@@ -205,7 +206,10 @@ const Notificationscreen = () => {
             <View style={styles.notificationContainer}>
               {allNotifications.map((notification, index) =>
                 notification?.like ? (
-                  <LikeNotification key={index} likeNotification={notification} />
+                  <LikeNotification
+                    key={index}
+                    likeNotification={notification}
+                  />
                 ) : notification?.comment ? (
                   <CommentNotification
                     key={index}
@@ -249,7 +253,7 @@ const styles = StyleSheet.create({
   },
   skeleton: {
     marginBottom: 10,
-    borderRadius:4,
+    borderRadius: 4,
   },
   skeletonHeader: {
     flexDirection: 'row',

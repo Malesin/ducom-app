@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   StyleSheet,
   Text,
@@ -11,9 +11,9 @@ import {
 import ProfilePicture from '../assets/profilepic.png';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import {useNavigation, useFocusEffect} from '@react-navigation/native';
 
-const ReportedNotification = ({ notif }) => {
+const ReportedNotification = ({notif}) => {
   const newNotif = notif[0];
   const slideAnim = useRef(new Animated.Value(-50)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -24,11 +24,11 @@ const ReportedNotification = ({ notif }) => {
 
   useEffect(() => {
     if (adminMessage == '') {
-      setMessage(false)
+      setMessage(false);
     } else {
-      setMessage(true)
+      setMessage(true);
     }
-    console.log(message)
+    console.log(message);
 
     Animated.parallel([
       Animated.timing(slideAnim, {
@@ -71,6 +71,29 @@ const ReportedNotification = ({ notif }) => {
     return `${day} ${month} ${year}`;
   };
 
+  const renderText = (text, options = {}) => {
+    const {maxLength = 10, ellipsis = '...', preserveWords = true} = options;
+
+    if (!text || text.length <= maxLength) return text;
+
+    if (!preserveWords) {
+      return `${text.substring(0, maxLength)}${ellipsis}`;
+    }
+
+    const words = text.split(' ');
+    let renderedText = '';
+
+    for (const word of words) {
+      if ((renderedText + word).length <= maxLength) {
+        renderedText += renderedText ? ` ${word}` : word;
+      } else {
+        break;
+      }
+    }
+
+    return `${renderedText}${ellipsis}`;
+  };
+
   useFocusEffect(
     React.useCallback(() => {
       return () => setModalVisible(false);
@@ -83,7 +106,7 @@ const ReportedNotification = ({ notif }) => {
         style={[
           styles.container,
           {
-            transform: [{ translateY: slideAnim }],
+            transform: [{translateY: slideAnim}],
             opacity: fadeAnim,
           },
         ]}>
@@ -130,9 +153,9 @@ const ReportedNotification = ({ notif }) => {
                       source={
                         newNotif?.reportedEntity?.user?.profilePicture
                           ? {
-                            uri: newNotif?.reportedEntity?.user
-                              ?.profilePicture,
-                          }
+                              uri: newNotif?.reportedEntity?.user
+                                ?.profilePicture,
+                            }
                           : ProfilePicture
                       }
                       style={styles.profileImage}
@@ -143,9 +166,11 @@ const ReportedNotification = ({ notif }) => {
                         'Post Deleted'}
                     </Text>
                     <Text style={styles.userMessage}>
-                      {newNotif?.relatedPost?.description ??
-                        newNotif?.report?.reportedPost?.description ??
-                        ''}
+                      {renderText(newNotif?.relatedPost?.description ?? '', {
+                        maxLength: 15,
+                        ellipsis: '...',
+                        preserveWords: true,
+                      })}
                     </Text>
                   </View>
                 </>
@@ -183,16 +208,16 @@ const ReportedNotification = ({ notif }) => {
             </View>
             <View style={styles.separator} />
 
-            {message &&
-              (<>
+            {message && (
+              <>
                 <View style={styles.adminMessageContainer}>
                   <Text style={styles.adminMessageTitle}>
                     Message from Admin :{' '}
                   </Text>
                   <Text style={styles.adminMessage}>{adminMessage}</Text>
                 </View>
-              </>)
-            }
+              </>
+            )}
             <TouchableOpacity
               style={styles.closeButton}
               onPress={() => setModalVisible(false)}>

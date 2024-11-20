@@ -13,10 +13,10 @@ import CommunityCard from '../../components/Community/CommunityCard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../../config';
-import { Skeleton } from 'react-native-elements';
-import { useRoute, useNavigation } from '@react-navigation/native';
+import {Skeleton} from 'react-native-elements';
+import {useRoute, useNavigation} from '@react-navigation/native';
 const serverUrl = config.SERVER_URL;
-const CommunityPost = ({navigation}) => {
+const CommunityPost = () => {
   const route = useRoute();
   const {communityId} = route.params;
   const [communityDataList, setCommunityDataList] = useState([]);
@@ -91,8 +91,7 @@ const CommunityPost = ({navigation}) => {
     <>
       {[...Array(5)].map((_, index) => (
         <View key={index} style={styles.skeletonContainer}>
-          <View style={styles.skeletonHeader}>
-          </View>
+          <View style={styles.skeletonHeader}></View>
           <Skeleton
             animation="pulse"
             height={20}
@@ -130,11 +129,12 @@ const CommunityPost = ({navigation}) => {
             communityDataList.map((communityCardData, index) => (
               <TouchableOpacity
                 key={index}
-                onPress={() => navigation.navigate('ViewPostCommunity', {
-                  post: communityCardData,
-                  focusCommentInput: false, // Atur sesuai kebutuhan
-                })}
-              >
+                onPress={() =>
+                  navigation.navigate('ViewPostCommunity', {
+                    post: communityCardData,
+                    focusCommentInput: false, // Atur sesuai kebutuhan
+                  })
+                }>
                 <CommunityCard
                   navigation={navigation}
                   communityCardData={communityCardData}
