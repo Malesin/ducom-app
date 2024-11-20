@@ -161,6 +161,7 @@ const CreateCommunity = ({navigation}) => {
 
       if (response.status === 201) {
         console.log('Community created successfully:', response.data);
+        navigation.goBack();
       } else {
         console.error('Error creating community:', response.data);
       }
