@@ -588,7 +588,7 @@ const ViewPostCommunity = ({ route }) => {
       <View style={[styles.inputContainer, { height: inputHeight }]}>
         <Image source={{ uri: profilePicture }} style={styles.profilePicture} />
 
-        {isEnabledComm || isOwner || post?.amIAdmin ? (
+        {(isEnabledComm || isOwner || post?.amIAdmin) && post?.isJoined ? (
           <>
             <TextInput
               ref={textInputRef}
@@ -628,7 +628,7 @@ const ViewPostCommunity = ({ route }) => {
                 styles.commentDisabled,
                 { color: colorScheme === 'dark' ? '#ccc' : '#888' },
               ]}>
-              Comments Disabled
+              {post?.isJoined ? 'Comments Disabled' : 'Join to Comment'}
             </Text>
           </>
         )}
