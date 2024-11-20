@@ -58,7 +58,7 @@ const CommunityScreen = () => {
         communityCardName: post?.communityId?.communityName || 'Community Name',
         communityProfile: post?.communityId?.picture?.profile?.profilePicture,
         communityDescription:
-          post?.description || 'This is Description Community.',
+          post?.description || null ,
         media: Array.isArray(post?.media)
           ? post?.media?.map(mediaItem => ({
             type: mediaItem?.type,
