@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   SafeAreaView,
   View,
@@ -12,15 +12,16 @@ import {
 } from 'react-native';
 import axios from 'axios';
 import config from '../../config';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {Skeleton} from 'react-native-elements';
 
 const serverUrl = config.SERVER_URL;
 
 const ViewCommunity = () => {
   const route = useRoute();
-  const { communityId } = route.params;
+  const {communityId} = route.params;
   const [communityData, setCommunityData] = useState(null);
   const [userData, setUserData] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -55,12 +56,11 @@ const ViewCommunity = () => {
       setIsAdmin(adminStatus);
     } catch (error) {
       console.error('Error fetching community data:', error);
-      Alert.alert('Error', 'Failed to fetch community data');
+      // Alert.alert('Error', 'Failed to fetch community data');
     }
   };
 
   useEffect(() => {
-
     fetchCommunityData();
     getUserData();
 
@@ -123,8 +123,43 @@ const ViewCommunity = () => {
 
   const handleCreate = () => {
     console.log('Creating post in community');
-    navigation.navigate('CreatePostCommunity', { communityId: communityId });
+    navigation.navigate('CreatePostCommunity', {communityId: communityId});
   };
+
+  const renderSkeleton = () => (
+    <View style={styles.skeletonContainer}>
+      <Skeleton
+        animation="pulse"
+        height={185}
+        width={'100%'}
+        style={styles.skeletonBanner}
+      />
+      <View style={styles.skeletonInfoActionContainer}>
+        <View style={styles.skeletonInfoContainer}>
+          <Skeleton
+            animation="pulse"
+            height={24}
+            width={150}
+            style={styles.skeleton}
+          />
+          <Skeleton
+            animation="pulse"
+            height={14}
+            width={200}
+            style={styles.skeleton}
+          />
+        </View>
+        <View style={styles.skeletonActionContainer}>
+          <Skeleton
+            animation="pulse"
+            height={30}
+            width={80}
+            style={styles.skeletonButton}
+          />
+        </View>
+      </View>
+    </View>
+  );
 
   return (
     <SafeAreaView style={styles.container}>
@@ -138,66 +173,72 @@ const ViewCommunity = () => {
             tintColor="#001374"
           />
         }>
-        <View style={styles.bannerContainer}>
-          <Image
-            source={
-              communityData?.picture?.banner?.bannerPicture
-                ? { uri: communityData.picture.banner.bannerPicture }
-                : require('../../assets/banner.png')
-            }
-            style={styles.banner}
-          />
-        </View>
-        <View style={styles.infoActionContainer}>
-          <View style={styles.infoContainer}>
-            <View style={styles.nameContainer}>
-              <Text style={styles.name}>
-                {communityData?.communityName || 'Community Name'}
-              </Text>
-              <Text style={styles.bio}>
-                {communityData?.communityDescription || 'Community bio'}
-              </Text>
+        {communityData ? (
+          <>
+            <View style={styles.bannerContainer}>
+              <Image
+                source={
+                  communityData?.picture?.banner?.bannerPicture
+                    ? {uri: communityData.picture.banner.bannerPicture}
+                    : require('../../assets/banner.png')
+                }
+                style={styles.banner}
+              />
             </View>
-          </View>
-          <View style={styles.actionContainer}>
-            {isAdmin ? (
-              <>
-                <TouchableOpacity
-                  style={styles.createButton}
-                  onPress={handleCreate}>
-                  <MaterialIcons
-                    name="add"
-                    size={20}
-                    color="#000"
-                    style={styles.addIcon}
-                  />
-                  <Text style={styles.create}>Create</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.settingsButton}
-                  onPress={handleSettingsPress}>
-                  <Text style={styles.settings}>Settings</Text>
-                </TouchableOpacity>
-              </>
-            ) : (
-              <>
-                {isJoined ? (
-                  <TouchableOpacity
-                    style={styles.joinedButton}
-                    onPress={handleJoinPress}>
-                    <Text style={styles.joined}>Joined</Text>
-                  </TouchableOpacity>
+            <View style={styles.infoActionContainer}>
+              <View style={styles.infoContainer}>
+                <View style={styles.nameContainer}>
+                  <Text style={styles.name}>
+                    {communityData?.communityName || 'Community Name'}
+                  </Text>
+                  <Text style={styles.bio}>
+                    {communityData?.communityDescription || 'Community bio'}
+                  </Text>
+                </View>
+              </View>
+              <View style={styles.actionContainer}>
+                {isAdmin ? (
+                  <>
+                    <TouchableOpacity
+                      style={styles.createButton}
+                      onPress={handleCreate}>
+                      <MaterialIcons
+                        name="add"
+                        size={20}
+                        color="#000"
+                        style={styles.addIcon}
+                      />
+                      <Text style={styles.create}>Create</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.settingsButton}
+                      onPress={handleSettingsPress}>
+                      <Text style={styles.settings}>Settings</Text>
+                    </TouchableOpacity>
+                  </>
                 ) : (
-                  <TouchableOpacity
-                    style={styles.joinButton}
-                    onPress={handleJoinPress}>
-                    <Text style={styles.join}>Join</Text>
-                  </TouchableOpacity>
+                  <>
+                    {isJoined ? (
+                      <TouchableOpacity
+                        style={styles.joinedButton}
+                        onPress={handleJoinPress}>
+                        <Text style={styles.joined}>Joined</Text>
+                      </TouchableOpacity>
+                    ) : (
+                      <TouchableOpacity
+                        style={styles.joinButton}
+                        onPress={handleJoinPress}>
+                        <Text style={styles.join}>Join</Text>
+                      </TouchableOpacity>
+                    )}
+                  </>
                 )}
-              </>
-            )}
-          </View>
-        </View>
+              </View>
+            </View>
+          </>
+        ) : (
+          renderSkeleton()
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -301,6 +342,35 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#000',
     fontWeight: 'bold',
+  },
+  skeletonContainer: {
+    marginBottom: 19,
+  },
+  skeletonBanner: {
+    marginBottom: 15,
+  },
+  skeletonInfoActionContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  skeletonInfoContainer: {
+    flex: 1,
+  },
+  skeletonActionContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+  },
+  skeletonButton: {
+    marginHorizontal: 5,
+    borderRadius: 15,
+    marginRight: 15,
+  },
+  skeleton: {
+    marginLeft: 14,
+    marginBottom: 10,
+    borderRadius: 3,
   },
 });
 

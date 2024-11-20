@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -15,8 +15,8 @@ import Animated, {
   withSpring,
   runOnJS,
 } from 'react-native-reanimated';
-import { PanGestureHandler } from 'react-native-gesture-handler';
-import { useRoute } from '@react-navigation/native';
+import {PanGestureHandler} from 'react-native-gesture-handler';
+import {useRoute} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../../config';
@@ -25,8 +25,7 @@ const serverUrl = config.SERVER_URL;
 
 const DELETE_THRESHOLD = -75;
 
-const SwipeableRule = ({ rule, index, updateRule, onDelete }) => {
-
+const SwipeableRule = ({rule, index, updateRule, onDelete}) => {
   const translateX = useSharedValue(0);
   const isRemoving = useSharedValue(false);
 
@@ -58,13 +57,13 @@ const SwipeableRule = ({ rule, index, updateRule, onDelete }) => {
 
   const rStyle = useAnimatedStyle(() => {
     return {
-      transform: [{ translateX: translateX.value }],
+      transform: [{translateX: translateX.value}],
     };
   });
 
   const deleteButtonStyle = useAnimatedStyle(() => {
     return {
-      transform: [{ translateX: translateX.value + 100 }],
+      transform: [{translateX: translateX.value + 100}],
     };
   });
 
@@ -81,8 +80,8 @@ const SwipeableRule = ({ rule, index, updateRule, onDelete }) => {
         <Animated.View style={[styles.ruleContainer, rStyle]}>
           <Text style={styles.ruleNumber}>Rule {index + 1}</Text>
           <TextInput
-            maxLength={150}
-            style={[styles.communityRulesInputTitle, { height: 35 }]}
+            maxLength={30}
+            style={[styles.communityRulesInputTitle, {height: 35}]}
             placeholder="Title"
             placeholderTextColor="#b6b6b6"
             value={rule.title}
@@ -90,7 +89,7 @@ const SwipeableRule = ({ rule, index, updateRule, onDelete }) => {
           />
           <TextInput
             maxLength={150}
-            style={[styles.communityRulesInputDescription, { height: 100 }]}
+            style={[styles.communityRulesInputDescription, {height: 100}]}
             placeholder="Description"
             placeholderTextColor="#b6b6b6"
             multiline={true}
@@ -104,21 +103,23 @@ const SwipeableRule = ({ rule, index, updateRule, onDelete }) => {
   );
 };
 
-const CommunityEditRules = ({ navigation }) => {
-  const route = useRoute()
-  const { communityData } = route.params
-  const [rules, setRules] = useState(communityData.rules || [{ title: '', description: '' }]);
+const CommunityEditRules = ({navigation}) => {
+  const route = useRoute();
+  const {communityData} = route.params;
+  const [rules, setRules] = useState(
+    communityData.rules || [{title: '', description: ''}],
+  );
 
   const addNewRule = () => {
     if (rules.length < 5) {
-      setRules([...rules, { title: '', description: '' }]);
+      setRules([...rules, {title: '', description: ''}]);
     }
   };
 
   const updateRule = (index, field, value) => {
     const updatedRules = rules.map((rule, i) => {
       if (i === index) {
-        return { ...rule, [field]: value };
+        return {...rule, [field]: value};
       }
       return rule;
     });
@@ -137,19 +138,20 @@ const CommunityEditRules = ({ navigation }) => {
     console.log('Rules saved:', rules);
     const token = await AsyncStorage.getItem('token');
     try {
-      await axios.post(`${serverUrl}/edit-rules-community`, {
-        token,
-        communityId: communityData._id,
-        rules
-      }).then(res => {
-        const response = res.data;
-        console.log(response);
-        navigation.goBack();
-      });
+      await axios
+        .post(`${serverUrl}/edit-rules-community`, {
+          token,
+          communityId: communityData._id,
+          rules,
+        })
+        .then(res => {
+          const response = res.data;
+          console.log(response);
+          navigation.goBack();
+        });
     } catch (error) {
       console.error(error);
     }
-    // Implement logic to save rules, e.g., API call
   };
 
   useEffect(() => {
@@ -180,7 +182,7 @@ const CommunityEditRules = ({ navigation }) => {
 
   const isFormValid = () => {
     return rules.every(
-      rule => rule.title.trim() !== '' && rule.description.trim() !== ''
+      rule => rule.title.trim() !== '' && rule.description.trim() !== '',
     );
   };
 

@@ -1,4 +1,4 @@
-package com.testing2.newarchitecture.modules;
+package com.dugam.ducom.newarchitecture.modules;
 
 import com.facebook.jni.HybridData;
 import com.facebook.react.ReactPackage;

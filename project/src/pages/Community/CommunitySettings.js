@@ -25,6 +25,7 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../../config';
+import {Skeleton} from 'react-native-elements';
 
 const serverUrl = config.SERVER_URL;
 
@@ -49,6 +50,19 @@ const CommunitySettings = () => {
   const [modalImageSource, setModalImageSource] = useState(null);
   const [communityData, setCommunityData] = useState();
   const [refreshing, setRefreshing] = useState(false);
+  const [isDeleted, setIsDeleted] = useState(false);
+  const communityNameInputRef = useRef(null);
+
+  const CommunityNameBackspacePress = event => {
+    try {
+      const key = event?.nativeEvent?.key;
+      if (key === 'Backspace' && communityName.length > 0) {
+        setCommunityName(communityName.slice(0, -1));
+      }
+    } catch (error) {
+      console.log('Error handling key press:', error);
+    }
+  };
 
   const fetchCommunityData = async () => {
     const token = await AsyncStorage.getItem('token');
@@ -79,10 +93,23 @@ const CommunitySettings = () => {
     });
   }, [communityDataBefore]);
 
-  const onRefresh = React.useCallback(() => {
+  const onRefresh = React.useCallback(async () => {
     setRefreshing(true);
-  }, [communityId]);
-
+    try {
+      await fetchCommunityData();
+      setBanner({uri: communityDataBefore?.picture?.banner.bannerPicture});
+      setProfilePicture({
+        uri: communityDataBefore?.picture?.profile.profilePicture,
+      });
+      setProfileBackground({
+        uri: communityDataBefore?.picture?.background.backgroundPicture,
+      });
+    } catch (error) {
+      console.error('Error refreshing data:', error);
+    } finally {
+      setRefreshing(false);
+    }
+  }, [communityId, communityDataBefore]);
   const toggleEditing = field => {
     if (field === 'name') {
       setIsEditingName(!isEditingName);
@@ -96,7 +123,9 @@ const CommunitySettings = () => {
   useEffect(() => {
     const checkDataChanged = () => {
       const dataChanged =
-        (communityName && communityName !== communityData?.communityName) ||
+        (communityName &&
+          communityName.length >= 3 &&
+          communityName !== communityData?.communityName) ||
         (communityBio &&
           communityBio !== communityData?.communityDescription) ||
         newProfilePicture ||
@@ -139,6 +168,11 @@ const CommunitySettings = () => {
     const nameToSave = communityName.trim();
     const bioToSave = communityBio.trim();
 
+    if (nameToSave.length < 3) {
+      Alert.alert('Error', 'Community name must be at least 3 characters long');
+      return;
+    }
+
     if (!nameToSave || !bioToSave) {
       Alert.alert('Error', 'Community name and description are required');
       return;
@@ -152,7 +186,8 @@ const CommunitySettings = () => {
     };
 
     try {
-      // Upload new images if they exist
+      setRefreshing(true);
+
       if (newProfilePicture) {
         const profileFormData = new FormData();
         profileFormData.append('image', {
@@ -227,8 +262,12 @@ const CommunitySettings = () => {
       );
 
       if (editResponse.status === 200 || editResponse.data?.status === 'ok') {
-        await fetchCommunityData(); // Refresh data
+        await onRefresh();
+
         setIsDataChanged(false);
+        setNewProfilePicture(null);
+        setNewBanner(null);
+        setNewProfileBackground(null);
 
         Alert.alert(
           'Success',
@@ -236,6 +275,8 @@ const CommunitySettings = () => {
             'Community settings updated successfully',
         );
       } else {
+        setRefreshing(false);
+
         const errorMessage =
           editResponse.data?.message ||
           editResponse.data?.error ||
@@ -243,6 +284,8 @@ const CommunitySettings = () => {
         Alert.alert('Error', errorMessage);
       }
     } catch (error) {
+      setRefreshing(false);
+
       console.error('Error Update Data:', error);
       Alert.alert('Error', error.message || 'An unexpected error occurred');
     }
@@ -326,10 +369,22 @@ const CommunitySettings = () => {
     setModalImageSource(null);
   };
 
+  const validateCommunityName = name => {
+    const symbolRegex = /[@#!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/;
+
+    if (symbolRegex.test(name)) {
+      return false;
+    }
+
+    return /^[a-zA-Z0-9\s]+$/.test(name);
+  };
+
   const inputNameChange = text => {
     console.log('Full Input Text:', text);
     console.log('Input Text Length:', text.length);
-    setCommunityName(text);
+    if (validateCommunityName(text)) {
+      setCommunityName(text);
+    }
   };
 
   const handleBioChange = text => {
@@ -376,6 +431,16 @@ const CommunitySettings = () => {
     }
   };
 
+  useFocusEffect(
+    React.useCallback(() => {
+      const refreshData = async () => {
+        await onRefresh();
+      };
+
+      refreshData();
+    }, [communityId, communityDataBefore]),
+  );
+
   return (
     <ScrollView
       contentContainerStyle={styles.container}
@@ -385,7 +450,7 @@ const CommunitySettings = () => {
       <View style={styles.bannerContainer}>
         <TouchableOpacity onPress={() => openModal(banner)}>
           <ImageBackground
-            source={banner ? banner : require('../../assets/banner.png')}
+            source={banner.uri ? banner : require('../../assets/banner.png')}
             style={styles.banner}
             resizeMode="cover"
             imageStyle={styles.bannerImage}>
@@ -418,22 +483,44 @@ const CommunitySettings = () => {
         <Text style={styles.sectionTitle}>Community Account</Text>
         <View style={styles.infoContainer}>
           <View style={styles.infoRow}>
-            <TextInput
-              style={styles.infoText}
-              value={communityName}
-              onChangeText={inputNameChange}
-            />
+            {communityData ? (
+              <TextInput
+                maxLength={30}
+                style={styles.infoText}
+                value={communityName}
+                onChangeText={inputNameChange}
+                onKeyPress={CommunityNameBackspacePress}
+                ref={communityNameInputRef}
+              />
+            ) : (
+              <Skeleton
+                animation="pulse"
+                height={20}
+                width={150}
+                style={styles.skeleton}
+              />
+            )}
           </View>
           <Text style={styles.label}>Community Name</Text>
         </View>
         <View style={styles.bioContainer}>
           <View style={styles.infoRow}>
-            <TextInput
-              style={styles.bioText}
-              value={communityBio}
-              onChangeText={handleBioChange}
-              multiline={true}
-            />
+            {communityData ? (
+              <TextInput
+                maxLength={150}
+                style={styles.bioText}
+                value={communityBio}
+                onChangeText={handleBioChange}
+                multiline={true}
+              />
+            ) : (
+              <Skeleton
+                animation="pulse"
+                height={20}
+                width={150}
+                style={styles.skeleton}
+              />
+            )}
           </View>
           <Text style={styles.label}>Description</Text>
         </View>
@@ -489,15 +576,7 @@ const CommunitySettings = () => {
               style={styles.dropdownItem}
               onPress={() => {
                 setDropdownVisible(false);
-              }}>
-              <MaterialCommunityIcons
-                name="delete"
-                size={20}
-                color="red"
-                style={styles.dropdownIcon}
-              />
-              <Text style={styles.dropdownItemText}>Delete Rules</Text>
-            </TouchableOpacity>
+              }}></TouchableOpacity>
           </View>
         )}
         <View style={styles.rulesContainer}>
@@ -799,6 +878,10 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     resizeMode: 'contain',
+  },
+  skeleton: {
+    borderRadius: 3,
+    marginBottom: 10,
   },
 });
 

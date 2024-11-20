@@ -232,11 +232,8 @@ const CreatePostCommunity = ({route, navigation}) => {
       });
 
       if (postResponse.data.status === 'ok') {
-        navigation.reset({
-          index: 0,
-          routes: [{name: 'Home'}],
-        });
         console.log('Post created successfully');
+        navigation.navigate('Community');
       } else {
         console.error('Failed to create post:', postResponse.data.data);
         Alert.alert('Error', 'Failed to create post.');

@@ -1,4 +1,4 @@
-package com.testing2.newarchitecture;
+package com.dugam.ducom.newarchitecture;
 
 import android.app.Application;
 import androidx.annotation.NonNull;
@@ -19,9 +19,9 @@ import com.facebook.react.fabric.CoreComponentsRegistry;
 import com.facebook.react.fabric.FabricJSIModuleProvider;
 import com.facebook.react.fabric.ReactNativeConfig;
 import com.facebook.react.uimanager.ViewManagerRegistry;
-import com.testing2.BuildConfig;
-import com.testing2.newarchitecture.components.MainComponentsRegistry;
-import com.testing2.newarchitecture.modules.MainApplicationTurboModuleManagerDelegate;
+import com.dugam.ducom.BuildConfig;
+import com.dugam.ducom.newarchitecture.components.MainComponentsRegistry;
+import com.dugam.ducom.newarchitecture.modules.MainApplicationTurboModuleManagerDelegate;
 import java.util.ArrayList;
 import java.util.List;
 

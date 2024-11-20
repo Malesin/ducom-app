@@ -370,7 +370,7 @@ const ViewPostCommunity = ({ route }) => {
         width="100%"
         style={[styles.skeleton, { borderRadius: 3, marginTop: 5 }]}
       />
-      <View style={styles.skeletonIconRow}>
+      <View style={[styles.skeletonIconRow, { justifyContent: 'center' }]}>
         <Skeleton
           animation="pulse"
           circle
@@ -378,27 +378,7 @@ const ViewPostCommunity = ({ route }) => {
           width={20}
           style={styles.skeletonIcon}
         />
-        <Skeleton
-          animation="pulse"
-          circle
-          height={20}
-          width={20}
-          style={styles.skeletonIcon}
-        />
-        <Skeleton
-          animation="pulse"
-          circle
-          height={20}
-          width={20}
-          style={styles.skeletonIcon}
-        />
-        <Skeleton
-          animation="pulse"
-          circle
-          height={20}
-          width={20}
-          style={styles.skeletonIcon}
-        />
+        <View style={{ width: 140 }} />
         <Skeleton
           animation="pulse"
           circle

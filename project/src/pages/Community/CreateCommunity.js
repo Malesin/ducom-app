@@ -7,6 +7,7 @@ import {
   TextInput,
   View,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import Animated, {
   useAnimatedGestureHandler,
@@ -82,7 +83,7 @@ const SwipeableRule = ({rule, index, updateRule, onDelete, canDelete}) => {
         <Animated.View style={[styles.ruleContainer, rStyle]}>
           <Text style={styles.ruleNumber}>Rule {index + 1}</Text>
           <TextInput
-            maxLength={150}
+            maxLength={30}
             style={[styles.communityRulesInputTitle, {height: 35}]}
             placeholder="Title"
             placeholderTextColor="#b6b6b6"
@@ -114,6 +115,7 @@ const CreateCommunity = ({navigation}) => {
   const serverUrl = config.SERVER_URL;
 
   const communityNameInputRef = useRef(null);
+  const [isCreating, setIsCreating] = useState(false);
 
   const CommunityNameBackspacePress = event => {
     try {
@@ -145,10 +147,14 @@ const CreateCommunity = ({navigation}) => {
       return;
     }
 
+    if (isCreating) return;
+    setIsCreating(true);
+
     try {
       const token = await AsyncStorage.getItem('token');
       if (!token) {
         console.error('Token not found');
+        setIsCreating(false);
         return;
       }
       const response = await axios.post(`${serverUrl}/create-community`, {
@@ -161,12 +167,24 @@ const CreateCommunity = ({navigation}) => {
 
       if (response.status === 201) {
         console.log('Community created successfully:', response.data);
-        navigation.goBack();
+        Alert.alert(
+          'Success',
+          'Community created successfully!',
+          [
+            {
+              text: 'OK',
+              onPress: () => navigation.goBack(),
+            },
+          ],
+          {cancelable: false},
+        );
       } else {
         console.error('Error creating community:', response.data);
       }
     } catch (error) {
       console.error('Network error:', error);
+    } finally {
+      setIsCreating(false);
       Alert.alert('Error', 'Failed to create community. Please try again.');
     }
   };
@@ -187,14 +205,15 @@ const CreateCommunity = ({navigation}) => {
       headerRight: () => (
         <TouchableOpacity
           style={{
-            backgroundColor: isFormValid() ? '#00137f' : '#b0b0b0',
+            backgroundColor:
+              isFormValid() && !isCreating ? '#00137f' : '#b0b0b0',
             borderRadius: 20,
             paddingVertical: 6,
             paddingHorizontal: 16,
             marginRight: 5,
           }}
           onPress={handleCreateCommunity}
-          disabled={!isFormValid()}>
+          disabled={!isFormValid() || isCreating}>
           <Text
             style={{
               color: '#fff',
@@ -206,7 +225,13 @@ const CreateCommunity = ({navigation}) => {
         </TouchableOpacity>
       ),
     });
-  }, [navigation, newCommunityName, newCommunityDescription, rules]);
+  }, [
+    navigation,
+    newCommunityName,
+    newCommunityDescription,
+    rules,
+    isCreating,
+  ]);
 
   const addNewRule = () => {
     if (rules.length < 5) {
@@ -318,7 +343,7 @@ const CreateCommunity = ({navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    padding: 20,
     backgroundColor: '#f5f5f5',
   },
   communityName: {

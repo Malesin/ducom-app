@@ -4,6 +4,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Tabs, MaterialTabBar } from 'react-native-collapsible-tab-view';
 import { CommunityPost, CommunityMedia, ViewCommunity, CommunityAbout } from '../pages';
 import { useRoute } from '@react-navigation/native';
+import { Skeleton } from 'react-native-elements';
 
 
 function CommunityTabNavigator() {
@@ -29,6 +30,29 @@ function CommunityTabNavigator() {
     </View>
   );
 
+  const renderSkeleton = () => (
+    <>
+      {[...Array(5)].map((_, index) => (
+        <View key={index} style={styles.skeletonContainer}>
+          <View style={styles.skeletonHeader}>
+          </View>
+          <Skeleton
+            animation="pulse"
+            height={20}
+            width={200}
+            style={styles.skeleton}
+          />
+          <Skeleton
+            animation="pulse"
+            height={150}
+            width={'100%'}
+            style={styles.skeleton}
+          />
+        </View>
+      ))}
+    </>
+  );
+
   return (
     <GestureHandlerRootView style={styles.container}>
       <Tabs.Container
@@ -52,7 +76,7 @@ function CommunityTabNavigator() {
                 enabled={isScrollTop}
               />
             }>
-            <CommunityPost />
+            {refreshing ? renderSkeleton() : <CommunityPost />}
           </Tabs.ScrollView>
         </Tabs.Tab>
         <Tabs.Tab name="Media">
@@ -66,7 +90,7 @@ function CommunityTabNavigator() {
                 enabled={isScrollTop}
               />
             }>
-            <CommunityMedia />
+            {refreshing ? renderSkeleton() : <CommunityMedia />}
           </Tabs.ScrollView>
         </Tabs.Tab>
         <Tabs.Tab name="About">
@@ -80,7 +104,7 @@ function CommunityTabNavigator() {
                 enabled={isScrollTop}
               />
             }>
-            <CommunityAbout communityId={communityId}/>
+            {refreshing ? renderSkeleton() : <CommunityAbout communityId={communityId} />}
           </Tabs.ScrollView>
         </Tabs.Tab>
       </Tabs.Container>
@@ -110,6 +134,24 @@ const styles = StyleSheet.create({
   tabBarIndicator: {
     backgroundColor: '#000',
     height: 3,
+  },
+  skeletonContainer: {
+    padding: 20,
+  },
+  skeletonHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  skeletonAvatar: {
+    marginRight: 10,
+  },
+  skeletonTextContainer: {
+    flex: 1,
+  },
+  skeleton: {
+    marginBottom: 10,
+    backgroundColor: '#e1e1e1',
   },
 });
 
