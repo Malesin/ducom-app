@@ -7,18 +7,18 @@ import {
   RefreshControl, // Tambahkan RefreshControl
   Alert, // Tambahkan Alert
 } from 'react-native';
-import React, { useState, useEffect, useCallback } from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import CommunityCard from '../../components/Community/CommunityCard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../../config';
-import { useRoute } from '@react-navigation/native';
+import {useRoute} from '@react-navigation/native';
 
 const serverUrl = config.SERVER_URL;
 
-const CommunityPost = ({ navigation }) => {
+const CommunityPost = ({navigation}) => {
   const route = useRoute();
-  const { communityId } = route.params;
+  const {communityId} = route.params;
   const [communityDataList, setCommunityDataList] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -26,25 +26,27 @@ const CommunityPost = ({ navigation }) => {
     const token = await AsyncStorage.getItem('token');
 
     try {
-      const postsResponse = await axios.post(`${serverUrl}/communityPosts-byId`, {
-        token,
-        communityId,
-      });
+      const postsResponse = await axios.post(
+        `${serverUrl}/communityPosts-byId`,
+        {
+          token,
+          communityId,
+        },
+      );
       const data = postsResponse.data.data;
-      const myData = postsResponse.data.myUser
+      const myData = postsResponse.data.myUser;
       const formattedData = data.map(post => ({
         id: post?._id,
         userIdPost: post?.user?._id,
         communityId: post?.communityId?._id,
         communityCardName: post?.communityId?.communityName || 'Community Name',
         communityProfile: post?.communityId?.picture?.profile?.profilePicture,
-        communityDescription:
-          post?.description || 'This is Description Community.',
+        communityDescription: post?.description || '',
         media: Array.isArray(post?.media)
           ? post?.media?.map(mediaItem => ({
-            type: mediaItem?.type,
-            uri: mediaItem?.uri,
-          }))
+              type: mediaItem?.type,
+              uri: mediaItem?.uri,
+            }))
           : [],
         isLiked: post?.likes?.some(like => like?._id === myData?.myId),
         likesCount: post.likes.length || 0,
@@ -53,7 +55,7 @@ const CommunityPost = ({ navigation }) => {
         commentsEnabled: post?.commentsEnabled,
         idUser: myData?.myId,
         amIAdmin: myData?.amIAdmin,
-        profilePicture: myData?.profilePicture
+        profilePicture: myData?.profilePicture,
       }));
       setCommunityDataList(formattedData);
     } catch (error) {
