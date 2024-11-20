@@ -53,6 +53,7 @@ const CommunityPost = ({navigation}) => {
         commentsCount: post.comments.length || 0,
         postDate: post?.created_at,
         commentsEnabled: post?.commentsEnabled,
+        isJoined: post?.isJoined,
         idUser: myData?.myId,
         amIAdmin: myData?.amIAdmin,
         profilePicture: myData?.profilePicture,
