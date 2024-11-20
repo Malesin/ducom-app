@@ -15,10 +15,8 @@ import axios from 'axios';
 import config from '../../config';
 import { Skeleton } from 'react-native-elements';
 import { useRoute, useNavigation } from '@react-navigation/native';
-
 const serverUrl = config.SERVER_URL;
-
-const CommunityPost = () => {
+const CommunityPost = ({navigation}) => {
   const route = useRoute();
   const {communityId} = route.params;
   const [communityDataList, setCommunityDataList] = useState([]);
@@ -58,6 +56,7 @@ const CommunityPost = () => {
         commentsCount: post.comments.length || 0,
         postDate: post?.created_at,
         commentsEnabled: post?.commentsEnabled,
+        isJoined: post?.isJoined,
         idUser: myData?.myId,
         amIAdmin: myData?.amIAdmin,
         profilePicture: myData?.profilePicture,

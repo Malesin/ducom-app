@@ -185,6 +185,7 @@ const CreateCommunity = ({navigation}) => {
       console.error('Network error:', error);
     } finally {
       setIsCreating(false);
+      Alert.alert('Error', 'Failed to create community. Please try again.');
     }
   };
 

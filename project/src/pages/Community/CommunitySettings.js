@@ -110,7 +110,6 @@ const CommunitySettings = () => {
       setRefreshing(false);
     }
   }, [communityId, communityDataBefore]);
-
   const toggleEditing = field => {
     if (field === 'name') {
       setIsEditingName(!isEditingName);

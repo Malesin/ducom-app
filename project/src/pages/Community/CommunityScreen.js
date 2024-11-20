@@ -40,7 +40,7 @@ const CommunityScreen = () => {
         communityId: data._id,
         exploreName: data.communityName,
         memberCount: `${data.members.length} Members`,
-        description: data.description || 'No description available.',
+        description: data.communityDescription || 'No description available.',
         profilePicture: data.picture.profile.profilePicture,
         backgroundPicture: data.picture.background.backgroundPicture,
       }));
@@ -69,6 +69,7 @@ const CommunityScreen = () => {
         commentsCount: post.comments.length || 0,
         postDate: post?.created_at,
         commentsEnabled: post?.commentsEnabled,
+        isJoined: post?.isJoined,
         idUser: myData?.myId,
         amIAdmin: myData?.amIAdmin,
         profilePicture: myData?.profilePicture,
