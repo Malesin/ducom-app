@@ -139,10 +139,11 @@ const CommunityCard = ({communityCardData = {}}) => {
   };
 
   const handlePress = useCallback(() => {
-    navigator.navigate('ViewCommunity', {
-      communityId: communityCardData?.communityId,
+    navigator.navigate('ViewPostCommunity', {
+      post: communityCardData,
+      focusCommentInput: false,
     });
-  }, [navigator]);
+  }, [navigator, communityCardData]);
 
   const openMediaPreview = useCallback(uri => {
     setModalMediaUri(uri);
