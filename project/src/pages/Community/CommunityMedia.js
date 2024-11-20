@@ -75,27 +75,6 @@ const CommunityMedia = ({navigation}) => {
       {[...Array(5)].map((_, index) => (
         <View key={index} style={styles.skeletonContainer}>
           <View style={styles.skeletonHeader}>
-            <Skeleton
-              animation="pulse"
-              circle
-              height={40}
-              width={40}
-              style={styles.skeletonAvatar}
-            />
-            <View style={styles.skeletonTextContainer}>
-              <Skeleton
-                animation="pulse"
-                height={20}
-                width={100}
-                style={styles.skeleton}
-              />
-              <Skeleton
-                animation="pulse"
-                height={14}
-                width={60}
-                style={styles.skeleton}
-              />
-            </View>
           </View>
           <Skeleton
             animation="pulse"
