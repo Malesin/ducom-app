@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, {useState, useEffect, useCallback, useMemo} from 'react';
 import {
   View,
   Text,
@@ -15,14 +15,14 @@ import {
 import CommBottomSheet from '../CommBottomSheet';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Video from 'react-native-video';
-import { createThumbnail } from 'react-native-create-thumbnail';
+import {createThumbnail} from 'react-native-create-thumbnail';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 import axios from 'axios';
 import config from '../../config';
 const serverUrl = config.SERVER_URL;
 
-const CommunityCard = ({ communityCardData = {} }) => {
+const CommunityCard = ({communityCardData = {}}) => {
   const navigator = useNavigation();
   const {
     communityCardName = '',
@@ -45,7 +45,7 @@ const CommunityCard = ({ communityCardData = {} }) => {
     for (const mediaItem of mediaItems || []) {
       if (mediaItem.type === 'video' && mediaItem.uri) {
         try {
-          const { path } = await createThumbnail({ url: mediaItem.uri });
+          const {path} = await createThumbnail({url: mediaItem.uri});
           newThumbnails[mediaItem.uri] = path;
         } catch (error) {
           console.log('Error generating thumbnail:', error);
@@ -81,7 +81,6 @@ const CommunityCard = ({ communityCardData = {} }) => {
     };
 
     loadThumbnails();
-
   }, [
     initialLikesCount,
     initialCommentsCount,
@@ -140,7 +139,9 @@ const CommunityCard = ({ communityCardData = {} }) => {
   };
 
   const handlePress = useCallback(() => {
-    navigator.navigate('ViewCommunity', { communityId: communityCardData?.communityId });
+    navigator.navigate('ViewCommunity', {
+      communityId: communityCardData?.communityId,
+    });
   }, [navigator]);
 
   const openMediaPreview = useCallback(uri => {
@@ -154,7 +155,7 @@ const CommunityCard = ({ communityCardData = {} }) => {
   }, []);
 
   const renderMediaItem = useCallback(
-    ({ item, index }) => {
+    ({item, index}) => {
       const isImage =
         item.type === 'image' || /\.(jpg|jpeg|png|gif|webp)$/i.test(item.uri);
 
@@ -178,7 +179,7 @@ const CommunityCard = ({ communityCardData = {} }) => {
           ]}>
           {isImage ? (
             <Image
-              source={{ uri: item.uri }}
+              source={{uri: item.uri}}
               style={styles.mediaImage}
               resizeMode="cover"
               onError={e => {
@@ -188,7 +189,7 @@ const CommunityCard = ({ communityCardData = {} }) => {
           ) : isVideo ? (
             <View style={styles.videoContainer}>
               <Image
-                source={{ uri: thumbnails[item.uri] || item.uri }}
+                source={{uri: thumbnails[item.uri] || item.uri}}
                 style={styles.mediaImage}
                 resizeMode="cover"
               />
@@ -211,7 +212,7 @@ const CommunityCard = ({ communityCardData = {} }) => {
   };
 
   const InteractionButton = useCallback(
-    ({ icon, color, count, onPress }) => (
+    ({icon, color, count, onPress}) => (
       <TouchableOpacity style={styles.actionButton} onPress={onPress}>
         <MaterialCommunityIcons name={icon} size={20} color={color} />
         <Text style={styles.actionText}>{count}</Text>
@@ -263,10 +264,10 @@ const CommunityCard = ({ communityCardData = {} }) => {
                 onResp(resp);
               }}
               post={communityCardData}
-            // onRefreshPage={onRefreshPage}
-            // isUserProfile={isUserProfile}
-            // handlePin={false}
-            // handlePinUser={false}
+              // onRefreshPage={onRefreshPage}
+              // isUserProfile={isUserProfile}
+              // handlePin={false}
+              // handlePinUser={false}
             />
           </View>
         </Modal>
@@ -315,7 +316,7 @@ const CommunityCard = ({ communityCardData = {} }) => {
               {modalMediaUri ? (
                 /\.(jpg|jpeg|png|gif|webp)$/i.test(modalMediaUri) ? (
                   <Image
-                    source={{ uri: modalMediaUri }}
+                    source={{uri: modalMediaUri}}
                     style={styles.modalImage}
                     resizeMode="contain"
                     onError={e => {
@@ -327,7 +328,7 @@ const CommunityCard = ({ communityCardData = {} }) => {
                   />
                 ) : /\.(mp4|mov|avi|mkv)$/i.test(modalMediaUri) ? (
                   <Video
-                    source={{ uri: modalMediaUri }}
+                    source={{uri: modalMediaUri}}
                     style={styles.modalVideo}
                     controls
                     resizeMode="contain"
