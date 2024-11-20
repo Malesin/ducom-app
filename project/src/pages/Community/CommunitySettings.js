@@ -50,6 +50,7 @@ const CommunitySettings = () => {
   const [modalImageSource, setModalImageSource] = useState(null);
   const [communityData, setCommunityData] = useState();
   const [refreshing, setRefreshing] = useState(false);
+  const [isDeleted, setIsDeleted] = useState(false);
 
   const fetchCommunityData = async () => {
     const token = await AsyncStorage.getItem('token');
@@ -69,7 +70,9 @@ const CommunitySettings = () => {
   };
 
   useEffect(() => {
-    fetchCommunityData();
+    if (!isDeleted) {
+      fetchCommunityData();
+    }
 
     if (communityDataBefore?.picture?.banner?.bannerPicture) {
       setBanner({ uri: communityDataBefore.picture.banner.bannerPicture });
@@ -80,7 +83,7 @@ const CommunitySettings = () => {
     if (communityDataBefore?.picture?.background?.backgroundPicture) {
       setProfileBackground({ uri: communityDataBefore.picture.background.backgroundPicture });
     }
-  }, [communityDataBefore]);
+  }, [communityDataBefore, isDeleted]);
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
@@ -353,6 +356,7 @@ const CommunitySettings = () => {
               })
               .then(res => {
                 console.log(res.data)
+                setIsDeleted(true);
                 navigation.navigate('Community');
                 ToastAndroid.show('Community successfully deleted', ToastAndroid.SHORT);
               })
@@ -414,7 +418,7 @@ const CommunitySettings = () => {
                 value={communityName}
                 onChangeText={inputNameChange}
               />
-            ) : (
+            ) : ( 
               <Skeleton animation="pulse" height={20} width={150} style={styles.skeleton} />
             )}
           </View>

@@ -28,7 +28,6 @@ const ViewCommunity = () => {
   const [isJoined, setIsJoined] = useState();
   const [refreshing, setRefreshing] = useState(false);
   const navigation = useNavigation();
-  const [loading, setLoading] = useState(true);
 
   const getUserData = async () => {
     const token = await AsyncStorage.getItem('token');
@@ -51,33 +50,25 @@ const ViewCommunity = () => {
       });
 
       const communityData = response?.data?.data;
-      setCommunityData(communityData);
+      const adminStatus = userData?.isAdmin === true;
 
-      // Simulate loading delay
-      setTimeout(() => {
-        setLoading(false); // Stop loading after 3 seconds
-      }, 2000);
+      setCommunityData(communityData);
+      setIsAdmin(adminStatus);
     } catch (error) {
       console.error('Error fetching community data:', error);
       Alert.alert('Error', 'Failed to fetch community data');
-      setLoading(false); // Stop loading in case of error
     }
   };
 
   useEffect(() => {
+
     fetchCommunityData();
     getUserData();
 
     const isJoined = communityData?.members?.map(user => user?.user);
     const data = isJoined?.some(userId => userId?._id === userData?._id);
     setIsJoined(data);
-
-    // Determine admin status during loading
-    if (userData) {
-      const adminStatus = userData?.isAdmin === true;
-      setIsAdmin(adminStatus);
-    }
-  }, [communityId, communityData, userData]);
+  }, [communityId, communityData]);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -145,7 +136,7 @@ const ViewCommunity = () => {
           <Skeleton animation="pulse" height={14} width={200} style={styles.skeleton} />
         </View>
         <View style={styles.skeletonActionContainer}>
-          <Skeleton animation="pulse" height={30} width={100} style={styles.skeletonButton} />
+          <Skeleton animation="pulse" height={30} width={80} style={styles.skeletonButton} />
         </View>
       </View>
     </View>
@@ -163,9 +154,7 @@ const ViewCommunity = () => {
             tintColor="#001374"
           />
         }>
-        {loading ? (
-          renderSkeleton()
-        ) : (
+        {communityData ? (
           <>
             <View style={styles.bannerContainer}>
               <Image
@@ -228,6 +217,8 @@ const ViewCommunity = () => {
               </View>
             </View>
           </>
+        ) : (
+          renderSkeleton()
         )}
       </ScrollView>
     </SafeAreaView>
@@ -334,10 +325,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   skeletonContainer: {
-    marginBottom: 15,
+    marginBottom:19,
   },
   skeletonBanner: {
-    marginBottom: 25,
+    marginBottom: 15,
   },
   skeletonInfoActionContainer: {
     flexDirection: 'row',
@@ -353,11 +344,12 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   skeletonButton: {
-    marginHorizontal: 10,
+    marginHorizontal: 5,
     borderRadius: 15,
+    marginRight: 15,
   },
   skeleton: {
-    marginLeft: 20,
+    marginLeft:14,
     marginBottom: 10,
     borderRadius: 3,
   },

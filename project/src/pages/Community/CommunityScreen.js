@@ -76,13 +76,8 @@ const CommunityScreen = () => {
       }));
       setCardData(formattedData);
     } catch (error) {
-      if (error.response && error.response.status === 404) {
-        console.warn('Community not found, it might have been deleted.');
-        // Handle the 404 error specifically
-      } else {
-        console.error('Error fetching community data:', error);
-        // Alert.alert('Error', 'Failed to fetch community data');
-      }
+      console.error('Error fetching community data:', error);
+      // Alert.alert('Error', 'Failed to fetch community data');
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -132,32 +127,18 @@ const CommunityScreen = () => {
               : { ...styles.skeletonContainer, paddingHorizontal: 8 }
           }>
           {!isHorizontal && (
-            <>
-              <Skeleton
-                animation="pulse"
-                height={17}
-                width={120}
-                style={[styles.skeleton, { borderRadius: 4, marginBottom: 10 }]}
-              />
-              <Skeleton
-                animation="pulse"
-                height={17}
-                width={170}
-                style={[styles.skeleton, { borderRadius: 4, marginBottom: 10 }]}
-              />
-            </>
+            <Skeleton
+              animation="pulse"
+              height={17}
+              width={170}
+              style={[styles.skeleton, { borderRadius: 2, marginBottom: 10 }]}
+            />
           )}
           <Skeleton
             animation="pulse"
             height={isHorizontal ? 320 : 100}
             width={isHorizontal ? 240 : '100%'}
             style={[styles.skeleton, { borderRadius: 5 }]}
-          />
-          <Skeleton
-            animation="pulse"
-            height={10}
-            width={27}
-            style={{ position: 'absolute', top: 20, right: 10, borderRadius: 4}}
           />
         </View>
       ))}
@@ -236,7 +217,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   skeleton: {
-    marginBottom: 5,
+    marginBottom: 10,
   },
   skeletonContainerHorizontal: {
     padding: 5,
