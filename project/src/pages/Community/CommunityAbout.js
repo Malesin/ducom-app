@@ -129,12 +129,13 @@ const styles = StyleSheet.create({
   infoRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 5,
-    paddingLeft: 13,
+    paddingVertical: 5,
+    paddingHorizontal: 5,
+
   },
   infoText: {
     marginLeft: 10,
-    fontSize: 16,
+    fontSize: 14,
     color: 'black',
   },
   subText: {
@@ -161,7 +162,7 @@ const styles = StyleSheet.create({
   },
   createAt: {
     marginLeft: 10,
-    fontSize: 16,
+    fontSize: 14,
     color: '#B6B6B6',
   },
   username: {
