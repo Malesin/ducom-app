@@ -104,7 +104,7 @@ const UserFollower = ({ route }) => {
           : dataFollowers.map((data, index) => (
             <View key={index}>
               <FollowCard
-                followText="Follow Back"
+                followText="Follow"
                 followingText="Following"
                 removeButtonText="Remove"
                 message={
