@@ -312,7 +312,7 @@ const RegisterScreen = ({navigation}) => {
           Already signed up?{' '}
           <Text
             style={styles.loginLink}
-            onPress={() => navigation.navigate('Homescreen')}>
+            onPress={() => navigation.navigate('Signin')}>
             Log In
           </Text>
         </Text>
