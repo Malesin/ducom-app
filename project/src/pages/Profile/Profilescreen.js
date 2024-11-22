@@ -101,236 +101,244 @@ export default function Profilescreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView>
-        <View style={styles.bannerContainer}>
-          <Image
-            source={banner || require('../../assets/banner.png')}
-            style={styles.banner}
-          />
-          <TouchableOpacity
-            style={styles.settingsButton}
-            onPress={toggleDropdown}>
-            <MaterialCommunityIcons
-              name="dots-vertical"
-              size={30}
-              color="#000"
-            />
-          </TouchableOpacity>
-          {dropdownVisible && (
-            <TouchableWithoutFeedback onPress={toggleDropdown}>
-              <View style={styles.dropdownOverlay}>
-                <View style={styles.dropdownMenu}>
-                  <TouchableOpacity
-                    style={styles.dropdownItem}
-                    onPress={() => handleDropdownItemPress('Need Help')}>
-                    <MaterialCommunityIcons
-                      name="information"
-                      size={20}
-                      color="#000"
-                      style={styles.dropdownIcon}
-                    />
-                    <Text style={styles.dropdownItemText}>Need Help?</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={styles.dropdownItem}
-                    onPress={() =>
-                      handleDropdownItemPress('Settings and Support')
-                    }>
-                    <MaterialCommunityIcons
-                      name="cog"
-                      size={20}
-                      color="#000"
-                      style={styles.dropdownIcon}
-                    />
-                    <Text style={styles.dropdownItemText}>Settings</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </TouchableWithoutFeedback>
-          )}
-          <View style={styles.profileContainer}>
-            <View style={styles.profilePictureContainer}>
-              <TouchableOpacity onPress={openModal}>
-                <Image
-                  source={
-                    profilePicture || require('../../assets/profilepic.png')
-                  }
-                  style={styles.profile}
+      <TouchableWithoutFeedback
+        onPress={dropdownVisible ? toggleDropdown : null}>
+        <View style={styles.container}>
+          <ScrollView>
+            <View style={styles.bannerContainer}>
+              <Image
+                source={banner || require('../../assets/banner.png')}
+                style={styles.banner}
+              />
+              <TouchableOpacity
+                style={styles.settingsButton}
+                onPress={toggleDropdown}>
+                <MaterialCommunityIcons
+                  name="dots-vertical"
+                  size={30}
+                  color="#000"
                 />
               </TouchableOpacity>
-            </View>
-            <View style={styles.statsContainer}>
-              <View style={styles.statItem}>
-                {!userData ? (
-                  <>
-                    <Skeleton
-                      animation="pulse"
-                      height={18}
-                      width={30}
-                      style={[styles.skeleton, {borderRadius: 3}]}
+              {dropdownVisible && (
+                <TouchableWithoutFeedback onPress={toggleDropdown}>
+                  <View style={styles.dropdownOverlay}>
+                    <View style={styles.dropdownMenu}>
+                      <TouchableOpacity
+                        style={styles.dropdownItem}
+                        onPress={() => handleDropdownItemPress('Need Help')}>
+                        <MaterialCommunityIcons
+                          name="information"
+                          size={20}
+                          color="#000"
+                          style={styles.dropdownIcon}
+                        />
+                        <Text style={styles.dropdownItemText}>Need Help?</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={styles.dropdownItem}
+                        onPress={() =>
+                          handleDropdownItemPress('Settings and Support')
+                        }>
+                        <MaterialCommunityIcons
+                          name="cog"
+                          size={20}
+                          color="#000"
+                          style={styles.dropdownIcon}
+                        />
+                        <Text style={styles.dropdownItemText}>Settings</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </TouchableWithoutFeedback>
+              )}
+              <View style={styles.profileContainer}>
+                <View style={styles.profilePictureContainer}>
+                  <TouchableOpacity onPress={openModal}>
+                    <Image
+                      source={
+                        profilePicture || require('../../assets/profilepic.png')
+                      }
+                      style={styles.profile}
                     />
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.statsContainer}>
+                  <View style={styles.statItem}>
+                    {!userData ? (
+                      <>
+                        <Skeleton
+                          animation="pulse"
+                          height={18}
+                          width={30}
+                          style={[styles.skeleton, {borderRadius: 3}]}
+                        />
+                        <Skeleton
+                          animation="pulse"
+                          height={14}
+                          width={60}
+                          style={[styles.skeleton, {borderRadius: 3}]}
+                        />
+                      </>
+                    ) : (
+                      <>
+                        <Text style={styles.statNumber}>
+                          {userData?.postCount || 0}
+                        </Text>
+                        <Text style={styles.statLabel}>Posts</Text>
+                      </>
+                    )}
+                  </View>
+                  <View style={styles.statItem}>
+                    {!userData ? (
+                      <>
+                        <Skeleton
+                          animation="pulse"
+                          height={18}
+                          width={30}
+                          style={[styles.skeleton, {borderRadius: 3}]}
+                        />
+                        <Skeleton
+                          animation="pulse"
+                          height={14}
+                          width={60}
+                          style={[styles.skeleton, {borderRadius: 3}]}
+                        />
+                      </>
+                    ) : (
+                      <>
+                        <TouchableOpacity
+                          onPress={() =>
+                            navigation.navigate('Follow', {
+                              username: userData?.username,
+                            })
+                          }>
+                          <Text style={styles.statNumber}>
+                            {userData ? userData?.followers.length : 0}
+                          </Text>
+                          <Text style={styles.statLabel}>Followers</Text>
+                        </TouchableOpacity>
+                      </>
+                    )}
+                  </View>
+                  <View style={styles.statItem}>
+                    {!userData ? (
+                      <>
+                        <Skeleton
+                          animation="pulse"
+                          height={18}
+                          width={30}
+                          style={[styles.skeleton, {borderRadius: 3}]}
+                        />
+                        <Skeleton
+                          animation="pulse"
+                          height={14}
+                          width={60}
+                          style={[styles.skeleton, {borderRadius: 3}]}
+                        />
+                      </>
+                    ) : (
+                      <>
+                        <TouchableOpacity
+                          onPress={() =>
+                            navigation.navigate('Follow', {
+                              username: userData?.username,
+                            })
+                          }>
+                          <Text style={styles.statNumber}>
+                            {userData ? userData?.following.length : 0}
+                          </Text>
+                          <Text style={styles.statLabel}>Following</Text>
+                        </TouchableOpacity>
+                      </>
+                    )}
+                  </View>
+                </View>
+              </View>
+              <View style={styles.userInfoWrapper}>
+                <View style={styles.userInfoContainer}>
+                  <View style={styles.nameContainer}>
+                    {!userData ? (
+                      <Skeleton
+                        animation="pulse"
+                        height={20}
+                        width={150}
+                        style={[styles.skeleton, {borderRadius: 3}]}
+                      />
+                    ) : (
+                      <Text style={styles.name}>{userData?.name}</Text>
+                    )}
+                  </View>
+                  {!userData ? (
                     <Skeleton
                       animation="pulse"
                       height={14}
-                      width={60}
+                      width={100}
                       style={[styles.skeleton, {borderRadius: 3}]}
                     />
-                  </>
-                ) : (
-                  <>
-                    <Text style={styles.statNumber}>
-                      {userData?.postCount || 0}
+                  ) : (
+                    <View style={styles.usernameContainer}>
+                      <Text style={styles.username}>@{userData?.username}</Text>
+                      {userData?.isAdmin && (
+                        <Icon name="verified" size={18} color="#699BF7" />
+                      )}
+                    </View>
+                  )}
+                  {!userData ? (
+                    <Skeleton
+                      animation="pulse"
+                      height={13}
+                      width={200}
+                      style={[styles.skeleton, {borderRadius: 3}]}
+                    />
+                  ) : (
+                    <Text style={styles.description}>
+                      {userData?.bio || 'No Description'}
                     </Text>
-                    <Text style={styles.statLabel}>Posts</Text>
-                  </>
-                )}
-              </View>
-              <View style={styles.statItem}>
-                {!userData ? (
-                  <>
-                    <Skeleton
-                      animation="pulse"
-                      height={18}
-                      width={30}
-                      style={[styles.skeleton, {borderRadius: 3}]}
-                    />
-                    <Skeleton
-                      animation="pulse"
-                      height={14}
-                      width={60}
-                      style={[styles.skeleton, {borderRadius: 3}]}
-                    />
-                  </>
-                ) : (
-                  <>
-                    <TouchableOpacity
-                      onPress={() =>
-                        navigation.navigate('Follow', {
-                          username: userData?.username,
-                        })
-                      }>
-                      <Text style={styles.statNumber}>
-                        {userData ? userData?.followers.length : 0}
-                      </Text>
-                      <Text style={styles.statLabel}>Followers</Text>
-                    </TouchableOpacity>
-                  </>
-                )}
-              </View>
-              <View style={styles.statItem}>
-                {!userData ? (
-                  <>
-                    <Skeleton
-                      animation="pulse"
-                      height={18}
-                      width={30}
-                      style={[styles.skeleton, {borderRadius: 3}]}
-                    />
-                    <Skeleton
-                      animation="pulse"
-                      height={14}
-                      width={60}
-                      style={[styles.skeleton, {borderRadius: 3}]}
-                    />
-                  </>
-                ) : (
-                  <>
-                    <TouchableOpacity
-                      onPress={() =>
-                        navigation.navigate('Follow', {
-                          username: userData?.username,
-                        })
-                      }>
-                      <Text style={styles.statNumber}>
-                        {userData ? userData?.following.length : 0}
-                      </Text>
-                      <Text style={styles.statLabel}>Following</Text>
-                    </TouchableOpacity>
-                  </>
-                )}
-              </View>
-            </View>
-          </View>
-          <View style={styles.userInfoWrapper}>
-            <View style={styles.userInfoContainer}>
-              <View style={styles.nameContainer}>
+                  )}
+                </View>
                 {!userData ? (
                   <Skeleton
                     animation="pulse"
-                    height={20}
-                    width={150}
-                    style={[styles.skeleton, {borderRadius: 3}]}
+                    height={28}
+                    width={120}
+                    borderRadius={14}
+                    style={[
+                      styles.skeleton,
+                      {marginRight: 14, borderRadius: 3},
+                    ]}
                   />
                 ) : (
-                  <Text style={styles.name}>{userData?.name}</Text>
+                  <View style={styles.buttonContainer}>
+                    <TouchableOpacity
+                      style={styles.editButton}
+                      onPress={() => navigation.navigate('EditProfile')}>
+                      <Text style={styles.editButtonText}>Edit Profile</Text>
+                    </TouchableOpacity>
+                  </View>
                 )}
               </View>
-              {!userData ? (
-                <Skeleton
-                  animation="pulse"
-                  height={14}
-                  width={100}
-                  style={[styles.skeleton, {borderRadius: 3}]}
-                />
-              ) : (
-                <View style={styles.usernameContainer}>
-                  <Text style={styles.username}>@{userData?.username}</Text>
-                  {userData?.isAdmin && (
-                    <Icon name="verified" size={18} color="#699BF7" />
-                  )}
-                </View>
-              )}
-              {!userData ? (
-                <Skeleton
-                  animation="pulse"
-                  height={13}
-                  width={200}
-                  style={[styles.skeleton, {borderRadius: 3}]}
-                />
-              ) : (
-                <Text style={styles.description}>
-                  {userData?.bio || 'No Description'}
-                </Text>
-              )}
+              <Modal
+                visible={modalVisible}
+                transparent
+                onRequestClose={closeModal}
+                animationType="fade">
+                <TouchableWithoutFeedback onPress={closeModal}>
+                  <View style={styles.modalBackground}>
+                    <View style={styles.modalContainer}>
+                      {modalImageSource && (
+                        <Image
+                          source={modalImageSource}
+                          style={styles.previewImage}
+                        />
+                      )}
+                    </View>
+                  </View>
+                </TouchableWithoutFeedback>
+              </Modal>
             </View>
-            {!userData ? (
-              <Skeleton
-                animation="pulse"
-                height={28}
-                width={120}
-                borderRadius={14}
-                style={[styles.skeleton, {marginRight: 14, borderRadius: 3}]}
-              />
-            ) : (
-              <View style={styles.buttonContainer}>
-                <TouchableOpacity
-                  style={styles.editButton}
-                  onPress={() => navigation.navigate('EditProfile')}>
-                  <Text style={styles.editButtonText}>Edit Profile</Text>
-                </TouchableOpacity>
-              </View>
-            )}
-          </View>
-          <Modal
-            visible={modalVisible}
-            transparent
-            onRequestClose={closeModal}
-            animationType="fade">
-            <TouchableWithoutFeedback onPress={closeModal}>
-              <View style={styles.modalBackground}>
-                <View style={styles.modalContainer}>
-                  {modalImageSource && (
-                    <Image
-                      source={modalImageSource}
-                      style={styles.previewImage}
-                    />
-                  )}
-                </View>
-              </View>
-            </TouchableWithoutFeedback>
-          </Modal>
+          </ScrollView>
         </View>
-      </ScrollView>
+      </TouchableWithoutFeedback>
     </SafeAreaView>
   );
 }

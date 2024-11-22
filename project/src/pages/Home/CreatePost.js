@@ -508,7 +508,7 @@ const CreatePost = ({ route, navigation }) => {
             multiline
             value={newPostText}
             onChangeText={handleTextChange}
-            maxLength={500}
+            maxLength={400}
             placeholderTextColor={
               colorScheme === 'dark' ? '#cccccc' : '#888888'
             }

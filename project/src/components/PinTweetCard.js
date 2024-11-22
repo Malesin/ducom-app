@@ -1,5 +1,5 @@
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -16,22 +16,23 @@ import {
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Video from 'react-native-video';
-import { createThumbnail } from 'react-native-create-thumbnail';
+import {createThumbnail} from 'react-native-create-thumbnail';
 import DefaultAvatar from '../assets/profilepic.png';
 import BottomSheet from './BottomSheet';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 import axios from 'axios';
 import config from '../config';
 const serverUrl = config.SERVER_URL;
 const verifiedIcon = <Icon name="verified" size={15} color="#699BF7" />;
 
-
-const PinTweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
+const PinTweetCard = ({tweet, onRefreshPage, comments, isUserProfile}) => {
   const [liked, setLiked] = useState(tweet?.isLiked || false);
   const [likesCount, setLikesCount] = useState(tweet?.likesCount || 0);
   const [bookmarked, setBookmarked] = useState(tweet?.isBookmarked || false);
-  const [bookMarksCount, setBookMarksCount] = useState(tweet?.bookMarksCount || 0);
+  const [bookMarksCount, setBookMarksCount] = useState(
+    tweet?.bookMarksCount || 0,
+  );
   const [reposted, setReposted] = useState(tweet?.isReposted || false);
   const [repostsCount, setRepostsCount] = useState(tweet?.repostsCount || 0);
   const [commentsCount] = useState(tweet?.commentsCount || 0);
@@ -39,7 +40,7 @@ const PinTweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
   const [modalMediaUri, setModalMediaUri] = useState('');
   const [thumbnails, setThumbnails] = useState({});
   const [showBottomSheet, setShowBottomSheet] = useState(false);
-  const [dataSent, setDataSent] = useState()
+  const [dataSent, setDataSent] = useState();
   const navigator = useNavigation();
 
   const handleProfilePress = () => {
@@ -48,7 +49,7 @@ const PinTweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
     } else {
       navigator.navigate('Userprofile', {
         userIdPost: tweet.userIdPost,
-        isUserProfile: isUserProfile
+        isUserProfile: isUserProfile,
       });
     }
   };
@@ -59,7 +60,7 @@ const PinTweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
       for (const media of tweet?.media || []) {
         if (media.type === 'video' && media.uri) {
           try {
-            const { path } = await createThumbnail({ url: media.uri });
+            const {path} = await createThumbnail({url: media.uri});
             newThumbnails[media.uri] = path;
           } catch (error) {
             console.log('Error generating thumbnail:', error);
@@ -73,62 +74,103 @@ const PinTweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
       const token = await AsyncStorage.getItem('token');
       const dataSent = {
         token: token,
-        postId: tweet.id
-      }
-      setDataSent(dataSent)
-    }
+        postId: tweet.id,
+      };
+      setDataSent(dataSent);
+    };
 
     generateThumbnails();
-    dataSend()
+    dataSend();
   }, [tweet?.media]);
 
   const handleLike = async () => {
     try {
       setLiked(liked ? false : true);
-      setLikesCount(prevLikesCount => liked ? prevLikesCount - 1 : prevLikesCount + 1);
+      setLikesCount(prevLikesCount =>
+        liked ? prevLikesCount - 1 : prevLikesCount + 1,
+      );
 
-      await axios.post(`${serverUrl}/${liked ? 'unlike' : 'like'}-post`, dataSent);
-
+      await axios.post(
+        `${serverUrl}/${liked ? 'unlike' : 'like'}-post`,
+        dataSent,
+      );
     } catch (error) {
-      console.error(`Error in ${liked ? 'unliking' : 'liking'} post:`, error.message);
+      console.error(
+        `Error in ${liked ? 'unliking' : 'liking'} post:`,
+        error.message,
+      );
       setLiked(liked ? true : false);
-      setLikesCount(prevLikesCount => liked ? prevLikesCount + 1 : prevLikesCount - 1);
+      setLikesCount(prevLikesCount =>
+        liked ? prevLikesCount + 1 : prevLikesCount - 1,
+      );
 
-      ToastAndroid.show(`Failed to ${liked ? 'unlike' : 'like'} post. Please try again.`, ToastAndroid.SHORT);
+      ToastAndroid.show(
+        `Failed to ${liked ? 'unlike' : 'like'} post. Please try again.`,
+        ToastAndroid.SHORT,
+      );
     }
   };
 
   const handleBookmark = async () => {
     try {
       setBookmarked(bookmarked ? false : true);
-      setBookMarksCount(prevBookmarksCount => bookmarked ? prevBookmarksCount - 1 : prevBookmarksCount + 1);
+      setBookMarksCount(prevBookmarksCount =>
+        bookmarked ? prevBookmarksCount - 1 : prevBookmarksCount + 1,
+      );
 
-      await axios.post(`${serverUrl}/${bookmarked ? 'unbookmark' : 'bookmark'}-post`, dataSent);
+      await axios.post(
+        `${serverUrl}/${bookmarked ? 'unbookmark' : 'bookmark'}-post`,
+        dataSent,
+      );
 
-      ToastAndroid.show(`Post ${bookmarked ? 'removed' : 'added'} from bookmarks!`, ToastAndroid.SHORT);
-
+      ToastAndroid.show(
+        `Post ${bookmarked ? 'removed' : 'added'} from bookmarks!`,
+        ToastAndroid.SHORT,
+      );
     } catch (error) {
-      console.error(`Error in ${bookmarked ? 'unbookmarking' : 'bookmarking'} post:`, error.message);
+      console.error(
+        `Error in ${bookmarked ? 'unbookmarking' : 'bookmarking'} post:`,
+        error.message,
+      );
       setBookmarked(bookmarked ? true : false);
-      setBookMarksCount(prevBookmarksCount => bookmarked ? prevBookmarksCount + 1 : prevBookmarksCount - 1);
+      setBookMarksCount(prevBookmarksCount =>
+        bookmarked ? prevBookmarksCount + 1 : prevBookmarksCount - 1,
+      );
 
-      ToastAndroid.show(`Failed to ${bookmarked ? 'unbookmark' : 'bookmark'} post. Please try again.`, ToastAndroid.SHORT);
+      ToastAndroid.show(
+        `Failed to ${
+          bookmarked ? 'unbookmark' : 'bookmark'
+        } post. Please try again.`,
+        ToastAndroid.SHORT,
+      );
     }
   };
 
   const handleRepost = async () => {
     try {
       setReposted(reposted ? false : true);
-      setRepostsCount(prevRepostsCount => reposted ? prevRepostsCount - 1 : prevRepostsCount + 1);
+      setRepostsCount(prevRepostsCount =>
+        reposted ? prevRepostsCount - 1 : prevRepostsCount + 1,
+      );
 
-      await axios.post(`${serverUrl}/${reposted ? 'unrepost' : 'repost'}-post`, dataSent)
-
+      await axios.post(
+        `${serverUrl}/${reposted ? 'unrepost' : 'repost'}-post`,
+        dataSent,
+      );
     } catch (error) {
-      console.error(`Error in ${reposted ? 'unreposting' : 'reposting'} post:`, error.message);
+      console.error(
+        `Error in ${reposted ? 'unreposting' : 'reposting'} post:`,
+        error.message,
+      );
       setReposted(reposted ? true : false);
-      setRepostsCount(prevRepostsCount => reposted ? prevRepostsCount + 1 : prevRepostsCount - 1);
+      setRepostsCount(prevRepostsCount =>
+        reposted ? prevRepostsCount + 1 : prevRepostsCount - 1,
+      );
 
-      ToastAndroid.show(`Failed to ${reposted ? 'unrepost' : 'repost'} post. Please try again.`, ToastAndroid.SHORT);
+      ToastAndroid.show(
+        `Failed to ${reposted ? 'unrepost' : 'repost'} post. Please try again.`,
+        ToastAndroid.SHORT,
+      );
     }
   };
 
@@ -202,7 +244,7 @@ const PinTweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
     return `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
   };
 
-  const renderMediaItem = ({ item }) => {
+  const renderMediaItem = ({item}) => {
     if (!item.uri) {
       return null;
     }
@@ -213,8 +255,8 @@ const PinTweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
           ? styles.singleMediaVideo
           : styles.singleMediaImage
         : item.type === 'video'
-          ? styles.tweetVideo
-          : styles.tweetImage;
+        ? styles.tweetVideo
+        : styles.tweetImage;
 
     return (
       <TouchableOpacity
@@ -222,7 +264,7 @@ const PinTweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
         style={styles.mediaContainer}>
         {item.type === 'image' ? (
           <Image
-            source={{ uri: item.uri }}
+            source={{uri: item.uri}}
             style={mediaStyle}
             onError={() => console.log('Failed to load image')}
           />
@@ -230,7 +272,7 @@ const PinTweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
           <TouchableOpacity
             onPress={() => openMediaPreview(item.uri)}
             style={styles.videoContainer}>
-            <Image source={{ uri: thumbnails[item.uri] }} style={mediaStyle} />
+            <Image source={{uri: thumbnails[item.uri]}} style={mediaStyle} />
             <MaterialCommunityIcons
               name="play-circle-outline"
               size={40}
@@ -264,13 +306,19 @@ const PinTweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
     }
   };
 
-  const onResp = async (resp) => {
-    console.log(resp)
+  const onResp = async resp => {
+    console.log(resp);
     try {
       if (resp.status == `ok${resp.type}`) {
-        ToastAndroid.show(`Tweet Successfully ${resp.typed}`, ToastAndroid.SHORT);
+        ToastAndroid.show(
+          `Tweet Successfully ${resp.typed}`,
+          ToastAndroid.SHORT,
+        );
       } else if (resp.status == `okUn${resp.type}`) {
-        ToastAndroid.show(`Tweet Successfully Un${resp.typed}`, ToastAndroid.SHORT);
+        ToastAndroid.show(
+          `Tweet Successfully Un${resp.typed}`,
+          ToastAndroid.SHORT,
+        );
       } else {
         console.error(`Error in ${resp.typing} response data:`, resp.status);
         Alert.alert('Error', `Failed to ${resp.type} post. Please try again.`);
@@ -279,22 +327,20 @@ const PinTweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
       console.error(`Error ${resp.type}:`, error.message);
       Alert.alert('Error', `Failed to ${resp.type}. Please try again.`);
     }
-  }
+  };
 
   return (
     <SafeAreaView style={styles.card}>
       <View style={styles.pin}>
-        <Text style={styles.pinIcon} >
-          <MaterialCommunityIcons
-            name="pin"
-            size={13}
-            color="#001374"
-          />Pinned Post</Text>
+        <Text style={styles.pinIcon}>
+          <MaterialCommunityIcons name="pin" size={13} color="#001374" />
+          Pinned Post
+        </Text>
       </View>
       <View style={styles.userInfo}>
         <TouchableOpacity onPress={handleProfilePress}>
           <Image
-            source={tweet.userAvatar ? { uri: tweet.userAvatar } : DefaultAvatar}
+            source={tweet.userAvatar ? {uri: tweet.userAvatar} : DefaultAvatar}
             style={styles.avatar}
           />
         </TouchableOpacity>
@@ -305,7 +351,9 @@ const PinTweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
           <TouchableOpacity onPress={handleProfilePress}>
             <Text style={styles.userHandle}>@{tweet.userHandle}</Text>
           </TouchableOpacity>
-          {tweet.isAdmin ? (<Text style={styles.verifiedIcon}>{verifiedIcon}</Text>) : null}
+          {tweet.isAdmin ? (
+            <Text style={styles.verifiedIcon}>{verifiedIcon}</Text>
+          ) : null}
           <Text style={styles.postDate}>{formatDate(tweet.postDate)}</Text>
         </View>
         <View style={styles.optionsContainer}>
@@ -333,10 +381,10 @@ const PinTweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
                 setShowBottomSheet(false);
                 onRefreshPage();
               }}
-              onCloseResp={(resp) => {
+              onCloseResp={resp => {
                 setShowBottomSheet(false);
                 onRefreshPage();
-                onResp(resp)
+                onResp(resp);
               }}
               tweet={tweet}
               onRefreshPage={onRefreshPage}
@@ -348,7 +396,9 @@ const PinTweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
           </View>
         </Modal>
       </View>
-      {tweet.content ? <Text style={styles.tweetText}>{tweet.content}</Text> : null}
+      {tweet.content ? (
+        <Text style={styles.tweetText}>{tweet.content}</Text>
+      ) : null}
       {tweet.media && tweet.media.length > 0 ? (
         <FlatList
           data={tweet.media}
@@ -368,7 +418,11 @@ const PinTweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
         />
 
         <InteractionButton
-          icon={tweet?.commentsEnabled ? "message-reply-outline" : "message-off-outline"}
+          icon={
+            tweet?.commentsEnabled
+              ? 'message-reply-outline'
+              : 'message-off-outline'
+          }
           color="#040608"
           count={commentsCount}
           onPress={() => handleCommentPress()}
@@ -403,15 +457,15 @@ const PinTweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
             <View style={styles.modalContainer}>
               {modalMediaUri ? (
                 modalMediaUri.endsWith('.jpg') ||
-                  modalMediaUri.endsWith('.png') ? (
+                modalMediaUri.endsWith('.png') ? (
                   <Image
-                    source={{ uri: modalMediaUri }}
+                    source={{uri: modalMediaUri}}
                     style={styles.modalImage}
                     onError={() => console.log('Failed to load image')}
                   />
                 ) : (
                   <Video
-                    source={{ uri: modalMediaUri }}
+                    source={{uri: modalMediaUri}}
                     style={styles.modalImage}
                     controls
                     resizeMode="contain"
@@ -426,7 +480,7 @@ const PinTweetCard = ({ tweet, onRefreshPage, comments, isUserProfile }) => {
   );
 };
 
-const InteractionButton = ({ icon, color, count, onPress }) => (
+const InteractionButton = ({icon, color, count, onPress}) => (
   <TouchableOpacity style={styles.actionButton} onPress={onPress}>
     <MaterialCommunityIcons name={icon} size={20} color={color} />
     <Text style={styles.actionText}>{count}</Text>
@@ -438,7 +492,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     padding: 10,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 1,
@@ -463,29 +517,20 @@ const styles = StyleSheet.create({
   userInfo: {
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  avatar: {
-    width: 52,
-    height: 49,
-    borderRadius: 24,
-    marginRight: 12,
-  },
-  pin: {
-    fontSize: 11,
-    marginLeft: 60,
-    marginBottom: -7,
     marginTop: 5,
   },
-  pinIcon: {
-    color: '#001374',
-    fontWeight: '700',
+  avatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 100,
+    marginRight: 12,
   },
   userDetails: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   userName: {
-    fontSize: 16,
+    fontSize: 12,
     fontWeight: 'bold',
     color: '#040608',
     marginRight: 4,
@@ -494,29 +539,39 @@ const styles = StyleSheet.create({
     color: '#718096',
     fontWeight: '700',
     marginRight: 7,
+    fontSize: 12,
   },
   verifiedIcon: {
     marginLeft: -3,
-    marginRight: 6
+    marginRight: 6,
+    marginTop: 2,
   },
   postDate: {
     color: '#718096',
-    fontSize: 12,
+    fontSize: 10,
   },
   tweetText: {
     fontSize: 15,
-    paddingVertical: 8,
+    marginVertical: 8,
     color: '#040608',
+    marginTop: 5,
   },
   mediaFlatList: {
     marginTop: 5,
-    marginVertical: 10,
+    marginVertical: 8,
   },
   tweetImage: {
     width: 200,
     height: 200,
     borderRadius: 8,
     marginRight: 8,
+  },
+  tweetVideo: {
+    width: 200,
+    height: 200,
+    borderRadius: 8,
+    marginRight: 8,
+    marginLeft: 2,
   },
   singleMediaImage: {
     width: 390,
@@ -525,9 +580,26 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
   },
   singleMediaVideo: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 8,
+  },
+  singleVideoContainer: {
     width: 390,
     height: 200,
     borderRadius: 8,
+    backgroundColor: '#000',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  videoContainer: {
+    width: 200,
+    height: 200,
+    borderRadius: 8,
+    backgroundColor: '#000',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 8,
   },
   actions: {
     flexDirection: 'row',
@@ -556,28 +628,63 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
   },
-  modalContainer: {
-    width: '90%',
-    height: '80%',
+  errorContainer: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'rgba(255,0,0,0.1)',
+    padding: 20,
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  modalContainer: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
   },
   modalImage: {
     width: '100%',
     height: '100%',
+    maxWidth: '100%',
+    maxHeight: '100%',
     resizeMode: 'contain',
   },
-  videoContainer: {
-    width: 390,
-    height: 200,
-    borderRadius: 8,
-    backgroundColor: '#000',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 8,
+  modalVideo: {
+    width: '100%',
+    height: '100%',
+    maxWidth: '85%',
+    maxHeight: '85%',
   },
   playIcon: {
     position: 'absolute',
+  },
+  placeholderThumbnail: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#e0e0e0',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 8,
+  },
+  pin: {
+    fontSize: 11,
+    marginLeft: 60,
+    marginBottom: -7,
+    marginTop: 5,
+  },
+  pinIcon: {
+    color: '#001374',
+    fontWeight: '700',
+  },
+  verifiedIcon: {
+    marginLeft: -3,
+    marginRight: 6,
   },
 });
 

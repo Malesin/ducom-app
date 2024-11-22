@@ -54,7 +54,7 @@ const ViewPost = ({route}) => {
   const [visibleComments, setVisibleComments] = useState(3);
   const [placeholder, setPlaceholder] = useState('Add Comments');
   const colorScheme = useColorScheme();
-
+  const [isAdmin, setIsAdmin] = useState(tweet?.amIAdmin);
   const [refreshing, setRefreshing] = useState(false);
   const [showBottomSheet, setShowBottomSheet] = useState(false);
   const [isEnabledComm, setIsEnabledComm] = useState(true);
@@ -202,19 +202,6 @@ const ViewPost = ({route}) => {
         `Failed to ${reposted ? 'unrepost' : 'repost'} post. Please try again.`,
         ToastAndroid.SHORT,
       );
-    }
-  };
-
-  const handleShare = async () => {
-    try {
-      await Share.share({
-        message: tweet.content,
-        url: tweet.media && tweet.media.length > 0 ? tweet.media[0].uri : '',
-        title: tweet.userName,
-      });
-    } catch (error) {
-      console.error('Error sharing:', error.message);
-      Alert.alert('Error', 'Failed to share post. Please try again.');
     }
   };
 
@@ -539,15 +526,17 @@ const ViewPost = ({route}) => {
                   @{tweet.userHandle}
                 </Text>
               </View>
-              <TouchableOpacity
-                style={styles.optionsButton}
-                onPress={() => setShowBottomSheet(true)}>
-                <MaterialCommunityIcons
-                  name="dots-vertical"
-                  size={26}
-                  color="#000"
-                />
-              </TouchableOpacity>
+              {isOwner || tweet?.amIAdmin ? (
+                <TouchableOpacity
+                  style={styles.optionsButton}
+                  onPress={() => setShowBottomSheet(true)}>
+                  <MaterialCommunityIcons
+                    name="dots-vertical"
+                    size={26}
+                    color="#000"
+                  />
+                </TouchableOpacity>
+              ) : null}
             </View>
             <View>
               <Text style={styles.postContent}>{tweet.content}</Text>
@@ -648,7 +637,7 @@ const ViewPost = ({route}) => {
                   color={reposted ? '#097969' : '#040608'}
                 />
               </TouchableOpacity>
-              <TouchableOpacity
+              {/* <TouchableOpacity
                 style={styles.actionButton}
                 onPress={handleShare}>
                 <MaterialCommunityIcons
@@ -656,7 +645,7 @@ const ViewPost = ({route}) => {
                   size={20}
                   color="#657786"
                 />
-              </TouchableOpacity>
+              </TouchableOpacity> */}
             </View>
             <View style={styles.commentContainer}>
               {comments.slice(0, visibleComments).map(comment => (
