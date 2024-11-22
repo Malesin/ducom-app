@@ -101,14 +101,12 @@ const BottomSheet = ({
 
   const handlePinPost = () => {
     if (isPin) {
-      // Jika sudah dipin, langsung unpin tanpa menampilkan modal
-      pinPost(0); // Anda bisa menggunakan 0 atau nilai lain yang menandakan unpin
+      pinPost(0);
     } else {
-      // Jika belum dipin, tampilkan modal untuk memilih durasi
       setModalVisible(true);
     }
   };
-  
+
   {
     /* PIN POST AT HOMESCREEN */
   }

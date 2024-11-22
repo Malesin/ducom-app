@@ -27,13 +27,14 @@ import CommentCard from '../../components/CommentCard';
 import BottomSheet from '../../components/BottomSheet';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {Skeleton} from 'react-native-elements';
+import {useNavigation} from '@react-navigation/native';
 const verifiedIcon = <Icon name="verified" size={16} color="#699BF7" />;
 
 const serverUrl = config.SERVER_URL;
 
 const ViewPost = ({route}) => {
   const {tweet, focusCommentInput, isUserProfile} = route?.params || {};
-
+  const navigation = useNavigation();
   const [liked, setLiked] = useState(tweet?.isLiked);
   const [likesCount, setLikesCount] = useState(tweet?.likesCount);
   const [bookmarked, setBookmarked] = useState(false);
@@ -369,6 +370,17 @@ const ViewPost = ({route}) => {
     onRefresh();
   };
 
+  const navigateProfile = () => {
+     if (tweet?.userIdPost === tweet?.idUser) {
+      navigation.navigate('Profile');
+    } else {
+      navigation.navigate('Userprofile', {
+        userIdPost: tweet?.userIdPost,
+        isUserProfile: isUserProfile,
+      });
+    }
+  };
+
   const renderSkeleton = () => (
     <View style={styles.skeletonContainer}>
       <View style={styles.skeletonHeader}>
@@ -496,35 +508,38 @@ const ViewPost = ({route}) => {
           }>
           <View style={styles.postContainer}>
             <View style={styles.headerContainer}>
-              <Image
-                source={
-                  tweet.userAvatar
-                    ? {uri: tweet.userAvatar}
-                    : require('../../assets/profilepic.png')
-                }
-                style={styles.avatar}
-              />
+              <TouchableOpacity onPress={navigateProfile}>
+                <Image
+                  source={
+                    tweet.userAvatar
+                      ? {uri: tweet.userAvatar}
+                      : require('../../assets/profilepic.png')
+                  }
+                  style={styles.avatar}
+                />
+              </TouchableOpacity>
               <View style={styles.userInfo}>
-                <View style={styles.usernameContainer}>
+                <TouchableOpacity onPress={navigateProfile}>
+                  <View style={styles.usernameContainer}>
+                    <Text
+                      style={[
+                        styles.userName,
+                        {color: colorScheme === 'dark' ? '#000000' : '#000'},
+                      ]}>
+                      {tweet.userName}
+                    </Text>
+                    {tweet.isAdmin ? (
+                      <Text style={styles.verifiedIcon}>{verifiedIcon}</Text>
+                    ) : null}
+                  </View>
                   <Text
                     style={[
-                      styles.userName,
-                      {color: colorScheme === 'dark' ? '#000000' : '#000'},
+                      styles.userHandle,
+                      {color: colorScheme === 'dark' ? '#ccc' : 'gray'},
                     ]}>
-                    {tweet.userName}
+                    @{tweet.userHandle}
                   </Text>
-                  {tweet.isAdmin ? (
-                    <Text style={styles.verifiedIcon}>{verifiedIcon}</Text>
-                  ) : null}
-                </View>
-
-                <Text
-                  style={[
-                    styles.userHandle,
-                    {color: colorScheme === 'dark' ? '#ccc' : 'gray'},
-                  ]}>
-                  @{tweet.userHandle}
-                </Text>
+                </TouchableOpacity>
               </View>
               {isOwner || tweet?.amIAdmin ? (
                 <TouchableOpacity
