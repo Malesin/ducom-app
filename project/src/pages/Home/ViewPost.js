@@ -184,7 +184,7 @@ const ViewPost = ({route}) => {
       setRepostsCount(prevRepostsCount =>
         reposted ? prevRepostsCount - 1 : prevRepostsCount + 1,
       );
-
+      console.log(reposted);
       await axios.post(
         `${serverUrl}/${reposted ? 'unrepost' : 'repost'}-post`,
         dataSent,
@@ -198,7 +198,6 @@ const ViewPost = ({route}) => {
       setRepostsCount(prevRepostsCount =>
         reposted ? prevRepostsCount + 1 : prevRepostsCount - 1,
       );
-
       ToastAndroid.show(
         `Failed to ${reposted ? 'unrepost' : 'repost'} post. Please try again.`,
         ToastAndroid.SHORT,
@@ -371,7 +370,7 @@ const ViewPost = ({route}) => {
   };
 
   const navigateProfile = () => {
-     if (tweet?.userIdPost === tweet?.idUser) {
+    if (tweet?.userIdPost === tweet?.idUser) {
       navigation.navigate('Profile');
     } else {
       navigation.navigate('Userprofile', {
@@ -608,6 +607,10 @@ const ViewPost = ({route}) => {
               <Text style={styles.interactionText}>
                 <Text style={styles.interactionNumber}>{likesCount}</Text> Likes{' '}
               </Text>
+              <Text style={styles.interactionText}>
+                <Text style={styles.interactionNumber}>{repostsCount}</Text>{' '}
+                Reposts{' '}
+              </Text>
             </View>
             <View style={styles.actions}>
               <TouchableOpacity
@@ -619,7 +622,6 @@ const ViewPost = ({route}) => {
                   color={liked ? '#E0245E' : '#040608'}
                 />
               </TouchableOpacity>
-
               <TouchableOpacity
                 style={styles.actionButton}
                 onPress={handleReplyIconPress}>
