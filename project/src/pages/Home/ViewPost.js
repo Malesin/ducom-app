@@ -27,13 +27,14 @@ import CommentCard from '../../components/CommentCard';
 import BottomSheet from '../../components/BottomSheet';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {Skeleton} from 'react-native-elements';
+import {useNavigation} from '@react-navigation/native';
 const verifiedIcon = <Icon name="verified" size={16} color="#699BF7" />;
 
 const serverUrl = config.SERVER_URL;
 
 const ViewPost = ({route}) => {
   const {tweet, focusCommentInput, isUserProfile} = route?.params || {};
-
+  const navigation = useNavigation();
   const [liked, setLiked] = useState(tweet?.isLiked);
   const [likesCount, setLikesCount] = useState(tweet?.likesCount);
   const [bookmarked, setBookmarked] = useState(false);
@@ -54,7 +55,7 @@ const ViewPost = ({route}) => {
   const [visibleComments, setVisibleComments] = useState(3);
   const [placeholder, setPlaceholder] = useState('Add Comments');
   const colorScheme = useColorScheme();
-
+  const [isAdmin, setIsAdmin] = useState(tweet?.amIAdmin);
   const [refreshing, setRefreshing] = useState(false);
   const [showBottomSheet, setShowBottomSheet] = useState(false);
   const [isEnabledComm, setIsEnabledComm] = useState(true);
@@ -183,7 +184,7 @@ const ViewPost = ({route}) => {
       setRepostsCount(prevRepostsCount =>
         reposted ? prevRepostsCount - 1 : prevRepostsCount + 1,
       );
-
+      console.log(reposted);
       await axios.post(
         `${serverUrl}/${reposted ? 'unrepost' : 'repost'}-post`,
         dataSent,
@@ -197,24 +198,10 @@ const ViewPost = ({route}) => {
       setRepostsCount(prevRepostsCount =>
         reposted ? prevRepostsCount + 1 : prevRepostsCount - 1,
       );
-
       ToastAndroid.show(
         `Failed to ${reposted ? 'unrepost' : 'repost'} post. Please try again.`,
         ToastAndroid.SHORT,
       );
-    }
-  };
-
-  const handleShare = async () => {
-    try {
-      await Share.share({
-        message: tweet.content,
-        url: tweet.media && tweet.media.length > 0 ? tweet.media[0].uri : '',
-        title: tweet.userName,
-      });
-    } catch (error) {
-      console.error('Error sharing:', error.message);
-      Alert.alert('Error', 'Failed to share post. Please try again.');
     }
   };
 
@@ -382,6 +369,17 @@ const ViewPost = ({route}) => {
     onRefresh();
   };
 
+  const navigateProfile = () => {
+    if (tweet?.userIdPost === tweet?.idUser) {
+      navigation.navigate('Profile');
+    } else {
+      navigation.navigate('Userprofile', {
+        userIdPost: tweet?.userIdPost,
+        isUserProfile: isUserProfile,
+      });
+    }
+  };
+
   const renderSkeleton = () => (
     <View style={styles.skeletonContainer}>
       <View style={styles.skeletonHeader}>
@@ -509,45 +507,50 @@ const ViewPost = ({route}) => {
           }>
           <View style={styles.postContainer}>
             <View style={styles.headerContainer}>
-              <Image
-                source={
-                  tweet.userAvatar
-                    ? {uri: tweet.userAvatar}
-                    : require('../../assets/profilepic.png')
-                }
-                style={styles.avatar}
-              />
-              <View style={styles.userInfo}>
-                <View style={styles.usernameContainer}>
-                  <Text
-                    style={[
-                      styles.userName,
-                      {color: colorScheme === 'dark' ? '#000000' : '#000'},
-                    ]}>
-                    {tweet.userName}
-                  </Text>
-                  {tweet.isAdmin ? (
-                    <Text style={styles.verifiedIcon}>{verifiedIcon}</Text>
-                  ) : null}
-                </View>
-
-                <Text
-                  style={[
-                    styles.userHandle,
-                    {color: colorScheme === 'dark' ? '#ccc' : 'gray'},
-                  ]}>
-                  @{tweet.userHandle}
-                </Text>
-              </View>
-              <TouchableOpacity
-                style={styles.optionsButton}
-                onPress={() => setShowBottomSheet(true)}>
-                <MaterialCommunityIcons
-                  name="dots-vertical"
-                  size={26}
-                  color="#000"
+              <TouchableOpacity onPress={navigateProfile}>
+                <Image
+                  source={
+                    tweet.userAvatar
+                      ? {uri: tweet.userAvatar}
+                      : require('../../assets/profilepic.png')
+                  }
+                  style={styles.avatar}
                 />
               </TouchableOpacity>
+              <View style={styles.userInfo}>
+                <TouchableOpacity onPress={navigateProfile}>
+                  <View style={styles.usernameContainer}>
+                    <Text
+                      style={[
+                        styles.userName,
+                        {color: colorScheme === 'dark' ? '#000000' : '#000'},
+                      ]}>
+                      {tweet.userName}
+                    </Text>
+                    {tweet.isAdmin ? (
+                      <Text style={styles.verifiedIcon}>{verifiedIcon}</Text>
+                    ) : null}
+                  </View>
+                  <Text
+                    style={[
+                      styles.userHandle,
+                      {color: colorScheme === 'dark' ? '#ccc' : 'gray'},
+                    ]}>
+                    @{tweet.userHandle}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+              {isOwner || tweet?.amIAdmin ? (
+                <TouchableOpacity
+                  style={styles.optionsButton}
+                  onPress={() => setShowBottomSheet(true)}>
+                  <MaterialCommunityIcons
+                    name="dots-vertical"
+                    size={26}
+                    color="#000"
+                  />
+                </TouchableOpacity>
+              ) : null}
             </View>
             <View>
               <Text style={styles.postContent}>{tweet.content}</Text>
@@ -604,6 +607,10 @@ const ViewPost = ({route}) => {
               <Text style={styles.interactionText}>
                 <Text style={styles.interactionNumber}>{likesCount}</Text> Likes{' '}
               </Text>
+              <Text style={styles.interactionText}>
+                <Text style={styles.interactionNumber}>{repostsCount}</Text>{' '}
+                Reposts{' '}
+              </Text>
             </View>
             <View style={styles.actions}>
               <TouchableOpacity
@@ -615,7 +622,6 @@ const ViewPost = ({route}) => {
                   color={liked ? '#E0245E' : '#040608'}
                 />
               </TouchableOpacity>
-
               <TouchableOpacity
                 style={styles.actionButton}
                 onPress={handleReplyIconPress}>
@@ -648,7 +654,7 @@ const ViewPost = ({route}) => {
                   color={reposted ? '#097969' : '#040608'}
                 />
               </TouchableOpacity>
-              <TouchableOpacity
+              {/* <TouchableOpacity
                 style={styles.actionButton}
                 onPress={handleShare}>
                 <MaterialCommunityIcons
@@ -656,7 +662,7 @@ const ViewPost = ({route}) => {
                   size={20}
                   color="#657786"
                 />
-              </TouchableOpacity>
+              </TouchableOpacity> */}
             </View>
             <View style={styles.commentContainer}>
               {comments.slice(0, visibleComments).map(comment => (

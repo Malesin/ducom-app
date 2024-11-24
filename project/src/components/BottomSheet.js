@@ -100,8 +100,13 @@ const BottomSheet = ({
   };
 
   const handlePinPost = () => {
-    setModalVisible(true);
+    if (isPin) {
+      pinPost(0);
+    } else {
+      setModalVisible(true);
+    }
   };
+
   {
     /* PIN POST AT HOMESCREEN */
   }
