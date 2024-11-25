@@ -31,6 +31,7 @@ const Userprofile = ({userIdPost, navigation}) => {
   const [isMuted, setIsMuted] = useState(false);
   const [isBlocked, setIsBlocked] = useState(false);
 
+  // Fungsi untuk mengosongkan data pengguna
   const resetUserData = () => {
     setUserData('');
     setBanner(false);
@@ -38,14 +39,14 @@ const Userprofile = ({userIdPost, navigation}) => {
     setIsFollowing(false);
     setFollowersCount(0);
     setIsMuted(false);
-    setIsBlocked(!isBlocked);
+    setIsBlocked(false);
   };
 
   useFocusEffect(
     useCallback(() => {
-      resetUserData();
+      resetUserData(); // Panggil fungsi reset
       getData();
-    }, [userIdPost]),
+    }, [userIdPost]) // Tambahkan userIdPost sebagai dependensi
   );
 
   const getData = async () => {
@@ -100,7 +101,7 @@ const Userprofile = ({userIdPost, navigation}) => {
     if (item === 'Mute') {
       muteUser();
     }
-    if (item === 'Block' || item === 'Unblock') {
+    if (item === 'Block') {
       blockUser();
     }
     if (item === 'Report') {
@@ -179,7 +180,7 @@ const Userprofile = ({userIdPost, navigation}) => {
         });
         console.log(block.data);
         setIsBlocked(true);
-        ToastAndroid.show('User  berhasil diblokir', ToastAndroid.SHORT);
+        ToastAndroid.show('User berhasil diblokir', ToastAndroid.SHORT);
         navigation.goBack();
       } else {
         const unblock = await axios.post(`${serverUrl}/unblock-user`, {
@@ -192,18 +193,11 @@ const Userprofile = ({userIdPost, navigation}) => {
           'Anda berhasil membuka blokir user ini',
           ToastAndroid.SHORT,
         );
-        navigation.goBack();
       }
     } catch (error) {
-      console.error(
-        'Error blocking/unblocking user:',
-        error.response?.data || error.message,
-      );
-      ToastAndroid.show('Gagal memproses blokir', ToastAndroid.SHORT);
+      console.error('Error:', error);
     }
   };
-
-  console.log(isBlocked, 'diblokir jir ');
 
   return (
     <SafeAreaView style={styles.container}>
@@ -239,27 +233,14 @@ const Userprofile = ({userIdPost, navigation}) => {
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.dropdownItem}
-                  onPress={() =>
-                    handleDropdownItemPress(isBlocked ? 'Unblock' : 'Block')
-                  }>
-                  {isBlocked ? (
-                    <MaterialCommunityIcons
-                      name="lock-open-variant-outline"
-                      size={20}
-                      color="#000"
-                      style={styles.dropdownIcon}
-                    />
-                  ) : (
-                    <MaterialCommunityIcons
-                      name="block-helper"
-                      size={20}
-                      color="#000"
-                      style={styles.dropdownIcon}
-                    />
-                  )}
-                  <Text style={styles.dropdownItemText}>
-                    {isBlocked ? 'Unblock' : 'Block'}
-                  </Text>
+                  onPress={() => handleDropdownItemPress('Block')}>
+                  <MaterialCommunityIcons
+                    name="block-helper"
+                    size={20}
+                    color="#000"
+                    style={styles.dropdownIcon}
+                  />
+                  <Text style={styles.dropdownItemText}>Block</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.dropdownItem}
