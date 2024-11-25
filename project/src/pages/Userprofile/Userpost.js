@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, {useState, useCallback} from 'react';
 import {
   StyleSheet,
   ScrollView,
@@ -9,15 +9,21 @@ import {
 } from 'react-native';
 import TweetCard from '../../components/TweetCard';
 import PinTweetCard from '../../components/PinTweetCard';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import { Skeleton } from 'react-native-elements';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
+import {Skeleton} from 'react-native-elements';
 import axios from 'axios';
 import config from '../../config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const serverUrl = config.SERVER_URL;
 
-const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile }) => {
+const Userpost = ({
+  userIdPost,
+  profilePicture,
+  idUser,
+  amIAdmin,
+  isUserProfile,
+}) => {
   const navigation = useNavigation();
   const [tweets, setTweets] = useState([]);
   const [page, setPage] = useState(1);
@@ -29,14 +35,16 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
   const fetchPinTweet = useCallback(async () => {
     const token = await AsyncStorage.getItem('token');
     try {
-      const respMyData = await axios.post(`${serverUrl}/userdata`, { token: token });
+      const respMyData = await axios.post(`${serverUrl}/userdata`, {
+        token: token,
+      });
 
-      const { data } = respMyData.data;
+      const {data} = respMyData.data;
       const idUser = data._id;
       const profilePicture = data.profilePicture;
-      const amIAdmin = data.isAdmin
-      const isMuteds = data.mutedUsers
-      const isBlockeds = data.blockedUsers
+      const amIAdmin = data.isAdmin;
+      const isMuteds = data.mutedUsers;
+      const isBlockeds = data.blockedUsers;
 
       const pinPost = await axios.post(`${serverUrl}/showPinPost-byId`, {
         token: token,
@@ -47,7 +55,12 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
       if (!postPin) {
         return null;
       }
-      const totalComments = postPin.comments.length + postPin.comments.reduce((acc, comment) => acc + comment.replies.length, 0);
+      const totalComments =
+        postPin.comments.length +
+        postPin.comments.reduce(
+          (acc, comment) => acc + comment.replies.length,
+          0,
+        );
 
       const pinTweet = {
         id: postPin._id,
@@ -58,16 +71,18 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
         content: postPin.description,
         media: Array.isArray(postPin.media)
           ? postPin.media.map(mediaItem => ({
-            type: mediaItem.type,
-            uri: mediaItem.uri,
-          }))
+              type: mediaItem.type,
+              uri: mediaItem.uri,
+            }))
           : [],
         likesCount: postPin.likes.length,
         commentsCount: totalComments,
         bookMarksCount: postPin.bookmarks.length,
         repostsCount: postPin.reposts.length,
         isLiked: postPin.likes.some(like => like._id === idUser),
-        isBookmarked: postPin.bookmarks.some(bookmark => bookmark.user === idUser),
+        isBookmarked: postPin.bookmarks.some(
+          bookmark => bookmark.user === idUser,
+        ),
         isReposted: postPin.reposts.some(repost => repost.user === idUser),
         isMuted: isMuteds.some(isMuted => isMuted === postPin.user._id),
         isBlocked: isBlockeds.some(isBlocked => isBlocked === postPin.user._id),
@@ -76,17 +91,17 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
         profilePicture: profilePicture,
         commentsEnabled: postPin.commentsEnabled,
         isAdmin: postPin.user.isAdmin,
-        amIAdmin: amIAdmin
+        amIAdmin: amIAdmin,
       };
 
       return pinTweet;
     } catch (error) {
       if (error.response && error.response.status === 403) {
-        console.log("lo diblokir")
-        setLoading(false)
-        return "You are blocked by this user";
+        console.log('lo diblokir');
+        setLoading(false);
+        return 'You are blocked by this user';
       }
-      setLoading(false)
+      setLoading(false);
       console.error('Error fetching data:', error);
       return null;
     }
@@ -95,14 +110,16 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
   const fetchTweets = useCallback(async () => {
     const token = await AsyncStorage.getItem('token');
     try {
-      const respMyData = await axios.post(`${serverUrl}/userdata`, { token: token });
+      const respMyData = await axios.post(`${serverUrl}/userdata`, {
+        token: token,
+      });
 
-      const { data } = respMyData.data;
+      const {data} = respMyData.data;
       const idUser = data._id;
       const profilePicture = data.profilePicture;
-      const amIAdmin = data.isAdmin
-      const isMuteds = data.mutedUsers
-      const isBlockeds = data.blockedUsers
+      const amIAdmin = data.isAdmin;
+      const isMuteds = data.mutedUsers;
+      const isBlockeds = data.blockedUsers;
 
       const respTweet = await axios.post(`${serverUrl}/userId-posts`, {
         token: token,
@@ -113,7 +130,12 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
       const formattedTweets = dataTweet
         .filter(post => post.user !== null)
         .map(post => {
-          const totalComments = post.comments.length + post.comments.reduce((acc, comment) => acc + comment.replies.length, 0);
+          const totalComments =
+            post.comments.length +
+            post.comments.reduce(
+              (acc, comment) => acc + comment.replies.length,
+              0,
+            );
           return {
             id: post._id,
             userAvatar: post.user.profilePicture,
@@ -123,42 +145,46 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
             content: post.description,
             media: Array.isArray(post.media)
               ? post.media.map(mediaItem => ({
-                type: mediaItem.type,
-                uri: mediaItem.uri,
-              }))
+                  type: mediaItem.type,
+                  uri: mediaItem.uri,
+                }))
               : [],
             likesCount: post.likes.length,
             commentsCount: totalComments,
             bookMarksCount: post.bookmarks.length,
             repostsCount: post.reposts.length,
             isLiked: post.likes.some(like => like._id === idUser),
-            isBookmarked: post.bookmarks.some(bookmark => bookmark.user === idUser),
+            isBookmarked: post.bookmarks.some(
+              bookmark => bookmark.user === idUser,
+            ),
             isReposted: post.reposts.some(repost => repost.user === idUser),
             isMuted: isMuteds.some(isMuted => isMuted === post.user._id),
-            isBlocked: isBlockeds.some(isBlocked => isBlocked === post.user._id),
+            isBlocked: isBlockeds.some(
+              isBlocked => isBlocked === post.user._id,
+            ),
             userIdPost: post.user._id,
             idUser: idUser,
             profilePicture: profilePicture,
             commentsEnabled: post.commentsEnabled,
             isAdmin: post.user.isAdmin,
-            amIAdmin: amIAdmin
+            amIAdmin: amIAdmin,
           };
         });
 
       return formattedTweets;
     } catch (error) {
       if (error.response && error.response.data === 'youBlockedBy') {
-        console.log("lo diblokir")
-        setLoading(false)
-        return "You are blocked by this user";
+        console.log('lo diblokir');
+        setLoading(false);
+        return 'You are blocked by this user';
       } else if (error.response && error.response.data === 'youBlockedThis') {
-        console.log("lo ngeblokir")
-        setLoading(false)
-        return "You have blocked this user";
+        console.log('lo ngeblokir');
+        setLoading(false);
+        return 'You have blocked this user';
       } else {
-        console.error("Error fetching tweets:", error);
+        console.error('Error fetching tweets:', error);
       }
-      setLoading(false)
+      setLoading(false);
       console.error('Error fetching data:', error);
       return null;
     }
@@ -218,12 +244,18 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
       const newTweets = await fetchTweets(1);
       const initialPinTweets = await fetchPinTweet();
 
-      if (newTweets === "You are blocked by this user" || initialPinTweets === "You are blocked by this user") {
-        setTweets("You are blocked by this user");
+      if (
+        newTweets === 'You are blocked by this user' ||
+        initialPinTweets === 'You are blocked by this user'
+      ) {
+        setTweets('You are blocked by this user');
         setLoading(false);
         return;
-      } else if (newTweets === "You have blocked this user" || initialPinTweets === "You have blocked this user") {
-        setTweets("You have blocked this user");
+      } else if (
+        newTweets === 'You have blocked this user' ||
+        initialPinTweets === 'You have blocked this user'
+      ) {
+        setTweets('You have blocked this user');
         setLoading(false);
         return;
       }
@@ -236,7 +268,9 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
         setPinnedTweetId(null);
       }
 
-      const filteredTweets = newTweets.filter(tweet => tweet.id !== initialPinTweets?.id);
+      const filteredTweets = newTweets.filter(
+        tweet => tweet.id !== initialPinTweets?.id,
+      );
       setTweets(filteredTweets.slice(0, 5));
       setIsFetched(true);
       setLoading(false);
@@ -254,12 +288,18 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
         const newTweets = await fetchTweets(1);
         const initialPinTweets = await fetchPinTweet();
 
-        if (newTweets === "You are blocked by this user" || initialPinTweets === "You are blocked by this user") {
-          setTweets("You are blocked by this user");
+        if (
+          newTweets === 'You are blocked by this user' ||
+          initialPinTweets === 'You are blocked by this user'
+        ) {
+          setTweets('You are blocked by this user');
           setLoading(false);
           return;
-        } else if (newTweets === "You have blocked this user" || initialPinTweets === "You have blocked this user") {
-          setTweets("You have blocked this user");
+        } else if (
+          newTweets === 'You have blocked this user' ||
+          initialPinTweets === 'You have blocked this user'
+        ) {
+          setTweets('You have blocked this user');
           setLoading(false);
           return;
         }
@@ -272,16 +312,18 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
           setPinnedTweetId(null);
         }
 
-        const filteredTweets = newTweets.filter(tweet => tweet.id !== initialPinTweets?.id);
+        const filteredTweets = newTweets.filter(
+          tweet => tweet.id !== initialPinTweets?.id,
+        );
         setTweets(filteredTweets.slice(0, 5));
         setIsFetched(true);
         setLoading(false);
       })();
-    }, [userIdPost])
+    }, [userIdPost]),
   );
 
-  const handlePostPress = (tweet) => {
-    navigation.navigate('ViewPost', { tweet });
+  const handlePostPress = tweet => {
+    navigation.navigate('ViewPost', {tweet});
   };
 
   return (
@@ -291,8 +333,8 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
       ) : (
         <ScrollView
           contentContainerStyle={styles.contentContainer}
-          onScroll={({ nativeEvent }) => {
-            const { contentOffset, layoutMeasurement, contentSize } = nativeEvent;
+          onScroll={({nativeEvent}) => {
+            const {contentOffset, layoutMeasurement, contentSize} = nativeEvent;
             const contentHeight = contentSize.height;
             const viewportHeight = layoutMeasurement.height;
             const scrollPosition = contentOffset.y + viewportHeight;
@@ -304,7 +346,11 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
           {pintweets.map((tweet, index) => (
             <View key={index} style={styles.tweetContainer}>
               <TouchableOpacity onPress={() => handlePostPress(tweet)}>
-                <PinTweetCard tweet={tweet} onRefreshPage={onRefreshPage} isUserProfile={isUserProfile} />
+                <PinTweetCard
+                  tweet={tweet}
+                  onRefreshPage={onRefreshPage}
+                  isUserProfile={isUserProfile}
+                />
               </TouchableOpacity>
             </View>
           ))}
@@ -312,15 +358,25 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
             tweets.map((tweet, index) => (
               <View key={index} style={styles.tweetContainer}>
                 <TouchableOpacity onPress={() => handlePostPress(tweet)}>
-                  <TweetCard tweet={tweet} onRefreshPage={onRefreshPage} isUserProfile={isUserProfile} />
+                  <TweetCard
+                    tweet={tweet}
+                    onRefreshPage={onRefreshPage}
+                    isUserProfile={isUserProfile}
+                  />
                 </TouchableOpacity>
               </View>
             ))
           ) : (
             <Text style={styles.noTweetsText}>
-              {tweets === "You are blocked by this user" ? "You are blocked by this user" : (<>
-                {tweets === "You have blocked this user" ? "You have blocked this user" : "No Tweets Available"}
-              </>)}
+              {tweets === 'You are blocked by this user' ? (
+                'You are blocked by this user'
+              ) : (
+                <>
+                  {tweets === 'You have blocked this user'
+                    ? 'You have blocked this user'
+                    : 'No Tweets Available'}
+                </>
+              )}
             </Text>
           )}
         </ScrollView>
