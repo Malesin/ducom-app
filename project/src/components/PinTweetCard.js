@@ -191,18 +191,7 @@ const PinTweetCard = ({tweet, onRefreshPage, comments, isUserProfile}) => {
     setIsModalVisible(false);
     setModalMediaUri('');
   };
-  const handleShare = async () => {
-    try {
-      await Share.share({
-        message: tweet.content,
-        url: tweet.media && tweet.media.length > 0 ? tweet.media[0].uri : '',
-        title: tweet.userName,
-      });
-    } catch (error) {
-      console.error('Error sharing:', error.message);
-      Alert.alert('Error', 'Failed to share post. Please try again.');
-    }
-  };
+
 
   const handleOptionPress = () => {
     setShowBottomSheet(true);
@@ -439,13 +428,6 @@ const PinTweetCard = ({tweet, onRefreshPage, comments, isUserProfile}) => {
           count={repostsCount}
           onPress={handleRepost}
         />
-        <TouchableOpacity style={styles.actionButton} onPress={handleShare}>
-          <MaterialCommunityIcons
-            name="export-variant"
-            size={20}
-            color="#657786"
-          />
-        </TouchableOpacity>
       </View>
       <Modal
         visible={isModalVisible}

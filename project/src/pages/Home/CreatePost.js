@@ -215,30 +215,30 @@ const CreatePost = ({ route, navigation }) => {
           }
         }
 
-        const media = [
+        media = [
           ...mediaDataImages.map(item => `${item.url}|${item.type}`),
           ...mediaDataVideos.map(item => `${item.url}|${item.type}`),
         ].join(',');
 
         console.log('media:', media);
+      }
 
-        const postResponse = await axios.post(`${serverUrl}/create-post`, {
-          token: token,
-          media: media,
-          description: newPostText,
-          commentsEnabled: commentsEnabled,
+      const postResponse = await axios.post(`${serverUrl}/create-post`, {
+        token: token,
+        media: media,
+        description: newPostText,
+        commentsEnabled: commentsEnabled,
+      });
+
+      if (postResponse.data.status === 'ok') {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Home' }],
         });
-
-        if (postResponse.data.status === 'ok') {
-          navigation.reset({
-            index: 0,
-            routes: [{ name: 'Home' }],
-          });
-          console.log('Post created successfully');
-        } else {
-          console.error('Failed to create post:', postResponse.data.data);
-          Alert.alert('Error', 'Failed to create post.');
-        }
+        console.log('Post created successfully');
+      } else {
+        console.error('Failed to create post:', postResponse.data.data);
+        Alert.alert('Error', 'Failed to create post.');
       }
     } catch (error) {
       console.error('Error submitting post:', error.message);
