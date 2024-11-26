@@ -10,6 +10,7 @@ const { height } = Dimensions.get('window');
 function UserTopTabNavigator({ route, navigation }) {
   const [refreshing, setRefreshing] = useState(false);
   const [isScrollTop, setIsScrollTop] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const { userIdPost, profilePicture, username, idUser, isAdmin, amIAdmin, tweet, isUserProfile } = route.params;
   useEffect(() => {
     if (username) {
@@ -32,9 +33,25 @@ function UserTopTabNavigator({ route, navigation }) {
     }, 300);
   }, []);
 
+  const loadMoreData = useCallback(() => {
+    if (!loadingMore) {
+      setLoadingMore(true);
+      // Simulasi pemuatan data
+      setTimeout(() => {
+        // Tambahkan logika untuk memuat data tambahan di sini
+        setLoadingMore(false);
+      }, 1000);
+    }
+  }, [loadingMore]);
+
   const handleScroll = event => {
-    const { contentOffset } = event.nativeEvent;
+    const { contentOffset, layoutMeasurement, contentSize } = event.nativeEvent;
     setIsScrollTop(contentOffset.y === 0);
+
+    // Deteksi jika mendekati bagian bawah
+    if (layoutMeasurement.height + contentOffset.y >= contentSize.height - 20) {
+      loadMoreData();
+    }
   };
 
   const Header = () => (
@@ -117,6 +134,7 @@ function UserTopTabNavigator({ route, navigation }) {
                 userIdPost={userIdPost} profilePicture={profilePicture} idUser={idUser} navigation={navigation} amIAdmin={amIAdmin} isUserProfile={isUserProfile}
               />
             )}
+            {loadingMore && renderSkeleton()}
           </Tabs.ScrollView>
         </Tabs.Tab>
         <Tabs.Tab name="Reposts">
