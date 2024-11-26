@@ -30,7 +30,7 @@ const TweetCard = ({tweet, onRefreshPage, comments, isUserProfile}) => {
   const [likesCount, setLikesCount] = useState(tweet?.likesCount || 0);
   const [bookmarked, setBookmarked] = useState(tweet?.isBookmarked || false);
   const [bookMarksCount, setBookMarksCount] = useState(
-    tweet?.bookMarksCount || 0,
+    tweet?.bookMarksCount || 0
   );
   const [reposted, setReposted] = useState(tweet?.isReposted || false);
   const [repostsCount, setRepostsCount] = useState(tweet?.repostsCount || 0);

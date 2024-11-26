@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -11,16 +11,18 @@ import {
 import ProfilePicture from '../assets/profilepic.png';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useNavigation, useFocusEffect} from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 
-const ReportedNotification = ({notif}) => {
+const ReportedNotification = ({ notif }) => {
   const newNotif = notif[0];
   const slideAnim = useRef(new Animated.Value(-50)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const [modalVisible, setModalVisible] = useState(false);
   const [adminMessage, setAdminMessage] = useState(newNotif?.message);
   const [message, setMessage] = useState(false);
+  const [typeReport, setTypeReport] = useState();
   const navigation = useNavigation();
+  const proofComment = newNotif?.reportedEntity?.comment
 
   useEffect(() => {
     if (adminMessage == '') {
@@ -28,7 +30,14 @@ const ReportedNotification = ({notif}) => {
     } else {
       setMessage(true);
     }
-    console.log(message);
+
+    if (newNotif?.category === 'comment') {
+      setTypeReport('Comment')
+    } else if (newNotif.category === 'user') {
+      setTypeReport('Account')
+    } else {
+      setTypeReport('Post')
+    }
 
     Animated.parallel([
       Animated.timing(slideAnim, {
@@ -72,7 +81,7 @@ const ReportedNotification = ({notif}) => {
   };
 
   const renderText = (text, options = {}) => {
-    const {maxLength = 10, ellipsis = '...', preserveWords = true} = options;
+    const { maxLength = 10, ellipsis = '...', preserveWords = true } = options;
 
     if (!text || text.length <= maxLength) return text;
 
@@ -100,13 +109,15 @@ const ReportedNotification = ({notif}) => {
     }, []),
   );
 
+  console.log(newNotif)
+
   return (
     <>
       <Animated.View
         style={[
           styles.container,
           {
-            transform: [{translateY: slideAnim}],
+            transform: [{ translateY: slideAnim }],
             opacity: fadeAnim,
           },
         ]}>
@@ -140,50 +151,65 @@ const ReportedNotification = ({notif}) => {
             </View>
             <View style={styles.separator} />
             <View style={styles.reasonContainer}>
+              <View style={styles.typeReport}>
+                <Text style={styles.typeReportTitle}>Type Report: </Text>
+                <Text style={styles.typeReportMessage}>{typeReport}</Text>
+              </View>
               <View style={styles.separator} />
               <Text style={styles.reasonTitle}>Why this happened</Text>
               <Text style={styles.reasonMessage}>
                 It looks like you threatened or harassed others, or targeted
                 them with content or messages that shame or disrespect them.
               </Text>
-              {newNotif.category == 'user' ? null : (
-                <>
+              {!newNotif.category === 'user' ? null :
+                (<>
                   <View style={styles.reasonMessageContainer}>
                     <Image
                       source={
                         newNotif?.reportedEntity?.user?.profilePicture
                           ? {
-                              uri: newNotif?.reportedEntity?.user
-                                ?.profilePicture,
-                            }
+                            uri: newNotif?.reportedEntity?.user
+                              ?.profilePicture,
+                          }
                           : ProfilePicture
                       }
                       style={styles.profileImage}
                     />
                     <Text style={styles.userInfo}>
-                      {newNotif?.relatedPost?.user?.username ??
-                        newNotif?.report?.reportedPost?.user?.username ??
+                      {(newNotif?.relatedPost?._id || newNotif?.report?.reportedPost?._id) ? (newNotif?.relatedPost?.user?.username ??
+                        newNotif?.report?.reportedPost?.user?.username) :
                         'Post Deleted'}
                     </Text>
                     <Text style={styles.userMessage}>
-                      {renderText(newNotif?.relatedPost?.description ?? '', {
+                      {renderText(newNotif?.relatedPost?.description ?? newNotif?.report?.reportedPost?.description ?? '', {
                         maxLength: 15,
                         ellipsis: '...',
                         preserveWords: true,
                       })}
                     </Text>
                   </View>
+                  <Text style={styles.profileMessage}>
+                    You shared this on your profile
+                  </Text>
+                  <Text style={styles.guidelineMessage}>
+                    This goes against our Community Guidelines
+                  </Text>
                 </>
-              )}
+                )}
 
-              <Text style={styles.profileMessage}>
-                You shared this on your profile
-              </Text>
-              <Text style={styles.guidelineMessage}>
-                This goes against our Community Guidelines
-              </Text>
+              {newNotif.category === 'comment' && (<>
+                <Text style={styles.reasonTitle}>Proof of Comment: </Text>
+                {proofComment ?
+                  (<>
+                    <Text style={styles.guidelineMessage}>{proofComment}</Text>
+                  </>)
+                  :
+                  (<>
+                    <Text style={styles.proof}>Comment has been deleted</Text>
+                  </>)
+                }
+              </>)}
               <Text style={styles.reasonTitle}>Reports: </Text>
-
               <Text style={styles.guidelineMessage}>{reasonText}</Text>
               <TouchableOpacity
                 style={styles.seeRuleButton}
@@ -312,6 +338,18 @@ const styles = StyleSheet.create({
     color: '#000',
     marginBottom: 5,
   },
+  typeReport: {
+    flexDirection: 'row',
+  },
+  typeReportTitle: {
+    fontSize: 15,
+    color: '#000',
+    fontWeight: 'bold',
+  },
+  typeReportMessage: {
+    fontSize: 15,
+    color: '#000',
+  },
   reasonMessageContainer: {
     padding: 10,
     alignItems: 'center',
@@ -346,6 +384,11 @@ const styles = StyleSheet.create({
   guidelineMessage: {
     fontSize: 14,
     color: '#000',
+    marginBottom: 10,
+  },
+  proof: {
+    fontSize: 14,
+    color: '#525B44',
     marginBottom: 10,
   },
   seeRuleButton: {

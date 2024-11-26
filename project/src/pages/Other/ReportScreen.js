@@ -40,7 +40,7 @@ const ReportScreen = () => {
     } else {
       setIsReport('User');
     }
-  }, []);
+  }, [report]);
 
   const handleSubmit = async () => {
     const token = await AsyncStorage.getItem('token');

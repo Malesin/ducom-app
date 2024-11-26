@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useCallback} from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   SafeAreaView,
   View,
@@ -11,15 +11,15 @@ import {
   ToastAndroid,
 } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useFocusEffect} from '@react-navigation/native';
-import {Skeleton} from 'react-native-elements';
+import { useFocusEffect } from '@react-navigation/native';
+import { Skeleton } from 'react-native-elements';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../../config';
 const serverUrl = config.SERVER_URL;
 
-const Userprofile = ({userIdPost, navigation}) => {
+const Userprofile = ({ userIdPost, navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [banner, setBanner] = useState(false);
   const [profilePicture, setProfilePicture] = useState(false);
@@ -27,26 +27,24 @@ const Userprofile = ({userIdPost, navigation}) => {
   const [userData, setUserData] = useState('');
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
-  const [followersCount, setFollowersCount] = useState(0);
-  const [isMuted, setIsMuted] = useState(false);
-  const [isBlocked, setIsBlocked] = useState(false);
+  const [isMuted, setIsMuted] = useState();
+  const [isBlocked, setIsBlocked] = useState();
 
-  // Fungsi untuk mengosongkan data pengguna
   const resetUserData = () => {
     setUserData('');
     setBanner(false);
     setProfilePicture(false);
     setIsFollowing(false);
-    setFollowersCount(0);
     setIsMuted(false);
     setIsBlocked(false);
+
   };
 
   useFocusEffect(
     useCallback(() => {
-      resetUserData(); // Panggil fungsi reset
+      resetUserData();
       getData();
-    }, [userIdPost]) // Tambahkan userIdPost sebagai dependensi
+    }, [userIdPost]),
   );
 
   const getData = async () => {
@@ -59,22 +57,26 @@ const Userprofile = ({userIdPost, navigation}) => {
       });
       const user = userResponse.data.data;
       const idUser = userResponse.data.myId;
+      const status = userResponse.data.statusUser;
       const isFollow = user?.followers.some(follow => follow._id === idUser);
+
       setIsFollowing(isFollow);
       setUserData(user);
-      console.log(userIdPost);
+      setIsMuted(status.statusMute);
+      setIsBlocked(status.statusBlockThis);
+
       if (user?.username) {
-        navigation.setOptions({title: `@${user.username}`});
+        navigation.setOptions({ title: `@${user.username}` });
       }
 
       if (user.bannerPicture) {
-        const banner = {uri: user.bannerPicture};
+        const banner = { uri: user.bannerPicture };
         setBanner(banner);
         console.log('Banner Berhasil Diambil');
       }
 
       if (user.profilePicture) {
-        const profile = {uri: user.profilePicture};
+        const profile = { uri: user.profilePicture };
         setProfilePicture(profile);
         console.log('Foto Profil Berhasil Diambil');
       }
@@ -96,18 +98,18 @@ const Userprofile = ({userIdPost, navigation}) => {
   const toggleDropdown = () => {
     setDropdownVisible(!dropdownVisible);
   };
-
-  const handleDropdownItemPress = item => {
-    if (item === 'Mute') {
-      muteUser();
+  const handleDropdownItemPress = async item => {
+    try {
+      if (item === 'Mute') {
+        await muteUser();
+      } else if (item === 'Block' || item === 'Unblock') {
+        await blockUser();
+      } else if (item === 'Report') {
+        navigation.navigate('Report', { reportUserId: userIdPost });
+      }
+    } catch (error) {
+      console.error('Error:', error);
     }
-    if (item === 'Block') {
-      blockUser();
-    }
-    if (item === 'Report') {
-      navigation.navigate('Report', {reportUserId: userIdPost});
-    }
-    console.log(item);
     toggleDropdown();
   };
 
@@ -153,20 +155,19 @@ const Userprofile = ({userIdPost, navigation}) => {
           token: token,
           muteUserId: userIdPost,
         });
-        console.log(mute.data);
         setIsMuted(true);
-        ToastAndroid.show('User berhasil dimute', ToastAndroid.SHORT);
+        ToastAndroid.show('User was successfully muted', ToastAndroid.SHORT);
       } else {
         const unmute = await axios.post(`${serverUrl}/unmute-user`, {
           token: token,
           unmuteUserId: userIdPost,
         });
-        console.log(unmute.data);
         setIsMuted(false);
-        ToastAndroid.show('Anda berhasil unmute user ini', ToastAndroid.SHORT);
+        ToastAndroid.show('User was successfully unmuted', ToastAndroid.SHORT);
       }
     } catch (error) {
       console.error('Error:', error);
+      ToastAndroid.show('Something Error, Try Again Later.', ToastAndroid.SHORT);
     }
   };
 
@@ -174,28 +175,33 @@ const Userprofile = ({userIdPost, navigation}) => {
     const token = await AsyncStorage.getItem('token');
     try {
       if (!isBlocked) {
+        // Block user
         const block = await axios.post(`${serverUrl}/block-user`, {
           token: token,
           blockUserId: userIdPost,
         });
-        console.log(block.data);
-        setIsBlocked(true);
-        ToastAndroid.show('User berhasil diblokir', ToastAndroid.SHORT);
-        navigation.goBack();
+        if (block.data.status === 'okBlock') {
+          setIsBlocked(true);
+          ToastAndroid.show('User was successfully blocked', ToastAndroid.SHORT);
+          navigation.goBack();
+        }
       } else {
+        // Unblock user
         const unblock = await axios.post(`${serverUrl}/unblock-user`, {
           token: token,
           unblockUserId: userIdPost,
         });
-        console.log(unblock.data);
-        setIsBlocked(false);
-        ToastAndroid.show(
-          'Anda berhasil membuka blokir user ini',
-          ToastAndroid.SHORT,
-        );
+        if (unblock.data.status === 'okUnBlock') {
+          setIsBlocked(false);
+          ToastAndroid.show(
+            'User was successfully unblocked',
+            ToastAndroid.SHORT,
+          );
+        }
       }
     } catch (error) {
       console.error('Error:', error);
+      ToastAndroid.show('Something Error, Try Again Later.', ToastAndroid.SHORT);
     }
   };
 
@@ -233,14 +239,18 @@ const Userprofile = ({userIdPost, navigation}) => {
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.dropdownItem}
-                  onPress={() => handleDropdownItemPress('Block')}>
+                  onPress={() =>
+                    handleDropdownItemPress(isBlocked ? 'Unblock' : 'Block')
+                  }>
                   <MaterialCommunityIcons
-                    name="block-helper"
+                    name={isBlocked ? "lock-open-variant-outline" : "block-helper"}
                     size={20}
                     color="#000"
                     style={styles.dropdownIcon}
                   />
-                  <Text style={styles.dropdownItemText}>Block</Text>
+                  <Text style={styles.dropdownItemText}>
+                    {isBlocked ? 'Unblock' : 'Block'}
+                  </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.dropdownItem}
@@ -276,13 +286,13 @@ const Userprofile = ({userIdPost, navigation}) => {
                     animation="pulse"
                     height={18}
                     width={30}
-                    style={[styles.skeleton, {borderRadius: 3}]}
+                    style={[styles.skeleton, { borderRadius: 3 }]}
                   />
                   <Skeleton
                     animation="pulse"
                     height={14}
                     width={60}
-                    style={[styles.skeleton, {borderRadius: 3}]}
+                    style={[styles.skeleton, { borderRadius: 3 }]}
                   />
                 </>
               ) : (
@@ -301,13 +311,13 @@ const Userprofile = ({userIdPost, navigation}) => {
                     animation="pulse"
                     height={18}
                     width={30}
-                    style={[styles.skeleton, {borderRadius: 3}]}
+                    style={[styles.skeleton, { borderRadius: 3 }]}
                   />
                   <Skeleton
                     animation="pulse"
                     height={14}
                     width={60}
-                    style={[styles.skeleton, {borderRadius: 3}]}
+                    style={[styles.skeleton, { borderRadius: 3 }]}
                   />
                 </>
               ) : (
@@ -334,13 +344,13 @@ const Userprofile = ({userIdPost, navigation}) => {
                     animation="pulse"
                     height={18}
                     width={30}
-                    style={[styles.skeleton, {borderRadius: 3}]}
+                    style={[styles.skeleton, { borderRadius: 3 }]}
                   />
                   <Skeleton
                     animation="pulse"
                     height={14}
                     width={60}
-                    style={[styles.skeleton, {borderRadius: 3}]}
+                    style={[styles.skeleton, { borderRadius: 3 }]}
                   />
                 </>
               ) : (
@@ -372,7 +382,7 @@ const Userprofile = ({userIdPost, navigation}) => {
                 animation="pulse"
                 height={14}
                 width={100}
-                style={[styles.skeleton, {borderRadius: 3}]}
+                style={[styles.skeleton, { borderRadius: 3 }]}
               />
             ) : (
               <View style={styles.usernameContainer}>
@@ -397,7 +407,7 @@ const Userprofile = ({userIdPost, navigation}) => {
                 animation="pulse"
                 height={13}
                 width={200}
-                style={[styles.skeleton, {borderRadius: 3}]}
+                style={[styles.skeleton, { borderRadius: 3 }]}
               />
             ) : (
               <Text
@@ -413,7 +423,7 @@ const Userprofile = ({userIdPost, navigation}) => {
               animation="pulse"
               height={28}
               width={120}
-              style={[styles.skeleton, {borderRadius: 20, marginRight: 7}]}
+              style={[styles.skeleton, { borderRadius: 20, marginRight: 7 }]}
             />
           ) : (
             <View style={styles.buttonContainer}>
@@ -613,7 +623,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 7,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.8,
     shadowRadius: 2,
     elevation: 5,

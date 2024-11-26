@@ -36,15 +36,13 @@ function Postscreen({}) {
     async pageNum => {
       const token = await AsyncStorage.getItem('token');
       try {
-        const response = await axios.post(`${serverUrl}/userdata`, {token});
-
+        const response = await axios.post(`${serverUrl}/userdata`, {token})
         const {data} = response.data;
         const idUser = data._id;
         const profilePicture = data.profilePicture;
         const amIAdmin = data.isAdmin;
         const isMuteds = data.mutedUsers;
         const isBlockeds = data.blockedUsers;
-
         const responseTweet = await axios.post(`${serverUrl}/my-posts`, {
           token: token,
           page: pageNum,
@@ -215,23 +213,24 @@ function Postscreen({}) {
     setPage(1);
     setTweets([]);
     setPinTweets([]);
-    const newTweets = await fetchTweets(1);
-    const initialPinTweets = await fetchPinTweet();
-    if (initialPinTweets) {
-      setPinTweets([initialPinTweets]);
-      setPinnedTweetId(initialPinTweets.id);
-    } else {
-      setPinTweets([]);
-      setPinnedTweetId(null);
-    }
-    const filteredTweets = newTweets.filter(
-      tweet => tweet.id !== initialPinTweets?.id,
-    );
-    setTweets(filteredTweets.slice(0, 5));
-    setIsFetched(true);
-    setLoading(false);
-    setRefreshing(false);
-  }, [fetchTweets, fetchPinTweet]);
+    (async () => {
+      const newTweets = await fetchTweets(1);
+      const initialPinTweets = await fetchPinTweet();
+      if (initialPinTweets) {
+        setPinTweets([initialPinTweets]);
+        setPinnedTweetId(initialPinTweets.id);
+      } else {
+        setPinTweets([]);
+        setPinnedTweetId(null);
+      }
+      const filteredTweets = newTweets.filter(
+        tweet => tweet.id !== initialPinTweets?.id,
+      );
+      setTweets(filteredTweets.slice(0, 5));
+      setIsFetched(true);
+      setLoading(false);
+    })();
+  };
 
   useFocusEffect(
     useCallback(() => {
@@ -364,7 +363,7 @@ function Postscreen({}) {
                 <TouchableOpacity onPress={() => handlePostPress(tweet)}>
                   <TweetCard
                     tweet={tweet}
-                    onRefreshPage={onRefresh}
+                    onRefreshPage={onRefresh}     
                     isUserProfile={true}
                   />
                 </TouchableOpacity>
