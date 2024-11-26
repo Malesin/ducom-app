@@ -254,6 +254,7 @@ const BottomSheet = ({
   const handleReportPress = () => {
     navigation.navigate('Report', {
       reportPostId: tweet.id,
+      report: 'Post'
     });
     console.log('report post');
   };

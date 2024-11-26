@@ -31,7 +31,6 @@ const ReportsManagement = () => {
                 const profilePicPost = report.relatedPost?.user?.profilePicture ?? '';
                 const profilePicture = report.reportedEntity?.user?.profilePicture ?? report.reportedEntity?.profilePicture ?? '';
                 const bio = report.reportedEntity?.description ?? '';
-                const commentProof = report.reportedEntity?.comment ?? '';
                 const reason = report.reportCategoryDescriptions;
                 const reportedAt = report.reported_at;
                 const myId = report.myId
@@ -47,14 +46,12 @@ const ReportsManagement = () => {
                     profilePicPost,
                     profilePicture,
                     bio,
-                    commentProof,
                     reason,
                     reportedAt,
                     myId
                 };
             });
-
-            const sortedReports = formatted.sort((a, b) => new Date(b.reportedAt) - new Date(a.reportedAt));
+            const sortedReports = formatted.sort((a, b) => new Date(b.reportedAt) - new Date(a.reportedAt)).filter(post => post.postId !== undefined)
 
             setShowSkeleton(false);
             return sortedReports;
