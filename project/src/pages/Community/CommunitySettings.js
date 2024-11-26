@@ -283,7 +283,6 @@ const CommunitySettings = () => {
         );
       } else {
         setRefreshing(false);
-
         const errorMessage =
           editResponse.data?.message ||
           editResponse.data?.error ||
@@ -415,7 +414,7 @@ const CommunitySettings = () => {
           {
             text: 'Delete',
             onPress: async () => {
-              await axios
+              await axiosf
                 .post(`${serverUrl}/delete-community`, {
                   token: token,
                   communityId: communityId,
@@ -456,12 +455,11 @@ const CommunitySettings = () => {
                   navigation.goBack();
                 },
               },
-              {text: 'Save', onPress: handleSave},
             ],
           );
         } else {
           isNavigatingAway = true;
-          navigation.goBack();
+          navigation.navigate('ViewCommunity', {communityId: communityId});
         }
       };
 

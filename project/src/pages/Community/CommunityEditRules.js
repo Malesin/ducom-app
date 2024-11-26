@@ -147,7 +147,7 @@ const CommunityEditRules = ({navigation}) => {
         .then(res => {
           const response = res.data;
           console.log(response);
-          navigation.goBack();
+          navigation.navigate('ViewCommunity', {communityId: communityData._id});
         });
     } catch (error) {
       console.error(error);

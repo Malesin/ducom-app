@@ -16,23 +16,23 @@ import {
   Keyboard,
   useColorScheme,
 } from 'react-native';
-import React, { useState, useEffect, useCallback } from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../../config';
 import Video from 'react-native-video';
-import { createThumbnail } from 'react-native-create-thumbnail';
+import {createThumbnail} from 'react-native-create-thumbnail';
 import CommentCard from '../../components/CommentCard';
 import CommBottomSheet from '../../components/CommBottomSheet';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { Skeleton } from 'react-native-elements';
+import {Skeleton} from 'react-native-elements';
 const verifiedIcon = <Icon name="verified" size={16} color="#699BF7" />;
 
 const serverUrl = config.SERVER_URL;
 
-const ViewPostCommunity = ({ route }) => {
-  const { post, focusCommentInput } = route?.params || {};
+const ViewPostCommunity = ({route}) => {
+  const {post, focusCommentInput} = route?.params || {};
   const [liked, setLiked] = useState(post?.isLiked);
   const [likesCount, setLikesCount] = useState(post?.likesCount);
   const profilePicture = post?.profilePicture;
@@ -66,13 +66,14 @@ const ViewPostCommunity = ({ route }) => {
       const token = await AsyncStorage.getItem('token');
       const dataSent = {
         token: token,
-        postId: post?.id
-      }
-      setDataSent(dataSent)
-    }
-    data()
-
+        postId: post?.id,
+      };
+      setDataSent(dataSent);
+    };
+    data();
   }, [focusCommentInput]);
+
+  console.log(post);
 
   useEffect(() => {
     const generateThumbnails = async () => {
@@ -80,7 +81,7 @@ const ViewPostCommunity = ({ route }) => {
       for (const media of post?.media || []) {
         if (media.type === 'video' && media.uri) {
           try {
-            const { path } = await createThumbnail({ url: media.uri });
+            const {path} = await createThumbnail({url: media.uri});
             newThumbnails[media.uri] = path;
           } catch (error) {
             console.log('Error generating thumbnail:', error);
@@ -176,7 +177,7 @@ const ViewPostCommunity = ({ route }) => {
     setRefreshing(true);
     try {
       const url = `${serverUrl}/comments`;
-      const params = { postId: post.id };
+      const params = {postId: post.id};
 
       const response = await axios.post(url, params);
       const dataComment = response.data.data;
@@ -191,17 +192,15 @@ const ViewPostCommunity = ({ route }) => {
           isLikedCom: comment.likes.some(like => like.user === post.idUser),
           replies: Array.isArray(comment.replies)
             ? comment.replies.map(reply => ({
-              id: reply._id,
-              text: reply.comment,
-              userIdPost: reply.user._id,
-              idUser: post.idUser,
-              username: reply.user.username,
-              isLikedCom: reply.likes.some(
-                like => like.user === post.idUser,
-              ),
-              profilePicture: reply.user.profilePicture,
-              replies: reply.replies || [],
-            }))
+                id: reply._id,
+                text: reply.comment,
+                userIdPost: reply.user._id,
+                idUser: post.idUser,
+                username: reply.user.username,
+                isLikedCom: reply.likes.some(like => like.user === post.idUser),
+                profilePicture: reply.user.profilePicture,
+                replies: reply.replies || [],
+              }))
             : [],
           username: comment.user.username,
           profilePicture: comment.user.profilePicture,
@@ -338,39 +337,39 @@ const ViewPostCommunity = ({ route }) => {
         animation="pulse"
         height={20}
         width="80%"
-        style={[styles.skeleton, { borderRadius: 3 }]}
+        style={[styles.skeleton, {borderRadius: 3}]}
       />
       <Skeleton
         animation="pulse"
         height={200}
         width="100%"
-        style={[styles.skeleton, { borderRadius: 8, marginTop: 10 }]}
+        style={[styles.skeleton, {borderRadius: 8, marginTop: 10}]}
       />
       <Skeleton
         animation="pulse"
         height={17}
         width="50%"
-        style={[styles.skeleton, { borderRadius: 3, marginTop: 10 }]}
+        style={[styles.skeleton, {borderRadius: 3, marginTop: 10}]}
       />
       <Skeleton
         animation="pulse"
         height={1}
         width="100%"
-        style={[styles.skeleton, { borderRadius: 3, marginTop: 5 }]}
+        style={[styles.skeleton, {borderRadius: 3, marginTop: 5}]}
       />
       <Skeleton
         animation="pulse"
         height={16}
         width="58%"
-        style={[styles.skeleton, { borderRadius: 3, marginTop: 5 }]}
+        style={[styles.skeleton, {borderRadius: 3, marginTop: 5}]}
       />
       <Skeleton
         animation="pulse"
         height={1}
         width="100%"
-        style={[styles.skeleton, { borderRadius: 3, marginTop: 5 }]}
+        style={[styles.skeleton, {borderRadius: 3, marginTop: 5}]}
       />
-      <View style={[styles.skeletonIconRow, { justifyContent: 'center' }]}>
+      <View style={[styles.skeletonIconRow, {justifyContent: 'center'}]}>
         <Skeleton
           animation="pulse"
           circle
@@ -378,7 +377,7 @@ const ViewPostCommunity = ({ route }) => {
           width={20}
           style={styles.skeletonIcon}
         />
-        <View style={{ width: 140 }} />
+        <View style={{width: 140}} />
         <Skeleton
           animation="pulse"
           circle
@@ -391,7 +390,7 @@ const ViewPostCommunity = ({ route }) => {
         animation="pulse"
         height={1}
         width="100%"
-        style={[styles.skeleton, { borderRadius: 3, marginTop: 5 }]}
+        style={[styles.skeleton, {borderRadius: 3, marginTop: 5}]}
       />
     </View>
   );
@@ -403,7 +402,7 @@ const ViewPostCommunity = ({ route }) => {
       ) : (
         <ScrollView
           style={styles.scrollContainer}
-          contentContainerStyle={{ paddingBottom: 50 }}
+          contentContainerStyle={{paddingBottom: 50}}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }>
@@ -412,7 +411,7 @@ const ViewPostCommunity = ({ route }) => {
               <Image
                 source={
                   post.communityProfile
-                    ? { uri: post.communityProfile }
+                    ? {uri: post.communityProfile}
                     : require('../../assets/profilepic.png')
                 }
                 style={styles.avatar}
@@ -422,7 +421,7 @@ const ViewPostCommunity = ({ route }) => {
                   <Text
                     style={[
                       styles.userName,
-                      { color: colorScheme === 'dark' ? '#000000' : '#000' },
+                      {color: colorScheme === 'dark' ? '#000000' : '#000'},
                     ]}>
                     {post.communityCardName}
                   </Text>
@@ -430,11 +429,10 @@ const ViewPostCommunity = ({ route }) => {
                     <Text style={styles.verifiedIcon}>{verifiedIcon}</Text>
                   ) : null}
                 </View>
-
                 <Text
                   style={[
                     styles.userHandle,
-                    { color: colorScheme === 'dark' ? '#ccc' : 'gray' },
+                    {color: colorScheme === 'dark' ? '#ccc' : 'gray'},
                   ]}>
                   Community
                 </Text>
@@ -450,7 +448,9 @@ const ViewPostCommunity = ({ route }) => {
               </TouchableOpacity>
             </View>
             <View>
-              <Text style={styles.postContent}>{post.content}</Text>
+              <Text style={styles.postContent}>
+                {post.communityDescription}
+              </Text>
               <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                 {(post.media || []).map((mediaItem, index) => (
                   <TouchableOpacity
@@ -458,7 +458,7 @@ const ViewPostCommunity = ({ route }) => {
                     onPress={() => handleMediaPress(mediaItem.uri)}>
                     {mediaItem.type === 'image' ? (
                       <Image
-                        source={{ uri: mediaItem.uri }}
+                        source={{uri: mediaItem.uri}}
                         style={
                           post.media.length === 1
                             ? styles.singleMediaImage
@@ -471,7 +471,7 @@ const ViewPostCommunity = ({ route }) => {
                         onPress={() => handleMediaPress(mediaItem.uri)}
                         style={styles.videoContainer}>
                         <Image
-                          source={{ uri: thumbnails[mediaItem.uri] }}
+                          source={{uri: thumbnails[mediaItem.uri]}}
                           style={
                             post.media.length === 1
                               ? styles.singleMediaVideo
@@ -565,8 +565,8 @@ const ViewPostCommunity = ({ route }) => {
           </View>
         </ScrollView>
       )}
-      <View style={[styles.inputContainer, { height: inputHeight }]}>
-        <Image source={{ uri: profilePicture }} style={styles.profilePicture} />
+      <View style={[styles.inputContainer, {height: inputHeight}]}>
+        <Image source={{uri: profilePicture}} style={styles.profilePicture} />
 
         {(isEnabledComm || isOwner || post?.amIAdmin) && post?.isJoined ? (
           <>
@@ -606,7 +606,7 @@ const ViewPostCommunity = ({ route }) => {
             <Text
               style={[
                 styles.commentDisabled,
-                { color: colorScheme === 'dark' ? '#ccc' : '#888' },
+                {color: colorScheme === 'dark' ? '#ccc' : '#888'},
               ]}>
               {post?.isJoined ? 'Comments Disabled' : 'Join to Comment'}
             </Text>
@@ -623,15 +623,15 @@ const ViewPostCommunity = ({ route }) => {
             <View style={styles.modalBackground}>
               <View style={styles.modalContainer}>
                 {selectedMedia.endsWith('.jpg') ||
-                  selectedMedia.endsWith('.png') ? (
+                selectedMedia.endsWith('.png') ? (
                   <Image
-                    source={{ uri: selectedMedia }}
+                    source={{uri: selectedMedia}}
                     style={styles.modalImage}
                     onError={() => console.log('Failed to load image')}
                   />
                 ) : (
                   <Video
-                    source={{ uri: selectedMedia }}
+                    source={{uri: selectedMedia}}
                     style={styles.modalImage}
                     controls
                     resizeMode="contain"
@@ -726,7 +726,7 @@ const styles = StyleSheet.create({
   },
   postContent: {
     fontSize: 16,
-    marginVertical: 10,
+    paddingVertical: 10,
     color: 'black',
   },
   media: {

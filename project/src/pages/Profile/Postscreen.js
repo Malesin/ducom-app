@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {
   StyleSheet,
   ScrollView,
@@ -7,19 +7,20 @@ import {
   SafeAreaView,
   Text,
   TouchableOpacity,
+  RefreshControl,
 } from 'react-native';
 import PinTweetCard from '../../components/PinTweetCard';
 import TweetCard from '../../components/TweetCard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useFocusEffect } from '@react-navigation/native';
-import { useNavigation } from '@react-navigation/native';
+import {useFocusEffect} from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 import axios from 'axios';
 import config from '../../config';
-import { Skeleton } from 'react-native-elements';
+import {Skeleton} from 'react-native-elements';
 
 const serverUrl = config.SERVER_URL;
 
-function Postscreen({ }) {
+function Postscreen({}) {
   const [tweets, setTweets] = useState([]);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -27,96 +28,115 @@ function Postscreen({ }) {
   const [isFetched, setIsFetched] = useState(false);
   const [pintweets, setPinTweets] = useState([]);
   const [pinnedTweetId, setPinnedTweetId] = useState(null);
+  const [hasMore, setHasMore] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const navigation = useNavigation();
 
-  const fetchTweets = useCallback(async (pageNum) => {
-    const token = await AsyncStorage.getItem('token');
-    try {
-      const response = await axios.post(`${serverUrl}/userdata`, { token });
+  const fetchTweets = useCallback(
+    async pageNum => {
+      const token = await AsyncStorage.getItem('token');
+      try {
+        const response = await axios.post(`${serverUrl}/userdata`, {token});
 
-      const { data } = response.data;
-      const idUser = data._id;
-      const profilePicture = data.profilePicture;
-      const amIAdmin = data.isAdmin
-      const isMuteds = data.mutedUsers
-      const isBlockeds = data.blockedUsers
+        const {data} = response.data;
+        const idUser = data._id;
+        const profilePicture = data.profilePicture;
+        const amIAdmin = data.isAdmin;
+        const isMuteds = data.mutedUsers;
+        const isBlockeds = data.blockedUsers;
 
-      const responseTweet = await axios.post(`${serverUrl}/my-posts`, {
-        token: token,
-        page: pageNum,
-      });
-      const dataTweet = responseTweet.data.data;
-
-      const formattedTweets = dataTweet
-        .filter(post => post.user !== null)
-        .map(post => {
-          const totalComments = post.comments.length + post.comments.reduce((acc, comment) => acc + comment.replies.length, 0);
-          return {
-            id: post._id,
-            userAvatar: post.user.profilePicture,
-            userName: post.user.name,
-            userHandle: post.user.username,
-            postDate: post.created_at,
-            content: post.description,
-            media: Array.isArray(post.media)
-              ? post.media.map(mediaItem => ({
-                type: mediaItem.type,
-                uri: mediaItem.uri,
-              }))
-              : [],
-            likesCount: post.likes.length,
-            commentsCount: totalComments,
-            bookMarksCount: post.bookmarks.length,
-            repostsCount: post.reposts.length,
-            isLiked: post.likes.some(like => like._id === idUser),
-            isBookmarked: post.bookmarks.some(bookmark => bookmark.user === idUser),
-            isReposted: post.reposts.some(repost => repost.user === idUser),
-            isMuted: isMuteds.some(isMuted => isMuted === post.user._id),
-            isBlocked: isBlockeds.some(isBlocked => isBlocked === post.user._id),
-            userIdPost: post.user._id,
-            idUser: idUser,
-            profilePicture: profilePicture,
-            commentsEnabled: post.commentsEnabled,
-            isAdmin: post.user.isAdmin,
-            amIAdmin: amIAdmin
-          };
+        const responseTweet = await axios.post(`${serverUrl}/my-posts`, {
+          token: token,
+          page: pageNum,
         });
+        const dataTweet = responseTweet.data.data;
 
-      return formattedTweets;
-    } catch (error) {
-      console.error('Error fetching data:', error);
-      return [];
-    } finally {
-      setLoadingMore(false);
-    }
-  },
+        const formattedTweets = dataTweet
+          .filter(post => post.user !== null)
+          .map(post => {
+            const totalComments =
+              post.comments.length +
+              post.comments.reduce(
+                (acc, comment) => acc + comment.replies.length,
+                0,
+              );
+            return {
+              id: post._id,
+              userAvatar: post.user.profilePicture,
+              userName: post.user.name,
+              userHandle: post.user.username,
+              postDate: post.created_at,
+              content: post.description,
+              media: Array.isArray(post.media)
+                ? post.media.map(mediaItem => ({
+                    type: mediaItem.type,
+                    uri: mediaItem.uri,
+                  }))
+                : [],
+              likesCount: post.likes.length,
+              commentsCount: totalComments,
+              bookMarksCount: post.bookmarks.length,
+              repostsCount: post.reposts.length,
+              isLiked: post.likes.some(like => like._id === idUser),
+              isBookmarked: post.bookmarks.some(
+                bookmark => bookmark.user === idUser,
+              ),
+              isReposted: post.reposts.some(repost => repost.user === idUser),
+              isMuted: isMuteds.some(isMuted => isMuted === post.user._id),
+              isBlocked: isBlockeds.some(
+                isBlocked => isBlocked === post.user._id,
+              ),
+              userIdPost: post.user._id,
+              idUser: idUser,
+              profilePicture: profilePicture,
+              commentsEnabled: post.commentsEnabled,
+              isAdmin: post.user.isAdmin,
+              amIAdmin: amIAdmin,
+            };
+          });
+
+        return formattedTweets;
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        return [];
+      } finally {
+        setLoadingMore(false);
+      }
+    },
     [navigation],
   );
 
   const fetchPinTweet = async () => {
     try {
       const token = await AsyncStorage.getItem('token');
-      const response = await axios.post(`${serverUrl}/userdata`, { token: token });
-      const { data, status } = response.data;
+      const response = await axios.post(`${serverUrl}/userdata`, {
+        token: token,
+      });
+      const {data, status} = response.data;
       if (status === 'error') {
         Alert.alert('Error', 'Anda Telah Keluar dari Akun', [
-          { text: 'OK', onPress: () => navigation.navigate('Auths') },
+          {text: 'OK', onPress: () => navigation.navigate('Auths')},
         ]);
         return;
       }
       const idUser = data._id;
       const profilePicture = data.profilePicture;
-      const amIAdmin = data.isAdmin
+      const amIAdmin = data.isAdmin;
 
       const pinPost = await axios.post(`${serverUrl}/showPinPost-User`, {
-        token: token
+        token: token,
       });
 
       const postPin = pinPost.data.data;
       if (!postPin) {
         return null;
       }
-      const totalComments = postPin.comments.length + postPin.comments.reduce((acc, comment) => acc + comment.replies.length, 0);
+      const totalComments =
+        postPin.comments.length +
+        postPin.comments.reduce(
+          (acc, comment) => acc + comment.replies.length,
+          0,
+        );
 
       const pinTweet = {
         id: postPin._id,
@@ -127,21 +147,23 @@ function Postscreen({ }) {
         content: postPin.description,
         media: Array.isArray(postPin.media)
           ? postPin.media.map(mediaItem => ({
-            type: mediaItem.type,
-            uri: mediaItem.uri,
-          }))
+              type: mediaItem.type,
+              uri: mediaItem.uri,
+            }))
           : [],
         likesCount: postPin.likes.length,
         commentsCount: totalComments,
         bookMarksCount: postPin.bookmarks.length,
         isLiked: postPin.likes.some(like => like._id === idUser),
-        isBookmarked: postPin.bookmarks.some(bookmark => bookmark.user === idUser),
+        isBookmarked: postPin.bookmarks.some(
+          bookmark => bookmark.user === idUser,
+        ),
         userIdPost: postPin.user._id,
         idUser: idUser,
         profilePicture: profilePicture,
         commentsEnabled: postPin.commentsEnabled,
         isAdmin: postPin.user.isAdmin,
-        amIAdmin: amIAdmin
+        amIAdmin: amIAdmin,
       };
 
       return pinTweet;
@@ -151,10 +173,10 @@ function Postscreen({ }) {
     }
   };
 
-  const fetchComments = async (postId) => {
+  const fetchComments = async postId => {
     try {
       const response = await axios.get(`${serverUrl}/comments`, {
-        params: { postId },
+        params: {postId},
       });
       if (response.data.status === 'ok') {
         return response.data.comments;
@@ -168,7 +190,7 @@ function Postscreen({ }) {
     }
   };
 
-  const handlePostPress = async (tweet) => {
+  const handlePostPress = async tweet => {
     if (!tweet || !tweet.id) {
       console.error('Tweet data is incomplete:', tweet);
       return;
@@ -186,28 +208,30 @@ function Postscreen({ }) {
     });
   };
 
-  const onRefreshPage = () => {
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
     setLoading(true);
     setIsFetched(false);
     setPage(1);
     setTweets([]);
     setPinTweets([]);
-    (async () => {
-      const newTweets = await fetchTweets(1);
-      const initialPinTweets = await fetchPinTweet();
-      if (initialPinTweets) {
-        setPinTweets([initialPinTweets]);
-        setPinnedTweetId(initialPinTweets.id);
-      } else {
-        setPinTweets([]);
-        setPinnedTweetId(null);
-      }
-      const filteredTweets = newTweets.filter(tweet => tweet.id !== initialPinTweets?.id);
-      setTweets(filteredTweets.slice(0, 5));
-      setIsFetched(true);
-      setLoading(false);
-    })();
-  };
+    const newTweets = await fetchTweets(1);
+    const initialPinTweets = await fetchPinTweet();
+    if (initialPinTweets) {
+      setPinTweets([initialPinTweets]);
+      setPinnedTweetId(initialPinTweets.id);
+    } else {
+      setPinTweets([]);
+      setPinnedTweetId(null);
+    }
+    const filteredTweets = newTweets.filter(
+      tweet => tweet.id !== initialPinTweets?.id,
+    );
+    setTweets(filteredTweets.slice(0, 5));
+    setIsFetched(true);
+    setLoading(false);
+    setRefreshing(false);
+  }, [fetchTweets, fetchPinTweet]);
 
   useFocusEffect(
     useCallback(() => {
@@ -223,7 +247,9 @@ function Postscreen({ }) {
             setPinTweets([]);
             setPinnedTweetId(null);
           }
-          const filteredTweets = newTweets.filter(tweet => tweet.id !== initialPinTweets?.id);
+          const filteredTweets = newTweets.filter(
+            tweet => tweet.id !== initialPinTweets?.id,
+          );
           setTweets(filteredTweets.slice(0, 5));
           setIsFetched(true);
           setLoading(false);
@@ -233,26 +259,27 @@ function Postscreen({ }) {
   );
 
   const handleLoadMore = async () => {
-    if (!loadingMore) {
-      setLoadingMore(true);
-      const newPage = page + 1;
-      setPage(newPage);
-      const newTweets = await fetchTweets(newPage);
-      const newPinTweet = await fetchPinTweet();
-      if (newPinTweet) {
-        setPinTweets([newPinTweet]);
-        setPinnedTweetId(newPinTweet.id);
-      } else {
-        setPinTweets([]);
-        setPinnedTweetId(null);
-      }
-      const filteredTweets = newTweets.filter(tweet => tweet.id !== newPinTweet?.id);
-      setTweets(prevTweets => {
+    if (!loadingMore && hasMore) {
+      try {
+        setLoadingMore(true);
+        const newPage = page + 1;
+        const newTweets = await fetchTweets(newPage);
         const uniqueTweets = newTweets.filter(
-          newTweet => !prevTweets.some(tweet => tweet.id === newTweet.id),
+          newTweet => !tweets.some(tweet => tweet.id === newTweet.id)
         );
-        return [...prevTweets, ...uniqueTweets];
-      });
+
+        if (uniqueTweets.length > 0) {
+          setTweets(prevTweets => [...prevTweets, ...uniqueTweets]);
+          setPage(newPage);
+        }
+
+        setHasMore(uniqueTweets.length >= 5);
+      } catch (error) {
+        console.error('Error loading more tweets', error);
+        Alert.alert('Load Error', 'Unable to load more tweets');
+      } finally {
+        setLoadingMore(false);
+      }
     }
   };
 
@@ -307,8 +334,11 @@ function Postscreen({ }) {
       ) : (
         <ScrollView
           contentContainerStyle={styles.contentContainer}
-          onScroll={({ nativeEvent }) => {
-            const { contentOffset, layoutMeasurement, contentSize } = nativeEvent;
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          onScroll={({nativeEvent}) => {
+            const {contentOffset, layoutMeasurement, contentSize} = nativeEvent;
             const contentHeight = contentSize.height;
             const viewportHeight = layoutMeasurement.height;
             const scrollPosition = contentOffset.y + viewportHeight;
@@ -320,7 +350,11 @@ function Postscreen({ }) {
           {pintweets.map((tweet, index) => (
             <View key={index} style={styles.tweetContainer}>
               <TouchableOpacity onPress={() => handlePostPress(tweet)}>
-                <PinTweetCard tweet={tweet} onRefreshPage={onRefreshPage} isUserProfile={true} />
+                <PinTweetCard
+                  tweet={tweet}
+                  onRefreshPage={onRefresh}
+                  isUserProfile={true}
+                />
               </TouchableOpacity>
             </View>
           ))}
@@ -328,7 +362,11 @@ function Postscreen({ }) {
             tweets.map((tweet, index) => (
               <View key={index} style={styles.tweetContainer}>
                 <TouchableOpacity onPress={() => handlePostPress(tweet)}>
-                  <TweetCard tweet={tweet} onRefreshPage={onRefreshPage} isUserProfile={true} />
+                  <TweetCard
+                    tweet={tweet}
+                    onRefreshPage={onRefresh}
+                    isUserProfile={true}
+                  />
                 </TouchableOpacity>
               </View>
             ))
