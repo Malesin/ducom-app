@@ -30,7 +30,6 @@ const Userprofile = ({ userIdPost, navigation }) => {
   const [isMuted, setIsMuted] = useState();
   const [isBlocked, setIsBlocked] = useState();
 
-  // Fungsi untuk mengosongkan data pengguna
   const resetUserData = () => {
     setUserData('');
     setBanner(false);
@@ -43,9 +42,9 @@ const Userprofile = ({ userIdPost, navigation }) => {
 
   useFocusEffect(
     useCallback(() => {
-      resetUserData(); // Panggil fungsi reset
+      resetUserData();
       getData();
-    }, [userIdPost]) // Tambahkan userIdPost sebagai dependensi
+    }, [userIdPost]),
   );
 
   const getData = async () => {
@@ -99,7 +98,6 @@ const Userprofile = ({ userIdPost, navigation }) => {
   const toggleDropdown = () => {
     setDropdownVisible(!dropdownVisible);
   };
-
   const handleDropdownItemPress = async item => {
     try {
       if (item === 'Mute') {
@@ -177,6 +175,7 @@ const Userprofile = ({ userIdPost, navigation }) => {
     const token = await AsyncStorage.getItem('token');
     try {
       if (!isBlocked) {
+        // Block user
         const block = await axios.post(`${serverUrl}/block-user`, {
           token: token,
           blockUserId: userIdPost,
@@ -187,6 +186,7 @@ const Userprofile = ({ userIdPost, navigation }) => {
           navigation.goBack();
         }
       } else {
+        // Unblock user
         const unblock = await axios.post(`${serverUrl}/unblock-user`, {
           token: token,
           unblockUserId: userIdPost,
