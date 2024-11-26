@@ -73,6 +73,8 @@ const ViewPostCommunity = ({route}) => {
     data();
   }, [focusCommentInput]);
 
+  console.log(post);
+
   useEffect(() => {
     const generateThumbnails = async () => {
       const newThumbnails = {};
@@ -393,8 +395,6 @@ const ViewPostCommunity = ({route}) => {
     </View>
   );
 
-  console.log(post.content);
-
   return (
     <SafeAreaView style={styles.container}>
       {loading ? (
@@ -448,7 +448,9 @@ const ViewPostCommunity = ({route}) => {
               </TouchableOpacity>
             </View>
             <View>
-              <Text style={styles.postContent}>{post.content}</Text>
+              <Text style={styles.postContent}>
+                {post.communityDescription}
+              </Text>
               <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                 {(post.media || []).map((mediaItem, index) => (
                   <TouchableOpacity

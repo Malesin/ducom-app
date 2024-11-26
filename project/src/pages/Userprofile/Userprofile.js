@@ -31,7 +31,6 @@ const Userprofile = ({userIdPost, navigation}) => {
   const [isMuted, setIsMuted] = useState(false);
   const [isBlocked, setIsBlocked] = useState(false);
 
-  // Fungsi untuk mengosongkan data pengguna
   const resetUserData = () => {
     setUserData('');
     setBanner(false);
@@ -44,9 +43,9 @@ const Userprofile = ({userIdPost, navigation}) => {
 
   useFocusEffect(
     useCallback(() => {
-      resetUserData(); // Panggil fungsi reset
+      resetUserData();
       getData();
-    }, [userIdPost]) // Tambahkan userIdPost sebagai dependensi
+    }, [userIdPost]),
   );
 
   const getData = async () => {
@@ -102,7 +101,7 @@ const Userprofile = ({userIdPost, navigation}) => {
       muteUser();
     }
     if (item === 'Block') {
-      blockUser();
+      blockUser(); 
     }
     if (item === 'Report') {
       navigation.navigate('Report', {reportUserId: userIdPost});
@@ -174,15 +173,17 @@ const Userprofile = ({userIdPost, navigation}) => {
     const token = await AsyncStorage.getItem('token');
     try {
       if (!isBlocked) {
+        // Block user
         const block = await axios.post(`${serverUrl}/block-user`, {
           token: token,
           blockUserId: userIdPost,
         });
         console.log(block.data);
         setIsBlocked(true);
-        ToastAndroid.show('User berhasil diblokir', ToastAndroid.SHORT);
-        navigation.goBack();
+        ToastAndroid.show('User  berhasil diblokir', ToastAndroid.SHORT);
+        navigation.goBack(); // Go back after blocking
       } else {
+        // Unblock user
         const unblock = await axios.post(`${serverUrl}/unblock-user`, {
           token: token,
           unblockUserId: userIdPost,
@@ -190,12 +191,13 @@ const Userprofile = ({userIdPost, navigation}) => {
         console.log(unblock.data);
         setIsBlocked(false);
         ToastAndroid.show(
-          'Anda berhasil membuka blokir user ini',
+          'Anda berhasil membuka blokir user',
           ToastAndroid.SHORT,
         );
       }
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error blocking/unblocking user:', error);
+      ToastAndroid.show('Gagal memproses blokir', ToastAndroid.SHORT);
     }
   };
 
@@ -240,7 +242,9 @@ const Userprofile = ({userIdPost, navigation}) => {
                     color="#000"
                     style={styles.dropdownIcon}
                   />
-                  <Text style={styles.dropdownItemText}>Block</Text>
+                  <Text style={styles.dropdownItemText}>
+                    {isBlocked ? 'Unblock' : 'Block'}
+                  </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.dropdownItem}

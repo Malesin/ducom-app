@@ -58,14 +58,12 @@ const BlockedUsers = () => {
     loadBlocked();
   }, []);
 
-
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     const newBlocked = await fetchBlockUsers();
     setBlockUsers(newBlocked)
     setRefreshing(false);
   }, []);
-
 
   const handleUnblock = async (blockUserData) => {
     try {
