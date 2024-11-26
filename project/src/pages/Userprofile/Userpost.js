@@ -30,23 +30,32 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
     const token = await AsyncStorage.getItem('token');
     try {
       const respMyData = await axios.post(`${serverUrl}/userdata`, { token: token });
-
-      const { data } = respMyData.data;
-      const idUser = data._id;
-      const profilePicture = data.profilePicture;
-      const amIAdmin = data.isAdmin
-      const isMuteds = data.mutedUsers
-      const isBlockeds = data.blockedUsers
-
       const pinPost = await axios.post(`${serverUrl}/showPinPost-byId`, {
         token: token,
         userId: userIdPost,
       });
 
+      if (pinPost.data.dataMsg === 'youBlockedBy') {
+        setLoading(false);
+        return "You are blocked by this user";
+      } 
+      if (pinPost.data.dataMsg === 'youBlockedThis') {
+        setLoading(false);
+        return "You have blocked this user";
+      }
+
+      const { data } = respMyData.data;
+      const idUser = data._id;
+      const profilePicture = data.profilePicture;
+      const amIAdmin = data.isAdmin;
+      const isMuteds = data.mutedUsers;
+      const isBlockeds = data.blockedUsers;
+
       const postPin = pinPost.data.data;
-      if (!postPin) {
+      if (!postPin || !postPin.user) {
         return null;
       }
+
       const totalComments = postPin.comments.length + postPin.comments.reduce((acc, comment) => acc + comment.replies.length, 0);
 
       const pinTweet = {
@@ -81,13 +90,16 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
 
       return pinTweet;
     } catch (error) {
-      if (error.response && error.response.status === 403) {
-        console.log("lo diblokir")
-        setLoading(false)
-        return "You are blocked by this user";
+      setLoading(false);
+      if (error.response) {
+        if (error.response.data === 'youBlockedBy') {
+          return "You are blocked by this user";
+        } 
+        if (error.response.data === 'youBlockedThis') {
+          return "You have blocked this user";
+        }
       }
-      setLoading(false)
-      console.error('Error fetching data:', error);
+      console.error('Error fetching pin tweet:', error);
       return null;
     }
   }, [userIdPost, profilePicture]);
@@ -96,23 +108,37 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
     const token = await AsyncStorage.getItem('token');
     try {
       const respMyData = await axios.post(`${serverUrl}/userdata`, { token: token });
-
-      const { data } = respMyData.data;
-      const idUser = data._id;
-      const profilePicture = data.profilePicture;
-      const amIAdmin = data.isAdmin
-      const isMuteds = data.mutedUsers
-      const isBlockeds = data.blockedUsers
-
       const respTweet = await axios.post(`${serverUrl}/userId-posts`, {
         token: token,
         userId: userIdPost,
       });
 
+      if (respTweet.data.dataMsg === 'youBlockedBy') {
+        setLoading(false);
+        return "You are blocked by this user";
+      } 
+      if (respTweet.data.dataMsg === 'youBlockedThis') {
+        setLoading(false);
+        return "You have blocked this user";
+      }
+
+      const { data } = respMyData.data;
+      const idUser = data._id;
+      const profilePicture = data.profilePicture;
+      const amIAdmin = data.isAdmin;
+      const isMuteds = data.mutedUsers;
+      const isBlockeds = data.blockedUsers;
+
       const dataTweet = respTweet.data.data;
+      
+      if (!Array.isArray(dataTweet)) {
+        setLoading(false);
+        return [];
+      }
+
       const formattedTweets = dataTweet
-        .filter(post => post.user !== null)
         .filter(post => post !== null)
+        .filter(post => post.user !== null)
         .map(post => {
           const totalComments = post.comments.length + post.comments.reduce((acc, comment) => acc + comment.replies.length, 0);
           return {
@@ -148,21 +174,17 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
 
       return formattedTweets;
     } catch (error) {
-      console.log(error)
-      if (error.response && error.response.data === 'youBlockedBy') {
-        console.log("lo diblokir")
-        setLoading(false)
-        return "You are blocked by this user";
-      } else if (error.response && error.response.data === 'youBlockedThis') {
-        console.log("lo ngeblokir")
-        setLoading(false)
-        return "You have blocked this user";
-      } else {
-        console.error("Error fetching tweets:", error);
+      setLoading(false);
+      if (error.response) {
+        if (error.response.data === 'youBlockedBy') {
+          return "You are blocked by this user";
+        } 
+        if (error.response.data === 'youBlockedThis') {
+          return "You have blocked this user";
+        }
       }
-      setLoading(false)
       console.error('Error fetching data:', error);
-      return null;
+      return [];
     }
   }, [userIdPost, profilePicture]);
 
@@ -209,6 +231,7 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
       ))}
     </>
   );
+
 
   const onRefreshPage = () => {
     setLoading(true);
