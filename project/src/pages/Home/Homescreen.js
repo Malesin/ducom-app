@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {
   StyleSheet,
   ScrollView,
@@ -12,7 +12,7 @@ import {
   Text,
 } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
-import { useFocusEffect } from '@react-navigation/native';
+import {useFocusEffect} from '@react-navigation/native';
 import TweetCard from '../../components/TweetCard';
 import PinTweetCard from '../../components/PinTweetCard';
 import Animated, {
@@ -26,14 +26,14 @@ import Animated, {
 } from 'react-native-reanimated';
 import * as ImagePicker from 'react-native-image-picker';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { Skeleton } from 'react-native-elements';
+import {Skeleton} from 'react-native-elements';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import config from '../../config';
 
 const serverUrl = config.SERVER_URL;
 
-const HomeScreen = ({ navigation }) => {
+const HomeScreen = ({navigation}) => {
   const [tweets, setTweets] = useState([]);
   const [pintweets, setPinTweets] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
@@ -50,7 +50,6 @@ const HomeScreen = ({ navigation }) => {
     const unsubscribe = NetInfo.addEventListener(state => {
       setIsConnected(state.isConnected);
     });
-
     return () => {
       unsubscribe();
     };
@@ -69,7 +68,7 @@ const HomeScreen = ({ navigation }) => {
         token: token,
       });
 
-      const { data } = response.data;
+      const {data} = response.data;
       const idUser = data._id;
       const profilePicture = data.profilePicture;
       const amIAdmin = data.isAdmin;
@@ -100,10 +99,9 @@ const HomeScreen = ({ navigation }) => {
             content: post?.description,
             media: Array.isArray(post?.media)
               ? post?.media.map(mediaItem => ({
-                type: mediaItem.type,
-                uri: mediaItem.uri,
-              }))
-            
+                  type: mediaItem.type,
+                  uri: mediaItem.uri,
+                }))
               : [],
             likesCount: post?.likes?.length,
             commentsCount: totalComments,
@@ -124,10 +122,8 @@ const HomeScreen = ({ navigation }) => {
             commentsEnabled: post?.commentsEnabled,
             isAdmin: post?.user?.isAdmin,
             amIAdmin: amIAdmin,
-            // isNew: post?.isNew
           };
         });
-      // const sortedTweets = formattedTweets.sort((a, b) => b.isNew - a.isNew);
       return formattedTweets;
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -143,7 +139,7 @@ const HomeScreen = ({ navigation }) => {
       const response = await axios.post(`${serverUrl}/userdata`, {
         token: token,
       });
-      const { data } = response.data;
+      const {data} = response.data;
       const idUser = data._id;
       const profilePicture = data.profilePicture;
       const amIAdmin = data.isAdmin;
@@ -165,6 +161,20 @@ const HomeScreen = ({ navigation }) => {
       if (!postPin) {
         return null;
       }
+
+      const isPinnedByBlockedUser = isBlockeds.some(
+        blockedUser => blockedUser === pinnedBy,
+      );
+
+      const isPostFromBlockedUser = isBlockeds.some(
+        blockedUser => blockedUser === postPin?.user?._id,
+      );
+
+      if (isPinnedByBlockedUser || isPostFromBlockedUser) {
+        console.log('Pinned post is from or pinned by a blocked user');
+        return null;
+      }
+
       const totalComments =
         postPin.comments.length +
         postPin.comments.reduce(
@@ -181,9 +191,9 @@ const HomeScreen = ({ navigation }) => {
         content: postPin?.description,
         media: Array.isArray(postPin?.media)
           ? postPin?.media.map(mediaItem => ({
-            type: mediaItem.type,
-            uri: mediaItem.uri,
-          }))
+              type: mediaItem.type,
+              uri: mediaItem.uri,
+            }))
           : [],
         likesCount: postPin?.likes?.length,
         commentsCount: totalComments,
@@ -195,7 +205,9 @@ const HomeScreen = ({ navigation }) => {
         ),
         isReposted: postPin?.reposts?.some(repost => repost?.user === idUser),
         isMuted: isMuteds?.some(isMuted => isMuted === postPin?.user?._id),
-        isBlocked: isBlockeds?.some(isBlocked => isBlocked === postPin?.user?._id),
+        isBlocked: isBlockeds?.some(
+          isBlocked => isBlocked === postPin?.user?._id,
+        ),
         userIdPost: postPin?.user?._id,
         idUser: idUser,
         profilePicture: profilePicture,
@@ -215,7 +227,7 @@ const HomeScreen = ({ navigation }) => {
   const fetchComments = async postId => {
     try {
       const response = await axios.get(`${serverUrl}/comments`, {
-        params: { postId },
+        params: {postId},
       });
       if (response.data.status === 'ok') {
         return response.data.comments;
@@ -360,12 +372,12 @@ const HomeScreen = ({ navigation }) => {
       } else {
         const uri = response.assets[0].uri;
         console.log('Captured image URI:', uri);
-        navigation.navigate('CreatePost', { mediaUri: uri, mediaType: 'photo' });
+        navigation.navigate('CreatePost', {mediaUri: uri, mediaType: 'photo'});
       }
     });
   };
 
-  const FloatingActionButton = ({ isExpanded, index, iconName, onPress }) => {
+  const FloatingActionButton = ({isExpanded, index, iconName, onPress}) => {
     const animatedStyles = useAnimatedStyle(() => {
       const moveValue = isExpanded.value ? OFFSET * index : 0;
       const translateValue = withSpring(-moveValue, SPRING_CONFIG);
@@ -374,8 +386,8 @@ const HomeScreen = ({ navigation }) => {
 
       return {
         transform: [
-          { translateY: translateValue },
-          { scale: withDelay(delay, withTiming(scaleValue)) },
+          {translateY: translateValue},
+          {scale: withDelay(delay, withTiming(scaleValue))},
         ],
         backgroundColor: isExpanded.value ? '#F3F3F3' : '#F3F3F3',
       };
@@ -414,8 +426,8 @@ const HomeScreen = ({ navigation }) => {
 
     return {
       transform: [
-        { translateX: translateValue },
-        { rotate: withTiming(rotateValue) },
+        {translateX: translateValue},
+        {rotate: withTiming(rotateValue)},
       ],
     };
   });
@@ -478,13 +490,13 @@ const HomeScreen = ({ navigation }) => {
             animation="pulse"
             height={20}
             width="75%"
-            style={[styles.skeleton, { borderRadius: 3 }]}
+            style={[styles.skeleton, {borderRadius: 3}]}
           />
           <Skeleton
             animation="pulse"
             height={200}
             width="100%"
-            style={[styles.skeleton, { borderRadius: 7 }]}
+            style={[styles.skeleton, {borderRadius: 7}]}
           />
         </View>
       ))}
@@ -508,8 +520,8 @@ const HomeScreen = ({ navigation }) => {
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
-        onScroll={({ nativeEvent }) => {
-          const { contentOffset, layoutMeasurement, contentSize } = nativeEvent;
+        onScroll={({nativeEvent}) => {
+          const {contentOffset, layoutMeasurement, contentSize} = nativeEvent;
           const contentHeight = contentSize.height;
           const viewportHeight = layoutMeasurement.height;
           const scrollPosition = contentOffset.y + viewportHeight;
@@ -567,7 +579,7 @@ const HomeScreen = ({ navigation }) => {
           isExpanded={isExpanded}
           index={2}
           iconName={'feather'}
-          onPress={() => navigation.navigate('CreatePost', { onPostSuccess })}
+          onPress={() => navigation.navigate('CreatePost', {onPostSuccess})}
         />
       </View>
     </SafeAreaView>
@@ -666,7 +678,7 @@ const styles = StyleSheet.create({
   },
   shadow: {
     shadowColor: '#171717',
-    shadowOffset: { width: -0.5, height: 3.5 },
+    shadowOffset: {width: -0.5, height: 3.5},
     shadowOpacity: 0.2,
     shadowRadius: 3,
   },
