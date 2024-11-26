@@ -726,7 +726,7 @@ const styles = StyleSheet.create({
   },
   postContent: {
     fontSize: 16,
-    marginVertical: 10,
+    paddingVertical: 10,
     color: 'black',
   },
   media: {

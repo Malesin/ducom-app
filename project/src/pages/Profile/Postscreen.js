@@ -7,6 +7,7 @@ import {
   SafeAreaView,
   Text,
   TouchableOpacity,
+  RefreshControl,
 } from 'react-native';
 import PinTweetCard from '../../components/PinTweetCard';
 import TweetCard from '../../components/TweetCard';
@@ -27,21 +28,21 @@ function Postscreen({}) {
   const [isFetched, setIsFetched] = useState(false);
   const [pintweets, setPinTweets] = useState([]);
   const [pinnedTweetId, setPinnedTweetId] = useState(null);
+  const [hasMore, setHasMore] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const navigation = useNavigation();
 
   const fetchTweets = useCallback(
     async pageNum => {
       const token = await AsyncStorage.getItem('token');
       try {
-        const response = await axios.post(`${serverUrl}/userdata`, {token});
-
+        const response = await axios.post(`${serverUrl}/userdata`, {token})
         const {data} = response.data;
         const idUser = data._id;
         const profilePicture = data.profilePicture;
         const amIAdmin = data.isAdmin;
         const isMuteds = data.mutedUsers;
         const isBlockeds = data.blockedUsers;
-
         const responseTweet = await axios.post(`${serverUrl}/my-posts`, {
           token: token,
           page: pageNum,
@@ -205,7 +206,8 @@ function Postscreen({}) {
     });
   };
 
-  const onRefreshPage = () => {
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
     setLoading(true);
     setIsFetched(false);
     setPage(1);
@@ -256,28 +258,27 @@ function Postscreen({}) {
   );
 
   const handleLoadMore = async () => {
-    if (!loadingMore) {
-      setLoadingMore(true);
-      const newPage = page + 1;
-      setPage(newPage);
-      const newTweets = await fetchTweets(newPage);
-      const newPinTweet = await fetchPinTweet();
-      if (newPinTweet) {
-        setPinTweets([newPinTweet]);
-        setPinnedTweetId(newPinTweet.id);
-      } else {
-        setPinTweets([]);
-        setPinnedTweetId(null);
-      }
-      const filteredTweets = newTweets.filter(
-        tweet => tweet.id !== newPinTweet?.id,
-      );
-      setTweets(prevTweets => {
+    if (!loadingMore && hasMore) {
+      try {
+        setLoadingMore(true);
+        const newPage = page + 1;
+        const newTweets = await fetchTweets(newPage);
         const uniqueTweets = newTweets.filter(
-          newTweet => !prevTweets.some(tweet => tweet.id === newTweet.id),
+          newTweet => !tweets.some(tweet => tweet.id === newTweet.id)
         );
-        return [...prevTweets, ...uniqueTweets];
-      });
+
+        if (uniqueTweets.length > 0) {
+          setTweets(prevTweets => [...prevTweets, ...uniqueTweets]);
+          setPage(newPage);
+        }
+
+        setHasMore(uniqueTweets.length >= 5);
+      } catch (error) {
+        console.error('Error loading more tweets', error);
+        Alert.alert('Load Error', 'Unable to load more tweets');
+      } finally {
+        setLoadingMore(false);
+      }
     }
   };
 
@@ -332,6 +333,9 @@ function Postscreen({}) {
       ) : (
         <ScrollView
           contentContainerStyle={styles.contentContainer}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
           onScroll={({nativeEvent}) => {
             const {contentOffset, layoutMeasurement, contentSize} = nativeEvent;
             const contentHeight = contentSize.height;
@@ -347,7 +351,7 @@ function Postscreen({}) {
               <TouchableOpacity onPress={() => handlePostPress(tweet)}>
                 <PinTweetCard
                   tweet={tweet}
-                  onRefreshPage={onRefreshPage}
+                  onRefreshPage={onRefresh}
                   isUserProfile={true}
                 />
               </TouchableOpacity>
@@ -359,7 +363,7 @@ function Postscreen({}) {
                 <TouchableOpacity onPress={() => handlePostPress(tweet)}>
                   <TweetCard
                     tweet={tweet}
-                    onRefreshPage={onRefreshPage}
+                    onRefreshPage={onRefresh}     
                     isUserProfile={true}
                   />
                 </TouchableOpacity>
