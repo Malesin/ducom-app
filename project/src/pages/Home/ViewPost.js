@@ -65,7 +65,8 @@ const ViewPost = ({ route }) => {
     if (focusCommentInput && textInputRef.current) {
       textInputRef.current.focus();
     }
-    const data = async () => {
+
+    const fetchToken = async () => {
       const token = await AsyncStorage.getItem('token');
       const dataSent = {
         token: token,
@@ -73,10 +74,8 @@ const ViewPost = ({ route }) => {
       };
       setDataSent(dataSent);
     };
-    data();
-  }, [focusCommentInput]);
+    fetchToken();
 
-  useEffect(() => {
     const generateThumbnails = async () => {
       const newThumbnails = {};
       for (const media of tweet?.media || []) {
@@ -98,9 +97,7 @@ const ViewPost = ({ route }) => {
     if (tweet?.media) {
       generateThumbnails();
     }
-  }, [tweet?.media]);
 
-  useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(false);
     }, 10000);
@@ -109,7 +106,7 @@ const ViewPost = ({ route }) => {
     isEnabledComment();
 
     return () => clearTimeout(timer);
-  }, [fetchComments]);
+  }, [focusCommentInput, tweet?.media, fetchComments]);
 
   const handleLike = async () => {
     console.log('Like button pressed');
@@ -141,7 +138,6 @@ const ViewPost = ({ route }) => {
   };
 
   const handleBookmark = async () => {
-    console.log('Bookmark button pressed');
     try {
       setBookmarked(bookmarked ? false : true);
       setBookMarksCount(prevBookmarksCount =>
@@ -181,7 +177,6 @@ const ViewPost = ({ route }) => {
       setRepostsCount(prevRepostsCount =>
         reposted ? prevRepostsCount - 1 : prevRepostsCount + 1,
       );
-      console.log(reposted);
       await axios.post(
         `${serverUrl}/${reposted ? 'unrepost' : 'repost'}-post`,
         dataSent,
@@ -631,7 +626,6 @@ const ViewPost = ({ route }) => {
                   color="#040608"
                 />
               </TouchableOpacity>
-
               <TouchableOpacity
                 style={styles.actionButton}
                 onPress={handleBookmark}>
@@ -650,15 +644,6 @@ const ViewPost = ({ route }) => {
                   color={reposted ? '#097969' : '#040608'}
                 />
               </TouchableOpacity>
-              {/* <TouchableOpacity
-                style={styles.actionButton}
-                onPress={handleShare}>
-                <MaterialCommunityIcons
-                  name="export-variant"
-                  size={20}
-                  color="#657786"
-                />
-              </TouchableOpacity> */}
             </View>
             <View style={styles.commentContainer}>
               {comments.slice(0, visibleComments).map(comment => (
@@ -700,7 +685,6 @@ const ViewPost = ({ route }) => {
       )}
       <View style={[styles.inputContainer, { height: inputHeight }]}>
         <Image source={{ uri: profilePicture }} style={styles.profilePicture} />
-
         {isEnabledComm || isOwner || tweet?.amIAdmin ? (
           <>
             <TextInput
