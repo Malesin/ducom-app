@@ -37,10 +37,10 @@ const ViewPost = ({ route }) => {
   const navigation = useNavigation();
   const [liked, setLiked] = useState(tweet?.isLiked);
   const [likesCount, setLikesCount] = useState(tweet?.likesCount);
-  const [bookmarked, setBookmarked] = useState(false);
-  const [bookMarksCount, setBookMarksCount] = useState(0);
-  const [reposted, setReposted] = useState(false);
-  const [repostsCount, setRepostsCount] = useState(0);
+  const [bookmarked, setBookmarked] = useState(tweet?.isBookmarked || false);
+  const [bookMarksCount, setBookMarksCount] = useState(tweet?.bookMarksCount || 0);
+  const [reposted, setReposted] = useState(tweet?.isReposted || false);
+  const [repostsCount, setRepostsCount] = useState(tweet?.repostsCount || 0);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState(null);
   const [thumbnails, setThumbnails] = useState({});
@@ -587,7 +587,7 @@ const ViewPost = ({ route }) => {
             <View style={styles.interactionsContainer}>
               <Text style={styles.interactionText}>
                 <Text style={styles.interactionNumber}>
-                  {tweet.commentsCount}
+                  {tweet?.commentsCount}
                 </Text>{' '}
                 Comments{' '}
               </Text>
