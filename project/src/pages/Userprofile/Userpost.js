@@ -112,6 +112,7 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
       const dataTweet = respTweet.data.data;
       const formattedTweets = dataTweet
         .filter(post => post.user !== null)
+        .filter(post => post !== null)
         .map(post => {
           const totalComments = post.comments.length + post.comments.reduce((acc, comment) => acc + comment.replies.length, 0);
           return {
@@ -147,6 +148,7 @@ const Userpost = ({ userIdPost, profilePicture, idUser, amIAdmin, isUserProfile 
 
       return formattedTweets;
     } catch (error) {
+      console.log(error)
       if (error.response && error.response.data === 'youBlockedBy') {
         console.log("lo diblokir")
         setLoading(false)
