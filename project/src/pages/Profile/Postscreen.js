@@ -230,7 +230,7 @@ function Postscreen({}) {
       setIsFetched(true);
       setLoading(false);
     })();
-  };
+  }, [fetchTweets]);
 
   useFocusEffect(
     useCallback(() => {

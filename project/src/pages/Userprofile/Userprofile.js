@@ -19,7 +19,7 @@ import axios from 'axios';
 import config from '../../config';
 const serverUrl = config.SERVER_URL;
 
-const Userprofile = ({ userIdPost, navigation }) => {
+const Userprofile = ({ userIdPost, navigation, refreshAllTabs }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [banner, setBanner] = useState(false);
   const [profilePicture, setProfilePicture] = useState(false);
@@ -175,7 +175,6 @@ const Userprofile = ({ userIdPost, navigation }) => {
     const token = await AsyncStorage.getItem('token');
     try {
       if (!isBlocked) {
-        // Block user
         const block = await axios.post(`${serverUrl}/block-user`, {
           token: token,
           blockUserId: userIdPost,
@@ -183,20 +182,17 @@ const Userprofile = ({ userIdPost, navigation }) => {
         if (block.data.status === 'okBlock') {
           setIsBlocked(true);
           ToastAndroid.show('User was successfully blocked', ToastAndroid.SHORT);
-          navigation.goBack();
+          refreshAllTabs();
         }
       } else {
-        // Unblock user
         const unblock = await axios.post(`${serverUrl}/unblock-user`, {
           token: token,
           unblockUserId: userIdPost,
         });
         if (unblock.data.status === 'okUnBlock') {
           setIsBlocked(false);
-          ToastAndroid.show(
-            'User was successfully unblocked',
-            ToastAndroid.SHORT,
-          );
+          ToastAndroid.show('User was successfully unblocked', ToastAndroid.SHORT);
+          refreshAllTabs();
         }
       }
     } catch (error) {

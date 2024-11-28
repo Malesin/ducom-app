@@ -25,7 +25,7 @@ import config from '../config';
 const serverUrl = config.SERVER_URL;
 const verifiedIcon = <Icon name="verified" size={16} color="#699BF7" />;
 
-const TweetCard = ({tweet, onRefreshPage, comments, isUserProfile}) => {
+const TweetCard = ({tweet, onRefreshPage, comments, isUserProfile, onLikeChange}) => {
   const [liked, setLiked] = useState(tweet?.isLiked || false);
   const [likesCount, setLikesCount] = useState(tweet?.likesCount || 0);
   const [bookmarked, setBookmarked] = useState(tweet?.isBookmarked || false);
@@ -85,13 +85,18 @@ const TweetCard = ({tweet, onRefreshPage, comments, isUserProfile}) => {
 
   const handleLike = async () => {
     try {
-      setLiked(liked ? false : true);
-      setLikesCount(prevLikesCount =>
-        liked ? prevLikesCount - 1 : prevLikesCount + 1,
-      );
+      const newLikedStatus = !liked;
+      const newLikesCount = newLikedStatus ? likesCount + 1 : likesCount - 1;
+      
+      setLiked(newLikedStatus);
+      setLikesCount(newLikesCount);
+
+      if (onLikeChange) {
+        onLikeChange(newLikedStatus, newLikesCount);
+      }
 
       await axios.post(
-        `${serverUrl}/${liked ? 'unlike' : 'like'}-post`,
+        `${serverUrl}/${newLikedStatus ? 'like' : 'unlike'}-post`,
         dataSent,
       );
     } catch (error) {

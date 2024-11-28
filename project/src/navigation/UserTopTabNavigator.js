@@ -56,7 +56,7 @@ function UserTopTabNavigator({ route, navigation }) {
 
   const Header = () => (
     <View style={styles.profileWrapper}>
-      <Userprofile userIdPost={userIdPost} navigation={navigation} idUser={idUser} />
+      <Userprofile userIdPost={userIdPost} navigation={navigation} idUser={idUser} refreshAllTabs={refreshAllTabs} />
     </View>
   );
 
@@ -103,6 +103,14 @@ function UserTopTabNavigator({ route, navigation }) {
       ))}
     </>
   );
+
+  // Fungsi untuk me-refresh semua tab
+  const refreshAllTabs = () => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 300);
+  };
 
   return (
     <GestureHandlerRootView style={styles.container}>

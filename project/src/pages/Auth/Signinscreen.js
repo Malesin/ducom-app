@@ -161,7 +161,18 @@ const Signinscreen = ({navigation}) => {
                 },
               ],
             );
-          }
+          } else if (res.data.status === 'errorDeleted') {
+            Toast.show({
+              type: 'error',
+              text1: 'Error',
+              text2: 'Your account has been deleted',
+              onHide: () => {
+                setTimeout(() => {
+                  navigation.navigate('Signin');
+                }, 1000);
+              },
+            });
+          } 
         })
         .catch(e => {
           console.log(e);

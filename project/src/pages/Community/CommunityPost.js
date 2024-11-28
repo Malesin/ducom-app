@@ -56,7 +56,7 @@ const CommunityPost = () => {
         commentsCount: post.comments.length || 0,
         postDate: post?.created_at,
         commentsEnabled: post?.commentsEnabled,
-        isJoined: post?.isJoined,
+        isJoined: myData?.isJoined,
         idUser: myData?.myId,
         amIAdmin: myData?.amIAdmin,
         profilePicture: myData?.profilePicture,
@@ -69,6 +69,8 @@ const CommunityPost = () => {
       setLoading(false); // Set loading ke false setelah fetch selesai
     }
   };
+
+  console.log(communityDataList.isJoined)
 
   useEffect(() => {
     fetchDataPost();

@@ -301,6 +301,7 @@ const ViewPostCommunity = ({route}) => {
     onRefresh();
   };
 
+
   const renderSkeleton = () => (
     <View style={styles.skeletonContainer}>
       <View style={styles.skeletonHeader}>
@@ -394,7 +395,6 @@ const ViewPostCommunity = ({route}) => {
       />
     </View>
   );
-
   return (
     <SafeAreaView style={styles.container}>
       {loading ? (

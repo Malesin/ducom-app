@@ -468,13 +468,6 @@ const ViewPost = ({ route }) => {
           width={20}
           style={styles.skeletonIcon}
         />
-        <Skeleton
-          animation="pulse"
-          circle
-          height={20}
-          width={20}
-          style={styles.skeletonIcon}
-        />
       </View>
       <Skeleton
         animation="pulse"
@@ -484,6 +477,11 @@ const ViewPost = ({ route }) => {
       />
     </View>
   );
+
+  const handleLikeChange = (isLiked, newLikesCount) => {
+    setLiked(isLiked);
+    setLikesCount(newLikesCount);
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -669,6 +667,7 @@ const ViewPost = ({ route }) => {
                   isAdmin={comment.isAdmin}
                   amIAdmin={tweet.amIAdmin}
                   onDeleteSuccess={onDeleteSuccess}
+                  onLikeChange={handleLikeChange}
                 />
               ))}
               {visibleComments < comments.length && (
@@ -1039,7 +1038,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   skeletonIcon: {
-    marginHorizontal: 5,
+    marginHorizontal: 10,
   },
   skeletonVertical: {
     position: 'absolute',
