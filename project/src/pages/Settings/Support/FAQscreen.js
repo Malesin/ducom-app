@@ -65,7 +65,6 @@ const FAQscreen = () => {
         const subject = 'Support Request';
         const body = 'Please describe your issue here.';
         const url = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-
         try {
             await Linking.openURL(url);
         } catch (error) {

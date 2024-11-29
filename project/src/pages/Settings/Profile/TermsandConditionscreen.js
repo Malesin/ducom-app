@@ -1,10 +1,12 @@
-import { StyleSheet, Text, ScrollView, SafeAreaView, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, ScrollView, SafeAreaView, View, TouchableOpacity, useColorScheme } from 'react-native';
 import React from 'react';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useNavigation } from '@react-navigation/native';
 
 const TermsandConditionsScreen = () => {
     const navigation = useNavigation();
+    const colorScheme = useColorScheme();
+    const styles = getStyles(colorScheme);
 
     return (
         <SafeAreaView style={styles.container}>
@@ -129,38 +131,43 @@ const TermsandConditionsScreen = () => {
 
 export default TermsandConditionsScreen;
 
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-    header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        padding: 16,
-        backgroundColor: '#0a3e99',
-        justifyContent: 'center',
-    },
-    backButton: {
-        position: 'absolute',
-        left: 16,
-    },
-    headerText: {
-        fontSize: 24,
-        color: '#fff',
-        fontWeight: 'bold',
-    },
-    scrollView: {
-        padding: 16,
-    },
-    sectionTitle: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        marginVertical: 10,
-        color: '#000'
-    },
-    sectionContent: {
-        fontSize: 16,
-        lineHeight: 24,
-        marginBottom: 20,
-    },
-});
+const getStyles = (colorScheme) => {
+    const currentTextColor = colorScheme === 'dark' ? '#000' : '#000';
+    return StyleSheet.create({
+        container: {
+            flex: 1,
+            backgroundColor: '#ffffff'
+        },
+        header: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            padding: 16,
+            backgroundColor: '#0a3e99',
+            justifyContent: 'center',
+        },
+        backButton: {
+            position: 'absolute',
+            left: 16,
+        },
+        headerText: {
+            fontSize: 24,
+            color: '#fff',
+            fontWeight: 'bold',
+        },
+        scrollView: {
+            padding: 16,
+        },
+        sectionTitle: {
+            fontSize: 20,
+            fontWeight: 'bold',
+            marginVertical: 10,
+            color: currentTextColor,
+        },
+        sectionContent: {
+            fontSize: 16,
+            lineHeight: 24,
+            marginBottom: 20,
+            color: currentTextColor,
+        },
+    });
+};

@@ -7,6 +7,7 @@ import {
   TextInput,
   View,
   TouchableOpacity,
+  useColorScheme,
 } from 'react-native';
 import Animated, {
   useAnimatedGestureHandler,
@@ -25,7 +26,7 @@ const serverUrl = config.SERVER_URL;
 
 const DELETE_THRESHOLD = -75;
 
-const SwipeableRule = ({rule, index, updateRule, onDelete}) => {
+const SwipeableRule = ({rule, index, updateRule, onDelete, colorScheme}) => {
   const translateX = useSharedValue(0);
   const isRemoving = useSharedValue(false);
 
@@ -81,17 +82,17 @@ const SwipeableRule = ({rule, index, updateRule, onDelete}) => {
           <Text style={styles.ruleNumber}>Rule {index + 1}</Text>
           <TextInput
             maxLength={30}
-            style={[styles.communityRulesInputTitle, {height: 35}]}
+            style={[styles.communityRulesInputTitle, {height: 35, color: colorScheme === 'dark' ? '#000000' : '#000000'}]}
             placeholder="Title"
-            placeholderTextColor="#b6b6b6"
+            placeholderTextColor={colorScheme === 'dark' ? '#cccccc' : '#888888'}
             value={rule.title}
             onChangeText={text => updateRule(index, 'title', text)}
           />
           <TextInput
             maxLength={150}
-            style={[styles.communityRulesInputDescription, {height: 100}]}
+            style={[styles.communityRulesInputDescription, {height: 100, color: colorScheme === 'dark' ? '#000000' : '#000000'}]}
             placeholder="Description"
-            placeholderTextColor="#b6b6b6"
+            placeholderTextColor={colorScheme === 'dark' ? '#cccccc' : '#888888'}
             multiline={true}
             textAlignVertical="top"
             value={rule.description}
@@ -109,6 +110,8 @@ const CommunityEditRules = ({navigation}) => {
   const [rules, setRules] = useState(
     communityData.rules || [{title: '', description: ''}],
   );
+
+  const colorScheme = useColorScheme();
 
   const addNewRule = () => {
     if (rules.length < 5) {
@@ -198,6 +201,7 @@ const CommunityEditRules = ({navigation}) => {
               index={index}
               updateRule={updateRule}
               onDelete={deleteRule}
+              colorScheme={colorScheme}
             />
           ))}
           <Text style={styles.communityRulesSubText}>

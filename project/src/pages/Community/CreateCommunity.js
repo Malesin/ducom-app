@@ -8,6 +8,7 @@ import {
   View,
   TouchableOpacity,
   Alert,
+  useColorScheme,
 } from 'react-native';
 import Animated, {
   useAnimatedGestureHandler,
@@ -23,7 +24,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const DELETE_THRESHOLD = -75;
 
-const SwipeableRule = ({rule, index, updateRule, onDelete, canDelete}) => {
+const SwipeableRule = ({rule, index, updateRule, onDelete, canDelete, colorScheme}) => {
   const translateX = useSharedValue(0);
   const isRemoving = useSharedValue(false);
 
@@ -84,17 +85,17 @@ const SwipeableRule = ({rule, index, updateRule, onDelete, canDelete}) => {
           <Text style={styles.ruleNumber}>Rule {index + 1}</Text>
           <TextInput
             maxLength={30}
-            style={[styles.communityRulesInputTitle, {height: 35}]}
+            style={[styles.communityRulesInputTitle, {height: 35, color: colorScheme === 'dark' ? '#000000' : '#000000'}]}
             placeholder="Title"
-            placeholderTextColor="#b6b6b6"
+            placeholderTextColor={colorScheme === 'dark' ? '#cccccc' : '#888888'}
             value={rule.title}
             onChangeText={text => updateRule(index, 'title', text)}
           />
           <TextInput
             maxLength={150}
-            style={[styles.communityRulesInputDescription, {height: 100}]}
+            style={[styles.communityRulesInputDescription, {height: 100, color: colorScheme === 'dark' ? '#000000' : '#000000'}]}
             placeholder="Description"
-            placeholderTextColor="#b6b6b6"
+            placeholderTextColor={colorScheme === 'dark' ? '#cccccc' : '#888888'}
             multiline={true}
             textAlignVertical="top"
             value={rule.description}
@@ -107,6 +108,7 @@ const SwipeableRule = ({rule, index, updateRule, onDelete, canDelete}) => {
 };
 
 const CreateCommunity = ({navigation}) => {
+  const colorScheme = useColorScheme();
   const [inputNameHeight, setInputNameHeight] = useState(35);
   const [inputHeightDescription, setInputHeightDescription] = useState(35);
   const [rules, setRules] = useState([{title: '', description: ''}]);
@@ -269,8 +271,10 @@ const CreateCommunity = ({navigation}) => {
             maxLength={30}
             style={[
               styles.communityNameInput,
-              {height: Math.max(35, inputNameHeight)},
+              {height: Math.max(35, inputNameHeight), color: colorScheme === 'dark' ? '#000000' : '#000000'},
             ]}
+            placeholder="Enter community name"
+            placeholderTextColor={colorScheme === 'dark' ? '#cccccc' : '#888888'}
             multiline={true}
             onContentSizeChange={e => {
               const {height} = e.nativeEvent.contentSize;
@@ -298,8 +302,10 @@ const CreateCommunity = ({navigation}) => {
             maxLength={150}
             style={[
               styles.communityDescriptionInput,
-              {height: Math.max(35, inputHeightDescription)},
+              {height: Math.max(35, inputHeightDescription), color: colorScheme === 'dark' ? '#000000' : '#000000'},
             ]}
+            placeholder="Enter community description"
+            placeholderTextColor={colorScheme === 'dark' ? '#cccccc' : '#888888'}
             multiline={true}
             onContentSizeChange={e => {
               const {height} = e.nativeEvent.contentSize;
@@ -323,6 +329,7 @@ const CreateCommunity = ({navigation}) => {
               updateRule={updateRule}
               onDelete={deleteRule}
               canDelete={rules.length > 1}
+              colorScheme={colorScheme}
             />
           ))}
           <Text style={styles.communityRulesSubText}>

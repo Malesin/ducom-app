@@ -414,7 +414,7 @@ const CommunitySettings = () => {
           {
             text: 'Delete',
             onPress: async () => {
-              await axiosf
+              await axios
                 .post(`${serverUrl}/delete-community`, {
                   token: token,
                   communityId: communityId,
@@ -434,6 +434,25 @@ const CommunitySettings = () => {
     } catch (error) {
       ToastAndroid.show('Something Error, Try Again Later', ToastAndroid.SHORT);
       console.error(error);
+    }
+  };
+
+  const handleEditRulesPress = () => {
+    if (isDataChanged) {
+      Alert.alert(
+        'Unsaved Changes',
+        'You have unsaved changes. Do you want to save them before editing rules?',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Edit Without Saving',
+            style: 'destructive',
+            onPress: () => navigation.navigate('CommunityEditRules', { communityData }),
+          },
+        ]
+      );
+    } else {
+      navigation.navigate('CommunityEditRules', { communityData });
     }
   };
 
@@ -593,10 +612,8 @@ const CommunitySettings = () => {
           <View style={styles.dropdownMenu}>
             <TouchableOpacity
               style={styles.dropdownItem}
-              onPress={() => {
-                navigation.navigate('CommunityEditRules', {communityData});
-                setDropdownVisible(false);
-              }}>
+              onPress={handleEditRulesPress}
+            >
               <MaterialCommunityIcons
                 name="pencil"
                 size={20}
@@ -609,7 +626,8 @@ const CommunitySettings = () => {
               style={styles.dropdownItem}
               onPress={() => {
                 setDropdownVisible(false);
-              }}></TouchableOpacity>
+              }}
+            ></TouchableOpacity>
           </View>
         )}
         <View style={styles.rulesContainer}>
