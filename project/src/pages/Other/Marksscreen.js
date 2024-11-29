@@ -196,7 +196,7 @@ const Marksscreen = ({ navigation }) => {
 
   const handlePostPress = (tweet) => {
     navigation.navigate('ViewPost', {
-      tweet,
+      tweetId: tweet?.id,
       comments: [], // Anda bisa menambahkan data komentar jika ada
       focusCommentInput: false,
     });

@@ -25,12 +25,18 @@ import config from '../config';
 const serverUrl = config.SERVER_URL;
 const verifiedIcon = <Icon name="verified" size={16} color="#699BF7" />;
 
-const TweetCard = ({tweet, onRefreshPage, comments, isUserProfile, onLikeChange}) => {
+const TweetCard = ({
+  tweet,
+  onRefreshPage,
+  comments,
+  isUserProfile,
+  onLikeChange,
+}) => {
   const [liked, setLiked] = useState(tweet?.isLiked || false);
   const [likesCount, setLikesCount] = useState(tweet?.likesCount || 0);
   const [bookmarked, setBookmarked] = useState(tweet?.isBookmarked || false);
   const [bookMarksCount, setBookMarksCount] = useState(
-    tweet?.bookMarksCount || 0
+    tweet?.bookMarksCount || 0,
   );
   const [reposted, setReposted] = useState(tweet?.isReposted || false);
   const [repostsCount, setRepostsCount] = useState(tweet?.repostsCount || 0);
@@ -87,7 +93,7 @@ const TweetCard = ({tweet, onRefreshPage, comments, isUserProfile, onLikeChange}
     try {
       const newLikedStatus = !liked;
       const newLikesCount = newLikedStatus ? likesCount + 1 : likesCount - 1;
-      
+
       setLiked(newLikedStatus);
       setLikesCount(newLikesCount);
 
@@ -181,7 +187,7 @@ const TweetCard = ({tweet, onRefreshPage, comments, isUserProfile, onLikeChange}
 
   const handleCommentPress = () => {
     navigator.navigate('ViewPost', {
-      tweet,
+      tweetId: tweet.id,
       comments,
       focusCommentInput: true,
     });

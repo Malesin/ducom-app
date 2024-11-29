@@ -35,7 +35,9 @@ const Userpost = ({
   const fetchPinTweet = useCallback(async () => {
     const token = await AsyncStorage.getItem('token');
     try {
-      const respMyData = await axios.post(`${serverUrl}/userdata`, { token: token });
+      const respMyData = await axios.post(`${serverUrl}/userdata`, {
+        token: token,
+      });
       const pinPost = await axios.post(`${serverUrl}/showPinPost-byId`, {
         token: token,
         userId: userIdPost,
@@ -43,14 +45,14 @@ const Userpost = ({
 
       if (pinPost.data.dataMsg === 'youBlockedBy') {
         setLoading(false);
-        return "You are blocked by this user";
-      } 
+        return 'You are blocked by this user';
+      }
       if (pinPost.data.dataMsg === 'youBlockedThis') {
         setLoading(false);
-        return "You have blocked this user";
+        return 'You have blocked this user';
       }
 
-      const { data } = respMyData.data;
+      const {data} = respMyData.data;
       const idUser = data._id;
       const profilePicture = data.profilePicture;
       const amIAdmin = data.isAdmin;
@@ -62,7 +64,12 @@ const Userpost = ({
         return null;
       }
 
-      const totalComments = postPin.comments.length + postPin.comments.reduce((acc, comment) => acc + comment.replies.length, 0);
+      const totalComments =
+        postPin.comments.length +
+        postPin.comments.reduce(
+          (acc, comment) => acc + comment.replies.length,
+          0,
+        );
 
       const pinTweet = {
         id: postPin._id,
@@ -101,10 +108,10 @@ const Userpost = ({
       setLoading(false);
       if (error.response) {
         if (error.response.data === 'youBlockedBy') {
-          return "You are blocked by this user";
-        } 
+          return 'You are blocked by this user';
+        }
         if (error.response.data === 'youBlockedThis') {
-          return "You have blocked this user";
+          return 'You have blocked this user';
         }
       }
       console.error('Error fetching pin tweet:', error);
@@ -115,7 +122,9 @@ const Userpost = ({
   const fetchTweets = useCallback(async () => {
     const token = await AsyncStorage.getItem('token');
     try {
-      const respMyData = await axios.post(`${serverUrl}/userdata`, { token: token });
+      const respMyData = await axios.post(`${serverUrl}/userdata`, {
+        token: token,
+      });
       const respTweet = await axios.post(`${serverUrl}/userId-posts`, {
         token: token,
         userId: userIdPost,
@@ -123,14 +132,14 @@ const Userpost = ({
 
       if (respTweet.data.dataMsg === 'youBlockedBy') {
         setLoading(false);
-        return "You are blocked by this user";
-      } 
+        return 'You are blocked by this user';
+      }
       if (respTweet.data.dataMsg === 'youBlockedThis') {
         setLoading(false);
-        return "You have blocked this user";
+        return 'You have blocked this user';
       }
 
-      const { data } = respMyData.data;
+      const {data} = respMyData.data;
       const idUser = data._id;
       const profilePicture = data.profilePicture;
       const amIAdmin = data.isAdmin;
@@ -138,7 +147,7 @@ const Userpost = ({
       const isBlockeds = data.blockedUsers;
 
       const dataTweet = respTweet.data.data;
-      
+
       if (!Array.isArray(dataTweet)) {
         setLoading(false);
         return [];
@@ -194,10 +203,10 @@ const Userpost = ({
       setLoading(false);
       if (error.response) {
         if (error.response.data === 'youBlockedBy') {
-          return "You are blocked by this user";
-        } 
+          return 'You are blocked by this user';
+        }
         if (error.response.data === 'youBlockedThis') {
-          return "You have blocked this user";
+          return 'You have blocked this user';
         }
       }
       console.error('Error fetching data:', error);
@@ -248,7 +257,6 @@ const Userpost = ({
       ))}
     </>
   );
-
 
   const onRefreshPage = () => {
     setLoading(true);
@@ -339,7 +347,7 @@ const Userpost = ({
   );
 
   const handlePostPress = tweet => {
-    navigation.navigate('ViewPost', {tweet});
+    navigation.navigate('ViewPost', {tweetId: tweet?.id});
   };
 
   return (

@@ -22,7 +22,7 @@ const LikeNotification = ({likeNotification}) => {
 
     if (formattedTweet) {
       navigation.navigate('ViewPost', {
-        tweet: formattedTweet,
+        tweetId: tweet?.id,
         postId: formattedTweet.id,
         idUser: formattedTweet.idUser,
         comments: formattedTweet.comments || [],
