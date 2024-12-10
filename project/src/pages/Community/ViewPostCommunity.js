@@ -583,7 +583,7 @@ const ViewPostCommunity = ({route}) => {
               placeholderTextColor={colorScheme === 'dark' ? '#ccc' : '#888'}
               maxLength={300}
               multiline={true}
-              value={comment}
+              value={comment} //menambahkan value comment 
               onChangeText={handleTextInputChange}
               onContentSizeChange={handleTextInputContentSizeChange}
             />

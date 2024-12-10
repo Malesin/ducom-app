@@ -199,7 +199,7 @@ function Postscreen({}) {
     const focusCommentInput = true;
 
     navigation.navigate('ViewPost', {
-      tweet: tweet,
+      tweetId: tweet?.id,
       comments: comments,
       focusCommentInput: focusCommentInput,
       isUserProfile: true,
