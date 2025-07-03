@@ -206,7 +206,7 @@ function Mediascreen() {
   );
 
   const handleProfilePress = tweet => {
-    navigation.navigate('ViewPost', {tweet});
+    navigation.navigate('ViewPost', {tweetId: tweet?.id});
   };
 
   return (

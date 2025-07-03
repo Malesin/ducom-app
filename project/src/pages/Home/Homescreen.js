@@ -251,7 +251,7 @@ const HomeScreen = ({navigation}) => {
     const idUser = tweet.idUser;
     const focusCommentInput = true;
     navigation.navigate('ViewPost', {
-      tweet,
+      tweetId: tweet?.id,
       comments,
       postId,
       idUser,
