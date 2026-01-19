@@ -51,6 +51,7 @@ buck-out/
 /vendor/bundle/
 
 config.js
+node_modules/
 
 .gradle
 **/build/
