@@ -43,6 +43,9 @@ import UserFollowTopTabNavigator from './UserFollowTopTabNavigator';
 import CommunityTabNavigator from './CommunityTabNavigator';
 import {TouchableOpacity, StyleSheet} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import SplashscreenContainer from '../pages/Auth/Splashscreen/SplashscreenContainer';
+import SigninContainer from '../pages/Auth/SignIn/SigninContainer';
+import WelcomeContainer from '../pages/Auth/Welcome/WelcomeContainer';
 
 const Stack = createNativeStackNavigator();
 
@@ -52,17 +55,17 @@ export default function MainNavigation() {
       <Stack.Navigator initialRouteName="Splash">
         <Stack.Screen
           name="Splash"
-          component={Splashscreen}
+          component={SplashscreenContainer}
           options={{headerShown: false}}
         />
         <Stack.Screen
-          name="Auths"
-          component={Authscreen}
+          name="Welcome"
+          component={WelcomeContainer}
           options={{headerShown: false}}
         />
         <Stack.Screen
           name="Signin"
-          component={Signinscreen}
+          component={SigninContainer}
           options={{headerShown: false}}
         />
         <Stack.Screen

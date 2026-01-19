@@ -36,7 +36,7 @@ function Postscreen({}) {
     async pageNum => {
       const token = await AsyncStorage.getItem('token');
       try {
-        const response = await axios.post(`${serverUrl}/userdata`, {token})
+        const response = await axios.post(`${serverUrl}/userdata`, {token});
         const {data} = response.data;
         const idUser = data._id;
         const profilePicture = data.profilePicture;
@@ -113,7 +113,7 @@ function Postscreen({}) {
       const {data, status} = response.data;
       if (status === 'error') {
         Alert.alert('Error', 'Anda Telah Keluar dari Akun', [
-          {text: 'OK', onPress: () => navigation.navigate('Auths')},
+          {text: 'OK', onPress: () => navigation.navigate('Welcome')},
         ]);
         return;
       }
@@ -264,7 +264,7 @@ function Postscreen({}) {
         const newPage = page + 1;
         const newTweets = await fetchTweets(newPage);
         const uniqueTweets = newTweets.filter(
-          newTweet => !tweets.some(tweet => tweet.id === newTweet.id)
+          newTweet => !tweets.some(tweet => tweet.id === newTweet.id),
         );
 
         if (uniqueTweets.length > 0) {
@@ -363,7 +363,7 @@ function Postscreen({}) {
                 <TouchableOpacity onPress={() => handlePostPress(tweet)}>
                   <TweetCard
                     tweet={tweet}
-                    onRefreshPage={onRefresh}     
+                    onRefreshPage={onRefresh}
                     isUserProfile={true}
                   />
                 </TouchableOpacity>

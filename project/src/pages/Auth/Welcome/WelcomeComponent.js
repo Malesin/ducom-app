@@ -1,3 +1,4 @@
+import React from 'react';
 import {
   StyleSheet,
   Text,
@@ -5,58 +6,13 @@ import {
   Image,
   TouchableOpacity,
   Animated,
-  Alert,
-  BackHandler,
 } from 'react-native';
-import React, {useState} from 'react';
-import {useFocusEffect} from '@react-navigation/native';
+import ducomLogo from '../../../assets/logo1.png';
 
-const Authscreen = ({navigation}) => {
-  const [selectedButton, setSelectedButton] = useState('login');
-  const [slideAnim] = useState(new Animated.Value(0));
-
-  const handlePress = button => {
-    setSelectedButton(button);
-    Animated.timing(slideAnim, {
-      toValue: button === 'login' ? 0 : 1,
-      duration: 650,
-      useNativeDriver: true,
-    }).start();
-    if (button === 'login') {
-      navigation.navigate('Signin');
-    } else {
-      navigation.navigate('Register');
-    }
-  };
-
-  const handleBackPress = () => {
-    Alert.alert('Exit App', 'Are you sure want to exit', [
-      {
-        text: 'cancel',
-        onPress: () => null,
-        style: 'cancel',
-      },
-      {
-        text: 'Exit',
-        onPress: () => BackHandler.exitApp(),
-      },
-    ]);
-    return true;
-  };
-
-  useFocusEffect(
-    React.useCallback(() => {
-      BackHandler.addEventListener('hardwareBackPress', handleBackPress);
-
-      return () => {
-        BackHandler.removeEventListener('hardwareBackPress', handleBackPress);
-      };
-    }),
-  );
-
+const WelcomeComponent = ({selectedButton, slideAnim, onPressButton}) => {
   const slideInterpolation = slideAnim.interpolate({
     inputRange: [0, 1],
-    outputRange: [0, 150], 
+    outputRange: [0, 150],
   });
 
   const slideStyle = {
@@ -65,7 +21,8 @@ const Authscreen = ({navigation}) => {
 
   return (
     <View style={styles.container}>
-      <Image source={require('../../assets/logo1.png')} style={styles.logo} />
+      <Image source={ducomLogo} style={styles.logo} />
+
       <Text style={styles.title}>Welcome Dugam Community</Text>
 
       <Text style={styles.subtitle}>
@@ -76,13 +33,14 @@ const Authscreen = ({navigation}) => {
 
       <View style={styles.buttonContainer}>
         <Animated.View style={[styles.buttonBackground, slideStyle]} />
+
         <TouchableOpacity
-          style={styles.buttonLogin}
-          onPress={() => handlePress('login')}>
+          style={styles.button}
+          onPress={() => onPressButton('login')}>
           <Text
             style={
               selectedButton === 'login'
-                ? styles.buttonTextLogin
+                ? styles.buttonTextActive
                 : styles.buttonTextInactive
             }>
             Log In
@@ -90,12 +48,12 @@ const Authscreen = ({navigation}) => {
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={styles.buttonSignUp}
-          onPress={() => handlePress('register')}>
+          style={styles.button}
+          onPress={() => onPressButton('register')}>
           <Text
             style={
               selectedButton === 'register'
-                ? styles.buttonTextSignUp
+                ? styles.buttonTextActive
                 : styles.buttonTextInactive
             }>
             Sign Up
@@ -106,8 +64,6 @@ const Authscreen = ({navigation}) => {
   );
 };
 
-export default Authscreen;
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -117,7 +73,6 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   logo: {
-    alignItems: 'center',
     marginBottom: 20,
     width: 250,
     height: 250,
@@ -125,18 +80,16 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontFamily: 'inter',
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 10,
-    color: '#000000',
+    color: '#000',
   },
   subtitle: {
     fontSize: 16,
-    fontFamily: 'inter',
     textAlign: 'center',
     marginBottom: 20,
-    color: '#000000',
+    color: '#000',
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -144,39 +97,24 @@ const styles = StyleSheet.create({
     borderColor: '#dcdcdc',
     borderRadius: 30,
     overflow: 'hidden',
-    position: 'relative',
     width: '80%',
     height: 55,
+    position: 'relative',
   },
   buttonBackground: {
     position: 'absolute',
     width: '50%',
     height: '100%',
-    backgroundColor: '#001374', 
+    backgroundColor: '#001374',
     borderRadius: 30,
   },
-  buttonLogin: {
+  button: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 15,
-    paddingHorizontal: 30,
-    flex: 1,
     zIndex: 1,
   },
-  buttonSignUp: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 15,
-    paddingHorizontal: 30,
-    flex: 1,
-    zIndex: 1,
-  },
-  buttonTextLogin: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  buttonTextSignUp: {
+  buttonTextActive: {
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
@@ -187,3 +125,5 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
+
+export default WelcomeComponent;

@@ -51,7 +51,7 @@ const Settingsscreen = ({navigation}) => {
           await AsyncStorage.clear();
           navigation.reset({
             index: 0,
-            routes: [{name: 'Auths'}],
+            routes: [{name: 'Welcome'}],
           });
           console.log('Logout successfully');
         },

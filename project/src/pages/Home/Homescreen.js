@@ -344,7 +344,7 @@ const HomeScreen = ({navigation}) => {
       const checkLoginStatus = async () => {
         const token = await AsyncStorage.getItem('token');
         if (!token) {
-          navigation.navigate('Auths');
+          navigation.navigate('Welcome');
         }
       };
       checkLoginStatus();

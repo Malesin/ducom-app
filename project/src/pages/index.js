@@ -1,6 +1,3 @@
-import Splashscreen from './Other/Splashscreen';
-import Authscreen from './Auth/Authscreen';
-import Signinscreen from './Auth/Signinscreen';
 import Registerscreen from './Auth/Registerscreen';
 import Homescreen from './Home/Homescreen';
 import SearchPage from './Home/SearchPage';
@@ -52,9 +49,6 @@ import CommunityEditRules from './Community/CommunityEditRules';
 import ViewPostCommunity from './Community/ViewPostCommunity';
 
 export {
-  Splashscreen,
-  Authscreen,
-  Signinscreen,
   Registerscreen,
   Homescreen,
   SearchPage,
