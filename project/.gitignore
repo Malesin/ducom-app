@@ -52,6 +52,7 @@ buck-out/
 
 config.js
 node_modules/
+.yarn
 
 .gradle
 **/build/
